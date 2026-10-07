@@ -1,0 +1,351 @@
+{
+  "id": "2026-10-07-gpt-4",
+  "status": "published",
+  "title": "雲の皿",
+  "genre": "アクション",
+  "concept": "指で皿を左右に運び、雲から落ちる果物を受ける。まとめ売りは数が多いほど高得点だが、積んだ重みで皿が傾き果物が転がる。いま売って安全に戻すか、もう１個を欲張るかという判断と、こぼれそうな皿を運ぶ感触が核。",
+  "howToPlay": "指を左右に動かして果物を受け、皿の上で落ち着いたら「まとめて売る」をタップ。たくさん一緒に売るほど高得点。45秒でお店じまいです。",
+  "libraryDecision": "候補３案から、積むほど不安定になり売り時を迷う企画を選んだ後、Matter.js 0.20.0 を採用。重みによる傾き、果物の転がりと積み重なりが欲張る判断を実際の動きにするため、中心で支えた皿に低い縁を加え、指で運んだときの揺れも遊びにした。3Dと追加の音楽ライブラリは判断の読みやすさを強めないため使わず、果物約20個以内の2D物理を推奨スマホで動かす。",
+  "i18n": {
+    "en": {
+      "title": "Cloud Platter",
+      "concept": "Slide a platter to catch fruit falling from clouds. Larger batches earn more, but their weight tilts the platter and sends fruit rolling. The core is deciding whether to sell safely now or risk one more fruit while carrying an unstable load.",
+      "howToPlay": "Slide your finger left and right to catch fruit. Once fruit settles, tap Sell the batch. Bigger batches score more. The shop closes after 45 seconds.",
+      "libraryDecision": "After comparing three designs, I chose unstable cargo and sell timing, then selected Matter.js 0.20.0. Weight-driven tilting, rolling and stacking make greed physical; the rethink added low rims and a central support so movement-induced sway matters too. 3D and extra music libraries would not clarify these choices, so I use 2D physics with fewer than about 20 fruits on the target phone."
+    }
+  },
+  "createdAt": "2026-10-07T19:31:51+09:00",
+  "specVersion": 4,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6 (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "manual",
+    "startedAt": "2026-10-07T19:31:51+09:00",
+    "metricsFrom": "2026-10-07T10:30:47.507Z",
+    "transcript": null,
+    "validationRuns": 1,
+    "finishedAt": "2026-10-07T19:40:35+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-07T19:34:37+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "12.1KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=100",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=83",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=78",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=79",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 12435,
+    "lines": 55
+  },
+  "libraries": [
+    {
+      "name": "matter-js",
+      "version": "0.20.0",
+      "file": "matter-0.20.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6 (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6"
+    },
+    "verdict": "fun",
+    "works": "ok",
+    "comment": "各スクリーンショットを画像で見ながら12手プレイし、45秒を遊び切った。２個売り26点から３個売り48点への増え方が嬉しく、いま売るか次の１個を受けるかで迷えた。左右移動で果物が大きく跳ね、動きの結果は少し荒いが、戻った果物を受け直す驚きもあった。最終126点、出荷９個、こぼれ８個。最後の積み荷の自動出荷と再スタートも正常。次は揺らしすぎず大きなまとめ売りを狙いたい。",
+    "similar": [
+      {
+        "title": "Fruit Mountain",
+        "url": "https://bexide.co.jp/en/fruit",
+        "similarity": "中",
+        "note": "物理演算で皿に果物を積み、落とさない判断が共通。公式作品は同種を合体させて大きくする３Dパズル。本作は皿自体を左右に運んで落下物を受け、任意の時点でまとめ売りし、45秒で終了する。",
+        "note_en": "Both use physics to stack fruit on a plate without spilling. Fruit Mountain is a 3D merging puzzle. Here the platter moves to catch falling fruit, batches can be sold at any time, and a run lasts 45 seconds."
+      },
+      {
+        "title": "Game & Watch Chef",
+        "url": "https://www.nintendo.com/en-gb/Games/Nintendo-DSiWare/Game-Watch-Chef-263291.html",
+        "similarity": "中",
+        "note": "左右に動き、落ちる食べ物を皿やフライパンで受ける核が近い。公式Chefは食べ物を空中でジャグリングする。本作は積み荷を皿に残して重みと揺れに対処し、ためた数による売り時を選ぶ。",
+        "note_en": "Both move left and right to catch falling food. Chef keeps food juggling in the air. This game holds cargo on a tilting platter, uses physical sway and weight, and lets the player choose when to sell a batch."
+      }
+    ],
+    "research": "ウェブ検索を２回、計４クエリで実行。plate fruit balance game catch、Super Crate Box official crates score、Fruit Mountain official BeXide plate fruit stack、Game Watch Chef Nintendo catch food pan official を調べた。関連の強い２作品を選び、BeXideとNintendoの公式ページで実在とルールを確認した。",
+    "i18n": {
+      "en": {
+        "comment": "I viewed every screenshot as an image during 12 moves and played the full 45-second run. Increasing from a 26-point two-fruit sale to a 48-point three-fruit sale felt rewarding, with a real choice between selling and catching one more. Moving sideways can launch fruit dramatically, making outcomes somewhat wild, but catching a returning fruit was a fun surprise. I finished with 126 points, nine fruits sold and eight spilled. Final automatic selling and restarting worked. I want to carry more gently and try a larger batch next time.",
+        "research": "Used two web-search calls with four queries: plate fruit balance game catch; Super Crate Box official crates score; Fruit Mountain official BeXide plate fruit stack; Game Watch Chef Nintendo catch food pan official. Selected the two relevant games and confirmed their existence and rules on official BeXide and Nintendo pages."
+      }
+    },
+    "method": "スマホ縦画面で 12 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 12 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.87) 120ms",
+        "note": "タイトルには傾いた皿と果物、まとめ売りのルールが見える。中央の皿で最初の果物を受けるつもりで開始する。",
+        "noteEn": "The title shows a tilted platter, fruit and the batch-selling rule. I start expecting to catch the first fruit on the centered platter.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "swipe(0.50,0.75→0.77,0.75) 650ms",
+        "note": "中央の果物１個が緑の輪になり、売れば10点。次は右端の黄色い果物なので、１個を載せたまま皿を右へ運ぶ。",
+        "noteEn": "The first fruit has a green ring and would sell for 10. The next yellow fruit is on the right, so I carry the loaded platter that way.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.50,0.91) 120ms",
+        "note": "２個を受けてまとめ売りは26点になったが、皿が大きく傾いて果物が片側に寄った。次は反対側なので、ここで売って荷を軽くする。",
+        "noteEn": "Two fruits would sell for 26, but the platter is visibly tilted with cargo crowded to one side. The next fruit is opposite, so I sell now to lighten the load.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "swipe(0.77,0.75→0.23,0.75) 700ms",
+        "note": "26点で出荷でき、皿が空になった。左の落下予告の下へ皿を移して、次の果物を受ける。",
+        "noteEn": "The sale scored 26 and emptied the platter. I move under the left-hand drop preview to catch the next fruit.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "swipe(0.23,0.75→0.77,0.75) 600ms",
+        "note": "左で１個を受けられたが、皿はまだ左へ傾いている。次の紫は右なので、今度は売らずに載せたまま横断し、欲張ってみる。",
+        "noteEn": "I caught one on the left, though the platter still leans left. The next purple fruit is on the right; this time I take the risk of crossing without selling.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 3200ms",
+        "note": "横断したら黄色い果物が皿から跳ね上がり、紫１個だけが緑の輪になった。黄色が戻るか見たいので右で待つ。次の左の果物は取り逃すかもしれない。",
+        "noteEn": "Crossing tossed the yellow fruit upward, leaving only the purple fruit with a green ring. I stay on the right to see if yellow returns, risking the next drop on the left.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.50,0.91) 120ms → swipe(0.77,0.75→0.44,0.75) 850ms",
+        "note": "黄色が戻って２個になった一方、こぼれは１。26点分を売ってから、次の紫の予告線に合わせて中央寄りへゆっくり運ぶ。",
+        "noteEn": "Yellow returned, giving two fruits, while the spill counter is one. I sell the 26-point batch, then move slowly toward the next purple preview near the center.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "swipe(0.44,0.75→0.77,0.75) 1000ms",
+        "note": "52点、こぼれ２で紫１個を受けた。皿はほぼ水平に戻っている。今度はゆっくり右へ運んで、まとめ売りの数を増やしたい。",
+        "noteEn": "I have 52 points, two spills and one purple fruit on a nearly level platter. I move more slowly to the right, aiming to grow the next batch.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "swipe(0.77,0.75→0.33,0.75) 700ms",
+        "note": "２個で26点分が載り、左には赤い果物が落ちてきている。次の予告も左寄りなので、今回は売らずに追いかけて３個以上を狙う。",
+        "noteEn": "Two fruits worth 26 are loaded and a red fruit is falling on the left. The next preview is left too, so I cross without selling and try for three or more.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 6500ms",
+        "note": "移動後も２個は残ったが、こぼれが４に増えた。次の赤い予告は皿の中央付近なので、ここで動かずに追加を受けてみる。",
+        "noteEn": "Two fruits survived the crossing, but spills rose to four. The next red preview is near the platter center, so I stay still and try to add more.",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.50,0.91) 120ms → swipe(0.33,0.75→0.55,0.75) 850ms",
+        "note": "３個が落ち着いて48点分になった。こぼれは５だが、２個より１個増やす価値がはっきり分かる。出荷し、最後は次の予告の下へ移って時間切れまで受ける。",
+        "noteEn": "Three settled fruits are now worth 48. Despite five spills, the value of one extra fruit is clear. I sell, move under the next preview and catch through the final countdown.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 126
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.50,0.87) 120ms",
+        "note": "終了時に最後の２個も自動出荷され、126点、出荷９個、こぼれ８個になった。３個売りの48点が嬉しく、次は揺らしすぎず運びたい。もう一度を押す。",
+        "noteEn": "The final two fruits were sold automatically, ending at 126 points, nine sold and eight spilled. The 48-point three-fruit sale felt rewarding; I want to try carrying more gently next time. I tap to restart.",
+        "image": "ai-play/step-12.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 126
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-07T19:40:35+09:00"
+  },
+  "publishedAt": "2026-10-07T19:40:35+09:00",
+  "metrics": {
+    "model": "gpt-6",
+    "effort": null,
+    "thinkingTokens": null,
+    "outputTokens": null,
+    "contextTokens": null,
+    "turns": null,
+    "toolCalls": null,
+    "webSearches": null,
+    "minutes": 9.8,
+    "from": "2026-10-07T10:30:47.507Z",
+    "to": "2026-10-07T10:40:36.030Z",
+    "method": "この環境ではトークン数を自動取得できないため、制作時間（と申告値）のみ記録",
+    "methodEn": "Token counts are not available in this environment; only time (and any self-reported values) recorded",
+    "recordedAt": "2026-10-07T19:40:36+09:00",
+    "validationRuns": 1,
+    "codeKB": 12.1
+  }
+}
