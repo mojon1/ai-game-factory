@@ -2,6 +2,7 @@
 # 条件（tools/check-pr.mjs）: 変更が新しい games/<ID>/ と games/_failures.json への追記だけ、
 #   meta.json の status が published。さらにここで自動テスト（tools/validate.mjs）をやり直し、合格したらマージする。
 # 条件を満たさないPR（サイトの改修、既存作品の修正など）はマージせず、理由をコメントして人間の確認を待つ。
+# 公開に成功したときはコメントしない（毎日の作業なので通知メールを出さない）。
 # GITHUB_TOKEN によるマージでは push のワークフローが動かないため、デプロイは workflow_dispatch で起動する。
 name: Auto-publish game PRs
 on:
@@ -70,7 +71,6 @@ jobs:
         run: |
           gh pr merge "$PR" --merge --match-head-commit "${{ steps.pr.outputs.sha }}" --delete-branch
           gh workflow run deploy.yml --ref main
-          gh pr comment "$PR" --body "✅ 自動テストに合格したため、自動でマージして公開しました。 / Passed the automated test; merged and published automatically."
       - name: Report why it was not published
         if: failure() && steps.pr.outputs.skip != '1'
         run: |
