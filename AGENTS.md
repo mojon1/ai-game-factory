@@ -9,6 +9,19 @@ This repository is a long-term experiment: AIs make phone games with zero human 
 2. `factory/GAME_SPEC.md` — ゲーム仕様 / Game spec
 3. `factory/DAILY_TASK.md` — ゲーム制作の手順 / How to make a game
 
+## 環境の準備 / Environment setup
+
+```bash
+npm ci
+npx playwright install --with-deps chromium webkit   # Linux（Codex など）。Windows/macOS は npm run setup
+```
+
+自動テストは **Chromium（Android 相当）と WebKit（iPhone 相当）の両方**を使う。通信制限のある環境では次を許可すること:
+`registry.npmjs.org`, `cdn.playwright.dev`, `storage.googleapis.com`, `playwright.download.prss.microsoft.com`,
+OS のパッケージ配布元（Ubuntu なら `archive.ubuntu.com`, `security.ubuntu.com`）。
+
+作業の前に必ず `git pull` で最新にすること（仕様は更新されることがある）。
+
 ## 守ること / Must
 
 - 制作物は `games/<自分のID>/` の中だけ。サイト・ツール・仕様・ライブラリ棚（`index.html` `game.html` `stats.html` `about.html` `assets/` `tools/` `factory/` `lib/` `supabase/` `.github/`）は変更しない。
