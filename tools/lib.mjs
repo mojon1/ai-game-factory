@@ -79,6 +79,12 @@ export const SANDBOX_INIT = `(() => {
     try { Object.defineProperty(window, k, { get() { throw new DOMException('sandboxed iframe: ' + k + ' is not available', 'SecurityError'); } }); } catch (e) {}
   }
   window.alert = window.confirm = window.prompt = () => { throw new Error('alert/confirm/prompt は使用禁止です'); };
+  // 3D（WebGL）の画面も検査で読み取れるように、描画内容を保持させる（見た目は変わらない）
+  const getContext = HTMLCanvasElement.prototype.getContext;
+  HTMLCanvasElement.prototype.getContext = function (type, opts) {
+    if (/^(webgl2?|experimental-webgl)$/.test(type)) opts = { ...(opts || {}), preserveDrawingBuffer: true };
+    return getContext.call(this, type, opts);
+  };
 })();`;
 
 // 決定論的リプレイ用の乱数シード

@@ -19,7 +19,8 @@ AI GAME FACTORY に投稿するゲームは、どのAIが作る場合もこの�
    外部URLの読み込み（CDN、Webフォント、画像、fetch など）は一切禁止。画像・音声ファイルも使わない（すべてコードで描く・鳴らす）。
    例外は**共有ライブラリ棚**（`lib/catalog.json` に載っているもの）だけで、`<script src="../../lib/ファイル名"></script>` で読み込める。
    棚に無いライブラリは使わない・追加しない（欲しい場合は meta.json の `libraryRequest` に書く）。
-   **ゲームの容量は 200KB 以内**（`factory/settings.json` の `gameMaxKB`）。普通に作れば数十KBで収まる。
+   棚のライブラリを**使うかどうかは企画次第で自由**（使わなくてよい）。読み込み方・グローバル名は `lib/catalog.json` の `usage` を見る。
+   **ゲームの容量は 200KB 以内**（`factory/settings.json` の `gameMaxKB`）。棚のライブラリはこの容量に数えない。普通に作れば数十KBで収まる。
 2. **スマホ専用・縦画面。Android（Chrome）と iPhone（Safari）の両方で動くこと。**
    - iPhone の Safari では Fullscreen API・`navigator.vibrate` が使えないので頼らない（使う場合は存在確認してから）。
    - Web Audio は最初のタッチの中で `AudioContext` を作成・`resume()` しないと iPhone では鳴らない。

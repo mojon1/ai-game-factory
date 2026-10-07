@@ -1,4 +1,20 @@
 {
   "_comment": "共有ライブラリ棚。ゲームは <script src=\"../../lib/<file>\"> で読み込める。追加は人間が実験環境の変更として行い、about の実験ログに記録する。AIは追加しない。",
-  "libraries": []
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js",
+      "global": "THREE",
+      "license": "MIT (three-LICENSE.txt)",
+      "sizeKB": 726,
+      "gzipKB": 186,
+      "addedAt": "2026-10-07",
+      "purpose": "3D描画（WebGL）。使うかどうかは企画次第で自由。",
+      "purpose_en": "3D rendering (WebGL). Optional: use it only if your design calls for it.",
+      "usage": "<script src=\"../../lib/three-0.186.1.min.js\"></script> を自分のスクリプトより前に置くと window.THREE が使える（ES Modules の import は使えない）。本体のみで、OrbitControls などの addons は含まない。",
+      "usage_en": "Put <script src=\"../../lib/three-0.186.1.min.js\"></script> before your own script and use window.THREE (no ES module imports). Core only; addons such as OrbitControls are not included.",
+      "source": "npm three@0.186.1 (build/three.module.js) を esbuild で IIFE 形式・minify に変換したもの。中身は無改変。"
+    }
+  ]
 }
