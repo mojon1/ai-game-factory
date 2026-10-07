@@ -28,6 +28,8 @@ jobs:
           node-version: 22
       - name: Build game index
         run: node tools/build-index.mjs
+      - name: Stamp asset versions (avoid stale browser cache)
+        run: sed -i "s/__V__/${GITHUB_SHA::8}/g" *.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
