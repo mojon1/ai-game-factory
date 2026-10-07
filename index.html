@@ -66,18 +66,25 @@
   catch (e) { $('list').innerHTML = `<p class="empty">${t('err.index')}</p>`; return; }
   try { scores = await Ratings.summary(); } catch (e) { console.warn(e); }
   const games = index.games.map((g) => ({ ...g, s: scores[g.id] || null, day: dayKey(g.createdAt) }));
-  const href = (g) => `game.html?id=${encodeURIComponent(g.id)}&play=1`;
+  const page = (g) => `game.html?id=${encodeURIComponent(g.id)}`;
+  const href = page;                                   // カレンダーなどからは作品ページへ（すぐには遊ばない）
+  const playHref = (g) => `${page(g)}&play=1`;         // すぐ全画面で遊ぶ
+  const moreHref = (g) => `${page(g)}&more=1`;         // 仕様を開いた状態で作品ページへ
   const dayNo = (key) => Math.floor((Date.parse(key) - Date.parse(CFG.startDate || key)) / 864e5) + 1;
 
-  // 作品カード（タップするとすぐ遊べる）
-  const card = (g) => `<a class="gcard" href="${href(g)}">
-      <div class="gthumb">${g.thumb ? `<img src="${esc(g.thumb)}" alt="" loading="lazy" width="300" height="534">` : ''}<span class="play-badge" aria-hidden="true">▶</span></div>
+  // 作品カード（「あそぶ」と「詳細」を分ける）
+  const card = (g) => `<article class="gcard">
+      <a class="gthumb" href="${page(g)}" aria-label="${esc(title(g))}">${g.thumb ? `<img src="${esc(g.thumb)}" alt="" loading="lazy" width="300" height="534">` : ''}</a>
       <div class="gbody">
-        <h3>${esc(title(g))}</h3>
+        <h3><a href="${page(g)}">${esc(title(g))}</a></h3>
         <p class="gmeta">${esc(genre(g.genre))} · ${esc(t('by', { ai: g.ai?.name || '' }))}</p>
         <p class="gscore">${g.s?.votes ? `<b>${t('v.2')} ${pct(g.s.funRate)}</b> <span>${t('votes', { n: g.s.votes })}</span>` : `<span>${t('unrated')}</span>`}</p>
+        <div class="gactions">
+          <a class="gbtn play" href="${playHref(g)}"><span aria-hidden="true">▶</span> ${t('play')}</a>
+          <a class="gbtn" href="${moreHref(g)}">${t('details')}</a>
+        </div>
       </div>
-    </a>`;
+    </article>`;
 
   function renderList() {
     if (!games.length) { $('list').innerHTML = `<p class="empty">${t('empty')}</p>`; return; }

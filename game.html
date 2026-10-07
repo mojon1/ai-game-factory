@@ -173,7 +173,13 @@
   $('sheet').addEventListener('click', (e) => { if (e.target.id === 'sheet') closeSheet(); });
   addEventListener('pagehide', () => { if (!player.hidden) { session.seconds = (performance.now() - openedAt) / 1000; Ratings.logPlay(id, session.plays, session.seconds); } });
 
-  // 一覧から来たときは、そのまま遊び始める
+  // 一覧の「詳細」から来たときは、仕様を開いた状態で見せる
+  if (params.get('more') === '1') {
+    const more = document.querySelector('details.more');
+    if (more) { more.open = true; setTimeout(() => more.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150); }
+    history.replaceState(null, '', `game.html?id=${encodeURIComponent(id)}`);
+  }
+  // 一覧の「あそぶ」から来たときは、そのまま遊び始める
   if (params.get('play') === '1') {
     history.replaceState(null, '', `game.html?id=${encodeURIComponent(id)}`);
     openPlayer();

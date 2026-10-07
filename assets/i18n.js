@@ -43,6 +43,7 @@
     'rate.err': ['送信できませんでした', 'Could not send'],
     // ゲームページ
     'play': ['あそぶ', 'Play'],
+    'details': ['詳細', 'Details'],
     'close': ['もどる', 'Back'],
     'back': ['← 一覧', '← All games'],
     'result.title': ['みんなの評価', 'What players think'],
