@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>ネオン・フリックゴール</title>
+<style>
+  html,body{margin:0;height:100%;background:#070714;overflow:hidden}
+  canvas{display:block;width:100vw;height:100vh;touch-action:none}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+(() => {
+  const cv = document.getElementById('c'), g = cv.getContext('2d');
+  let W, H, DPR;
+  function resize() {
+    DPR = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight;
+    cv.width = W * DPR; cv.height = H * DPR; g.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  addEventListener('resize', resize); resize();
+
+  // フィールドは 100 x 160 の論理座標（縦長）で計算し、画面に合わせて拡大
+  const FW = 100, FH = 160, GOAL_W = 30, BALLS = 10;
+  let state = 'title', ball, keeper, blocks, shotsLeft = 10, goals = 0, level = 1, aim = -Math.PI / 2, power = 0, charging = false, msg = null, particles = [], bounced = 0, best = 0;
+
+  function fit() {
+    const s = Math.min((W - 20) / FW, (H - 20) / FH);
+    return { s, ox: (W - FW * s) / 2, oy: (H - FH * s) / 2 };
+  }
+  function resetBall() {
+    ball = { x: FW / 2, y: FH - 18, vx: 0, vy: 0, r: 3.2, moving: false, trail: [] };
+    aim = -Math.PI / 2; power = 0; charging = false; bounced = 0;
+  }
+  function setupLevel() {
+    keeper = { x: FW / 2, w: 14 + Math.min(8, level), speed: 22 + level * 6, dir: 1 };
+    blocks = [];
+    const n = Math.min(5, level);
+    for (let i = 0; i < n; i++) {
+      blocks.push({ x: 15 + Math.random() * 70, y: 45 + i * 16 + Math.random() * 6, w: 12 + Math.random() * 8, h: 4, vx: (Math.random() < 0.5 ? -1 : 1) * (8 + level * 3) * (i % 2 ? 1 : 0.6) });
+    }
+  }
+  function newGame() {
+    shotsLeft = BALLS; goals = 0; level = 1; particles = []; msg = null;
+    setupLevel(); resetBall(); state = 'play';
+  }
+
+  // ---------- 入力 ----------
+  const held = {};
+  let pointer = null;
+  addEventListener('keydown', (e) => {
+    if (['Space', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.code)) e.preventDefault();
+    if (state !== 'play') { if (e.code === 'Space' || e.code === 'Enter') newGame(); return; }
+    held[e.code] = true;
+    if ((e.code === 'Space' || e.code === 'Enter') && !ball.moving && !e.repeat) { charging = true; power = 0; }
+  });
+  addEventListener('keyup', (e) => {
+    held[e.code] = false;
+    if ((e.code === 'Space' || e.code === 'Enter') && charging) shoot();
+  });
+  function toField(e) { const f = fit(); return { x: (e.clientX - f.ox) / f.s, y: (e.clientY - f.oy) / f.s }; }
+  cv.addEventListener('pointerdown', (e) => {
+    if (state !== 'play') { newGame(); return; }
+    if (ball.moving) return;
+    pointer = toField(e); charging = true; power = 0; updatePointerAim(pointer);
+  });
+  cv.addEventListener('pointermove', (e) => { if (pointer) { pointer = toField(e); updatePointerAim(pointer); } });
+  addEventListener('pointerup', () => { if (pointer && charging) shoot(); pointer = null; });
+  function updatePointerAim(p) {
+    // ボールから引っ張った反対方向へ飛ぶ（スリングショット）。ほぼ引っ張っていない時はタップ地点へ向ける
+    const dx = ball.x - p.x, dy = ball.y - p.y, d = Math.hypot(dx, dy);
+    if (d > 6) { aim = Math.atan2(dy, dx); power = Math.min(1, d / 40); }
+    else { aim = Math.atan2(p.y - ball.y, p.x - ball.x); }
+    aim = Math.max(-Math.PI + 0.15, Math.min(-0.15, aim));
+  }
+  function shoot() {
+    charging = false;
+    const p = Math.max(0.25, power);
+    ball.vx = Math.cos(aim) * p * 150; ball.vy = Math.sin(aim) * p * 150; ball.moving = true; shotsLeft--;
+    sfx(300 + p * 300, 0.12, 'square');
+  }
+
+  let ac;
+  function sfx(f, d, type = 'sine', v = 0.05) {
+    try {
+      ac ||= new (window.AudioContext || window.webkitAudioContext)();
+      const o = ac.createOscillator(), gn = ac.createGain(); o.type = type; o.frequency.value = f;
+      gn.gain.value = v; gn.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + d);
+      o.connect(gn).connect(ac.destination); o.start(); o.stop(ac.currentTime + d);
+    } catch (e) {}
+  }
+
+  // ---------- 更新 ----------
+  function burst(x, y, col, n = 24) {
+    for (let i = 0; i < n; i++) { const a = Math.random() * 7, v = 10 + Math.random() * 40; particles.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, col }); }
+  }
+  function rectHit(b, r) {
+    const cx = Math.max(r.x, Math.min(b.x, r.x + r.w)), cy = Math.max(r.y, Math.min(b.y, r.y + r.h));
+    const dx = b.x - cx, dy = b.y - cy;
+    if (dx * dx + dy * dy > b.r * b.r) return false;
+    if (Math.abs(dx) > Math.abs(dy)) { b.vx = Math.abs(b.vx) * Math.sign(dx || 1); b.x = cx + Math.sign(dx || 1) * b.r; }
+    else { b.vy = Math.abs(b.vy) * Math.sign(dy || 1); b.y = cy + Math.sign(dy || 1) * b.r; }
+    return true;
+  }
+  function endShot(text, col) {
+    msg = { text, col, t: 1.4 };
+    setTimeout(() => {
+      if (state !== 'play') return;
+      if (shotsLeft <= 0) { state = 'over'; best = Math.max(best, goals); sfx(200, 0.6, 'triangle', 0.08); }
+      else resetBall();
+    }, 900);
+    ball.moving = false; ball.vx = ball.vy = 0; ball.done = true;
+  }
+  function update(dt) {
+    particles = particles.filter((p) => (p.life -= dt * 1.4) > 0);
+    particles.forEach((p) => { p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= 0.96; p.vy *= 0.96; });
+    if (msg && (msg.t -= dt) <= 0) msg = null;
+    if (state !== 'play') return;
+    // キーパーとブロック
+    keeper.x += keeper.dir * keeper.speed * dt;
+    const gl = FW / 2 - GOAL_W / 2 + keeper.w / 2, gr = FW / 2 + GOAL_W / 2 - keeper.w / 2;
+    if (keeper.x < gl) { keeper.x = gl; keeper.dir = 1; } if (keeper.x > gr) { keeper.x = gr; keeper.dir = -1; }
+    for (const b of blocks) { b.x += b.vx * dt; if (b.x < 4 || b.x + b.w > FW - 4) { b.vx *= -1; b.x = Math.max(4, Math.min(FW - 4 - b.w, b.x)); } }
+    // 照準（キーボード）
+    if (!ball.moving && !ball.done) {
+      if (held.ArrowLeft || held.KeyA) aim -= dt * 1.6;
+      if (held.ArrowRight || held.KeyD) aim += dt * 1.6;
+      aim = Math.max(-Math.PI + 0.15, Math.min(-0.15, aim));
+      if (charging && !pointer) power = Math.min(1, power + dt * 0.9);
+    }
+    if (!ball.moving) return;
+    // ボール物理（サブステップ）
+    const steps = 4;
+    for (let i = 0; i < steps; i++) {
+      const h = dt / steps;
+      ball.x += ball.vx * h; ball.y += ball.vy * h;
+      ball.vx *= Math.pow(0.55, h); ball.vy *= Math.pow(0.55, h);
+      if (ball.x < 3 + ball.r) { ball.x = 3 + ball.r; ball.vx *= -1; bounced++; sfx(500, 0.05); }
+      if (ball.x > FW - 3 - ball.r) { ball.x = FW - 3 - ball.r; ball.vx *= -1; bounced++; sfx(500, 0.05); }
+      if (ball.y > FH - 3 - ball.r) { ball.y = FH - 3 - ball.r; ball.vy *= -1; }
+      for (const b of blocks) if (rectHit(ball, b)) { sfx(260, 0.06, 'square'); burst(ball.x, ball.y, '#ff4fa3', 6); }
+      if (rectHit(ball, { x: keeper.x - keeper.w / 2, y: 14, w: keeper.w, h: 4 })) { sfx(180, 0.1, 'square'); burst(ball.x, ball.y, '#ffb84f', 10); }
+      // ゴールライン
+      if (ball.y < 10) {
+        if (Math.abs(ball.x - FW / 2) < GOAL_W / 2) {
+          const bonus = bounced > 0 ? 1 : 0;
+          goals += 1 + bonus; level++; setupLevel();
+          burst(ball.x, 8, '#3fffd2', 50); sfx(660, 0.15, 'triangle', 0.08); setTimeout(() => sfx(990, 0.25, 'triangle', 0.08), 120);
+          endShot(bonus ? 'バンクショット！ +2' : 'ゴール！', '#3fffd2'); return;
+        }
+        ball.y = 10; ball.vy *= -1; bounced++;
+      }
+    }
+    ball.trail.push({ x: ball.x, y: ball.y }); if (ball.trail.length > 14) ball.trail.shift();
+    if (Math.hypot(ball.vx, ball.vy) < 4) endShot('ノーゴール…', '#ff6b8b');
+  }
+
+  // ---------- 描画 ----------
+  const city = Array.from({ length: 26 }, (_, i) => ({ x: i / 26, w: 0.03 + Math.random() * 0.03, h: 0.2 + Math.random() * 0.5, c: ['#ff4fa3', '#3fffd2', '#7a6bff', '#ffd84f'][i % 4] }));
+  function neonRect(x, y, w, h, col, blur = 14) { g.shadowColor = col; g.shadowBlur = blur; g.strokeStyle = col; g.lineWidth = 2; g.strokeRect(x, y, w, h); g.shadowBlur = 0; }
+  function draw(t) {
+    g.fillStyle = '#070714'; g.fillRect(0, 0, W, H);
+    for (const b of city) { g.fillStyle = '#0d0d24'; g.fillRect(b.x * W, H - b.h * H, b.w * W, b.h * H); g.fillStyle = b.c; g.globalAlpha = 0.25 + 0.15 * Math.sin(t * 2 + b.x * 20); g.fillRect(b.x * W, H - b.h * H, b.w * W, 2); g.globalAlpha = 1; }
+    if (!ball) { level = 1; setupLevel(); resetBall(); shotsLeft = BALLS; goals = 0; particles = []; }
+    const f = fit(), s = f.s, X = (x) => f.ox + x * s, Y = (y) => f.oy + y * s;
+    // ピッチ
+    g.fillStyle = 'rgba(20,16,50,.85)'; g.fillRect(X(0), Y(0), FW * s, FH * s);
+    g.strokeStyle = 'rgba(122,107,255,.12)'; g.lineWidth = 1;
+    for (let y = 0; y < FH; y += 10) { g.beginPath(); g.moveTo(X(0), Y(y)); g.lineTo(X(FW), Y(y)); g.stroke(); }
+    neonRect(X(3), Y(10), (FW - 6) * s, (FH - 13) * s, '#7a6bff');
+    g.beginPath(); g.arc(X(FW / 2), Y(FH - 18), 14 * s, 0, 7); g.strokeStyle = 'rgba(122,107,255,.35)'; g.stroke();
+    // ゴール
+    neonRect(X(FW / 2 - GOAL_W / 2), Y(2), GOAL_W * s, 8 * s, '#3fffd2', 20);
+    g.fillStyle = 'rgba(63,255,210,.08)'; g.fillRect(X(FW / 2 - GOAL_W / 2), Y(2), GOAL_W * s, 8 * s);
+    // キーパー・ブロック
+    g.shadowColor = '#ffb84f'; g.shadowBlur = 16; g.fillStyle = '#ffb84f';
+    g.fillRect(X(keeper.x - keeper.w / 2), Y(14), keeper.w * s, 4 * s);
+    g.shadowColor = '#ff4fa3'; g.fillStyle = '#ff4fa3';
+    for (const b of blocks) g.fillRect(X(b.x), Y(b.y), b.w * s, b.h * s);
+    g.shadowBlur = 0;
+    // 照準
+    if (state === 'play' && !ball.moving && !ball.done) {
+      const len = 16 + power * 40;
+      g.setLineDash([4, 5]); g.strokeStyle = `hsl(${170 - power * 170},100%,60%)`; g.lineWidth = 2;
+      g.beginPath(); g.moveTo(X(ball.x), Y(ball.y)); g.lineTo(X(ball.x + Math.cos(aim) * len), Y(ball.y + Math.sin(aim) * len)); g.stroke(); g.setLineDash([]);
+      // パワーゲージ
+      g.fillStyle = 'rgba(255,255,255,.12)'; g.fillRect(X(FW - 10), Y(FH - 50), 4 * s, 36 * s);
+      g.fillStyle = `hsl(${170 - power * 170},100%,60%)`; g.fillRect(X(FW - 10), Y(FH - 14 - 36 * power), 4 * s, 36 * power * s);
+    }
+    // ボール
+    ball.trail.forEach((p, i) => { g.globalAlpha = i / ball.trail.length * 0.5; g.fillStyle = '#3fffd2'; g.beginPath(); g.arc(X(p.x), Y(p.y), ball.r * s * 0.7, 0, 7); g.fill(); });
+    g.globalAlpha = 1; g.shadowColor = '#ffffff'; g.shadowBlur = 18; g.fillStyle = '#fff';
+    g.beginPath(); g.arc(X(ball.x), Y(ball.y), ball.r * s, 0, 7); g.fill(); g.shadowBlur = 0;
+    for (const p of particles) { g.globalAlpha = p.life; g.fillStyle = p.col; g.fillRect(X(p.x) - 2, Y(p.y) - 2, 4, 4); }
+    g.globalAlpha = 1;
+    // HUD
+    g.textBaseline = 'middle'; g.font = `bold ${Math.max(13, 5 * s)}px sans-serif`;
+    g.textAlign = 'left'; g.fillStyle = '#3fffd2'; g.fillText(`GOAL ${goals}`, X(5), Y(FH - 6));
+    g.textAlign = 'right'; g.fillStyle = '#e6e3ff'; g.fillText(`残りボール ${shotsLeft}`, X(FW - 5), Y(FH - 6));
+    g.textAlign = 'center'; g.fillStyle = '#ffd84f'; g.fillText(`LV ${level}`, X(FW / 2), Y(FH - 6));
+    if (msg) { g.font = `bold ${10 * s}px sans-serif`; g.fillStyle = msg.col; g.shadowColor = msg.col; g.shadowBlur = 20; g.globalAlpha = Math.min(1, msg.t * 2); g.fillText(msg.text, X(FW / 2), Y(FH / 2)); g.shadowBlur = 0; g.globalAlpha = 1; }
+    if (state !== 'play') {
+      g.fillStyle = 'rgba(7,7,20,.78)'; g.fillRect(0, 0, W, H); g.textAlign = 'center';
+      const big = Math.min(34, W / 12);
+      if (state === 'title') {
+        g.font = `bold ${big}px sans-serif`; g.fillStyle = '#3fffd2'; g.shadowColor = '#3fffd2'; g.shadowBlur = 20; g.fillText('ネオン・フリックゴール', W / 2, H / 2 - 70); g.shadowBlur = 0;
+        g.font = '16px sans-serif'; g.fillStyle = '#e6e3ff';
+        g.fillText('10球でいくつゴールを決められるか！', W / 2, H / 2 - 26);
+        g.fillText('壁に当ててから決めるとバンクショットで2点', W / 2, H / 2 + 2);
+        g.font = 'bold 17px sans-serif'; g.fillStyle = '#ffd84f'; g.fillText('Space / クリック / タップでスタート', W / 2, H / 2 + 46);
+        g.font = '13px sans-serif'; g.fillStyle = '#9d98c9';
+        g.fillText('キーボード: ←→で狙う / Space長押しでパワー → 離してシュート', W / 2, H - 46);
+        g.fillText('マウス・タッチ: ボールから引っ張って離す（パチンコ式）', W / 2, H - 24);
+      } else {
+        g.font = `bold ${big}px sans-serif`; g.fillStyle = '#e6e3ff'; g.fillText('試合終了', W / 2, H / 2 - 56);
+        g.font = 'bold 56px sans-serif'; g.fillStyle = '#3fffd2'; g.fillText(`${goals} 点`, W / 2, H / 2 + 6);
+        g.font = '17px sans-serif'; g.fillStyle = '#ffd84f'; g.fillText(`ベスト ${best} 点`, W / 2, H / 2 + 52);
+        g.font = '15px sans-serif'; g.fillStyle = '#9d98c9'; g.fillText('Space / タップでもう一度', W / 2, H / 2 + 84);
+      }
+    }
+  }
+
+  let last = 0;
+  function frame(ts) {
+    const dt = Math.min(0.05, (ts - last) / 1000 || 0); last = ts;
+    update(dt); draw(ts / 1000);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

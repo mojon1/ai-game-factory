@@ -1,0 +1,364 @@
+{
+  "id": "2026-10-07-02",
+  "status": "published",
+  "title": "ツイン・ペインター",
+  "genre": "ストラテジー",
+  "tags": [
+    "陣取り",
+    "2機同時操作",
+    "鏡写し"
+  ],
+  "description": "2機の宇宙船を同時に操り、60秒で宇宙空間を塗りつぶす陣取りゲーム。マゼンタ機は左右が鏡写しで動くため、片方を意識するともう片方がおろそかになる。紫の虚無は塗った場所を消していく。",
+  "howToPlay": "制限時間60秒で、できるだけ多くのマスを塗る。★を取ると周囲をまとめて塗れる。虚無に触れると一時停止し、周りの塗りを失う。塗り率でS〜Dのランクがつく。",
+  "controls": [
+    {
+      "input": "矢印キー / WASD",
+      "action": "進行方向を変える（マゼンタ機は左右反転）"
+    },
+    {
+      "input": "スワイプ / タップした方向",
+      "action": "進行方向を変える（スマホ）"
+    },
+    {
+      "input": "Space / Enter / タップ",
+      "action": "スタート・リトライ"
+    }
+  ],
+  "createdAt": "2026-10-07T13:33:56+09:00",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "claude-code",
+    "prompt": "ジャンル「ストラテジー」: 陣地を塗り広げるゲーム。ひねり: 2つのキャラを同時に操作する。テーマ/見た目: 宇宙。",
+    "startedAt": "2026-10-07T13:33:56+09:00",
+    "validationRuns": 2,
+    "finishedAt": "2026-10-07T14:05:59+09:00",
+    "promptEn": "Genre \"Strategy\": paint and expand your territory. Twist: you control two characters at once. Theme/look: outer space."
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-07T14:05:22+09:00",
+    "version": 2,
+    "checks": [
+      {
+        "name": "コードが 120KB 以下",
+        "ok": true,
+        "detail": "12.2KB",
+        "group": "common",
+        "nameEn": "Code size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "group": "common",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "group": "common",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "タッチ操作に対応したイベントを使っている",
+        "ok": true,
+        "detail": "",
+        "group": "common",
+        "nameEn": "Uses touch-capable events"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "group": "common",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "PC: 画面に描画されている",
+        "ok": true,
+        "detail": "canvas色数=39",
+        "group": "pc",
+        "nameEn": "PC: renders on screen"
+      },
+      {
+        "name": "PC: キーボードだけで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "",
+        "group": "pc",
+        "nameEn": "PC: starts and responds with keyboard only"
+      },
+      {
+        "name": "PC: 操作後も描画が残っている",
+        "ok": true,
+        "detail": "canvas色数=27",
+        "group": "pc",
+        "nameEn": "PC: still renders after input"
+      },
+      {
+        "name": "スマホ: 縦画面で描画されている",
+        "ok": true,
+        "detail": "canvas色数=21",
+        "group": "mobile",
+        "nameEn": "Mobile: renders in portrait"
+      },
+      {
+        "name": "スマホ: タッチだけで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "",
+        "group": "mobile",
+        "nameEn": "Mobile: starts and responds with touch only"
+      },
+      {
+        "name": "スマホ: 操作後も描画が残っている",
+        "ok": true,
+        "detail": "canvas色数=24",
+        "group": "mobile",
+        "nameEn": "Mobile: still renders after input"
+      },
+      {
+        "name": "スマホ: 画面からはみ出してスクロールしない",
+        "ok": true,
+        "detail": "",
+        "group": "mobile",
+        "nameEn": "Mobile: no overflow scrolling"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "group": "common",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": [],
+    "note": "テスト仕様v2（PC/スマホ別検査）で再検査。コードは未変更"
+  },
+  "code": {
+    "bytes": 12527,
+    "lines": 236
+  },
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "selfReview": true,
+    "method": "時間停止ターン制プレイ（PC 7手 / スマホ 3手）: 画面を見て操作を決め、その操作の間だけゲーム内時間を進める",
+    "scores": {
+      "playable": 1,
+      "fun": 2,
+      "quality": 3,
+      "originality": 3
+    },
+    "playableByDevice": {
+      "pc": 2,
+      "mobile": 1
+    },
+    "overall": 2.67,
+    "comment": "2機を鏡写しで同時に動かすアイデアは新鮮で、序盤に★で一気に塗れた時は気持ちよかった。しかし最後までプレイすると、後半は虚無が6個まで増えて塗るより消される方が速く、塗り率は最高21%から5.6%まで下がってランクD。難易度調整の失敗を認めざるを得ない。スマホ縦画面ではフィールドが細長い帯状に縮み、マスが小さすぎて状況が見えにくい。",
+    "good": "ネオンの見た目と★の演出。鏡写し操作は狙いどおり頭が混乱して面白い瞬間がある。スワイプ操作自体はスマホでも正しく効く。",
+    "bad": "虚無の増え方と消去範囲が強すぎ、時間がたつほど塗り率が下がる。2機がすれ違うと左右の端に離れていき、ジグザグ戦略が成立しにくい。スマホ縦画面ではフィールドが画面の3分の1程度しか使われず小さい。",
+    "similar": [
+      {
+        "title": "Paper.io 2",
+        "url": "https://www.crazygames.com/game/paper-io-2",
+        "similarity": "中",
+        "note": "マップを自分の色で塗って陣地を広げる点が共通。あちらは囲んで陣地化・対人要素あり、こちらは2機同時操作と虚無による消去",
+        "note_en": "Shares painting the map in your color to expand territory. That one claims areas by enclosing them and has other players; mine has two ships at once and voids that erase."
+      },
+      {
+        "title": "Mirror Runners",
+        "url": "https://traditionpixel.itch.io/mirror-runner",
+        "similarity": "中",
+        "note": "鏡写しに動く2キャラを同時に操作する仕組みが共通。あちらは障害物回避ランナー",
+        "note_en": "Shares controlling two mirrored characters at once. That one is an obstacle-dodging runner."
+      },
+      {
+        "title": "Bright Mirror",
+        "url": "https://ownfame.itch.io/bright-mirror",
+        "similarity": "低",
+        "note": "2キャラ同時操作のミラーリング系パズル",
+        "note_en": "A mirroring puzzle game controlling two characters at once."
+      }
+    ],
+    "research": "Web検索で「two characters at once mirrored movement」「Paper.io territory painting」等を調査。陣取りと鏡写し同時操作はそれぞれ既存ジャンルとして確立しており、組み合わせのみが新しいと判断。当初の独創性4から3に修正（類似作品リサーチ導入に伴う再採点）。",
+    "playLog": [
+      {
+        "device": "pc",
+        "step": 1,
+        "action": "Space 80ms → ArrowUp 60ms",
+        "note": "Spaceで開始。まず上に曲がって2機がどう動くか確かめる",
+        "image": "ai-play/step-01.webp"
+      },
+      {
+        "device": "pc",
+        "step": 2,
+        "action": "wait 350ms → ArrowRight 60ms → ArrowDown 60ms → ArrowRight 60ms → ArrowUp 60ms",
+        "note": "端まで上がったら1段ずらして往復する作戦（ジグザグ塗り）。虚無は下側にいるので上半分から"
+      },
+      {
+        "device": "pc",
+        "step": 3,
+        "action": "wait 200ms → ArrowLeft 60ms → ArrowDown 60ms → ArrowRight 60ms",
+        "note": "左の★を取りに行く。シアン機が左へ行くとマゼンタ機は右の空白地帯へ広がるので一石二鳥",
+        "image": "ai-play/step-03.webp"
+      },
+      {
+        "device": "pc",
+        "step": 4,
+        "action": "wait 250ms → ArrowUp 60ms → ArrowRight 60ms → ArrowDown 60ms",
+        "note": "右上の★はマゼンタ機の真上。あと3マス進んでから上へ曲がれば届くはず",
+        "image": "ai-play/step-04.webp"
+      },
+      {
+        "device": "pc",
+        "step": 5,
+        "action": "ArrowUp 60ms → ArrowLeft 60ms → ArrowDown 60ms",
+        "note": "停止を食らったようで狙いがずれた。今度は上へ→左（マゼンタは右）で上段を横切り、★の行を通過させる"
+      },
+      {
+        "device": "pc",
+        "step": 6,
+        "action": "wait 250ms → ArrowRight 60ms → ArrowUp 60ms → ArrowRight 60ms → ArrowDown 60ms → ArrowRight 60ms → ArrowUp 60ms → ArrowRight 60ms → ArrowDown 60ms → ArrowRight 60ms → ArrowUp 60ms → ArrowRight 60ms → ArrowDown 60ms → ArrowRight 60ms → ArrowUp 60ms → ArrowRight 60ms → ArrowDown 60ms → ArrowRight 60ms → ArrowUp 60ms → ArrowRight 60ms → ArrowDown 60ms → ArrowRight 60ms → ArrowUp 60ms → ArrowRight 60ms → ArrowDown 60ms → ArrowRight 60ms → ArrowUp 60ms → ArrowRight 60ms → ArrowDown 60ms → ArrowRight 60ms → ArrowUp 60ms → ArrowRight 60ms → ArrowDown 60ms → ArrowRight 60ms → ArrowUp 60ms",
+        "note": "下の★をシアン機で回収したあと、残り時間は2機を左右から中央へ寄せながら縦ジグザグで塗り続ける",
+        "image": "ai-play/step-06.webp"
+      },
+      {
+        "device": "pc",
+        "step": 7,
+        "action": "wait 8000ms",
+        "note": "残り7秒。両機とも端に張り付いてしまった。結果を見届ける",
+        "image": "ai-play/step-07.webp"
+      },
+      {
+        "device": "mobile",
+        "step": 1,
+        "action": "tap(0.50,0.50) 80ms",
+        "note": "タップで開始",
+        "image": "ai-play-mobile/step-01.webp"
+      },
+      {
+        "device": "mobile",
+        "step": 2,
+        "action": "swipe(0.50,0.60→0.50,0.40) 150ms",
+        "note": "上へスワイプして2機を上に向ける",
+        "image": "ai-play-mobile/step-02.webp"
+      },
+      {
+        "device": "mobile",
+        "step": 3,
+        "action": "swipe(0.30,0.50→0.70,0.50) 150ms",
+        "note": "右へスワイプ。シアンは右、マゼンタは左へ",
+        "image": "ai-play-mobile/step-03.webp"
+      }
+    ],
+    "reviewedAt": "2026-10-07T14:05:59+09:00",
+    "i18n": {
+      "en": {
+        "comment": "Steering two mirrored ships is a fresh idea, and wiping a big area with a star early on felt great. But playing to the end, the voids grow to six in the second half and erase faster than I can paint: coverage fell from a peak of 21% to 5.6%, rank D. As the maker I have to admit the difficulty tuning failed. On a portrait phone screen the field shrinks to a thin strip and the tiles are too small to read.",
+        "good": "Neon look and the star effect. The mirrored controls confuse you in a fun way, as intended. Swipe controls themselves work correctly on mobile.",
+        "bad": "Voids multiply and erase too strongly, so coverage drops over time. Once the ships pass each other they drift to opposite edges, which breaks zigzag strategies. On portrait phones the field uses only about a third of the screen.",
+        "research": "Searched the web for \"two characters at once mirrored movement\", \"Paper.io territory painting\" etc. Territory painting and mirrored dual control are each established genres; only the combination is new. Originality revised from 4 to 3 (re-scored when similar-work research was introduced)."
+      }
+    },
+    "methodEn": "Frozen-time turn-based play (PC 7 moves / mobile 3 moves): look at the frame, choose an input, and advance game time only during that input"
+  },
+  "publishedAt": "2026-10-07T13:41:00+09:00",
+  "platforms": {
+    "pc": true,
+    "mobile": true
+  },
+  "i18n": {
+    "en": {
+      "title": "Twin Painter",
+      "tags": [
+        "territory",
+        "two ships at once",
+        "mirrored"
+      ],
+      "description": "A territory game where you steer two spaceships at once to paint space within 60 seconds. The magenta ship moves mirrored left-to-right, so focusing on one makes you neglect the other. Purple voids erase what you painted.",
+      "howToPlay": "Paint as many tiles as you can in 60 seconds. Stars paint a whole area at once. Touching a void stuns you and erases nearby paint. You get a rank from S to D by coverage.",
+      "controls": [
+        {
+          "input": "Arrow keys / WASD",
+          "action": "Change direction (magenta ship is mirrored left/right)"
+        },
+        {
+          "input": "Swipe / tap a direction",
+          "action": "Change direction (mobile)"
+        },
+        {
+          "input": "Space / Enter / tap",
+          "action": "Start / retry"
+        }
+      ]
+    }
+  },
+  "languages": [
+    "ja"
+  ],
+  "cost": {
+    "tokens": {
+      "input": 57,
+      "output": 23148.17,
+      "cacheWrite": 31290,
+      "cacheRead": 5919463.5,
+      "total": 5973958.67
+    },
+    "webSearches": 0,
+    "usd": 1.8974,
+    "jpy": 300,
+    "fx": {
+      "usdJpy": 158.09,
+      "date": "2026-10-06",
+      "source": "Frankfurter（欧州中央銀行の参照レート）"
+    },
+    "breakdown": [
+      {
+        "model": "claude-opus-5-5",
+        "input": 57,
+        "output": 23148.17,
+        "cacheWrite5m": 0,
+        "cacheWrite1h": 31290,
+        "cacheRead": 5919463.5,
+        "webSearches": 0,
+        "calls": 28.5,
+        "usd": 1.8974,
+        "pricing": {
+          "input": 4,
+          "output": 20,
+          "cacheWrite5m": 5,
+          "cacheWrite1h": 8,
+          "cacheRead": 0.2,
+          "asOf": "2026-09-25",
+          "source": "https://www.anthropic.com/pricing#api"
+        }
+      }
+    ],
+    "method": "推定: サイト構築と同じ Claude Code セッションの記録から、この作品のコード作成・テスト・自己プレイ・採点を扱ったAPI呼び出し（約34回）を集計。サイト構築の長い文脈を読み込んでいるため、通常の日次制作より多めに出ています。",
+    "paid": "Claude サブスクリプション内（追加費用なし）",
+    "priceUnit": "USD / 1M tokens（API定価）",
+    "calculatedAt": "2026-10-07T14:30:10+09:00",
+    "methodEn": "Estimate: from the log of the same Claude Code session that built the site, summing the API calls (about 34) that worked on this game's code, tests, self-play and review. It is higher than a normal daily run because each call re-read the long site-building context.",
+    "paidEn": "Included in Claude subscription (no extra charge)",
+    "estimated": true
+  },
+  "revisions": [
+    {
+      "date": "2026-10-07T05:30:10.495Z",
+      "by": "Claude Opus 5.5",
+      "reason": "サイトの仕様追加（英語版の説明文・制作コスト）に合わせてメタデータを追記。ゲームのコードは未変更。",
+      "reasonEn": "Added English descriptions and production cost to the metadata after the site spec was extended. Game code unchanged."
+    }
+  ]
+}

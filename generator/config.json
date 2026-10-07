@@ -1,0 +1,57 @@
+{
+  "_comment": "API経由で他のAIを参加させる設定。無料枠のあるものだけを使う。enabled=true かつ APIキーの環境変数があるものが使われる。",
+  "gamesPerRun": 1,
+  "maxFixAttempts": 3,
+  "playSteps": 8,
+  "mobilePlaySteps": 3,
+  "providers": [
+    {
+      "id": "github-gpt-4.1",
+      "enabled": true,
+      "type": "openai",
+      "label": "GPT-4.1",
+      "vendor": "OpenAI",
+      "model": "openai/gpt-4.1",
+      "baseUrl": "https://models.github.ai/inference",
+      "apiKeyEnv": "GITHUB_TOKEN",
+      "via": "GitHub Models（無料枠）",
+      "maxTokens": 4000,
+      "temperature": 0.9
+    },
+    {
+      "id": "gemini-flash",
+      "enabled": true,
+      "type": "gemini",
+      "label": "Gemini 2.5 Flash",
+      "vendor": "Google",
+      "model": "gemini-2.5-flash",
+      "apiKeyEnv": "GEMINI_API_KEY",
+      "via": "Google AI Studio（無料枠）",
+      "search": true,
+      "maxTokens": 32768,
+      "temperature": 1
+    },
+    {
+      "id": "ollama",
+      "enabled": false,
+      "type": "openai",
+      "label": "Qwen2.5-Coder 14B",
+      "vendor": "Alibaba",
+      "model": "qwen2.5-coder:14b",
+      "baseUrl": "http://localhost:11434/v1",
+      "via": "Ollama（ローカル実行）",
+      "maxTokens": 16000,
+      "vision": false,
+      "jsonMode": false
+    },
+    {
+      "id": "mock",
+      "enabled": false,
+      "type": "mock",
+      "label": "Mock",
+      "vendor": "Test",
+      "model": "mock",
+      "via": "動作確認用"
+    }
+  ]
+}

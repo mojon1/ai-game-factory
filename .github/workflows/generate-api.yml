@@ -1,0 +1,54 @@
+# API経由のAI（GPT / Gemini など、無料枠のみ）でゲームを作って公開する
+# Claude の日次制作はローカルの Claude Code（スケジュール実行）で行うため、これは「他のAIの参加枠」。
+# 定期実行したい場合は schedule のコメントを外す。
+name: Generate games (API AIs)
+on:
+  workflow_dispatch:
+    inputs:
+      provider:
+        description: 'generator/config.json のプロバイダID（空なら有効な全プロバイダ）'
+        required: false
+        default: ''
+  # schedule:
+  #   - cron: '0 20 * * *'   # 毎日 05:00 JST
+permissions:
+  contents: write
+  models: read      # GitHub Models（GPT系の無料枠）を GITHUB_TOKEN で使うため
+  pages: write
+  id-token: write
+concurrency:
+  group: generate
+  cancel-in-progress: false
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Generate
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          if [ -n "${{ inputs.provider }}" ]; then
+            node generator/generate.mjs --provider "${{ inputs.provider }}"
+          else
+            node generator/generate.mjs
+          fi
+      - name: Commit
+        run: |
+          git config user.name "ai-game-factory-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add games
+          git diff --cached --quiet && exit 0
+          git commit -m "API games $(TZ=Asia/Tokyo date +%F)"
+          git push
+  deploy:
+    needs: generate
+    uses: ./.github/workflows/deploy.yml

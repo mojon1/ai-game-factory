@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mock Dodge</title>
+<style>html,body{margin:0;height:100%;background:#111;overflow:hidden}canvas{display:block;width:100vw;height:100vh;touch-action:none}</style></head>
+<body><canvas id="c"></canvas><script>
+const LANG=new URLSearchParams(location.search).get('lang')||(/^ja/i.test(navigator.language)?'ja':'en');
+const T={ja:{title:'モック・ドッジ Spaceかタップで開始',over:'ゲームオーバー スコア ',score:'スコア '},en:{title:'Mock Dodge - press Space or tap',over:'Game over - score ',score:'Score '}}[LANG];
+const c=document.getElementById('c'),g=c.getContext('2d');let W,H;function rs(){W=c.width=innerWidth;H=c.height=innerHeight}addEventListener('resize',rs);rs();
+let st='title',x=0.5,blocks=[],score=0,keys={},last=0;
+function start(){st='play';x=0.5;blocks=[];score=0}
+addEventListener('keydown',e=>{keys[e.code]=1;if(st!=='play'&&(e.code==='Space'||e.code==='Enter'))start()});addEventListener('keyup',e=>keys[e.code]=0);
+c.addEventListener('pointerdown',e=>{if(st!=='play')start();else x=e.clientX/W});
+function f(t){const dt=Math.min(.05,(t-last)/1000||0);last=t;g.fillStyle='#111';g.fillRect(0,0,W,H);
+if(st==='play'){if(keys.ArrowLeft)x-=dt;if(keys.ArrowRight)x+=dt;x=Math.max(0,Math.min(1,x));if(Math.random()<dt*3)blocks.push({x:Math.random(),y:0});
+blocks.forEach(b=>b.y+=dt*.4);blocks=blocks.filter(b=>b.y<1.1);score+=dt;if(blocks.some(b=>Math.abs(b.x-x)<.04&&Math.abs(b.y-.9)<.04))st='over';}
+g.fillStyle='#e55';blocks.forEach(b=>g.fillRect(b.x*W-10,b.y*H-10,20,20));g.fillStyle='#5e5';g.fillRect(x*W-15,H*.9-8,30,16);
+g.fillStyle='#fff';g.font='16px sans-serif';g.textAlign='center';g.fillText(st==='title'?T.title:st==='over'?T.over+score.toFixed(1):T.score+score.toFixed(1),W/2,30);requestAnimationFrame(f)}
+requestAnimationFrame(f);
+</script></body></html>
