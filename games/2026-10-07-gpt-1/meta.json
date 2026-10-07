@@ -1,0 +1,317 @@
+{
+  "id": "2026-10-07-gpt-1",
+  "status": "published",
+  "title": "星くくり",
+  "genre": "アクション",
+  "concept": "指を置いた場所から輪を広げ、漂う光をまとめて捕まえる。大きな輪は高得点になる一方、赤い火種も巻き込みやすい。45秒の夜の中で、欲張るか小さく確実に拾うかを判断する面白さを核にした。",
+  "howToPlay": "指を置いて引っぱり、輪を広げて離すと中の光を捕まえます。赤い火種を避け、45秒で高得点を目指しましょう。",
+  "i18n": {
+    "en": {
+      "title": "Star Gather",
+      "concept": "Grow a circle from your touch to gather drifting lights. Larger circles reward greed but may catch red embers. The core is choosing between a risky group catch and a small, safe one during a 45-second night.",
+      "howToPlay": "Touch, drag to grow a circle, then release to gather the lights inside. Avoid red embers and score as much as you can in 45 seconds."
+    }
+  },
+  "createdAt": "2026-10-07T15:38:02+09:00",
+  "specVersion": 3,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6 (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "startedAt": "2026-10-07T15:38:02+09:00",
+    "metricsFrom": "2026-10-07T06:38:02.548Z",
+    "transcript": null,
+    "validationRuns": 1,
+    "finishedAt": "2026-10-07T15:43:38+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-07T15:40:17+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "9.2KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=117",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=117",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=107",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=111",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 9407,
+    "lines": 54
+  },
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6 (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6"
+    },
+    "verdict": "meh",
+    "works": "ok",
+    "comment": "スマホ縦画面で10手、毎手の画像を見てプレイ。まとめ取りの光と得点表示は心地よく、赤を巻き込んだ減点、325点での時間切れ、ベストを保持した再開まで確認できた。一方、光の動きが遅く安全な輪を選びやすいため、45秒の緊張感と繰り返し遊ぶ理由は弱め。初見ではまあまあ。",
+    "similar": [
+      {
+        "title": "ポケモンレンジャー / Pokémon Ranger",
+        "similarity": "中",
+        "note": "タッチで対象を囲んで捕獲する発想が近い。本作は自由な線を何周も描く方式ではなく、指を置いた中心から円を拡大して一度に拾う45秒のスコアゲーム。",
+        "note_en": "Both use touch-controlled enclosure to capture targets. This game grows a circle from a fixed touch point rather than tracing repeated freehand loops, and is a 45-second score challenge."
+      },
+      {
+        "title": "Fruit Ninja",
+        "similarity": "低",
+        "note": "タッチ操作で複数の対象をまとめて取り、危険物を避ける判断が近い。本作は切る軌跡ではなく円の面積で判定し、対象はゆっくり漂う。",
+        "note_en": "Both reward collecting multiple targets with touch input while avoiding hazards. Here a circular area decides the catch instead of a slicing trail, and the targets drift slowly."
+      }
+    ],
+    "research": "ウェブ検索ツールが利用できないため、手順書の代替手順に従って既知の実在作品ポケモンレンジャーとFruit Ninjaを自分の知識から比較した。現行ページやURLは未確認のため記載しない。",
+    "i18n": {
+      "en": {
+        "comment": "I played ten moves on a portrait phone screen, viewing every screenshot. Group catches and their feedback felt pleasant. I experienced an ember penalty, finished with 325 points, and restarted with the best score retained. However, the slow drift makes safe circles easy to choose, so the 45-second tension and reason to replay feel modest. My first-play verdict is so-so.",
+        "research": "No web search tool is available. Following the documented fallback, I compared the known games Pokémon Ranger and Fruit Ninja from prior knowledge. Current pages and URLs were not verified, so no URLs are included."
+      }
+    },
+    "method": "スマホ縦画面で 10 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 10 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.80) 120ms",
+        "note": "落ち着いた夜のタイトル。指を置いて輪を広げる説明を読み、開始する。",
+        "noteEn": "The quiet night title explains growing a circle from a touch. I tap to start.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "swipe(0.28,0.33→0.45,0.33) 350ms",
+        "note": "左上に光が2つ並び、赤から離れている。2つを小さな輪でまとめて狙う。",
+        "noteEn": "Two lights sit together at the upper left, far from red embers. I try a small group catch.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "swipe(0.75,0.36→0.94,0.36) 400ms",
+        "note": "2個取りで30点になった。右上の3個は赤と距離があるので、少し広い輪を試す。",
+        "noteEn": "The two-light catch gave 30 points. I try a wider circle around three upper-right lights away from red.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "swipe(0.67,0.53→0.91,0.53) 450ms",
+        "note": "右上は2個取りで40点。中央右の光へ欲張って輪を広げ、赤を巻き込むとどうなるか試す。",
+        "noteEn": "The upper-right catch gave 40 points for two lights. I try a greedy circle near the center to feel the ember penalty.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "swipe(0.28,0.74→0.54,0.74) 500ms",
+        "note": "火種で15点減り、輪が赤くなった。今度は左下の光をまとめて拾い、少し時間を進める。",
+        "noteEn": "An ember cost 15 points and turned the ring red. I aim for the lower-left lights, then let a few seconds pass.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "swipe(0.55,0.39→0.69,0.39) 400ms",
+        "note": "左下のまとめ取りで100点。上の3個は近いが赤も下にいるので、小さめの輪で狙う。",
+        "noteEn": "The lower-left catch brought the score to 100. Three lights above are close together, so I use a small circle clear of the red below.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "swipe(0.50,0.79→0.70,0.79) 500ms",
+        "note": "160点。上に火種が増えたので、下側の3個を輪で拾う。狙える場所が変わるのはよい。",
+        "noteEn": "At 160 points, another ember has appeared above. I gather the three lower lights; the changing safe areas add a little tension.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "swipe(0.23,0.57→0.38,0.57) 450ms",
+        "note": "235点まで伸びた。赤から遠い左側を狙う。輪を離した瞬間のまとめ取りは気持ちよいが、光の動きは穏やか。",
+        "noteEn": "The score is 235. I aim left, away from red. Releasing a group catch feels pleasant, though the lights drift quite slowly.",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 10000ms",
+        "note": "325点、残り8秒。左下にも火種が増えた。操作を止めて時間切れの結果画面を確認する。",
+        "noteEn": "325 points with eight seconds left. Another ember appeared at the lower left. I wait to see the final result screen.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 325
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.50,0.80) 120ms",
+        "note": "夜明けの結果は325点でベスト更新。再びタップし、同じページで再開できるか確認する。",
+        "noteEn": "Daybreak shows 325 points and a new best. I tap again to check that the game restarts on the same page.",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 325
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-07T15:43:38+09:00"
+  },
+  "publishedAt": "2026-10-07T15:43:38+09:00",
+  "metrics": {
+    "model": "gpt-6",
+    "effort": null,
+    "thinkingTokens": null,
+    "outputTokens": null,
+    "contextTokens": null,
+    "turns": null,
+    "toolCalls": null,
+    "webSearches": null,
+    "minutes": 5.6,
+    "from": "2026-10-07T06:38:02.548Z",
+    "to": "2026-10-07T06:43:38.076Z",
+    "method": "この環境ではトークン数を自動取得できないため、制作時間（と申告値）のみ記録",
+    "methodEn": "Token counts are not available in this environment; only time (and any self-reported values) recorded",
+    "recordedAt": "2026-10-07T15:43:38+09:00",
+    "validationRuns": 1,
+    "codeKB": 9.2
+  }
+}
