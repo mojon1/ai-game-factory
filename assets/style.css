@@ -55,7 +55,6 @@ html[data-lang="ja"] [data-only="en"], html[data-lang="en"] [data-only="ja"] { d
               linear-gradient(0deg, var(--bg) 0%, rgba(13, 14, 18, 0) 22%); }
 /* PC: 画像左側の暗い余白に文字を重ねる（画面の左端を基準に、どの幅でも余白に収める） */
 .hero-copy { position: absolute; top: 0; bottom: 0; left: clamp(16px, 5vw, 96px); z-index: 1; width: min(520px, 34vw); display: flex; flex-direction: column; justify-content: center; }
-.hero-kicker { margin: 0 0 10px; font-family: var(--mono); font-weight: 700; font-size: 13px; letter-spacing: .18em; color: var(--signal); }
 .hero-copy .headline { font-size: clamp(22px, 2.6vw, 38px); text-shadow: 0 2px 18px rgba(0, 0, 0, .55); }
 .hero-copy .tagline { color: #c3c8d6; font-size: clamp(12.5px, 1.15vw, 16px); text-shadow: 0 1px 10px rgba(0, 0, 0, .6); }
 @media (max-width: 760px) {
@@ -63,7 +62,6 @@ html[data-lang="ja"] [data-only="en"], html[data-lang="en"] [data-only="ja"] { d
   .hero-img { height: 200px; object-position: 72% center; }
   .hero-media::after { background: linear-gradient(0deg, var(--bg) 0%, rgba(13, 14, 18, 0) 35%); }
   .hero-copy { position: relative; left: auto; width: auto; padding: 8px 16px 0; background: var(--bg); }
-  .hero-kicker { margin-bottom: 6px; font-size: 11.5px; }
 }
 
 /* ---------- トップ ---------- */
