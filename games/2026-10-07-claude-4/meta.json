@@ -1,0 +1,362 @@
+{
+  "id": "2026-10-07-claude-4",
+  "status": "published",
+  "title": "スパーン！だるま落とし",
+  "genre": "アクション",
+  "concept": "すばやく水平に打ち抜けば、ブロックだけがスパーンと飛んで上の段がストンと落ちる。遅いと上ごとズレ、斜めだと浮く。だるま落とし本来の手触りを物理演算でそのまま再現し、きれいに抜けた瞬間の気持ちよさを核にした。",
+  "howToPlay": "ブロックを横にすばやくスワイプして弾き飛ばす。だるまを倒さずに台まで下ろせばクリア。制限時間内にどこまで進めるか。",
+  "libraryDecision": "matter-js（2D物理演算）と ZzFX（効果音）を使う。上の段の重さによる摩擦、ゆっくり押すと上ごとズレる、斜めに打つと浮く、といった手触りがルールを書かずに生まれ、核の「打ち抜く気持ちよさ」を直接強めるため。three.js は使わない（横から見た2Dのほうが、どの段をどちら向きに打つかが分かりやすい）。再考で、氷（すべる）・鉄（重い）・ゴム（抜けにくい）の材質ちがいの段と、きれいに抜けた瞬間のスローモーション「スパーン！」判定を足した。",
+  "i18n": {
+    "en": {
+      "title": "Daruma Knockout",
+      "concept": "Strike fast and flat, and only the block shoots out while the stack drops straight down. Too slow and the stack slides with it; angled and it lifts. Physics recreates the real Daruma Otoshi toy, and the core is the thrill of a perfectly clean knockout.",
+      "howToPlay": "Swipe fast sideways across a block to knock it out. Get the daruma down to the stand without toppling it. See how far you get before time runs out.",
+      "libraryDecision": "Uses matter-js (2D physics) and ZzFX (sound effects). Friction from the weight above, a slow push dragging the stack, an angled hit lifting it: these come out of the physics without hand-written rules and directly strengthen the core thrill of a clean knockout. No three.js: a 2D side view makes it clearer which block to hit and in which direction. The rethink added blocks of different materials (slippery ice, heavy iron, grippy rubber) and a slow-motion \"THWACK!\" call for perfectly clean hits."
+    }
+  },
+  "createdAt": "2026-10-07T19:14:05+09:00",
+  "specVersion": 4,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "manual",
+    "startedAt": "2026-10-07T19:14:05+09:00",
+    "metricsFrom": "2026-10-07T10:11:10.019Z",
+    "transcript": "a0a8018a-9bba-4b1c-954f-a12c38a1485f.jsonl",
+    "validationRuns": 1,
+    "finishedAt": "2026-10-07T19:19:28+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-07T19:16:20+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "25.8KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=192",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=194",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=176",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=158",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 26423,
+    "lines": 561
+  },
+  "libraries": [
+    {
+      "name": "matter-js",
+      "version": "0.20.0",
+      "file": "matter-0.20.0.min.js"
+    },
+    {
+      "name": "ZzFX",
+      "version": "1.4.0",
+      "file": "zzfx-1.4.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "verdict": "meh",
+    "works": "buggy",
+    "comment": "だるま落としなので説明を読まなくても何をするか分かり、速く水平に打ち抜いたときに1段だけ飛んで塔がストンと落ちる『スパーン！』は、これまでの作品で一番気持ちのいい手応えだった。ゆっくり押すと上ごとズレ、斜め上に打つと塔が浮いて崩れる、という失敗も説明どおりに起き、だるまが困り顔から×目になるのも楽しい。一方で、打つ段はいつも台のすぐ上の同じ高さなので、やることは『同じ場所を速くスワイプ』の繰り返しになりやすい。スローモーション中に次を打つと空振りし、テンポが少し途切れる。ステージ2まで（4段）は簡単で、氷・鉄・ゴムの段が出るステージ3以降は自己プレイでは確かめられていない。不具合として、時間切れの結果画面で、文字（成績・タップでもう一度）が後ろの塔に重なって読みにくい。手触りは良いが、繰り返しの単調さが残るので、まあまあ。",
+    "similar": [
+      {
+        "title": "リアルなダルマ落とし",
+        "url": "https://apps.apple.com/us/app/id6443984095",
+        "similarity": "高",
+        "note": "木づちを横に力強くスワイプしてブロックを飛ばし、塔を崩さずにだるまを落とすスマホアプリ（ストアの紹介文で確認。遊んではいない）。操作の核がほぼ同じ。本作は制限時間つきの連続ステージと、氷・鉄・ゴムの材質ちがい、きれいに抜けたときの判定がある",
+        "note_en": "A phone app where you swipe a mallet hard and flat to knock blocks out without collapsing the tower (store blurb only; not played). Nearly the same core control. This one adds timed consecutive stages, ice/iron/rubber blocks, and a clean-hit judgement"
+      },
+      {
+        "title": "Daruma Challenge",
+        "url": "https://apps.apple.com/np/app/daruma-challenge/id1567421331",
+        "similarity": "中",
+        "note": "指でだるまの塔のブロックを打ち抜き、タイミングよく打ってレベルを進めるスマホゲーム。本作は打つ速さと角度を物理演算で判定する",
+        "note_en": "A phone game where you knock blocks out of a daruma tower with your finger, timing hits to climb levels. This one judges hit speed and angle through physics"
+      },
+      {
+        "title": "メイド イン ワリオ さわるメイド（だるま落としのプチゲーム）",
+        "url": "https://www.mariowiki.com/Middle_Management",
+        "similarity": "中",
+        "note": "タッチペンで真ん中の段を切るように払い、頭を倒さないプチゲーム。数秒の一発勝負に対し、本作は塔を最後まで下ろすステージ制",
+        "note_en": "A WarioWare: Touched! microgame where you slash the middle blocks with the stylus without toppling the head. That is a few-second one-shot; this one is stage-based, lowering the whole tower"
+      },
+      {
+        "title": "だるま落とし（日本の伝統玩具）",
+        "similarity": "高",
+        "note": "アイデアの直接のルーツ。木づちで下の段を打ち抜き、だるまの頭を倒さずに落とす。本作はそれを画面上で物理演算により再現した",
+        "note_en": "The direct root: knock the blocks out with a small mallet without toppling the daruma head. This game recreates it on screen with physics"
+      }
+    ],
+    "research": "企画を決めたあとにウェブ検索を2回（英語: daruma otoshi game app swipe / 日本語: だるま落とし ゲーム アプリ スワイプ）。だるま落としのスマホアプリは複数あり、特に『リアルなダルマ落とし』は横に力強くスワイプする操作が本作とほぼ同じ（紹介文のみ確認）。題材そのものが伝統玩具なので、ルーツとして明記する。",
+    "i18n": {
+      "en": {
+        "comment": "It's Daruma Otoshi, so you know what to do without reading. Striking fast and flat sends one block flying while the stack drops straight down — that THWACK was the most satisfying feel of any game here so far. The failure modes work as described: a slow push drags the stack, an upward swipe lifts and topples it, and the daruma's face goes from worried to X-eyed. But the block you hit is always at the same height right above the stand, so play drifts into swiping the same spot fast, over and over. Swiping during the slow-motion whiffs and breaks the rhythm a little. Stages 1–2 (up to four blocks) are easy; I could not check the ice/iron/rubber blocks from stage 3 on. Bug: on the time-up result screen, the text (results, Tap to play again) overlaps the tower behind it and is hard to read. Great feel, but some repetitiveness remains — so-so.",
+        "research": "Two web searches after the design was fixed (English: daruma otoshi game app swipe / Japanese equivalent). Several Daruma Otoshi phone apps exist; 'リアルなダルマ落とし' in particular uses nearly the same strong horizontal swipe (store blurb only). The subject itself is a traditional toy, listed as the root."
+      }
+    },
+    "method": "スマホ縦画面で 12 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 12 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.30) 120ms → wait 700ms",
+        "note": "タイトルに台の上のだるまとブロック。タップで開始し、塔が落ち着くのを待つ",
+        "noteEn": "Title shows a daruma on a block stack. Tap to start and let the tower settle",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "swipe(0.12,0.74→0.92,0.74) 80ms → wait 350ms",
+        "note": "台の上に3段とだるま。一番下の黄色を左から右へ一気にスワイプ",
+        "noteEn": "Three blocks and the daruma on the stand. Swiped hard left-to-right across the bottom yellow block",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "swipe(0.20,0.73→0.75,0.73) 700ms → wait 600ms",
+        "note": "スパーン！+25。塔がストンと1段落ちた。次はわざとゆっくり緑を押して、どうなるか確かめる",
+        "noteEn": "THWACK! +25 and the stack dropped one level. Now pushing the green block slowly on purpose to see what happens",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "swipe(0.92,0.73→0.08,0.73) 80ms → wait 400ms",
+        "note": "ゆっくり押すと緑だけでなく上の段とだるまごと右へズレた（説明どおり）。今度は右から左へ速く打ち抜く",
+        "noteEn": "The slow push dragged the whole stack and daruma to the right, as the title said. Now a fast right-to-left swipe",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "swipe(0.10,0.74→0.92,0.74) 70ms → wait 1500ms",
+        "note": "2連続スパーン（+40）。残りはだるまの真下の橙だけ。これを抜けばだるまが台に乗るはず",
+        "noteEn": "Two clean hits in a row (+40). Only the orange block under the daruma is left; knocking it out should land the daruma on the stand",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 900ms",
+        "note": "3連続スパーンでクリア、+8秒。気持ちいいがステージ1は簡単。次の塔を見る",
+        "noteEn": "Cleared with three clean hits in a row, +8s. Satisfying, but stage 1 is easy. Waiting for the next tower",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "swipe(0.10,0.79→0.92,0.60) 80ms → wait 900ms",
+        "note": "ステージ2は4段。わざと斜め上に向けて速く打ってみる",
+        "noteEn": "Stage 2 has four blocks. Deliberately swiping fast but angled upward",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 700ms",
+        "note": "斜めに打つと1段目は抜けたが塔が浮いて傾き、オレンジも押し出された。だるまが困り顔で倒れかけている",
+        "noteEn": "The angled hit knocked the first block out but lifted and tilted the stack, pushing the orange block out too. The daruma looks worried and is tipping over",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 900ms → swipe(0.10,0.74→0.92,0.74) 70ms → wait 450ms → swipe(0.92,0.74→0.08,0.74) 70ms → wait 450ms",
+        "note": "ガラガラ…-5秒。だるまの目が×になった。塔が組み直されたので、今度は水平に、一番下を左右交互にテンポよく打つ",
+        "noteEn": "Crash, -5s, and the daruma's eyes turned to X. The tower was rebuilt; now hitting the bottom block flat, alternating sides in rhythm",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "swipe(0.92,0.74→0.08,0.74) 70ms → wait 800ms → swipe(0.08,0.74→0.92,0.74) 70ms → wait 800ms",
+        "note": "2回目のスワイプは空振り。スローモーションで塔がまだ落ちている途中だった。着地を待ってから打つ",
+        "noteEn": "My second swipe whiffed: the stack was still dropping in slow motion. Waiting for it to land before each hit",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "swipe(0.92,0.74→0.08,0.74) 70ms → wait 1600ms",
+        "note": "着地を待てば連続でスパーン（×3）。残り1段を打ち抜いてクリアを狙う",
+        "noteEn": "Waiting for the landing gives back-to-back clean hits (x3). Knocking out the last block to clear",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "wait 10000ms → wait 10000ms → wait 10000ms → wait 10500ms",
+        "note": "ステージ2もクリア。ステージ3（氷のブロック入り）は見られないが、手順の上限なので手を止めて時間切れの結果画面を確認する",
+        "noteEn": "Stage 2 cleared too. I can't reach stage 3 (with an ice block) within my move limit, so I stop and let the clock run out to check the result screen",
+        "image": "ai-play/step-12.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 480
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-07T19:19:28+09:00"
+  },
+  "publishedAt": "2026-10-07T19:19:28+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "thinkingTokens": 17221,
+    "outputTokens": 23203,
+    "contextTokens": 7806644,
+    "turns": 30,
+    "toolCalls": 32,
+    "webSearches": 0,
+    "minutes": 8.3,
+    "from": "2026-10-07T10:11:10.019Z",
+    "to": "2026-10-07T10:19:28.582Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-07T19:19:28+09:00",
+    "validationRuns": 1,
+    "codeKB": 25.8
+  }
+}

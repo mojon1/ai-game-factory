@@ -1,0 +1,338 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-07T10:16:23.365Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.3
+          ]
+        },
+        {
+          "wait": 700
+        }
+      ],
+      "desc": "tap(0.50,0.30) 120ms → wait 700ms",
+      "note": "タイトルに台の上のだるまとブロック。タップで開始し、塔が落ち着くのを待つ",
+      "noteEn": "Title shows a daruma on a block stack. Tap to start and let the tower settle",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": [
+        {
+          "swipe": [
+            0.12,
+            0.737,
+            0.92,
+            0.737
+          ],
+          "hold": 80
+        },
+        {
+          "wait": 350
+        }
+      ],
+      "desc": "swipe(0.12,0.74→0.92,0.74) 80ms → wait 350ms",
+      "note": "台の上に3段とだるま。一番下の黄色を左から右へ一気にスワイプ",
+      "noteEn": "Three blocks and the daruma on the stand. Swiped hard left-to-right across the bottom yellow block",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "swipe": [
+            0.2,
+            0.735,
+            0.75,
+            0.735
+          ],
+          "hold": 700
+        },
+        {
+          "wait": 600
+        }
+      ],
+      "desc": "swipe(0.20,0.73→0.75,0.73) 700ms → wait 600ms",
+      "note": "スパーン！+25。塔がストンと1段落ちた。次はわざとゆっくり緑を押して、どうなるか確かめる",
+      "noteEn": "THWACK! +25 and the stack dropped one level. Now pushing the green block slowly on purpose to see what happens",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "swipe": [
+            0.92,
+            0.735,
+            0.08,
+            0.735
+          ],
+          "hold": 80
+        },
+        {
+          "wait": 400
+        }
+      ],
+      "desc": "swipe(0.92,0.73→0.08,0.73) 80ms → wait 400ms",
+      "note": "ゆっくり押すと緑だけでなく上の段とだるまごと右へズレた（説明どおり）。今度は右から左へ速く打ち抜く",
+      "noteEn": "The slow push dragged the whole stack and daruma to the right, as the title said. Now a fast right-to-left swipe",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": [
+        {
+          "swipe": [
+            0.1,
+            0.737,
+            0.92,
+            0.737
+          ],
+          "hold": 70
+        },
+        {
+          "wait": 1500
+        }
+      ],
+      "desc": "swipe(0.10,0.74→0.92,0.74) 70ms → wait 1500ms",
+      "note": "2連続スパーン（+40）。残りはだるまの真下の橙だけ。これを抜けばだるまが台に乗るはず",
+      "noteEn": "Two clean hits in a row (+40). Only the orange block under the daruma is left; knocking it out should land the daruma on the stand",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": {
+        "wait": 900
+      },
+      "desc": "wait 900ms",
+      "note": "3連続スパーンでクリア、+8秒。気持ちいいがステージ1は簡単。次の塔を見る",
+      "noteEn": "Cleared with three clean hits in a row, +8s. Satisfying, but stage 1 is easy. Waiting for the next tower",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "swipe": [
+            0.1,
+            0.79,
+            0.92,
+            0.6
+          ],
+          "hold": 80
+        },
+        {
+          "wait": 900
+        }
+      ],
+      "desc": "swipe(0.10,0.79→0.92,0.60) 80ms → wait 900ms",
+      "note": "ステージ2は4段。わざと斜め上に向けて速く打ってみる",
+      "noteEn": "Stage 2 has four blocks. Deliberately swiping fast but angled upward",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": {
+        "wait": 700
+      },
+      "desc": "wait 700ms",
+      "note": "斜めに打つと1段目は抜けたが塔が浮いて傾き、オレンジも押し出された。だるまが困り顔で倒れかけている",
+      "noteEn": "The angled hit knocked the first block out but lifted and tilted the stack, pushing the orange block out too. The daruma looks worried and is tipping over",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "swipe": [
+            0.1,
+            0.737,
+            0.92,
+            0.737
+          ],
+          "hold": 70
+        },
+        {
+          "wait": 450
+        },
+        {
+          "swipe": [
+            0.92,
+            0.737,
+            0.08,
+            0.737
+          ],
+          "hold": 70
+        },
+        {
+          "wait": 450
+        }
+      ],
+      "desc": "wait 900ms → swipe(0.10,0.74→0.92,0.74) 70ms → wait 450ms → swipe(0.92,0.74→0.08,0.74) 70ms → wait 450ms",
+      "note": "ガラガラ…-5秒。だるまの目が×になった。塔が組み直されたので、今度は水平に、一番下を左右交互にテンポよく打つ",
+      "noteEn": "Crash, -5s, and the daruma's eyes turned to X. The tower was rebuilt; now hitting the bottom block flat, alternating sides in rhythm",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "action": [
+        {
+          "swipe": [
+            0.92,
+            0.737,
+            0.08,
+            0.737
+          ],
+          "hold": 70
+        },
+        {
+          "wait": 800
+        },
+        {
+          "swipe": [
+            0.08,
+            0.737,
+            0.92,
+            0.737
+          ],
+          "hold": 70
+        },
+        {
+          "wait": 800
+        }
+      ],
+      "desc": "swipe(0.92,0.74→0.08,0.74) 70ms → wait 800ms → swipe(0.08,0.74→0.92,0.74) 70ms → wait 800ms",
+      "note": "2回目のスワイプは空振り。スローモーションで塔がまだ落ちている途中だった。着地を待ってから打つ",
+      "noteEn": "My second swipe whiffed: the stack was still dropping in slow motion. Waiting for it to land before each hit",
+      "image": "ai-play/step-10.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "action": [
+        {
+          "swipe": [
+            0.92,
+            0.737,
+            0.08,
+            0.737
+          ],
+          "hold": 70
+        },
+        {
+          "wait": 1600
+        }
+      ],
+      "desc": "swipe(0.92,0.74→0.08,0.74) 70ms → wait 1600ms",
+      "note": "着地を待てば連続でスパーン（×3）。残り1段を打ち抜いてクリアを狙う",
+      "noteEn": "Waiting for the landing gives back-to-back clean hits (x3). Knocking out the last block to clear",
+      "image": "ai-play/step-11.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 12,
+      "action": [
+        {
+          "wait": 10000
+        },
+        {
+          "wait": 10000
+        },
+        {
+          "wait": 10000
+        },
+        {
+          "wait": 10500
+        }
+      ],
+      "desc": "wait 10000ms → wait 10000ms → wait 10000ms → wait 10500ms",
+      "note": "ステージ2もクリア。ステージ3（氷のブロック入り）は見られないが、手順の上限なので手を止めて時間切れの結果画面を確認する",
+      "noteEn": "Stage 2 cleared too. I can't reach stage 3 (with an ice block) within my move limit, so I stop and let the clock run out to check the result screen",
+      "image": "ai-play/step-12.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 480
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}
