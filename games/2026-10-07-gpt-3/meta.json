@@ -1,0 +1,339 @@
+{
+  "id": "2026-10-07-gpt-3",
+  "status": "published",
+  "title": "くるり航路",
+  "genre": "パズル",
+  "concept": "矢印の先が空いた船を送り出す港のパズル。１隻出港するたびに残る全船が90度回転し、さっき通れた道が変わる。次の向きを想像して選ぶ面白さと、連続出港の得点を核にした60秒の勝負。風を回して行き詰まりも解ける。",
+  "howToPlay": "矢印の先が空いた船をタップ。出港のたび全船が右へ90度回転します。行き詰まったら「風を回す」で残り３秒を使って向きを変えましょう。",
+  "i18n": {
+    "en": {
+      "title": "Quarter-Turn Harbor",
+      "concept": "Launch ships with clear paths. Every departure turns all remaining ships 90 degrees, changing which routes are open. Predict the next orientation and build a scoring streak in 60 seconds; spend three seconds to turn the wind when stuck.",
+      "howToPlay": "Tap a ship with a clear path in its arrow direction. Every launch turns all remaining ships 90 degrees right. Tap Turn the wind to spend three seconds and rotate them when stuck."
+    }
+  },
+  "createdAt": "2026-10-07T18:05:52+09:00",
+  "specVersion": 3,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6 (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "manual",
+    "startedAt": "2026-10-07T18:05:52+09:00",
+    "metricsFrom": "2026-10-07T09:05:15.010Z",
+    "transcript": null,
+    "validationRuns": 1,
+    "finishedAt": "2026-10-07T18:13:17+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-07T18:08:39+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "10.8KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=107",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=124",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=84",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=108",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 11043,
+    "lines": 62
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6 (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6"
+    },
+    "verdict": "meh",
+    "works": "ok",
+    "comment": "各スクリーンショットを画像で見ながら11手プレイした。回転後に空いた道を見つける感触と連続加点は気持ちよい。ただ今回は外周の船を選ぶ場面が多く、先読みの深さは十分には感じなかった。６隻を出港させて72点になり、その後は意図的に時間切れまで待った。終了表示と再スタートは正常。港を全隻出港させるところまでは自己プレイでは到達していない。",
+    "similar": [
+      {
+        "title": "Tap Away",
+        "url": "https://play.google.com/store/apps/details?hl=en_SG&id=com.jctswbglsm.SwipeAway",
+        "similarity": "高",
+        "note": "矢印方向に障害がない駒をタップして盤面から出す核が共通。本作は２次元の港で、出港ごとに全船の向きが90度変わり、60秒の得点勝負になる。",
+        "note_en": "Both remove pieces by tapping when their arrow direction is unobstructed. This game uses a 2D harbor, turns every remaining ship 90 degrees after a launch, and scores a 60-second run."
+      },
+      {
+        "title": "Arrow Away (GamesnGames)",
+        "url": "https://play.google.com/store/apps/details?id=com.gamesngames.arrowsaway",
+        "similarity": "高",
+        "note": "矢印を回して経路を開き、時間内に盤面から出す点が近い。公式説明は矢印をタップして回転させる方式。本作は１隻の出港が残る全船を同時に回し、風の回転に３秒を使う。",
+        "note_en": "Its official description combines rotating arrows, opening paths and timed clearing. Here one departure turns all remaining ships together, and a manual wind turn costs three seconds."
+      },
+      {
+        "title": "Rotate Away",
+        "url": "https://apps.apple.com/us/app/rotate-away/id6799077942?platform=vision",
+        "similarity": "中",
+        "note": "タイルを回し矢印を揃えて送り出す点が共通。公式説明は六角形を個別に回す時間制限のないパズル。本作は四角い港で全船が同時に回り、制限時間と連続得点がある。",
+        "note_en": "Both rotate directions to release pieces. Its official description uses hexagon turns without a timer. This game turns all ships on a square grid together and adds a timer and scoring streak."
+      }
+    ],
+    "research": "ウェブ検索を２回実行し、Tap Away Popcore official puzzle、Rotate Away game rotating arrows puzzle official、Arrow Away GamesnGames rotate time の３クエリを調べた。検索結果の公式Google Play・App Store説明で実在とルールを確認し、３作品を比較した。",
+    "i18n": {
+      "en": {
+        "comment": "I viewed each screenshot as an image during an 11-move playthrough. Finding openings after a turn and building a scoring streak feels satisfying. However, many moves picked edge ships, so I did not experience much depth of planning. I launched six ships for 72 points, then deliberately waited for timeout. The result screen and restart worked. I did not clear an entire harbor in this playthrough.",
+        "research": "Used two web-search calls with three queries: Tap Away Popcore official puzzle; Rotate Away game rotating arrows puzzle official; Arrow Away GamesnGames rotate time. Confirmed three games and their rules using official Google Play and App Store descriptions in the results."
+      }
+    },
+    "method": "スマホ縦画面で 11 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 11 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.84) 120ms",
+        "note": "タイトルには船の矢印と３行のルールが見える。全船が回転する点を意識してスタートする。",
+        "noteEn": "The title shows ship arrows and three short rules. I start with the all-ships rotation rule in mind.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.83,0.34) 120ms",
+        "note": "右上の桃色の船は右向きで、すぐ外へ出られる。まずこれを送り出す。",
+        "noteEn": "The pink ship at the upper right points out of the harbor. I launch it first.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.17,0.34) 120ms",
+        "note": "出港後に残り15隻の矢印が右へ回り、スコアは10。今度は左上の左向きの船を選ぶ。",
+        "noteEn": "The launch scored 10 and turned the remaining 15 arrows right. I now choose the left-facing ship at the upper left.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.61,0.34) 120ms",
+        "note": "連続２回で22点。上段の青い船が上を向いたので、そのまま出港できそう。",
+        "noteEn": "Two consecutive launches gave 22 points. The blue ship on the top row now points upward and appears free to leave.",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.17,0.46) 120ms",
+        "note": "３連続で36点。２段目左の右向きの船には隣の船がいる。押したときの反応を確かめる。",
+        "noteEn": "Three consecutive launches scored 36. The right-facing ship at the left of row two has a neighbor blocking it. I tap it to see the response.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.50,0.89) 120ms",
+        "note": "赤い線と「道がふさがっています」が出て、得点は36のまま。風を回すボタンで３秒を使って別の向きにする。",
+        "noteEn": "A red line and blocked-route message appeared, with the score still at 36. I spend three seconds on Turn the wind to change orientation.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.39,0.34) 120ms",
+        "note": "残り55秒になり、上段の緑の船が上向きになった。風で出口を作れるが、連続得点はやり直しになる。これを出港させる。",
+        "noteEn": "The timer is now 55 and the green ship at the top points up. Turning the wind creates an exit but resets the streak. I launch this ship.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.17,0.46) 120ms",
+        "note": "46点になり、残り12隻。さっき塞がれていた２段目左の船が左向きになって外へ出られる。向きの変化を読む感触はある。",
+        "noteEn": "The score is 46 with 12 ships left. The previously blocked ship at the left of row two now points outward. Reading the changed directions feels engaging.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.39,0.46) 120ms",
+        "note": "空いた上段のおかげで、２段目の青い上向きの船にも出口ができた。外周以外の船を選べるのが気持ちよい。",
+        "noteEn": "With the top row cleared, the blue upward-facing ship in row two has an exit too. It is satisfying to free an interior ship.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 10000ms → wait 10000ms → wait 10000ms → wait 10000ms → wait 10000ms → wait 10000ms",
+        "note": "72点で10隻残っている。毎回全体が回るため少し考える必要がある。ここで操作せず時間切れまで待ち、結果画面を確かめる。",
+        "noteEn": "I have 72 points with 10 ships remaining. The global turns take some thought. I now wait without touching until time runs out to see the result screen.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 72
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.50,0.79) 120ms",
+        "note": "時間切れで72点とベスト更新が大きく表示された。再挑戦ボタンを押して、新しい航海に戻れるか確認する。",
+        "noteEn": "Time ran out and the result clearly shows 72 and a new best. I tap to play again and check that a new voyage starts.",
+        "image": "ai-play/step-11.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 72
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-07T18:13:17+09:00"
+  },
+  "publishedAt": "2026-10-07T18:13:17+09:00",
+  "metrics": {
+    "model": "gpt-6",
+    "effort": null,
+    "thinkingTokens": null,
+    "outputTokens": null,
+    "contextTokens": null,
+    "turns": null,
+    "toolCalls": null,
+    "webSearches": null,
+    "minutes": 8,
+    "from": "2026-10-07T09:05:15.010Z",
+    "to": "2026-10-07T09:13:17.693Z",
+    "method": "この環境ではトークン数を自動取得できないため、制作時間（と申告値）のみ記録",
+    "methodEn": "Token counts are not available in this environment; only time (and any self-reported values) recorded",
+    "recordedAt": "2026-10-07T18:13:17+09:00",
+    "validationRuns": 1,
+    "codeKB": 10.8
+  }
+}
