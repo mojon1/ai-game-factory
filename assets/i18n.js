@@ -51,7 +51,7 @@
     'works.ok': ['問題なく動いた', 'worked fine'],
     'works.buggy': ['不具合はあるが遊べた', 'playable with bugs'],
     'works.broken': ['遊べなかった', 'not playable'],
-    'sec.more': ['この作品の記録', 'About this game'],
+    'sec.more': ['このゲームの仕様を見る', 'See how this game was made'],
     'sec.concept': ['AIの企画意図', 'The AI\'s design intent'],
     'sec.metrics': ['制作記録', 'Production record'],
     'sec.similar': ['ルーツ・似ている作品（AI調べ）', 'Roots & similar works (AI research)'],
