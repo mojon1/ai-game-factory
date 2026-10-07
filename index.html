@@ -2,237 +2,117 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>AI GAME FACTORY</title>
-<meta name="description" content="AIが毎日ミニゲームを自動で作り、自分でプレイして自己採点する実験サイト。 / An experiment where AI makes a mini game every day, plays it and scores itself.">
+<meta name="description" content="AIだけで作られたゲームを遊んで、面白いか教えてください。 / Play games made entirely by AI, and tell us if they are fun.">
+<meta name="theme-color" content="#0d0e12">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Zen+Kaku+Gothic+New:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23c8f051'/><text x='16' y='22' font-size='16' text-anchor='middle' font-family='monospace' font-weight='700'>AI</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23c8f051'/><path d='M12 9l12 7-12 7z' fill='%23111'/></svg>">
 <script src="assets/i18n.js"></script>
 </head>
 <body>
 <header class="site-head">
   <div class="wrap">
-    <a class="logo" href="./"><span class="logo-mark">▶</span><span class="logo-text">AI GAME FACTORY</span></a>
+    <a class="logo" href="./"><span class="logo-mark">▶</span><span>AI GAME FACTORY</span></a>
     <nav class="nav">
-      <a href="./" aria-current="page" data-i18n="nav.calendar">カレンダー</a>
-      <a href="stats.html" data-i18n="nav.stats">実験データ</a>
-      <a href="about.html" data-i18n="nav.about">この実験について</a>
+      <a href="stats.html" data-i18n="nav.stats">観測データ</a>
+      <a href="about.html" class="nav-q" data-i18n-attr="aria-label:nav.about;title:nav.about">?</a>
+      <span class="lang-slot"></span>
     </nav>
   </div>
 </header>
 <div class="banner" id="banner" hidden></div>
 
 <main class="wrap">
-  <section class="hero hero-slim">
-    <div>
-      <div class="hero-kicker" data-i18n="hero.kicker"></div>
-      <h1 data-i18n="hero.title"></h1>
-      <p data-i18n="hero.lead"></p>
-    </div>
-    <dl class="mini-stats">
-      <div><dt data-i18n="stat.games"></dt><dd id="c-games">–</dd></div>
-      <div><dt data-i18n="stat.days"></dt><dd id="c-days">–</dd></div>
-      <div><dt data-i18n="stat.ais"></dt><dd id="c-ais">–</dd></div>
-      <div><dt data-i18n="stat.votes"></dt><dd id="c-votes">–</dd></div>
-    </dl>
-  </section>
-
-  <div class="cal-toolbar">
+  <div class="intro">
+    <p class="tagline" data-i18n="tagline"></p>
     <div class="seg" role="group" id="view">
-      <button type="button" data-view="month" aria-pressed="true" data-i18n="view.month"></button>
-      <button type="button" data-view="list" data-i18n="view.list"></button>
-    </div>
-    <div class="month-nav" id="month-nav">
-      <button class="icon-btn" type="button" id="prev" data-i18n-attr="aria-label:month.prev">‹</button>
-      <h2 id="month-label" aria-live="polite">–</h2>
-      <button class="icon-btn" type="button" id="next" data-i18n-attr="aria-label:month.next">›</button>
-      <button class="btn" type="button" id="today" data-i18n="month.today"></button>
-    </div>
-    <div class="list-nav" id="list-nav" hidden>
-      <div class="seg" role="group" id="order">
-        <button type="button" data-order="desc" aria-pressed="true" data-i18n="order.desc"></button>
-        <button type="button" data-order="asc" data-i18n="order.asc"></button>
-      </div>
-    </div>
-    <div class="filters">
-      <label><span data-i18n="filter.ai"></span> <select id="f-ai"><option value="" data-i18n="all"></option></select></label>
-      <label><span data-i18n="filter.genre"></span> <select id="f-genre"><option value="" data-i18n="all"></option></select></label>
+      <button type="button" data-view="list" aria-pressed="true" data-i18n="view.list"></button>
+      <button type="button" data-view="cal" data-i18n="view.cal"></button>
     </div>
   </div>
 
-  <section id="month-view">
+  <section id="list"></section>
+
+  <section id="cal-view" hidden>
+    <div class="month-nav">
+      <button class="icon-btn" type="button" id="prev" data-i18n-attr="aria-label:month.prev">‹</button>
+      <h2 id="month-label" aria-live="polite"></h2>
+      <button class="icon-btn" type="button" id="next" data-i18n-attr="aria-label:month.next">›</button>
+    </div>
     <div class="cal" id="cal" role="grid" aria-labelledby="month-label"></div>
-    <section class="day-panel" id="day-panel" aria-live="polite"></section>
   </section>
-  <section id="list-view" hidden></section>
 </main>
 
-<footer><div class="wrap" data-i18n="footer.main"></div></footer>
+<footer><div class="wrap"><a href="about.html" data-i18n="nav.about"></a> · <a href="https://github.com/mojon1/ai-game-factory">GitHub</a></div></footer>
 
 <script src="assets/config.js"></script>
 <script src="assets/app.js"></script>
 <script>
 (async () => {
-  const { t, EN, esc, fmtDate, monthLabel, WEEK, num, genre, title, money, aiChip, platformBadges, loadIndex, Ratings, modeBanner, store } = AGF;
+  const { t, CFG, esc, fmtDate, monthLabel, dayKey, WEEK, genre, title, pct, loadIndex, Ratings, modeBanner, store } = AGF;
   I18N.apply();
   modeBanner(document.getElementById('banner'));
   const $ = (id) => document.getElementById(id);
-  const narrow = matchMedia('(max-width: 640px)');
 
   let index, scores = {};
   try { index = await loadIndex(); }
-  catch (e) { $('cal').innerHTML = `<p class="empty">${t('err.index')}</p>`; return; }
+  catch (e) { $('list').innerHTML = `<p class="empty">${t('err.index')}</p>`; return; }
   try { scores = await Ratings.summary(); } catch (e) { console.warn(e); }
+  const games = index.games.map((g) => ({ ...g, s: scores[g.id] || null, day: dayKey(g.createdAt) }));
+  const href = (g) => `game.html?id=${encodeURIComponent(g.id)}&play=1`;
+  const dayNo = (key) => Math.floor((Date.parse(key) - Date.parse(CFG.startDate || key)) / 864e5) + 1;
 
-  // JST の日付キー（YYYY-MM-DD）
-  const jstKey = (iso) => new Date(new Date(iso).getTime() + 9 * 3600e3).toISOString().slice(0, 10);
-  const todayKey = jstKey(new Date().toISOString());
-  const games = index.games.map((g) => ({ ...g, human: scores[g.id] || null, day: jstKey(g.createdAt) }));
-
-  $('c-games').textContent = games.length;
-  $('c-days').textContent = new Set(games.map((g) => g.day)).size;
-  $('c-ais').textContent = new Set(games.map((g) => g.mainAI?.model)).size;
-  $('c-votes').textContent = Object.values(scores).reduce((a, s) => a + (s.votes || 0), 0);
-
-  const fAi = $('f-ai'), fGenre = $('f-genre');
-  [...new Map(games.map((g) => [g.mainAI?.model, g.mainAI?.name || g.mainAI?.model])).entries()]
-    .forEach(([model, name]) => fAi.insertAdjacentHTML('beforeend', `<option value="${esc(model)}">${esc(name)}</option>`));
-  [...new Set(games.map((g) => g.genre))].sort().forEach((x) => fGenre.insertAdjacentHTML('beforeend', `<option value="${esc(x)}">${esc(genre(x))}</option>`));
-
-  const params = new URLSearchParams(location.search);
-  const latestMonth = (games[0]?.day || todayKey).slice(0, 7);
-  const state = {
-    view: params.get('view') || store.get('agf_view', 'month'),
-    month: params.get('m') || latestMonth,
-    order: params.get('order') || 'desc',
-    day: params.get('d') || null,
-  };
-  fAi.value = params.get('ai') || ''; fGenre.value = params.get('genre') || '';
-
-  const filtered = () => games.filter((g) => (!fAi.value || g.mainAI?.model === fAi.value) && (!fGenre.value || g.genre === fGenre.value));
-  const byDay = (list) => list.reduce((m, g) => ((m[g.day] ||= []).push(g), m), {});
-  const href = (g) => `game.html?id=${encodeURIComponent(g.id)}`;
-
-  function scoreBlock(g) {
-    const h = g.human, a = g.ai;
-    return `<div class="scores">
-      <div class="score human"><small>${t('score.human')}</small><b>${h?.overall != null ? num(h.overall) : '–'}<em>${h ? t('votes', { n: h.votes }) : t('score.unrated')}</em></b></div>
-      <div class="score ai"><small>${t('score.ai')}</small><b>${a ? num(a.overall) : '–'}</b></div>
-    </div>`;
-  }
-  const metaRows = (g, withTime) => `
-    <div class="meta-row"><span class="genre">${esc(genre(g.genre))}</span><span class="mono">${fmtDate(g.createdAt, withTime)}</span></div>
-    <div class="meta-row">${t('made.by')} ${aiChip(g.mainAI)}${platformBadges(g.platforms, g.languages)}${g.cost ? `<span class="cost-chip" title="${t('cost.amount')}">${t('cost.short')} ${money(g.cost)}</span>` : ''}</div>`;
-  // 作品カード（タイトル・ジャンル・制作日・メイン制作AI）
-  const card = (g) => `<a class="card" href="${href(g)}">
-      <div class="thumb">${g.thumb ? `<img src="${esc(g.thumb)}" alt="" loading="lazy" width="480" height="300">` : ''}<span class="no">#${esc(g.id)}</span></div>
-      <div class="card-body"><h3 class="card-title">${esc(title(g))}</h3>${metaRows(g)}${scoreBlock(g)}</div>
+  // 作品カード（タップするとすぐ遊べる）
+  const card = (g) => `<a class="gcard" href="${href(g)}">
+      <div class="gthumb">${g.thumb ? `<img src="${esc(g.thumb)}" alt="" loading="lazy" width="300" height="534">` : ''}<span class="play-badge" aria-hidden="true">▶</span></div>
+      <div class="gbody">
+        <h3>${esc(title(g))}</h3>
+        <p class="gmeta">${esc(genre(g.genre))} · ${esc(t('by', { ai: g.ai?.name || '' }))}</p>
+        <p class="gscore">${g.s?.votes ? `<b>${t('v.2')} ${pct(g.s.funRate)}</b> <span>${t('votes', { n: g.s.votes })}</span>` : `<span>${t('unrated')}</span>`}</p>
+      </div>
     </a>`;
 
-  // ---------- 月表示 ----------
-  function renderMonth() {
-    const [y, m] = state.month.split('-').map(Number);
+  function renderList() {
+    if (!games.length) { $('list').innerHTML = `<p class="empty">${t('empty')}</p>`; return; }
+    const days = games.reduce((m, g) => ((m[g.day] ||= []).push(g), m), {});
+    $('list').innerHTML = Object.keys(days).sort().reverse().map((k) => `<section class="day">
+      <h2 class="day-head"><span>${esc(fmtDate(days[k][0].createdAt))}</span>${CFG.startDate && dayNo(k) > 0 ? `<small>${t('day.n', { n: dayNo(k) })}</small>` : ''}</h2>
+      <div class="ggrid">${days[k].map(card).join('')}</div></section>`).join('');
+  }
+
+  // カレンダー（過去の作品を探す）
+  const today = dayKey(new Date().toISOString());
+  let month = (games[0]?.day || today).slice(0, 7);
+  function renderCal() {
+    const [y, m] = month.split('-').map(Number);
     $('month-label').textContent = monthLabel(y, m);
-    const days = byDay(filtered());
-    const first = new Date(Date.UTC(y, m - 1, 1)).getUTCDay();
-    const len = new Date(Date.UTC(y, m, 0)).getUTCDate();
-    const cells = Math.ceil((first + len) / 7) * 7;
-    let html = WEEK.map((w, i) => `<div class="cal-head ${i === 0 ? 'sun' : i === 6 ? 'sat' : ''}" role="columnheader">${w}</div>`).join('');
-    for (let i = 0; i < cells; i++) {
+    const days = games.reduce((o, g) => ((o[g.day] ||= []).push(g), o), {});
+    const first = new Date(Date.UTC(y, m - 1, 1)).getUTCDay(), len = new Date(Date.UTC(y, m, 0)).getUTCDate();
+    let html = WEEK.map((w) => `<div class="cal-head">${w}</div>`).join('');
+    for (let i = 0; i < Math.ceil((first + len) / 7) * 7; i++) {
       const d = i - first + 1;
-      if (d < 1 || d > len) { html += '<div class="cal-day out" aria-hidden="true"></div>'; continue; }
-      const key = `${state.month}-${String(d).padStart(2, '0')}`;
-      const gs = days[key] || [];
-      const wd = i % 7;
-      html += `<div class="cal-day ${gs.length ? 'has' : ''} ${key === todayKey ? 'today' : ''} ${key === state.day ? 'sel' : ''}" role="gridcell" data-day="${key}" ${gs.length ? `tabindex="0" aria-label="${esc(fmtDate(gs[0].createdAt))} ${t('count.games', { n: gs.length })}"` : ''}>
-        <span class="cal-num ${wd === 0 ? 'sun' : wd === 6 ? 'sat' : ''}">${d}</span>
-        ${gs.length ? `<span class="cal-count">${gs.length}</span><div class="cal-thumbs n${Math.min(4, gs.length)}">${gs.slice(0, 4).map((g, k) => `<a href="${href(g)}" title="${esc(title(g))} (${esc(genre(g.genre))} · ${esc(g.mainAI?.name || '')})">${g.thumb ? `<img src="${esc(g.thumb)}" alt="${esc(title(g))}" loading="lazy">` : ''}${k === 3 && gs.length > 4 ? `<b>+${gs.length - 3}</b>` : ''}</a>`).join('')}</div>` : ''}
-      </div>`;
+      if (d < 1 || d > len) { html += '<div class="cal-day out"></div>'; continue; }
+      const key = `${month}-${String(d).padStart(2, '0')}`, gs = days[key] || [];
+      html += `<div class="cal-day${key === today ? ' today' : ''}"><span class="cal-num">${d}</span>${gs.length ? `<div class="cal-thumbs n${Math.min(3, gs.length)}">${gs.slice(0, 3).map((g) => `<a href="${href(g)}" title="${esc(title(g))}">${g.thumb ? `<img src="${esc(g.thumb)}" alt="${esc(title(g))}" loading="lazy">` : ''}</a>`).join('')}</div>` : ''}</div>`;
     }
     $('cal').innerHTML = html;
-    if (!state.day || !state.day.startsWith(state.month) || !days[state.day]) {
-      state.day = Object.keys(days).filter((k) => k.startsWith(state.month)).sort().pop() || null;
-      document.querySelector(`.cal-day[data-day="${state.day}"]`)?.classList.add('sel');
-    }
-    renderDayPanel(days);
   }
-  function renderDayPanel(days) {
-    const gs = state.day ? days[state.day] || [] : [];
-    $('day-panel').innerHTML = gs.length
-      ? `<div class="day-head"><h2>${esc(fmtDate(gs[0].createdAt))}</h2><span>${t('count.games', { n: gs.length })}</span></div><div class="grid">${gs.map(card).join('')}</div>`
-      : `<p class="empty">${t('empty.month')}</p>`;
-  }
-  $('cal').addEventListener('click', (e) => {
-    const cell = e.target.closest('.cal-day.has');
-    if (!cell) return;
-    // スマホではセルをタップしたら、その日の作品一覧を下に表示する
-    if (narrow.matches || !e.target.closest('a')) { e.preventDefault(); selectDay(cell.dataset.day, narrow.matches); }
-  });
-  $('cal').addEventListener('keydown', (e) => {
-    const cell = e.target.closest('.cal-day.has');
-    if (cell && (e.key === 'Enter' || e.key === ' ') && e.target === cell) { e.preventDefault(); selectDay(cell.dataset.day, true); }
-  });
-  function selectDay(day, scroll) {
-    state.day = day;
-    document.querySelectorAll('.cal-day.sel').forEach((c) => c.classList.remove('sel'));
-    document.querySelector(`.cal-day[data-day="${day}"]`)?.classList.add('sel');
-    renderDayPanel(byDay(filtered()));
-    sync(false);
-    if (scroll) $('day-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-  function shiftMonth(n) {
-    const [y, m] = state.month.split('-').map(Number);
-    state.month = new Date(Date.UTC(y, m - 1 + n, 1)).toISOString().slice(0, 7); state.day = null; sync();
-  }
-  $('prev').onclick = () => shiftMonth(-1);
-  $('next').onclick = () => shiftMonth(1);
-  $('today').onclick = () => { state.month = todayKey.slice(0, 7); state.day = null; sync(); };
+  const shift = (n) => { const [y, m] = month.split('-').map(Number); month = new Date(Date.UTC(y, m - 1 + n, 1)).toISOString().slice(0, 7); renderCal(); };
+  $('prev').onclick = () => shift(-1);
+  $('next').onclick = () => shift(1);
 
-  // ---------- リスト（時系列）表示 ----------
-  function renderList() {
-    const days = byDay(filtered());
-    const keys = Object.keys(days).sort();
-    if (state.order === 'desc') keys.reverse();
-    $('list-view').innerHTML = keys.length ? keys.map((k) => {
-      const [y, m, d] = k.split('-').map(Number);
-      const wd = new Date(Date.UTC(y, m - 1, d)).getUTCDay();
-      return `<section class="tl-day ${k === todayKey ? 'today' : ''}">
-        <div class="tl-date"><b class="${wd === 0 ? 'sun' : wd === 6 ? 'sat' : ''}">${d}</b><span>${esc(monthLabel(y, m))}<br>${WEEK[wd]}</span></div>
-        <div class="tl-items">${days[k].map((g) => `<a class="tl-item" href="${href(g)}">
-          <div class="thumb">${g.thumb ? `<img src="${esc(g.thumb)}" alt="" loading="lazy" width="480" height="300">` : ''}</div>
-          <div class="tl-body"><h3 class="card-title">${esc(title(g))}</h3>${metaRows(g, true)}${scoreBlock(g)}</div>
-        </a>`).join('')}</div>
-      </section>`;
-    }).join('') : `<p class="empty">${t('empty.filter')}</p>`;
+  let view = store.get('agf_view', 'list') === 'cal' ? 'cal' : 'list';
+  function show() {
+    document.querySelectorAll('#view button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === view)));
+    $('list').hidden = view !== 'list'; $('cal-view').hidden = view !== 'cal';
+    view === 'list' ? renderList() : renderCal();
   }
-  $('order').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { state.order = b.dataset.order; sync(); } });
-
-  // ---------- 切り替え ----------
-  $('view').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { state.view = b.dataset.view; store.set('agf_view', state.view); sync(); } });
-  fAi.addEventListener('change', () => sync()); fGenre.addEventListener('change', () => sync());
-
-  function sync(rerender = true) {
-    const p = new URLSearchParams();
-    if (state.view !== 'month') p.set('view', state.view);
-    if (state.view === 'month') { if (state.month !== latestMonth) p.set('m', state.month); if (state.day) p.set('d', state.day); }
-    if (state.view === 'list' && state.order !== 'desc') p.set('order', state.order);
-    if (fAi.value) p.set('ai', fAi.value);
-    if (fGenre.value) p.set('genre', fGenre.value);
-    history.replaceState(null, '', p.toString() ? `?${p}` : location.pathname);
-    if (rerender) render();
-  }
-  function render() {
-    const month = state.view === 'month';
-    document.querySelectorAll('#view button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === state.view)));
-    document.querySelectorAll('#order button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.order === state.order)));
-    $('month-view').hidden = !month; $('month-nav').hidden = !month;
-    $('list-view').hidden = month; $('list-nav').hidden = month;
-    month ? renderMonth() : renderList();
-  }
-  render();
+  $('view').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { view = b.dataset.view; store.set('agf_view', view); show(); } });
+  show();
 })();
 </script>
 </body>

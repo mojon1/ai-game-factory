@@ -1,52 +1,62 @@
-# ゲーム制作仕様（全AI共通）
+# ゲーム制作仕様（全AI共通） / Game spec (for every AI)
 
 AI GAME FACTORY に投稿するゲームは、どのAIが作る場合もこの仕様に従う。
 （Claude Code の日次タスクも、API経由の自動生成スクリプトも、このファイルをそのまま読み込む）
 
+この実験の問い: **人間が一切干渉せずに生まれたゲームを、人間が本当に「面白い」と感じる日は来るのか？**
+遊んだ人は「面白い / まあまあ / つまらない」で評価する。目指すのは「面白い」と言われるゲーム。
+
+## 企画
+
+- **何を作るかは、あなた（AI）が自分で決める。** ジャンル・ルール・見た目・テーマは自由。
+- 人間がスマホで数分遊んで「面白い」と感じるものを目指す。
+- 過去の作品と似た企画は避ける（`node tools/recent.mjs` で一覧を確認できる）。
+- 企画意図（何を面白さの核にしたか）を meta.json の `concept` に書く。
+
 ## 必須要件
 
-1. **HTMLファイル1枚で完結**すること。CSS・JavaScript・画像（あれば）はすべてインライン。
-   外部URLの読み込み（CDN、Webフォント、画像、fetch など）は一切禁止。目安 60KB 以下（上限 120KB）。
-2. **PC とスマホの両方に対応**すること（自動テストで両方検査され、どちらかが不合格なら公開されない）。
-   - 画面いっぱい（`100vw × 100vh`）に表示し、`resize` に追従する。`devicePixelRatio` を考慮して描画がぼやけないこと。
-   - **横長 PC（640×400 前後）でも、縦長スマホ（360×640 前後）でも** 画面を有効に使ったレイアウトにする。
-     縦長でフィールドが極端に小さくならないよう、縦横比に応じて配置・拡大率・フィールドの向きを変える。
-   - スマホでも文字は最小 12px 相当以上。HUD の文字同士が重ならないこと。
-   - 読み込み直後に一瞬サイズが 0 でも例外を出さないこと（サイズに依存する初期化は描画時に行うか、最小サイズで保護する）。
-3. 操作は **PC=キーボード（＋マウス）、スマホ=タッチだけ** で完結すること。
-   - ポインタ操作は Pointer Events（`pointerdown` / `pointermove` / `pointerup`）で実装する。
-   - タッチ時にスクロールやズームが起きないよう `touch-action: none` を指定する。
-   - キーボードは矢印キー / WASD / Space / Enter を基本とする。
-   - スマホではキーボードが無い前提で、タップ・長押し・スワイプ・画面上のボタンなどで全操作ができること。
-     画面上ボタンは指で押せる大きさ（最小 44px 四方）にする。
-   - タイトル画面やゲーム中に、その端末向けの操作説明を表示する（`pointer: coarse` などで出し分けてよい）。
+1. **HTMLファイル1枚で完結**すること。CSS・JavaScript はすべてインライン。
+   外部URLの読み込み（CDN、Webフォント、画像、fetch など）は一切禁止。画像・音声ファイルも使わない（すべてコードで描く・鳴らす）。
+   例外は**共有ライブラリ棚**（`lib/catalog.json` に載っているもの）だけで、`<script src="../../lib/ファイル名"></script>` で読み込める。
+   棚に無いライブラリは使わない・追加しない（欲しい場合は meta.json の `libraryRequest` に書く）。
+   **ゲームの容量は 200KB 以内**（`factory/settings.json` の `gameMaxKB`）。普通に作れば数十KBで収まる。
+2. **スマホ専用・縦画面。Android（Chrome）と iPhone（Safari）の両方で動くこと。**
+   - iPhone の Safari では Fullscreen API・`navigator.vibrate` が使えないので頼らない（使う場合は存在確認してから）。
+   - Web Audio は最初のタッチの中で `AudioContext` を作成・`resume()` しないと iPhone では鳴らない。
+   - 基準は 360×640 の縦画面。画面いっぱい（`100vw × 100dvh`）に表示し、`resize` に追従する。
+     縦横比が多少違っても破綻しないこと。`devicePixelRatio` を考慮して描画がぼやけないこと。
+   - 読み込み直後に一瞬サイズが 0 でも例外を出さないこと。
+   - 文字は最小 12px 相当以上。表示同士が重ならないこと。
+3. **操作はタッチだけ**で完結すること（キーボード前提にしない）。
+   - Pointer Events（`pointerdown` / `pointermove` / `pointerup`）で実装する。PC ではマウスがそのまま使える。
+   - スクロールやズームが起きないよう `touch-action: none` を指定する。
+   - 画面上のボタンは指で押せる大きさ（最小 44px 四方）。
 4. 流れは **タイトル画面 → プレイ → ゲームオーバー（またはクリア）→ リスタート**。
-   タイトル画面では Space / Enter / クリック / タップのいずれでも開始できること。
-   リスタートはページ再読み込みなしで行えること。
+   タイトル画面はタップで開始。リスタートはページ再読み込みなしで行えること。
+   遊び方は**タイトル画面に短く**表示する（長い説明は不要。直感的に分かるのが理想）。
 5. スコア・残りライフ・タイムなど、プレイ状況が画面に表示されていること。
-6. **日本語と英語の両方に対応**すること。
+6. 1プレイ 30秒〜3分程度。開始から3秒以内に遊べる状態になること。
+7. **日本語と英語の両方に対応**すること。
    - 表示言語は URL の `?lang=ja` / `?lang=en` で決める。指定が無い場合は `navigator.language` が `ja` で始まれば日本語、それ以外は英語。
      例: `const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');`
-   - 画面に出る文字（タイトル・説明・操作方法・HUD・結果画面）はすべて辞書オブジェクトにまとめ、両言語で用意する。
-   - 英語は文字数が増えやすいので、はみ出さないよう文字サイズや改行を調整する。
-   - 自動テストで `?lang=ja` と `?lang=en` のタイトル画面が異なることを確認する。
-7. 1プレイ 1〜3 分程度で遊べる、シンプルで分かりやすいルールにする。
-   開始から3秒以内に操作して遊べる状態になること。
+   - 画面に出る文字はすべて辞書オブジェクトにまとめ、両言語で用意する。
+8. **プレイの合図をサイトへ送る**こと（プレイ回数とプレイ時間の計測に使う。遊ぶ人には見えない）。
+   ```js
+   const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+   signal('start');                 // 1プレイ開始ごと（タイトルから開始・リスタートのたび）
+   signal('end', { score: 123 });   // ゲームオーバー／クリアのたび（スコアが無ければ省略可）
+   ```
 
 ## 禁止事項（サイトの sandbox iframe 内で動かすため）
 
-- `alert` / `confirm` / `prompt`、`window.open`、`top` / `parent` の操作
+- `alert` / `confirm` / `prompt`、`window.open`、`top` の操作（`parent.postMessage` は可）
 - `localStorage` / `sessionStorage` / Cookie / IndexedDB（使うと例外になる。ハイスコアはメモリ上で保持）
-- ネットワーク通信（fetch, XHR, WebSocket）
-- 外部リソースの読み込み
+- ネットワーク通信（fetch, XHR, WebSocket）、外部リソースの読み込み
 
 ## 推奨
 
-- ゲームループは `requestAnimationFrame` のタイムスタンプ（または `performance.now()`）から
-  経過時間 dt を求めて更新する。dt は上限（例: 50ms）でクランプする。
-  ※ AIの自己プレイでは「時間を止めて1手ずつ進める」ため、Date や時間を直接見ても問題なく動作する。
-- サウンドは Web Audio API で生成してよい（最初のユーザー操作後に `AudioContext` を作成し、try/catch で囲む）。
-- 図形・グラデーション・パーティクルなどコードで描ける表現を工夫して見た目の質を上げる。
+- ゲームループは `requestAnimationFrame` のタイムスタンプ（または `performance.now()`）から経過時間 dt を求めて更新し、dt は上限（例: 50ms）でクランプする。
+- サウンドは Web Audio API で生成してよい（最初のタッチ後に `AudioContext` を作成し、try/catch で囲む）。
 - 難易度は徐々に上がる設計にする。
 
 ## 提出物
@@ -56,9 +66,9 @@ AI GAME FACTORY に投稿するゲームは、どのAIが作る場合もこの�
 | ファイル | 内容 |
 | --- | --- |
 | `index.html` | ゲーム本体 |
-| `meta.json` | タイトル・ジャンル・説明・操作方法・制作AI情報など（`tools/new-game.mjs` が雛形を作る） |
-| `thumb.webp` | サムネイル（`tools/review.mjs` が自動生成・圧縮） |
-| `ai-play/` `ai-play-mobile/` | AI自己プレイ（PC・スマホ）の画像とログ（`tools/play.mjs` が生成、`review.mjs` が圧縮・間引き） |
+| `meta.json` | タイトル・ジャンル・企画意図・制作記録など（`tools/new-game.mjs` が雛形を作る） |
+| `thumb.webp` | サムネイル（`tools/review.mjs` が自動生成） |
+| `ai-play/` | AI自己プレイの画像とログ（`tools/play.mjs` が生成、`review.mjs` が間引き・圧縮） |
 
 ### meta.json で埋める項目
 
@@ -66,17 +76,13 @@ AI GAME FACTORY に投稿するゲームは、どのAIが作る場合もこの�
 {
   "title": "ゲームタイトル（日本語・20文字以内）",
   "genre": "アクション | シューティング | パズル | レース | リズム | スポーツ | ストラテジー | アドベンチャー | その他 のいずれか",
-  "tags": ["短い特徴タグ", "2〜4個"],
-  "description": "どんなゲームか（80〜150文字）",
-  "howToPlay": "目的とルール（1〜3文）",
-  "controls": [{ "input": "← → / A D / 画面左右タップ", "action": "移動" }],
+  "concept": "企画意図: 何を面白さの核にしたか（60〜120文字）",
+  "howToPlay": "遊び方（1〜2文）",
   "i18n": {
     "en": {
       "title": "English title",
-      "tags": ["tag"],
-      "description": "English description",
-      "howToPlay": "English how to play",
-      "controls": [{ "input": "← → / A D / tap left or right", "action": "Move" }]
+      "concept": "Design intent in English",
+      "howToPlay": "How to play in English"
     }
   }
 }

@@ -3,18 +3,19 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "AIが毎日ゲームを自動生成・自己採点し、人間が評価する実験サイト",
+  "description": "AIが人間の干渉なしに作ったゲームを、人間が「面白い」と感じる日が来るかを観測する実験サイト",
   "scripts": {
-    "setup": "playwright install chromium",
+    "setup": "playwright install chromium webkit",
     "serve": "node tools/serve.mjs",
+    "recent": "node tools/recent.mjs",
     "new": "node tools/new-game.mjs",
-    "idea": "node tools/idea.mjs",
     "validate": "node tools/validate.mjs",
     "play": "node tools/play.mjs",
     "review": "node tools/review.mjs",
+    "metrics": "node tools/metrics.mjs",
     "build": "node tools/build-index.mjs",
-    "generate": "node generator/generate.mjs",
-    "storage": "node tools/storage-report.mjs"
+    "storage": "node tools/storage-report.mjs",
+    "generate": "node generator/generate.mjs"
   },
   "devDependencies": {
     "playwright": "^1.63.0"

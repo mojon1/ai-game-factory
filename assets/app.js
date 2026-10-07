@@ -7,47 +7,22 @@
   // ---------- 小物 ----------
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const WEEK = EN ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] : ['日', '月', '火', '水', '木', '金', '土'];
-  const MONTH = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  // 日時は日本時間（JST）で表示する
-  function fmtDate(iso, withTime = false) {
+  const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const jst = (iso) => new Date(new Date(iso).getTime() + 9 * 3600e3);
+  const dayKey = (iso) => jst(iso).toISOString().slice(0, 10);
+  function fmtDate(iso) {
     if (!iso) return '-';
-    const j = new Date(new Date(iso).getTime() + 9 * 3600e3);
-    const p = (n) => String(n).padStart(2, '0');
-    let s = EN
-      ? `${MONTH[j.getUTCMonth()]} ${j.getUTCDate()}, ${j.getUTCFullYear()} (${WEEK[j.getUTCDay()]})`
-      : `${j.getUTCFullYear()}.${p(j.getUTCMonth() + 1)}.${p(j.getUTCDate())} (${WEEK[j.getUTCDay()]})`;
-    if (withTime) s += ` ${p(j.getUTCHours())}:${p(j.getUTCMinutes())}${EN ? ' JST' : ''}`;
-    return s;
+    const j = jst(iso), p = (n) => String(n).padStart(2, '0');
+    return EN ? `${MONTHS[j.getUTCMonth()].slice(0, 3)} ${j.getUTCDate()}, ${j.getUTCFullYear()}` : `${j.getUTCFullYear()}.${p(j.getUTCMonth() + 1)}.${p(j.getUTCDate())}（${WEEK[j.getUTCDay()]}）`;
   }
-  const monthLabel = (y, m) => (EN ? `${['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][m - 1]} ${y}` : `${y}年${m}月`);
-  const avg = (arr) => (arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null);
-  const overallOf = (s) => (s && s.fun != null ? (Number(s.fun) + Number(s.quality) + Number(s.originality)) / 3 : null);
-  const num = (v, d = 1) => (v == null || isNaN(v) ? '–' : Number(v).toFixed(d));
-
+  const monthLabel = (y, m) => (EN ? `${MONTHS[m - 1]} ${y}` : `${y}年${m}月`);
   const GENRE_EN = { アクション: 'Action', シューティング: 'Shooter', パズル: 'Puzzle', レース: 'Racing', リズム: 'Rhythm', スポーツ: 'Sports', ストラテジー: 'Strategy', アドベンチャー: 'Adventure', その他: 'Other' };
   const genre = (g) => (EN ? GENRE_EN[g] || g : g);
   const title = (g) => (EN && g.titleEn ? g.titleEn : g.title);
-
-  // 金額: 日本語は円、英語はドル（API定価換算）
-  function money(c) {
-    if (!c) return '–';
-    if (EN) return c.usd < 0.01 ? '<$0.01' : `$${c.usd.toFixed(2)}`;
-    return `¥${Math.round(c.jpy).toLocaleString('ja-JP')}`;
-  }
-  const tokens = (n) => (n == null ? '–' : n >= 1e6 ? `${(n / 1e6).toFixed(2)}M` : n >= 1e3 ? `${(n / 1e3).toFixed(1)}K` : String(Math.round(n)));
-
-  const VENDORS = { anthropic: '#e08a6a', openai: '#3fbf95', google: '#6fa0ff', meta: '#5aa7ff' };
-  const vendorColor = (v) => VENDORS[String(v || '').toLowerCase()] || '#b49cff';
-  function platformBadges(p, langs) {
-    if (!p) return '';
-    const jaOnly = langs && !langs.includes('en') ? `<span class="lang-chip">${t('lang.jaonly')}</span>` : '';
-    return jaOnly + `<span class="plats">${['pc', 'mobile'].map((k) => `<span class="plat ${p[k] ? 'ok' : 'ng'}" title="${t('plat.' + k)}: ${t(p[k] ? 'plat.ok' : 'plat.ng')}">${t('plat.' + k)}</span>`).join('')}</span>`;
-  }
+  const VERDICT = { fun: 2, meh: 1, boring: 0 };
+  const pct = (v) => (v == null || isNaN(v) ? '–' : `${Math.round(v)}%`);
+  const kTokens = (n) => (n == null ? '–' : n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e3 ? `${(n / 1e3).toFixed(1)}K` : String(Math.round(n)));
   const detectDevice = () => (matchMedia('(pointer: coarse)').matches ? 'mobile' : 'pc');
-  function aiChip(ai) {
-    if (!ai) return '';
-    return `<span class="ai-chip" title="${esc(ai.vendor || '')} ${esc(ai.model || '')}"><i style="background:${vendorColor(ai.vendor)}"></i>${esc(ai.name || ai.model)}</span>`;
-  }
 
   // ---------- データ ----------
   async function getJson(url) {
@@ -58,7 +33,7 @@
   const loadIndex = () => getJson('games/index.json');
   const loadMeta = (id) => getJson(`games/${encodeURIComponent(id)}/meta.json`);
 
-  // ---------- 評価（Supabase / ローカル） ----------
+  // ---------- 評価・プレイ記録（Supabase / このブラウザ） ----------
   const store = {
     get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
@@ -66,66 +41,73 @@
   function voterId() {
     let id = store.get('agf_voter', null);
     if (!id) {
-      id = (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => { const r = (Math.random() * 16) | 0; return (c === 'x' ? r : (r & 3) | 8).toString(16); }));
+      id = crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => { const r = (Math.random() * 16) | 0; return (c === 'x' ? r : (r & 3) | 8).toString(16); });
       store.set('agf_voter', id);
     }
     return id;
   }
   const remote = !!(CFG.supabaseUrl && CFG.supabaseKey);
-  async function rpc(fn, body) {
+  async function rpc(fn, body, keepalive = false) {
     const headers = { apikey: CFG.supabaseKey, 'Content-Type': 'application/json' };
     if (CFG.supabaseKey.startsWith('eyJ')) headers.Authorization = `Bearer ${CFG.supabaseKey}`;
-    const r = await fetch(`${CFG.supabaseUrl.replace(/\/$/, '')}/rest/v1/rpc/${fn}`, { method: 'POST', headers, body: JSON.stringify(body || {}) });
-    if (!r.ok) throw new Error(`Rating server error (${r.status}): ${await r.text()}`);
+    const r = await fetch(`${CFG.supabaseUrl.replace(/\/$/, '')}/rest/v1/rpc/${fn}`, { method: 'POST', headers, body: JSON.stringify(body || {}), keepalive });
+    if (!r.ok) throw new Error(`${r.status}`);
     const text = await r.text();
     return text ? JSON.parse(text) : null;
   }
 
   const Ratings = {
-    mode: remote ? 'shared' : 'local',
-    myVote: (gameId) => store.get('agf_my_votes', {})[gameId] || null,
-    // 全ゲームの集計 { [gameId]: { votes, playable(0-100%), fun, quality, originality, overall, byDevice } }
+    remote,
+    mine: (gameId) => store.get('agf_votes', {})[gameId] || null,
+    // 全作品の集計 { [id]: { votes, fun, meh, boring, broken, funRate, sessions, avgSeconds, replayRate } }
     async summary() {
       let rows;
-      if (remote) {
-        rows = await rpc('get_scores', {});
-      } else {
-        const mine = store.get('agf_my_votes', {});
-        rows = Object.entries(mine).map(([game_id, v]) => ({ game_id, votes: 1, playable_rate: (v.playable / 2) * 100, fun: v.fun, quality: v.quality, originality: v.originality,
-          votes_pc: v.device === 'mobile' ? 0 : 1, votes_mobile: v.device === 'mobile' ? 1 : 0,
-          playable_pc_rate: v.device === 'mobile' ? null : (v.playable / 2) * 100, playable_mobile_rate: v.device === 'mobile' ? (v.playable / 2) * 100 : null }));
+      if (remote) rows = await rpc('get_scores', {});
+      else {
+        const votes = store.get('agf_votes', {}), plays = store.get('agf_plays', {});
+        const ids = new Set([...Object.keys(votes), ...Object.keys(plays)]);
+        rows = [...ids].map((game_id) => {
+          const v = votes[game_id], p = plays[game_id] || { sessions: 0, seconds: 0, replays: 0 };
+          return { game_id, votes: v && v.verdict != null ? 1 : 0, fun: v?.verdict === 2 ? 1 : 0, meh: v?.verdict === 1 ? 1 : 0, boring: v?.verdict === 0 ? 1 : 0, broken: v?.broken ? 1 : 0, sessions: p.sessions, avg_seconds: p.sessions ? p.seconds / p.sessions : null, replay_rate: p.sessions ? (p.replays / p.sessions) * 100 : null };
+        });
       }
       const out = {};
       for (const r of rows || []) {
         const n = (x) => (x == null ? null : Number(x));
-        const s = { votes: Number(r.votes), playable: n(r.playable_rate), fun: n(r.fun), quality: n(r.quality), originality: n(r.originality) };
-        s.overall = overallOf(s);
-        s.byDevice = {
-          pc: { votes: Number(r.votes_pc || 0), playable: n(r.playable_pc_rate) },
-          mobile: { votes: Number(r.votes_mobile || 0), playable: n(r.playable_mobile_rate) },
-        };
+        const s = { votes: n(r.votes) || 0, fun: n(r.fun) || 0, meh: n(r.meh) || 0, boring: n(r.boring) || 0, broken: n(r.broken) || 0, sessions: n(r.sessions) || 0, avgSeconds: n(r.avg_seconds), replayRate: n(r.replay_rate) };
+        s.funRate = s.votes ? (s.fun / s.votes) * 100 : null;
         out[r.game_id] = s;
       }
       return out;
     },
-    async submit(gameId, v) {
-      const vote = { device: v.device === 'mobile' ? 'mobile' : 'pc', playable: v.playable, fun: v.fun, quality: v.quality, originality: v.originality, comment: (v.comment || '').slice(0, 300), at: new Date().toISOString() };
-      if (remote) {
-        await rpc('submit_rating', { p_game_id: gameId, p_voter_id: voterId(), p_playable: vote.playable, p_fun: vote.fun, p_quality: vote.quality, p_originality: vote.originality, p_comment: vote.comment || null, p_device: vote.device });
-      }
-      const mine = store.get('agf_my_votes', {}); mine[gameId] = vote; store.set('agf_my_votes', mine);
+    // verdict: 2=面白い 1=まあまあ 0=つまらない（broken のときは null 可）
+    async submit(gameId, { verdict = null, broken = false, plays = 0, seconds = 0 }) {
+      const device = detectDevice();
+      if (remote) await rpc('submit_rating', { p_game_id: gameId, p_voter_id: voterId(), p_device: device, p_verdict: verdict, p_broken: broken, p_plays: plays, p_seconds: Math.round(seconds) });
+      const all = store.get('agf_votes', {}); all[gameId] = { verdict, broken, at: new Date().toISOString() }; store.set('agf_votes', all);
     },
-    async comments(gameId) {
-      if (remote) return (await rpc('get_comments', { p_game_id: gameId, p_limit: 30 })) || [];
-      const v = Ratings.myVote(gameId);
-      return v && v.comment ? [{ comment: v.comment, device: v.device, playable: v.playable, fun: v.fun, quality: v.quality, originality: v.originality, created_at: v.at }] : [];
+    // 1回の訪問ごとのプレイ回数と時間（遊ぶ人には見えない計測）
+    logPlay(gameId, plays, seconds) {
+      if (!plays && seconds < 3) return;
+      const all = store.get('agf_plays', {});
+      const p = (all[gameId] ||= { sessions: 0, seconds: 0, replays: 0 });
+      p.sessions++; p.seconds += seconds; if (plays >= 2) p.replays++;
+      store.set('agf_plays', all);
+      if (remote) rpc('log_play', { p_game_id: gameId, p_voter_id: voterId(), p_device: detectDevice(), p_plays: plays, p_seconds: Math.round(seconds) }, true).catch(() => {});
     },
   };
 
-  const playableLabel = (n) => t('playable.' + n);
+  // 評価の内訳バー
+  function verdictBar(s, compact = false) {
+    if (!s || !s.votes) return `<span class="muted">${t('unrated')}</span>`;
+    const w = (n) => (n / s.votes) * 100;
+    return `<div class="vbar${compact ? ' compact' : ''}" role="img" aria-label="${t('v.2')} ${pct(w(s.fun))} / ${t('v.1')} ${pct(w(s.meh))} / ${t('v.0')} ${pct(w(s.boring))}">
+      <i class="v2" style="width:${w(s.fun)}%"></i><i class="v1" style="width:${w(s.meh)}%"></i><i class="v0" style="width:${w(s.boring)}%"></i></div>
+      ${compact ? '' : `<div class="vlegend"><span><b class="d v2"></b>${t('v.2')} ${pct(w(s.fun))}</span><span><b class="d v1"></b>${t('v.1')} ${pct(w(s.meh))}</span><span><b class="d v0"></b>${t('v.0')} ${pct(w(s.boring))}</span><span class="muted">${t('votes', { n: s.votes })}</span></div>`}`;
+  }
   function modeBanner(el) {
-    if (el && Ratings.mode === 'local') { el.innerHTML = t('banner.demo'); el.hidden = false; }
+    if (el && !remote) { el.textContent = t('banner.demo'); el.hidden = false; }
   }
 
-  window.AGF = { lang, t, EN, store, platformBadges, detectDevice, esc, fmtDate, monthLabel, WEEK, avg, overallOf, num, genre, title, money, tokens, vendorColor, aiChip, loadIndex, loadMeta, Ratings, playableLabel, modeBanner, CFG };
+  window.AGF = { lang, t, EN, CFG, esc, fmtDate, monthLabel, dayKey, WEEK, genre, title, VERDICT, pct, kTokens, detectDevice, loadIndex, loadMeta, Ratings, verdictBar, modeBanner, store };
 })();

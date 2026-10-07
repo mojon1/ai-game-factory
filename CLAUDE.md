@@ -1,22 +1,21 @@
 # AI GAME FACTORY
 
-AIが毎日ミニゲームを自動生成し、自分でプレイして自己採点し、人間の評価と比べる実験サイト（静的サイト / GitHub Pages）。
+**参加AI共通の指示は `AGENTS.md` にある。まずそれを読むこと。**（ChatGPT / Codex も同じ AGENTS.md を読む）
 
-- 日次のゲーム制作を頼まれたら **`factory/DAILY_TASK.md` の手順どおりに**進める。ゲーム仕様は `factory/GAME_SPEC.md`。
-- 「人の手を介さない」ことが実験の前提。公開済みゲーム（`games/<id>/`）のコードを人やAIが後から手直ししない。
-- 有料APIは使わない。Claude は Claude Code（サブスクリプション）経由、他のAIは `generator/`（無料枠のAPIのみ）経由で参加する。
-- 制作AIの記録（`meta.json` の `credits`）は正確に。モデル名を推測で書かない。
-- すべてのゲームは PC とスマホの両対応、日本語・英語の両対応が必須。自己採点の前に類似作品リサーチを必ず行う。
-- 制作コストは `tools/cost.mjs start/end` で記録する（料金表は `factory/pricing.json`）。
-- サイトの文言は `assets/i18n.js` の辞書で日英を管理する。新しい文言を足すときは両言語を書く。
-- 無料枠（GitHub Pages 1GB 等）に収めるため、画像は `tools/review.mjs` が WebP に圧縮・間引きする。画像・音声ファイルを追加しない。
+- 日次のゲーム制作を頼まれたら、`factory/CHARTER.md` → `factory/GAME_SPEC.md` → `factory/DAILY_TASK.md` の順に読み、その手順どおりに進める。`--maker claude`。
+- 有料APIは使わない。Claude は Claude Code（サブスクリプション）で参加する。
+- 制作AIの記録は正確に。自分のモデル名を推測で書かない。
 
-## 構成
+## サイト・プラットフォームを開発するとき（人間に頼まれた場合のみ）
 
 | パス | 役割 |
 | --- | --- |
-| `index.html`（カレンダー） / `game.html` / `stats.html` / `about.html` | サイト（`assets/app.js` が共通処理、評価は Supabase またはローカル） |
-| `games/<id>/` | ゲーム本体・meta.json・サムネ・AIプレイログ。`games/index.json` は `tools/build-index.mjs` が生成 |
-| `tools/` | 雛形作成・自動テスト・時間停止プレイ・自己採点・一覧生成 |
-| `generator/` | API経由のAI（GPT/Gemini/ローカルLLM）用の全自動パイプライン |
+| `index.html`（一覧／カレンダー） `game.html`（全画面プレイ＋3段階評価） `stats.html` `about.html` | サイト。文言は `assets/i18n.js` で日英を管理 |
+| `assets/app.js` | 共通処理（評価・プレイ記録は Supabase、未設定時はブラウザ内） |
+| `games/<id>/` | 作品。`games/index.json` はデプロイ時に生成（コミットしない） |
+| `tools/` | 雛形・自動テスト（Android/iPhone）・自己プレイ・自己判定・制作記録・一覧生成 |
+| `generator/` | API経由のAI用の全自動パイプライン |
+| `lib/` | 共有ライブラリ棚（人間が管理） |
 | `supabase/schema.sql` | 評価データベース |
+
+実験条件（憲章・仕様・判定ライン・ライブラリ棚）を変えたら、`about.html` から辿れる形で変更履歴を残す。

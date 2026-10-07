@@ -2,270 +2,182 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>AI GAME FACTORY</title>
+<meta name="theme-color" content="#0d0e12">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Zen+Kaku+Gothic+New:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23c8f051'/><text x='16' y='22' font-size='16' text-anchor='middle' font-family='monospace' font-weight='700'>AI</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23c8f051'/><path d='M12 9l12 7-12 7z' fill='%23111'/></svg>">
 <script src="assets/i18n.js"></script>
 </head>
 <body>
 <header class="site-head">
   <div class="wrap">
-    <a class="logo" href="./"><span class="logo-mark">▶</span><span class="logo-text">AI GAME FACTORY</span></a>
+    <a class="logo" href="./"><span class="logo-mark">▶</span><span>AI GAME FACTORY</span></a>
     <nav class="nav">
-      <a href="./" data-i18n="nav.calendar">カレンダー</a>
-      <a href="stats.html" data-i18n="nav.stats">実験データ</a>
-      <a href="about.html" data-i18n="nav.about">この実験について</a>
+      <a href="stats.html" data-i18n="nav.stats">観測データ</a>
+      <a href="about.html" class="nav-q" data-i18n-attr="aria-label:nav.about;title:nav.about">?</a>
+      <span class="lang-slot"></span>
     </nav>
   </div>
 </header>
 <div class="banner" id="banner" hidden></div>
+<main class="wrap narrow" id="main"><p class="empty" data-i18n="loading"></p></main>
 
-<main class="wrap" id="main"><p class="empty" data-i18n="loading"></p></main>
+<!-- 全画面プレイヤー -->
+<div class="player" id="player" hidden>
+  <div class="phone"><iframe id="frame" title="game" sandbox="allow-scripts allow-pointer-lock" allow="autoplay"></iframe></div>
+  <button class="player-close" id="close" type="button"><span aria-hidden="true">✕</span> <span data-i18n="close"></span></button>
+</div>
 
-<footer><div class="wrap" data-i18n="footer.game"></div></footer>
+<!-- 遊んだ後の評価シート -->
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sheet-q">
+    <p id="sheet-q" class="sheet-q" data-i18n="rate.q"></p>
+    <div class="vbtns" data-rate></div>
+    <div class="sheet-foot"><button type="button" class="linkish" data-broken data-i18n="v.broken"></button><button type="button" class="linkish" id="later" data-i18n="rate.later"></button></div>
+  </div>
+</div>
 
 <script src="assets/config.js"></script>
 <script src="assets/app.js"></script>
 <script>
 (async () => {
-  const { t, lang, EN, esc, fmtDate, num, genre, title, money, tokens, aiChip, platformBadges, detectDevice, loadIndex, loadMeta, Ratings, playableLabel, modeBanner, overallOf } = AGF;
+  const { t, lang, EN, esc, fmtDate, genre, kTokens, loadIndex, loadMeta, Ratings, verdictBar, modeBanner, VERDICT } = AGF;
   const tr = I18N.tr;
   I18N.apply();
   modeBanner(document.getElementById('banner'));
-  const main = document.getElementById('main');
-  const id = new URLSearchParams(location.search).get('id');
-  let meta, index;
-  try { [meta, index] = await Promise.all([loadMeta(id), loadIndex()]); }
-  catch (e) { main.innerHTML = `<p class="empty">${t('notfound')} <a href="./">${t('back')}</a></p>`; return; }
+  const $ = (id) => document.getElementById(id);
+  const params = new URLSearchParams(location.search);
+  const id = params.get('id');
+  let meta;
+  try { [meta] = await Promise.all([loadMeta(id), loadIndex()]); }
+  catch (e) { $('main').innerHTML = `<p class="empty">${t('notfound')} <a href="./">${t('back')}</a></p>`; return; }
   const gTitle = tr(meta, 'title');
   document.title = `${gTitle} — AI GAME FACTORY`;
-
-  const mainAI = meta.credits?.find((c) => c.role === 'main') || meta.credits?.[0] || {};
-  const others = (meta.credits || []).filter((c) => c !== mainAI);
-  const list = index.games, pos = list.findIndex((g) => g.id === id);
-  const newer = pos > 0 ? list[pos - 1] : null, older = pos >= 0 && pos < list.length - 1 ? list[pos + 1] : null;
-  const ai = meta.aiReview, gen = meta.generation || {}, test = meta.autoTest, cost = meta.cost;
-  const aiT = (k) => (EN && ai?.i18n?.en?.[k] ? ai.i18n.en[k] : ai?.[k]);
-  const ROLE = { main: ['メイン制作', 'Main'], review: ['レビュー', 'Review'], assist: ['補助', 'Assist'] };
-  const controls = tr(meta, 'controls') || [];
+  const ai = meta.aiReview, x = meta.metrics, main = meta.credits?.find((c) => c.role === 'main') || {};
   const src = `games/${encodeURIComponent(meta.id)}/index.html?lang=${lang}`;
+  const thumb = `games/${encodeURIComponent(meta.id)}/thumb.webp`;
+  const vBtns = [2, 1, 0].map((v) => `<button type="button" class="vbtn v${v}" data-v="${v}">${t('v.' + v)}</button>`).join('');
+  const aiV = ai ? VERDICT[ai.verdict] : null;
 
-  main.innerHTML = `
-  <div class="game-head">
-    <a class="back" href="./">${t('back')}</a>
-    <h1>${esc(gTitle)}</h1>
-    <div class="meta-row"><span class="genre">${esc(genre(meta.genre))}</span><span class="mono">${fmtDate(meta.createdAt, true)}</span><span>${t('made.by')} ${aiChip(mainAI)}</span>${platformBadges(meta.platforms, meta.languages)}${cost ? `<span class="cost-chip">${t('cost.short')} ${money(cost)}</span>` : ''}<span class="mono muted">#${esc(meta.id)}</span></div>
-  </div>
+  $('main').innerHTML = `
+  <a class="back" href="./">${t('back')}</a>
+  <h1 class="gtitle">${esc(gTitle)}</h1>
+  <p class="gmeta">${esc(genre(meta.genre))} · ${esc(t('by', { ai: main.name || '' }))} · ${esc(fmtDate(meta.createdAt))}</p>
 
-  <section class="player">
-    <div class="player-frame" id="frame">
-      <iframe id="game" data-src="${src}" title="${esc(gTitle)}" sandbox="allow-scripts allow-pointer-lock" allow="autoplay; fullscreen"></iframe>
-    </div>
-    <div class="player-bar">
-      <button class="btn" id="b-focus" type="button">${t('btn.focus')}</button>
-      <button class="btn" id="b-reload" type="button">${t('btn.reload')}</button>
-      <button class="btn" id="b-full" type="button">${t('btn.full')}</button>
-      <a class="btn" href="${src}" target="_blank" rel="noopener">${t('btn.open')}</a>
-      <span class="hint">${t('hint.focus')}</span>
-    </div>
+  <button class="hero" id="hero" type="button" aria-label="${t('play')}">
+    <img src="${thumb}" alt="" width="300" height="534">
+    <span class="hero-play"><span aria-hidden="true">▶</span> ${t('play')}</span>
+  </button>
+  <p class="howto">${esc(tr(meta, 'howToPlay') || '')}</p>
+  <p class="pc-note">${t('pc.note')}</p>
+
+  <section class="rate-box" id="rate-box">
+    <p class="sheet-q">${t('rate.q')}</p>
+    <div class="vbtns" data-rate>${vBtns}</div>
+    <div class="sheet-foot"><button type="button" class="linkish" data-broken>${t('v.broken')}</button></div>
   </section>
 
-  <div class="cols">
-    <div>
-      <section class="panel">
-        <h2>${t('sec.about')}</h2>
-        <p>${esc(tr(meta, 'description'))}</p>
-        <p class="muted">${esc(tr(meta, 'howToPlay'))}</p>
-        ${controls.length ? `<table class="controls"><tbody>${controls.map((c) => `<tr><td>${esc(c.input)}</td><td>${esc(c.action)}</td></tr>`).join('')}</tbody></table>` : ''}
-      </section>
-
-      <section class="panel">
-        <h2>${t('sec.versus')} <span class="tag">SCORE GAP</span></h2>
-        <div class="legend"><span><i style="background:var(--human)"></i>${t('score.human')} <b id="vote-count"></b></span><span><i style="background:var(--ai)"></i>${t('versus.ai')}${ai ? ` (${esc(ai.reviewer?.name || '')})` : ''}</span></div>
-        <div class="versus" id="versus"></div>
-        ${ai ? `<div class="ai-comment">
-          <div class="who">${t(ai.selfReview ? 'ai.self' : 'ai.other', { name: esc(ai.reviewer?.name || 'AI') })}</div>
-          ${esc(aiT('comment'))}
-          <dl>${aiT('good') ? `<dt>${t('ai.good')}</dt><dd>${esc(aiT('good'))}</dd>` : ''}${aiT('bad') ? `<dt>${t('ai.bad')}</dt><dd>${esc(aiT('bad'))}</dd>` : ''}</dl>
-        </div>` : `<p class="muted">${t('ai.none')}</p>`}
-      </section>
-
-      ${ai?.similar ? `<section class="panel">
-        <h2>${t('sec.similar')} <span class="tag">AI RESEARCH</span></h2>
-        <p class="muted" style="font-size:13px">${t('similar.lead')}</p>
-        ${ai.similar.length ? `<ul class="similar">${ai.similar.map((x) => `<li><span class="sim sim-${{ 高: 'h', 中: 'm', 低: 'l' }[x.similarity] || 'l'}">${t('similar.level', { v: t('sim.' + x.similarity) })}</span>
-          <div><b>${x.url ? `<a href="${esc(x.url)}" target="_blank" rel="noopener nofollow">${esc(x.title)}</a>` : esc(x.title)}</b><p>${esc(EN && x.note_en ? x.note_en : x.note)}</p></div></li>`).join('')}</ul>` : `<p>${t('similar.none')}</p>`}
-        ${aiT('research') ? `<p class="muted" style="font-size:12.5px;margin:10px 0 0">${t('similar.method')}: ${esc(aiT('research'))}</p>` : ''}
-      </section>` : ''}
-    </div>
-
-    <div>
-      <section class="panel" id="rate">
-        <h2>${t('sec.rate')}</h2>
-        <form id="rate-form" novalidate>
-          <fieldset class="rate-q"><legend class="q">${t('rate.device')}</legend>
-            <div class="opts">
-              <input type="radio" name="device" id="dv-pc" value="pc"><label for="dv-pc">${t('rate.dev.pc')}</label>
-              <input type="radio" name="device" id="dv-mobile" value="mobile"><label for="dv-mobile">${t('rate.dev.mobile')}</label>
-            </div>
-          </fieldset>
-          <fieldset class="rate-q"><legend class="q">${t('rate.playable')}</legend>
-            <div class="opts">${[2, 1, 0].map((n) => `<input type="radio" name="playable" id="p${n}" value="${n}"><label for="p${n}">${playableLabel(n)}</label>`).join('')}</div>
-          </fieldset>
-          ${['fun', 'quality', 'originality'].map((k) => `<fieldset class="rate-q"><legend class="q">${t('crit.' + k)}<small>${t('rate.' + k + '.sub')}</small></legend>
-              <div style="display:flex"><div class="star-input">${[5, 4, 3, 2, 1].map((n) => `<input type="radio" name="${k}" id="${k}${n}" value="${n}"><label for="${k}${n}" title="${n}">★</label>`).join('')}</div><span class="star-cap" id="cap-${k}"></span></div>
-            </fieldset>`).join('')}
-          <div class="rate-q"><label class="q" for="comment">${t('rate.comment')}<small>${t('rate.comment.sub')}</small></label>
-            <textarea id="comment" name="comment" maxlength="300" placeholder="${t('rate.comment.ph')}"></textarea>
-          </div>
-          <div class="form-foot"><button class="btn primary" type="submit" id="submit">${t('rate.submit')}</button><span class="note" id="form-msg"></span></div>
-        </form>
-      </section>
-
-      <section class="panel">
-        <h2>${t('sec.cost')} <span class="tag">COST</span></h2>
-        ${cost ? `<div class="cost-big"><b>${money(cost)}</b><span>${t('cost.amount')}${EN ? '' : `（$${cost.usd.toFixed(2)}）`}</span></div>
-        <table class="spec"><tbody>
-          <tr><th>${t('cost.tokens')}</th><td class="mono">${tokens(cost.tokens.total)}<br><span class="muted" style="font-size:12px">${t('cost.in')} ${tokens(cost.tokens.input)} · ${t('cost.out')} ${tokens(cost.tokens.output)} · ${t('cost.cw')} ${tokens(cost.tokens.cacheWrite)} · ${t('cost.cr')} ${tokens(cost.tokens.cacheRead)}${cost.webSearches ? ` · ${t('cost.search', { n: Math.round(cost.webSearches) })}` : ''}</span></td></tr>
-          ${EN ? '' : `<tr><th>為替</th><td class="mono">${t('cost.fx', { r: cost.fx.usdJpy, d: cost.fx.date })}</td></tr>`}
-          <tr><th>${t('cost.paid')}</th><td>${esc(EN ? (cost.paidEn || 'Included in subscription / free tier (no extra charge)') : cost.paid)}</td></tr>
-          <tr><th>${t('cost.method')}</th><td style="font-size:12.5px">${esc(EN && cost.methodEn ? cost.methodEn : cost.method)}</td></tr>
-        </tbody></table>
-        <p class="muted" style="font-size:12px;margin:8px 0 0">${t('cost.note')}</p>` : `<p class="muted">${t('cost.none')}</p>`}
-      </section>
-
-      <section class="panel">
-        <h2>${t('sec.spec')} <span class="tag">BUILD SPEC</span></h2>
-        <table class="spec"><tbody>
-          <tr><th>${t('spec.date')}</th><td class="mono">${fmtDate(meta.createdAt, true)}</td></tr>
-          <tr><th>${t('spec.main')}</th><td>${aiChip(mainAI)}<br><span class="mono muted">${esc(mainAI.vendor || '')} / ${esc(mainAI.model || '')}</span></td></tr>
-          ${mainAI.via ? `<tr><th>${t('spec.via')}</th><td>${esc(mainAI.via)}</td></tr>` : ''}
-          ${others.map((c) => `<tr><th>${esc((ROLE[c.role] || [c.role, c.role])[EN ? 1 : 0])}</th><td>${aiChip(c)} <span class="mono muted">${esc(c.model || '')}</span></td></tr>`).join('')}
-          ${gen.prompt ? `<tr><th>${t('spec.prompt')}</th><td>${esc(EN && gen.promptEn ? gen.promptEn : gen.prompt)}</td></tr>` : ''}
-          ${gen.pipeline ? `<tr><th>${t('spec.pipeline')}</th><td class="mono">${esc(gen.pipeline)}</td></tr>` : ''}
-          ${gen.durationSec ? `<tr><th>${t('spec.duration')}</th><td class="mono">${Math.round(gen.durationSec)} s</td></tr>` : ''}
-          <tr><th>${t('spec.platforms')}</th><td>${platformBadges(meta.platforms, meta.languages) || '–'}</td></tr>
-          <tr><th>${t('spec.test')}</th><td>${test ? `${test.passed ? `<span class="ok">${t('spec.test.pass')}</span>` : `<span class="err">${t('spec.test.fail')}</span>`}${gen.validationRuns ? `<span class="muted"> ${t('spec.test.runs', { n: gen.validationRuns, r: t(test.passed ? 'spec.test.pass' : 'spec.test.fail') })}</span>` : ''}
-            <ul class="checklist">${(test.checks || []).map((c) => `<li class="${c.ok ? '' : 'ng'}">${esc(EN && c.nameEn ? c.nameEn : c.name)}</li>`).join('')}</ul>` : '–'}</td></tr>
-          ${meta.code ? `<tr><th>${t('spec.code')}</th><td class="mono">${(meta.code.bytes / 1024).toFixed(1)} KB / ${meta.code.lines} lines <button class="btn" id="b-src" type="button" style="margin-left:6px;min-height:28px;padding:2px 10px">${t('spec.src')}</button></td></tr>` : ''}
-          ${ai ? `<tr><th>${t('spec.method')}</th><td>${esc(EN && ai.methodEn ? ai.methodEn : ai.method)}</td></tr>` : ''}
-          ${meta.revisions?.length ? `<tr><th>${t('spec.revisions')}</th><td style="font-size:12.5px">${meta.revisions.map((r) => `<div><span class="mono">${fmtDate(r.date)}</span> ${esc(r.by || '')} — ${esc(EN && r.reasonEn ? r.reasonEn : r.reason)}</div>`).join('')}</td></tr>` : ''}
-        </tbody></table>
-        <pre id="src" class="mono" hidden style="max-height:420px;overflow:auto;background:#0a0b0e;border:1px solid var(--line);border-radius:8px;padding:12px;font-size:11.5px;line-height:1.5;margin:12px 0 0;white-space:pre"></pre>
-      </section>
-    </div>
-  </div>
-
-  ${ai?.playLog?.length ? `<section class="panel">
-    <h2>${t('sec.playlog')} <span class="tag">${ai.playLog.length} STEPS</span></h2>
-    <p class="muted" style="font-size:13px">${t('playlog.lead')}</p>
-    ${['pc', 'mobile'].map((dev) => { const steps = ai.playLog.filter((s) => (s.device || 'pc') === dev); return steps.length ? `<h3 class="log-dev">${t('playlog.' + dev)}</h3>
-    <div class="playlog ${dev}">${steps.map((s) => `<figure class="step ${s.image ? '' : 'noimg'}" style="margin:0">
-      ${s.image ? `<img src="games/${encodeURIComponent(meta.id)}/${esc(s.image)}" alt="${t('playlog.alt', { n: s.step })}" loading="lazy" width="640" height="400">` : ''}
-      <div><span class="n">STEP ${String(s.step).padStart(2, '0')}</span><div class="act">${esc(s.action)}</div>${esc(EN && s.noteEn ? s.noteEn : s.note || '')}</div>
-    </figure>`).join('')}</div>` : ''; }).join('')}
-  </section>` : ''}
-
-  <section class="panel" style="margin-top:20px">
-    <h2>${t('sec.comments')}</h2>
-    <div class="comments" id="comments"><p class="muted">${t('loading')}</p></div>
+  <section class="result" id="result" hidden>
+    <p class="result-thanks" id="thanks"></p>
+    <h2>${t('result.title')}</h2>
+    <div id="dist"></div>
+    ${ai ? `<h2>${t('result.ai')}</h2>
+    <div class="ai-verdict"><span class="vchip v${aiV}">${t('v.' + aiV)}</span><span class="muted">${t('works.' + ai.works)}</span></div>
+    <p class="ai-comment">${esc(EN && ai.i18n?.en?.comment ? ai.i18n.en.comment : ai.comment)}</p>` : ''}
+    <button type="button" class="linkish" id="change">${t('rate.change')}</button>
   </section>
 
-  <nav class="pager">
-    ${newer ? `<a class="btn" href="game.html?id=${encodeURIComponent(newer.id)}">${t('pager.newer', { t: esc(title(newer)) })}</a>` : '<span></span>'}
-    ${older ? `<a class="btn" href="game.html?id=${encodeURIComponent(older.id)}">${t('pager.older', { t: esc(title(older)) })}</a>` : ''}
-  </nav>`;
+  <details class="more">
+    <summary>${t('sec.more')}</summary>
+    ${tr(meta, 'concept') ? `<h3>${t('sec.concept')}</h3><p>${esc(tr(meta, 'concept'))}</p>` : ''}
+    ${x ? `<h3>${t('sec.metrics')}</h3>
+    <dl class="metrics">
+      <div><dt>${t('m.model')}</dt><dd>${esc(main.name || '')}<small>${esc(main.model || '')}</small></dd></div>
+      ${x.effort ? `<div><dt>${t('m.effort')}</dt><dd>${esc(x.effort)}</dd></div>` : ''}
+      <div><dt>${t('m.thinking')}</dt><dd>${t('m.tokens', { n: kTokens(x.thinkingTokens) })}</dd></div>
+      <div><dt>${t('m.output')}</dt><dd>${t('m.tokens', { n: kTokens(x.outputTokens) })}</dd></div>
+      <div><dt>${t('m.turns')}</dt><dd>${t('m.times', { n: x.turns ?? '–' })}</dd></div>
+      <div><dt>${t('m.tools')}</dt><dd>${t('m.times', { n: x.toolCalls ?? '–' })}</dd></div>
+      ${x.validationRuns ? `<div><dt>${t('m.runs')}</dt><dd>${t('m.times', { n: x.validationRuns })}</dd></div>` : ''}
+      <div><dt>${t('m.minutes')}</dt><dd>${t('m.min', { n: x.minutes })}</dd></div>
+      ${meta.code ? `<div><dt>${t('m.code')}</dt><dd>${(meta.code.bytes / 1024).toFixed(1)} KB</dd></div>` : ''}
+    </dl>
+    <p class="muted small">${t('m.note')}</p>` : ''}
+    ${ai?.similar ? `<h3>${t('sec.similar')}</h3>
+    ${ai.similar.length ? `<ul class="similar">${ai.similar.map((s) => `<li><span class="sim">${t('sim.' + s.similarity)}</span> <b>${s.url ? `<a href="${esc(s.url)}" target="_blank" rel="noopener nofollow">${esc(s.title)}</a>` : esc(s.title)}</b><br><span class="muted">${esc(EN && s.note_en ? s.note_en : s.note)}</span></li>`).join('')}</ul>` : `<p class="muted">${t('similar.none')}</p>`}` : ''}
+    ${ai?.playLog?.length ? `<h3>${t('sec.playlog')}</h3>
+    <div class="playlog">${ai.playLog.filter((s) => s.image).map((s) => `<figure><img src="games/${encodeURIComponent(meta.id)}/${esc(s.image)}" alt="" loading="lazy" width="240" height="427"><figcaption>${String(s.step).padStart(2, '0')} · ${esc(EN && s.noteEn ? s.noteEn : s.note || '')}</figcaption></figure>`).join('')}</div>` : ''}
+  </details>`;
+  document.querySelector('#sheet [data-rate]').innerHTML = vBtns;
 
-  // ---------- プレイヤー ----------
-  const frame = document.getElementById('frame'), iframe = document.getElementById('game');
-  const focusGame = () => { iframe.focus(); try { iframe.contentWindow.focus(); } catch (e) {} };
-  iframe.addEventListener('load', focusGame);
-  // レイアウト確定後に読み込む（サイズ0の状態でゲームが初期化されるのを防ぐ）
-  requestAnimationFrame(() => requestAnimationFrame(() => { iframe.src = iframe.dataset.src; }));
-  document.getElementById('b-focus').onclick = focusGame;
-  document.getElementById('b-reload').onclick = () => { iframe.src = iframe.dataset.src; };
-  document.getElementById('b-full').onclick = () => { (frame.requestFullscreen || frame.webkitRequestFullscreen)?.call(frame); setTimeout(focusGame, 300); };
-  const bSrc = document.getElementById('b-src');
-  if (bSrc) bSrc.onclick = async () => {
-    const pre = document.getElementById('src');
-    if (pre.hidden && !pre.textContent) pre.textContent = await (await fetch(`games/${encodeURIComponent(meta.id)}/index.html`)).text();
-    pre.hidden = !pre.hidden; bSrc.textContent = t(pre.hidden ? 'spec.src' : 'spec.src.close');
-  };
-
-  // ---------- AI vs 人間 ----------
-  async function renderVersus() {
-    let h = null;
-    try { h = (await Ratings.summary())[id] || null; } catch (e) { console.warn(e); }
-    document.getElementById('vote-count').textContent = h ? t('votes', { n: h.votes }) : t('versus.none');
-    const a = ai?.scores;
-    const rows = [
-      ['playable', h?.playable != null ? h.playable / 20 : null, a ? (a.playable / 2) * 5 : null, true],
-      ['fun', h?.fun, a?.fun], ['quality', h?.quality, a?.quality], ['originality', h?.originality, a?.originality],
-      ['overall', h?.overall, a ? overallOf(a) : null],
-    ];
-    document.getElementById('versus').innerHTML = rows.map(([k, hv, av, pct]) => {
-      const f = pct ? (v) => `${Math.round(v * 20)}%` : (v) => num(v);
-      const gap = hv != null && av != null ? hv - av : null;
-      const gapTxt = gap == null ? '–' : pct ? `${gap >= 0 ? '+' : ''}${Math.round(gap * 20)}pt` : `${gap >= 0 ? '+' : ''}${gap.toFixed(1)}`;
-      return `<div class="vs-row" ${k === 'overall' ? 'style="font-weight:700"' : ''}>
-        <span class="lbl">${t('crit.' + k)}</span>
-        <div class="bars">
-          <div class="bar h" title="${t('score.human')}: ${hv == null ? '–' : f(hv)}"><i style="width:${hv == null ? 0 : (hv / 5) * 100}%"></i></div>
-          <div class="bar a" title="AI: ${av == null ? '–' : f(av)}"><i style="width:${av == null ? 0 : (av / 5) * 100}%"></i></div>
-        </div>
-        <span class="gap">${gapTxt}</span>
-      </div>`;
-    }).join('') + `<p class="muted" style="font-size:12px;margin:2px 0 0">${t('versus.note')}</p>
-      <div class="dev-play">${['pc', 'mobile'].map((k) => {
-        const hd = h?.byDevice?.[k], ad = ai?.playableByDevice?.[k];
-        return `<div><b>${t('versus.dev', { d: t('plat.' + k) })}</b><span style="color:var(--human)">${t('versus.players')} ${hd?.playable != null ? `${Math.round(hd.playable)}% (${t('votes', { n: hd.votes })})` : '–'}</span><span style="color:var(--ai)">AI ${ad != null ? playableLabel(ad) : '–'}</span></div>`;
-      }).join('')}</div>`;
+  // ---------- 評価 ----------
+  let session = { plays: 0, seconds: 0 };
+  async function showResult(note) {
+    let s = null;
+    try { s = (await Ratings.summary())[id] || null; } catch (e) { console.warn(e); }
+    $('dist').innerHTML = verdictBar(s);
+    $('thanks').textContent = note || '';
+    $('result').hidden = false;
+    $('rate-box').hidden = true;
   }
-
-  // ---------- コメント ----------
-  async function renderComments() {
-    const el = document.getElementById('comments');
+  async function rate(verdict, broken) {
     try {
-      const cs = await Ratings.comments(id);
-      el.innerHTML = cs.length ? cs.map((c) => `<div class="comment">${esc(c.comment)}<small>${t('plat.' + (c.device === 'mobile' ? 'mobile' : 'pc'))} · ${esc(playableLabel(c.playable))}${c.fun ? ` · ${t('crit.fun')} ${c.fun} ${t('crit.quality')} ${c.quality} ${t('crit.originality')} ${c.originality}` : ''} · ${fmtDate(c.created_at)}</small></div>`).join('') : `<p class="muted">${t('comments.none')}</p>`;
-    } catch (e) { el.innerHTML = `<p class="err">${esc(e.message)}</p>`; }
+      await Ratings.submit(id, { verdict, broken, plays: session.plays, seconds: session.seconds });
+      closeSheet();
+      showResult(broken ? t('rate.broken.done') : t('rate.thanks'));
+    } catch (e) { closeSheet(); $('thanks').textContent = t('rate.err'); }
   }
-
-  // ---------- 評価フォーム ----------
-  const form = document.getElementById('rate-form'), msg = document.getElementById('form-msg');
-  ['fun', 'quality', 'originality'].forEach((k) => form.querySelectorAll(`[name=${k}]`).forEach((r) => r.addEventListener('change', () => { document.getElementById(`cap-${k}`).textContent = t('cap.' + r.value); })));
-  form.querySelector(`[name=device][value="${detectDevice()}"]`).checked = true;
-  const mine = Ratings.myVote(id);
-  if (mine) {
-    if (mine.device) form.querySelector(`[name=device][value="${mine.device}"]`).checked = true;
-    form.querySelector(`[name=playable][value="${mine.playable}"]`)?.click();
-    ['fun', 'quality', 'originality'].forEach((k) => mine[k] && form.querySelector(`[name=${k}][value="${mine[k]}"]`)?.click());
-    form.comment.value = mine.comment || '';
-    document.getElementById('submit').textContent = t('rate.update');
-    msg.textContent = t('rate.done');
-  }
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const v = (k) => form.querySelector(`[name=${k}]:checked`)?.value;
-    const playable = v('playable');
-    const vote = { device: v('device') || 'pc', playable: Number(playable), fun: Number(v('fun')) || null, quality: Number(v('quality')) || null, originality: Number(v('originality')) || null, comment: form.comment.value.trim() };
-    if (playable == null) { msg.innerHTML = `<span class="err">${t('rate.err.playable')}</span>`; return; }
-    if (vote.playable > 0 && (!vote.fun || !vote.quality || !vote.originality)) { msg.innerHTML = `<span class="err">${t('rate.err.stars')}</span>`; return; }
-    const btn = document.getElementById('submit'); btn.disabled = true; msg.textContent = t('rate.sending');
-    try {
-      await Ratings.submit(id, vote);
-      msg.innerHTML = `<span class="ok">${t('rate.thanks')}</span>`;
-      btn.textContent = t('rate.update');
-      renderVersus(); renderComments();
-    } catch (err) { msg.innerHTML = `<span class="err">${esc(err.message)}</span>`; }
-    btn.disabled = false;
+  document.addEventListener('click', (e) => {
+    const v = e.target.closest('[data-rate] [data-v]');
+    if (v) return rate(Number(v.dataset.v), false);
+    if (e.target.closest('[data-broken]')) return rate(null, true);
   });
+  $('change').onclick = () => { $('result').hidden = true; $('rate-box').hidden = false; };
+  if (Ratings.mine(id)) showResult('');
 
-  renderVersus(); renderComments();
+  // ---------- 全画面プレイヤー ----------
+  const player = $('player'), frame = $('frame');
+  let openedAt = 0, pushed = false;
+  addEventListener('message', (e) => {
+    if (e.source !== frame.contentWindow || !e.data || !e.data.agf) return;
+    if (e.data.agf === 'start') session.plays++;
+  });
+  function openPlayer() {
+    session = { plays: 0, seconds: 0 };
+    frame.src = src;
+    player.hidden = false;
+    document.body.classList.add('locked');
+    openedAt = performance.now();
+    history.pushState({ player: 1 }, ''); pushed = true;
+    setTimeout(() => frame.focus(), 300);
+  }
+  function closePlayer() {
+    if (player.hidden) return;
+    session.seconds = (performance.now() - openedAt) / 1000;
+    player.hidden = true;
+    frame.src = 'about:blank';
+    document.body.classList.remove('locked');
+    Ratings.logPlay(id, session.plays, session.seconds);
+    if (!Ratings.mine(id) && session.seconds > 3) openSheet();
+  }
+  function openSheet() { $('sheet').hidden = false; document.body.classList.add('locked'); }
+  function closeSheet() { $('sheet').hidden = true; document.body.classList.remove('locked'); }
+  $('hero').onclick = openPlayer;
+  $('close').onclick = () => { if (pushed) { pushed = false; history.back(); } else closePlayer(); };
+  addEventListener('popstate', () => { pushed = false; closePlayer(); });
+  $('later').onclick = closeSheet;
+  $('sheet').addEventListener('click', (e) => { if (e.target.id === 'sheet') closeSheet(); });
+  addEventListener('pagehide', () => { if (!player.hidden) { session.seconds = (performance.now() - openedAt) / 1000; Ratings.logPlay(id, session.plays, session.seconds); } });
+
+  // 一覧から来たときは、そのまま遊び始める
+  if (params.get('play') === '1') {
+    history.replaceState(null, '', `game.html?id=${encodeURIComponent(id)}`);
+    openPlayer();
+  }
 })();
 </script>
 </body>

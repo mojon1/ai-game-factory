@@ -1,41 +1,41 @@
-# 日次ゲーム制作タスク（Claude Code 用）
+# 日次ゲーム制作タスク（参加AI共通）
 
-このファイルは、スケジュール実行された Claude Code が**人の手を借りずに**今日のゲームを制作・公開するための手順書。
-上から順に実行すること。途中で人に質問しない（判断に迷ったら、この手順書の方針で決めて進める）。
-ローカル実行・クラウド実行のどちらでも同じ手順で動く。
+参加するAI（Claude Code、ChatGPT / Codex など）が**人の手を借りずに**ゲームを制作・公開するための手順書。
+上から順に実行すること。途中で人に質問しない（迷ったら憲章と仕様に照らして自分で決める）。
 
 ## 0. 準備
 
-- 作業フォルダ: このリポジトリのルート（`factory/` の1つ上）
-- `git pull` で最新にする。`node_modules` が無ければ `npm ci`。
-  クラウド環境などでブラウザが無い場合は `npx playwright install chromium`（失敗したら `npx playwright install --with-deps chromium`）。
-- 制作本数: `factory/settings.json` の `gamesPerDay`（既定 3 本）
-- 自分のモデルIDと表示名を確認する（システムプロンプトに書かれている。例: `claude-opus-5-5` / `Claude Opus 5.5`）。
-  以降の `<MODEL>` `<NAME>` はこれに置き換える。推測で別のモデル名を書かないこと。
-- `factory/GAME_SPEC.md` を読み、仕様を把握する。**PC とスマホの両対応は必須。**
+1. **`factory/CHARTER.md`（実験憲章）と `factory/GAME_SPEC.md`（仕様）を読む。** この2つが最優先のルール。
+2. `git pull` で最新にする。`node_modules` が無ければ `npm ci`、ブラウザが無ければ `npm run setup`。
+3. 制作本数は `factory/settings.json` の `gamesPerDay`。
+4. 自分のモデルIDと表示名を確認する（システムプロンプト等に書かれている。例: `claude-opus-5-5` / `Claude Opus 5.5`）。
+   以降の `<MODEL>` `<NAME>` はこれに置き換える。分からない場合は推測せず、分かる範囲（例: `gpt` / `ChatGPT (Codex)`）で書く。
+   `<MAKER>` `<VENDOR>` `<VIA>` は AGENTS.md の表に従う（Claude: `claude` / `Anthropic` / `Claude Code`、ChatGPT: `gpt` / `OpenAI` / `Codex`）。
+5. 共有ライブラリ棚 `lib/catalog.json` を確認する（棚に無いものは使えない）。
 
 ## 1. ゲームごとの制作（本数分くり返す）
 
-### 1-1. お題と雛形
+### 1-1. 企画
 
 ```bash
-node tools/idea.mjs
-node tools/new-game.mjs --model <MODEL> --name "<NAME>" --vendor Anthropic --via "Claude Code" --pipeline claude-code --prompt "<お題>" --prompt-en "<EN のお題>"
-node tools/cost.mjs start <ID>
+node tools/metrics.mjs mark      # 制作記録の開始（企画を考え始める前に必ず実行）
+node tools/recent.mjs            # 過去の作品（似た企画を避ける）
 ```
 
-- 表示されたゲームID（例 `2026-10-08-01`）を以降 `<ID>` とする。
-- `cost.mjs start` で制作コストの計測を始める（必ず雛形作成の直後に実行）。
-- 最近のタイトルと似た内容にならないようにする。
+- 何を作るかは自分で決める。憲章の「面白いについて」を参考に、スマホで遊んで「面白い」と言われるものを狙う。
+- 人間の評価は見ない・探さない（閉じた系）。
+
+```bash
+node tools/new-game.mjs --maker <MAKER> --model <MODEL> --name "<NAME>" --vendor <VENDOR> --via "<VIA>"
+```
+
+- 表示されたゲームID（例 `2026-10-08-claude-1`）を以降 `<ID>` とする。
 
 ### 1-2. 制作
 
-- `games/<ID>/index.html` を GAME_SPEC.md に従って1ファイルで書く。
-  最初から **横長PC（キーボード）と縦長スマホ（タッチのみ）の両方** を想定してレイアウトと操作を設計する。
-- `games/<ID>/meta.json` の `title` `genre` `tags` `description` `howToPlay` `controls` を埋める（他の項目は触らない）。
-  `controls` には PC 用とスマホ用の操作を両方書く。
-- **日本語と英語の両対応**: ゲーム内の文字は `?lang=ja|en` で切り替える（GAME_SPEC.md 6.）。
-  `meta.json` の `i18n.en` にも英語版の `title` `tags` `description` `howToPlay` `controls` を書く。
+- `games/<ID>/index.html` を GAME_SPEC.md に従って1ファイルで書く（スマホ縦画面・タッチ・日英・合図の送信）。
+- `games/<ID>/meta.json` の `title` `genre` `concept` `howToPlay` と、`i18n.en` の `title` `concept` `howToPlay` を埋める。
+  他の項目は触らない。欲しいライブラリがあれば `libraryRequest` に書いてよい（今回は使えない）。
 
 ### 1-3. 自動テスト
 
@@ -43,85 +43,65 @@ node tools/cost.mjs start <ID>
 node tools/validate.mjs <ID>
 ```
 
-- PC（キーボードのみ）とスマホ（縦画面・タッチのみ）の両方で検査される。
+- Android（Chrome 相当）と iPhone（Safari 相当）の両方で、縦画面・タッチだけで検査される。
 - 不合格なら原因を直して再実行。**最大3回**まで。
 - 3回目も不合格なら `node tools/discard.mjs <ID> "理由"` で破棄し、次のゲームへ進む（作り直しはしない）。
 
-### 1-4. 自己プレイ（PC とスマホの両方・必須）
+### 1-4. 自己プレイ（必須）
 
 ```bash
-# PC（640×400・キーボード＋マウス）: 6〜10手
 node tools/play.mjs init <ID>
-node tools/play.mjs step <ID> '<操作JSON>' --note "画面から読み取ったこと／この操作の狙い" --note-en "English"
-
-# スマホ（360×640 縦・タッチのみ）: 3〜5手
-node tools/play.mjs init <ID> --device mobile
-node tools/play.mjs step <ID> '{"tap":[0.5,0.8],"hold":120}' --device mobile --note "…"
+node tools/play.mjs step <ID> '<操作JSON>' --note "画面から読み取ったこと／狙い" --note-en "English"
 ```
 
-- 1手ごとに出力された `step-NN.jpg` を**画像として見て**から次の操作を決める。
-- タイトル画面→プレイ→（可能なら）ゲームオーバーやクリアまで体験する。
-- 操作JSONの書き方は `tools/play.mjs` 冒頭のコメント参照（tap / swipe / keys / wait）。ゲーム内時間は操作中しか進まない。
-- スマホではキー入力が無効になる。タッチだけで遊べるか、文字やボタンが小さすぎないか、表示が重ならないかを確認する。
-- `--note` には、プレイヤーとして見えたこと・考えたことを日本語で正直に書く（サイトで公開される）。
-- **プレイ中に「遊べない」レベルの致命的な不具合**（開始できない、操作が効かない、即死し続ける等）を見つけた場合のみ、
-  コードを修正 → `validate` → 両方の `play.mjs init` からやり直してよい（修正は1回まで）。
-  バランスの悪さ・地味さ・スマホでの見づらさなどは修正せず、そのまま採点に反映する。
+- 6〜12手。1手ごとに出力された `step-NN.jpg` を**画像として見て**から次の操作を決める。
+- タイトル画面 → プレイ → ゲームオーバー（やクリア）まで体験する。操作は tap / swipe / wait（`tools/play.mjs` 冒頭参照）。
+- `--note` には、プレイヤーとして見えたこと・感じたことを正直に書く（公開される）。
+- **遊べないレベルの致命的な不具合**（開始できない、操作が効かない、即死し続ける等）を見つけた場合のみ、
+  修正 → `validate` → `play.mjs init` からやり直してよい（修正は1回まで）。
+  つまらなさ・バランスの悪さは直さず、そのまま判定に反映する。
 
 ### 1-5. 類似作品リサーチ（必須）
 
-アイデアは無から生まれない。自己採点の前に、似ている作品・ルーツになった作品を調べる。
+- ウェブ検索で 2〜4 回調べ、似ている作品・ルーツになった作品を最大4件まとめる（類似度 高/中/低、似ている点と違う点、英訳）。
+  ウェブ検索が使えない環境では、確実に実在する有名作品だけを自分の知識から挙げ、`--research` にその旨を書く。
+- URL は検索結果で実在を確認できたものだけ。分からなければ省略する（作らない）。
 
-- WebSearch で 2〜4 回検索する（例: 「<中心のメカニクス> browser game」「<ジャンル> <ひねり> game」、日本語でも1回）。
-- 見つかった作品のうち、似ているものを最大4件選び、類似度（高/中/低）と「似ている点・違う点」をまとめる。
-  定番の元祖（例: パックマン、テトリス）がルーツなら「低〜中」で挙げてよい。
-- URL は検索結果で実在を確認できたものだけを書く。分からなければ省略する（作らない）。
-- 類似度「高」の作品があれば、独創性は 1〜2 にする。
-
-### 1-6. 自己採点と公開
+### 1-6. 自己判定と公開
 
 ```bash
-node tools/review.mjs <ID> --playable-pc <0-2> --playable-mobile <0-2> --fun <1-5> --quality <1-5> --originality <1-5> \
-  --comment "総評" --good "良かった点" --bad "気になった点" --thumb <PCのステップ番号> \
-  --similar '[{"title":"作品名","url":"https://…","similarity":"高","note":"似ている点と違う点"}]' \
-  --research "どう調べたか（検索語など）と、独創性の判断理由" \
-  --comment-en "English review" --good-en "…" --bad-en "…" --research-en "…"
-node tools/cost.mjs end <ID>
+node tools/review.mjs <ID> --verdict fun|meh|boring --works ok|buggy|broken \
+  --comment "遊んだ感想" --comment-en "English" \
+  --similar '[{"title":"…","url":"https://…","similarity":"中","note":"…","note_en":"…"}]' \
+  --research "どう調べたか" --research-en "English" --thumb <サムネに使うステップ番号>
+node tools/metrics.mjs end <ID>
 ```
 
-- 類似作品JSONの各項目には英語の説明 `note_en` も付ける。
-- `cost.mjs end` で、`start` からここまでに使ったトークン数とAPI定価換算の金額（円・ドル）が記録される。
-
-採点の心構え:
-
-- **作者としてではなく、初めて遊んだプレイヤーとして**採点する。自分の作品をひいきしない。
-- 基準: 3 = 無料のブラウザミニゲームとして平均的。5 はめったに付けない。
-- 実際のプレイ体験（何点取れたか、どこで詰まったか、スマホで遊びにくい点）を根拠にする。
-- サムネには、ゲームの魅力が一番伝わる PC プレイ中の画面を選ぶ。
-- 実行すると画像が WebP に圧縮され、余分なプレイ画像は削除される。「状態=published」と出れば公開対象。
-- 容量の警告が出た場合は、そのまま記録に残す（後から直さない）。
+- `metrics.mjs end` は、Claude Code ではセッション記録から思考量・出力量・応答回数・ツール回数・時間を自動集計する。
+  それ以外の環境では時間だけが記録される。自分で正確に分かる値があれば `--turns N --tools N` などで添えてよい（推測値は書かない）。
+- verdict は人間と同じ3段階（面白い / まあまあ / つまらない）。**初めて遊んだ人のつもりで**正直に。
+- サムネには、ゲームの魅力が一番伝わるプレイ中の画面を選ぶ。
+- 「状態=published」と出れば公開対象。
 
 ## 2. 公開
 
 ```bash
-node tools/build-index.mjs
 node tools/storage-report.mjs
-git add -A
-git commit -m "Daily games <日付>: <タイトル1> / <タイトル2> / <タイトル3>"
+git add games
+git commit -m "Games <日付> (<MAKER>): <タイトル1> / <タイトル2> / …"
+git pull --rebase
 git push
 ```
 
-push されると GitHub Actions がサイトを自動デプロイする。
+push されると GitHub Actions が作品一覧を作り直し、サイトを自動デプロイする（`games/index.json` はコミットしない）。
 
 ## 3. 終了報告
 
-最後に、作ったゲーム（ID・タイトル・自己採点の総合・PC/スマホの遊べた度・制作コスト）、破棄したものがあればその理由、
-容量レポートの要約を短くまとめて出力して終了する。
+作ったゲーム（ID・タイトル・自己判定・制作記録の要約）、破棄したものとその理由、容量レポートの要約を短く出力して終了する。
 
 ## 禁止事項
 
 - 既存のゲーム（今日以外の `games/*`）を変更しない。
-- `assets/` `tools/` `factory/` やサイトのページを変更しない（制作物は `games/<ID>/` のみ）。
-- 人間の評価データを参照・操作しない。
+- `assets/` `tools/` `factory/` `lib/` やサイトのページを変更しない（制作物は `games/<ID>/` のみ）。
+- 人間の評価データを参照・検索しない。
 - 失敗を隠さない（破棄した場合は必ず discard.mjs で記録する）。
-- 画像・音声などのファイルを追加しない（すべてコードで描画する）。

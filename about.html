@@ -2,122 +2,78 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>AI GAME FACTORY — About</title>
+<meta name="theme-color" content="#0d0e12">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Zen+Kaku+Gothic+New:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23c8f051'/><text x='16' y='22' font-size='16' text-anchor='middle' font-family='monospace' font-weight='700'>AI</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23c8f051'/><path d='M12 9l12 7-12 7z' fill='%23111'/></svg>">
 <script src="assets/i18n.js"></script>
 </head>
 <body>
 <header class="site-head">
   <div class="wrap">
-    <a class="logo" href="./"><span class="logo-mark">▶</span><span class="logo-text">AI GAME FACTORY</span></a>
+    <a class="logo" href="./"><span class="logo-mark">▶</span><span>AI GAME FACTORY</span></a>
     <nav class="nav">
-      <a href="./" data-i18n="nav.calendar">カレンダー</a>
-      <a href="stats.html" data-i18n="nav.stats">実験データ</a>
-      <a href="about.html" aria-current="page" data-i18n="nav.about">この実験について</a>
+      <a href="stats.html" data-i18n="nav.stats">観測データ</a>
+      <a href="about.html" class="nav-q" aria-current="page" data-i18n-attr="aria-label:nav.about;title:nav.about">?</a>
+      <span class="lang-slot"></span>
     </nav>
   </div>
 </header>
 
-<main class="wrap prose">
-<div lang="ja" data-only="ja">
-  <section class="hero" style="border:0">
-    <div class="hero-kicker">ABOUT</div>
-    <h1>この実験について</h1>
-    <p>AIと一緒に数日かけて1本のゲームを作る——そんな制作を続けるうちに、ひとつの疑問が浮かびました。<br>「シンプルなゲームなら、人がまったく手を出さなくてもAIだけで作れるのでは？」</p>
-  </section>
+<main class="wrap narrow prose">
+<div data-only="ja" lang="ja">
+  <h1 class="page-title">この実験について</h1>
+  <p class="lead">人間が一切干渉せずに生まれたゲームを、人間が本当に「面白い」と感じる日は来るのか？</p>
+  <p>AIの創作物が、人間の娯楽として成立する瞬間を観測する長期実験です。</p>
 
   <h2>ルール</h2>
-  <ol>
-    <li>お題（ジャンル × ひねり × テーマ）はプログラムがランダムに出します。</li>
-    <li>企画・コーディング・修正はすべてAIが行います。人はコードに触れません。</li>
-    <li>すべてのゲームは <b>PC とスマホの両方</b>、<b>日本語と英語の両方</b>に対応します。自動テストで、PC（キーボードのみ）、スマホ（縦画面・タッチのみ）、言語の切り替えを検査し、合格したものだけが公開されます。不合格が続いた作品は破棄され、失敗として記録されます。</li>
-    <li>公開前に、制作したAI自身がPCとスマホの両方でゲームをプレイし、<b>似ている作品をリサーチ</b>したうえで自己採点します。</li>
-    <li>すべての作品に、制作日時・制作AI（モデル名）・<b>制作コスト</b>（使用トークン数と金額換算）を記録します。</li>
-  </ol>
-
-  <h2>AIはどうやってプレイしているの？</h2>
-  <p>ゲームの時計（アニメーションやタイマー）を止めた状態でスクリーンショットをAIに見せ、AIが決めた操作（「←を0.4秒押す」「画面のこの位置をタップ」など）の間だけ時間を進めます。これを繰り返すことで、AIは考える時間を気にせずアクションゲームもプレイできます。プレイの様子は各ゲームページの「AIのプレイログ」で見られます。</p>
-
-  <h2>類似作品のリサーチ</h2>
-  <p>ものづくりのアイデアは、完全な無から生まれることはありません。AIは自己採点の前にウェブで似ている作品やルーツになった作品を調べ、各ゲームページの「ルーツ・類似作品」に記録します。独創性の点数は、この調査結果を踏まえて付けられます。</p>
-
-  <h2>制作コスト</h2>
-  <p>AIが1本のゲームを作るのに使ったトークン数（入力・出力・キャッシュ）を集計し、制作時点のAPI定価で金額に換算して表示しています（日本語表示では円、英語表示ではドル）。実際の制作はサブスクリプションや無料枠の範囲で行っているため、追加の支払いは発生していません。AIの進化とともに「同じクオリティをいくらで作れるか」がどう変わるかも、この実験で見たいことのひとつです。</p>
-
-  <h2>評価の項目</h2>
   <ul>
-    <li><b>遊んだ端末</b> — PC / スマホ・タブレット</li>
-    <li><b>問題なく遊べたか</b> — 問題なく遊べた / 不具合はあるが遊べた / 遊べなかった</li>
-    <li><b>楽しさ</b>（★1〜5）</li>
-    <li><b>クオリティ</b>（★1〜5）— 見た目・操作感・完成度</li>
-    <li><b>独創性</b>（★1〜5）— アイデアの新しさ</li>
+    <li>AIが毎日、自分で企画してゲームを作り、自分で遊んで判定します。</li>
+    <li>人間はお題を出さず、コードにも触れず、作品を選びません。</li>
+    <li>AIは人間の評価を見ません（閉じた実験）。</li>
+    <li>スマホ向け・日本語と英語に対応。自動テストに合格したものだけが並びます。</li>
   </ul>
-  <p>AIも同じ項目で自己採点しています。「総合」は楽しさ・クオリティ・独創性の平均です。AIの感じ方と人間の感じ方の差も、この実験で見たいもののひとつです。</p>
 
-  <h2>参加するAI</h2>
-  <p>当面は Anthropic の Claude を中心に制作していますが、他社のAI（ChatGPT / GPT系、Gemini など）も同じお題・同じ仕様・同じテストで参加できる仕組みになっています。各作品の「制作AI」で、どのAIが作ったかを確認できます。</p>
+  <h2>あなたにお願いしたいこと</h2>
+  <p>遊んで、<b>面白い / まあまあ / つまらない</b> のどれかを押すだけです。</p>
+  <p>「面白い」が評価{n}人以上で{p}%を超えた作品が現れたとき、その日を「観測された日」として記録します。</p>
 
-  <h2>注意</h2>
-  <ul>
-    <li>ゲームはサイトから切り離された安全な環境（sandbox）で動いており、外部への通信や保存はできません。</li>
-    <li>評価は匿名で集計されます。ブラウザごとに1作品1票で、あとから更新できます。</li>
-    <li>このサイトは無料のサービスだけで運営しています。容量を抑えるため、AIのプレイ画像は一部だけを圧縮して保存しています。</li>
-    <li>初期の3作品はサイト構築中に作られたサンプルのため、ゲーム内の表示は日本語のみです。</li>
-  </ul>
+  <h2>記録していること</h2>
+  <p>評価のほか、プレイ回数とプレイ時間を匿名で記録しています。作品ごとに、制作したAI・制作日・制作記録（思考量、手数、時間）を公開しています。</p>
+  <p>実験のルールの全文は <a href="https://github.com/mojon1/ai-game-factory/blob/main/factory/CHARTER.md">実験憲章</a> にあります。</p>
 </div>
 
-<div lang="en" data-only="en">
-  <section class="hero" style="border:0">
-    <div class="hero-kicker">ABOUT</div>
-    <h1>About this experiment</h1>
-    <p>After spending days building single games together with AI, a question came up:<br>"For simple games, couldn't AI make them entirely on its own — with no human touching anything?"</p>
-  </section>
+<div data-only="en" lang="en">
+  <h1 class="page-title">About this experiment</h1>
+  <p class="lead">Will the day come when humans truly find a game — made with zero human interference — fun?</p>
+  <p>A long-term experiment to observe the moment AI-made works become real entertainment for humans.</p>
 
   <h2>Rules</h2>
-  <ol>
-    <li>A program picks a random prompt (genre × twist × theme).</li>
-    <li>All planning, coding and fixing is done by AI. Humans never touch the code.</li>
-    <li>Every game supports <b>both PC and mobile</b>, and <b>both Japanese and English</b>. Automated tests check PC (keyboard only), mobile (portrait, touch only) and language switching; only games that pass are published. Games that keep failing are discarded and recorded as failures.</li>
-    <li>Before publishing, the AI that made the game plays it on both PC and mobile, <b>researches similar existing works</b>, and then scores itself.</li>
-    <li>Every game records its creation time, the AI model that made it, and its <b>production cost</b> (tokens used and the equivalent price).</li>
-  </ol>
-
-  <h2>How does the AI play?</h2>
-  <p>The game clock (animations and timers) is frozen and the AI is shown a screenshot. It picks an input ("hold ← for 0.4 s", "tap here") and time advances only while that input happens. Repeating this lets the AI play even action games without worrying about thinking time. You can see each session in the "AI play log" on the game pages.</p>
-
-  <h2>Researching similar works</h2>
-  <p>Ideas never come from nothing. Before scoring itself, the AI searches the web for similar works and roots, and lists them under "Roots &amp; similar works". The originality score takes this research into account.</p>
-
-  <h2>Production cost</h2>
-  <p>We count the tokens (input, output, cache) the AI used to make each game and convert them to money at the API list price at the time of creation (yen in Japanese, US dollars in English). The actual production runs within subscriptions and free tiers, so no extra money is paid. Watching how "the cost of making the same quality" changes as AI evolves is part of this experiment.</p>
-
-  <h2>Rating criteria</h2>
   <ul>
-    <li><b>Device</b> — PC / phone or tablet</li>
-    <li><b>Playable?</b> — played fine / playable with bugs / could not play</li>
-    <li><b>Fun</b> (1–5 stars)</li>
-    <li><b>Quality</b> (1–5 stars) — look, feel and polish</li>
-    <li><b>Originality</b> (1–5 stars) — freshness of the idea</li>
+    <li>Every day, AI plans and builds games on its own, then plays and judges them itself.</li>
+    <li>Humans give no prompts, never touch the code, and never pick which games appear.</li>
+    <li>The AI never sees human ratings (a closed experiment).</li>
+    <li>Made for phones, in Japanese and English. Only games that pass automated tests are listed.</li>
   </ul>
-  <p>The AI scores itself on the same criteria. "Overall" is the average of fun, quality and originality. The gap between how AI and humans feel is one of the things we want to see.</p>
 
-  <h2>Participating AIs</h2>
-  <p>For now games are mainly made by Anthropic's Claude, but other AIs (ChatGPT / GPT models, Gemini, etc.) can join with the same prompts, spec and tests. Each game shows which AI made it.</p>
+  <h2>What we ask of you</h2>
+  <p>Play, then tap <b>Fun / So-so / Boring</b>. That's it.</p>
+  <p>When a game with {n}+ ratings goes over {p}% "fun", we will record that day as the day it was observed.</p>
 
-  <h2>Notes</h2>
-  <ul>
-    <li>Games run in a sandbox isolated from this site; they cannot access the network or store data.</li>
-    <li>Ratings are anonymous. One vote per game per browser, and you can update it later.</li>
-    <li>This site runs only on free services. To save space, only some of the AI's play screenshots are kept, compressed.</li>
-    <li>The first three games are samples made while the site was being built, so their in-game text is Japanese only.</li>
-  </ul>
+  <h2>What we record</h2>
+  <p>Besides ratings, we anonymously record play counts and play time. Each game shows the AI that made it, the date, and its production record (thinking, turns, time).</p>
+  <p>The full rules are in the <a href="https://github.com/mojon1/ai-game-factory/blob/main/factory/CHARTER.md">Experiment Charter</a>.</p>
 </div>
 </main>
-<footer><div class="wrap">AI GAME FACTORY</div></footer>
+<footer><div class="wrap"><a href="./">AI GAME FACTORY</a></div></footer>
+<script src="assets/config.js"></script>
+<script>
+  const o = (window.AGF_CONFIG || {}).observe || { minVotes: 20, funRate: 50 };
+  document.querySelectorAll('main p').forEach((p) => { p.innerHTML = p.innerHTML.replace('{n}', o.minVotes).replace('{p}', o.funRate); });
+</script>
 </body>
 </html>

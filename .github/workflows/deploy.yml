@@ -1,4 +1,5 @@
 # サイトを GitHub Pages に公開する（main への push / 手動 / 他ワークフローからの呼び出し）
+# 作品一覧 games/index.json はここで生成する（各AIはコミットしない）
 name: Deploy site
 on:
   push:
@@ -11,7 +12,7 @@ permissions:
   id-token: write
 concurrency:
   group: pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -22,6 +23,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build game index
+        run: node tools/build-index.mjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -2,152 +2,109 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>AI GAME FACTORY — Data</title>
+<meta name="theme-color" content="#0d0e12">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Zen+Kaku+Gothic+New:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23c8f051'/><text x='16' y='22' font-size='16' text-anchor='middle' font-family='monospace' font-weight='700'>AI</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23c8f051'/><path d='M12 9l12 7-12 7z' fill='%23111'/></svg>">
 <script src="assets/i18n.js"></script>
 </head>
 <body>
 <header class="site-head">
   <div class="wrap">
-    <a class="logo" href="./"><span class="logo-mark">▶</span><span class="logo-text">AI GAME FACTORY</span></a>
+    <a class="logo" href="./"><span class="logo-mark">▶</span><span>AI GAME FACTORY</span></a>
     <nav class="nav">
-      <a href="./" data-i18n="nav.calendar">カレンダー</a>
-      <a href="stats.html" aria-current="page" data-i18n="nav.stats">実験データ</a>
-      <a href="about.html" data-i18n="nav.about">この実験について</a>
+      <a href="stats.html" aria-current="page" data-i18n="nav.stats">観測データ</a>
+      <a href="about.html" class="nav-q" data-i18n-attr="aria-label:nav.about;title:nav.about">?</a>
+      <span class="lang-slot"></span>
     </nav>
   </div>
 </header>
 <div class="banner" id="banner" hidden></div>
 
 <main class="wrap">
-  <section class="hero">
-    <div class="hero-kicker">EXPERIMENT DATA</div>
-    <h1 data-i18n="stats.title"></h1>
-    <p data-i18n="stats.lead"></p>
+  <h1 class="page-title" data-i18n="stats.title"></h1>
+  <section class="observe" id="observe"></section>
+
+  <section class="panel">
+    <h2 data-i18n="stats.chart"></h2>
+    <div id="chart"></div>
   </section>
 
-  <section class="panel" style="margin-top:24px">
+  <section class="panel">
     <h2 data-i18n="stats.byai"></h2>
     <div class="table-wrap"><table class="data" id="by-ai"></table></div>
-    <p class="muted" style="font-size:12px;margin:10px 0 0" data-i18n="stats.note"></p>
+    <p class="muted small" data-i18n="stats.note"></p>
   </section>
-
-  <section class="panel" style="margin-top:20px">
-    <h2 data-i18n="stats.ranking"></h2>
-    <div class="seg" role="group" id="rank-tabs" style="margin-bottom:14px">
-      <button type="button" data-k="human" aria-pressed="true" data-i18n="rank.human"></button>
-      <button type="button" data-k="ai" data-i18n="rank.ai"></button>
-      <button type="button" data-k="gap" data-i18n="rank.gap"></button>
-    </div>
-    <ol class="ranking" id="ranking"></ol>
-  </section>
-
-  <div class="cols">
-    <section class="panel">
-      <h2><span data-i18n="stats.scatter"></span> <span class="tag" data-i18n="stats.scatter.tag"></span></h2>
-      <div id="scatter"></div>
-      <p class="muted" style="font-size:12px;margin:8px 0 0" data-i18n="stats.scatter.note"></p>
-    </section>
-    <section class="panel">
-      <h2><span data-i18n="stats.timeline"></span> <span class="tag">TIMELINE</span></h2>
-      <div class="legend"><span><i style="background:var(--human)"></i><span data-i18n="score.human"></span></span><span><i style="background:var(--ai)"></i><span data-i18n="score.ai"></span></span></div>
-      <div id="timeline"></div>
-    </section>
-  </div>
 </main>
-
-<footer><div class="wrap">AI GAME FACTORY</div></footer>
+<footer><div class="wrap"><a href="./">AI GAME FACTORY</a></div></footer>
 
 <script src="assets/config.js"></script>
 <script src="assets/app.js"></script>
 <script>
 (async () => {
-  const { t, EN, esc, num, avg, aiChip, genre, title, money, loadIndex, Ratings, modeBanner, vendorColor, fmtDate } = AGF;
+  const { t, CFG, esc, fmtDate, title, pct, kTokens, loadIndex, Ratings, modeBanner, VERDICT } = AGF;
   I18N.apply();
   modeBanner(document.getElementById('banner'));
+  const $ = (id) => document.getElementById(id);
   const index = await loadIndex();
   let scores = {};
   try { scores = await Ratings.summary(); } catch (e) { console.warn(e); }
-  const games = index.games.map((g) => ({ ...g, human: scores[g.id] || null }));
+  const games = index.games.map((g) => ({ ...g, s: scores[g.id] || null }));
+  const line = CFG.observe || { minVotes: 20, funRate: 50 };
+  const avg = (a) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : null);
 
-  // ---------- AI別テーブル ----------
+  // ---------- 観測の状況 ----------
+  const passed = games.filter((g) => g.s && g.s.votes >= line.minVotes && g.s.funRate >= line.funRate)
+    .sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1));
+  $('observe').innerHTML = `<div class="observe-status ${passed.length ? 'yes' : ''}">${t(passed.length ? 'stats.status.yes' : 'stats.status.none')}</div>
+    ${passed.length ? `<p>${t('stats.first', { t: `<a href="game.html?id=${encodeURIComponent(passed[0].id)}">${esc(title(passed[0]))}</a>`, d: esc(fmtDate(passed[0].createdAt)) })}</p>` : ''}
+    <p class="muted small">${t('stats.line', { n: line.minVotes, p: line.funRate })}</p>`;
+
+  // ---------- 作品ごとの「面白い」の割合 ----------
+  const rated = games.filter((g) => g.s?.votes).sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1));
+  const W = 640, H = 260, P = { l: 36, r: 12, t: 12, b: 28 };
+  const sy = (v) => H - P.b - (v / 100) * (H - P.t - P.b);
+  let svg = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${t('stats.chart')}">`;
+  for (const v of [0, 25, 50, 75, 100]) svg += `<line class="grid" x1="${P.l}" x2="${W - P.r}" y1="${sy(v)}" y2="${sy(v)}"/><text x="${P.l - 6}" y="${sy(v) + 4}" text-anchor="end">${v}%</text>`;
+  svg += `<line x1="${P.l}" x2="${W - P.r}" y1="${sy(line.funRate)}" y2="${sy(line.funRate)}" class="line-goal"/>`;
+  if (rated.length) {
+    const t0 = Date.parse(rated[0].createdAt), t1 = Date.parse(rated[rated.length - 1].createdAt);
+    const sx = (iso) => P.l + (t1 === t0 ? 0.5 : (Date.parse(iso) - t0) / (t1 - t0)) * (W - P.l - P.r);
+    for (const g of rated) {
+      const big = g.s.votes >= line.minVotes;
+      svg += `<a href="game.html?id=${encodeURIComponent(g.id)}"><circle cx="${sx(g.createdAt)}" cy="${sy(g.s.funRate)}" r="${big ? 6 : 4}" class="${big ? 'dot' : 'dot faint'}"><title>${esc(title(g))}: ${pct(g.s.funRate)} (${t('votes', { n: g.s.votes })})</title></circle></a>`;
+    }
+    svg += `<text x="${P.l}" y="${H - 8}">${esc(fmtDate(rated[0].createdAt))}</text><text x="${W - P.r}" y="${H - 8}" text-anchor="end">${esc(fmtDate(rated[rated.length - 1].createdAt))}</text>`;
+  } else svg += `<text x="${W / 2}" y="${H / 2}" text-anchor="middle">${t('stats.chart.empty')}</text>`;
+  $('chart').innerHTML = svg + '</svg>';
+
+  // ---------- AIごとの記録 ----------
   const byAi = new Map();
-  const slot = (ai) => { const k = ai?.model || '?'; if (!byAi.has(k)) byAi.set(k, { ai, games: [], fails: 0 }); return byAi.get(k); };
-  for (const g of games) slot(g.mainAI).games.push(g);
-  for (const f of index.failures || []) slot(f.mainAI).fails++;
-  const rows = [...byAi.values()].map((r) => {
-    const gs = r.games, rated = gs.filter((g) => g.human);
-    const first = gs.filter((g) => g.validationRuns != null);
-    const costed = gs.filter((g) => g.cost);
+  for (const g of games) { const k = g.ai?.model || '?'; if (!byAi.has(k)) byAi.set(k, { ai: g.ai, games: [] }); byAi.get(k).games.push(g); }
+  const rows = [...byAi.values()].map(({ ai, games: gs }) => {
+    const sum = (k) => gs.reduce((a, g) => a + (g.s?.[k] || 0), 0);
+    const votes = sum('votes'), voted = gs.filter((g) => g.s?.votes);
+    const majority = (s) => [['fun', 2], ['meh', 1], ['boring', 0]].sort((a, b) => s[b[0]] - s[a[0]])[0][1];
+    const agree = voted.filter((g) => g.aiVerdict && VERDICT[g.aiVerdict] === majority(g.s));
+    const m = gs.filter((g) => g.metrics);
+    const played = gs.filter((g) => g.s?.sessions);
     return {
-      ai: r.ai, n: gs.length,
-      success: gs.length + r.fails ? (gs.length / (gs.length + r.fails)) * 100 : null,
-      firstPass: first.length ? (first.filter((g) => g.validationRuns === 1).length / first.length) * 100 : null,
-      aiOverall: avg(gs.filter((g) => g.ai).map((g) => g.ai.overall)),
-      humanOverall: avg(rated.map((g) => g.human.overall).filter((v) => v != null)),
-      playable: avg(rated.map((g) => g.human.playable).filter((v) => v != null)),
-      votes: rated.reduce((a, g) => a + g.human.votes, 0),
-      gap: avg(rated.filter((g) => g.ai && g.human.overall != null).map((g) => g.human.overall - g.ai.overall)),
-      cost: costed.length ? { usd: avg(costed.map((g) => g.cost.usd)), jpy: avg(costed.map((g) => g.cost.jpy)) } : null,
-      firstDate: gs.map((g) => g.createdAt).sort()[0],
+      ai, n: gs.length, votes,
+      fun: votes ? (sum('fun') / votes) * 100 : null, meh: votes ? (sum('meh') / votes) * 100 : null, boring: votes ? (sum('boring') / votes) * 100 : null,
+      broken: sum('broken'), agree: voted.length ? (agree.length / voted.length) * 100 : null,
+      thinking: avg(m.map((g) => g.metrics.thinking).filter((v) => v != null)), turns: avg(m.map((g) => g.metrics.turns).filter((v) => v != null)), minutes: avg(m.map((g) => g.metrics.minutes).filter((v) => v != null)),
+      playtime: avg(played.map((g) => g.s.avgSeconds).filter((v) => v != null)), replay: avg(played.map((g) => g.s.replayRate).filter((v) => v != null)),
     };
-  }).sort((a, b) => (a.firstDate < b.firstDate ? -1 : 1));
-  const pct = (v) => (v == null ? '–' : num(v, 0) + '%');
-  document.getElementById('by-ai').innerHTML = `<thead><tr>${['th.ai', 'th.n', 'th.success', 'th.first', 'th.aiscore', 'th.human', 'th.gap', 'th.playable', 'th.votes', 'th.cost', 'th.first.date'].map((k) => `<th>${t(k)}</th>`).join('')}</tr></thead>
-  <tbody>${rows.map((r) => `<tr>
-    <td>${aiChip(r.ai)}</td><td>${r.n}</td><td>${pct(r.success)}</td><td>${pct(r.firstPass)}</td>
-    <td style="color:var(--ai)">${num(r.aiOverall, 2)}</td><td style="color:var(--human)">${num(r.humanOverall, 2)}</td>
-    <td>${r.gap == null ? '–' : (r.gap >= 0 ? '+' : '') + r.gap.toFixed(2)}</td><td>${pct(r.playable)}</td><td>${r.votes}</td>
-    <td>${money(r.cost)}</td><td>${r.firstDate ? fmtDate(r.firstDate) : '–'}</td>
-  </tr>`).join('')}</tbody>`;
-
-  // ---------- ランキング ----------
-  let rankKey = 'human';
-  function renderRanking() {
-    document.querySelectorAll('#rank-tabs button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.k === rankKey)));
-    const val = { human: (g) => g.human?.overall, ai: (g) => g.ai?.overall, gap: (g) => (g.human?.overall != null && g.ai ? g.human.overall - g.ai.overall : null) }[rankKey];
-    const list = games.filter((g) => val(g) != null).sort((a, b) => (rankKey === 'gap' ? Math.abs(val(b)) - Math.abs(val(a)) : val(b) - val(a))).slice(0, 10);
-    document.getElementById('ranking').innerHTML = list.length ? list.map((g) => {
-      const v = val(g);
-      return `<li><a href="game.html?id=${encodeURIComponent(g.id)}">${g.thumb ? `<img src="${esc(g.thumb)}" alt="" loading="lazy" width="96" height="60">` : '<span></span>'}
-        <div><b>${esc(title(g))}</b><span class="meta-row"><span class="genre">${esc(genre(g.genre))}</span><span class="mono">${fmtDate(g.createdAt)}</span>${aiChip(g.mainAI)}</span></div>
-        <em class="mono" style="color:${rankKey === 'ai' ? 'var(--ai)' : 'var(--human)'}">${rankKey === 'gap' ? (v >= 0 ? '+' : '') + v.toFixed(2) : num(v, 2)}</em></a></li>`;
-    }).join('') : `<p class="muted">${t('rank.empty')}</p>`;
-  }
-  document.getElementById('rank-tabs').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { rankKey = b.dataset.k; renderRanking(); } });
-  renderRanking();
-
-  // ---------- 散布図 ----------
-  const W = 520, H = 360, P = { l: 40, r: 14, t: 14, b: 36 };
-  const sx = (v) => P.l + ((v - 1) / 4) * (W - P.l - P.r), sy = (v) => H - P.b - ((v - 1) / 4) * (H - P.t - P.b);
-  const both = games.filter((g) => g.ai && g.human?.overall != null);
-  let svg = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${t('stats.scatter')}">`;
-  for (let v = 1; v <= 5; v++) svg += `<line class="grid" x1="${sx(v)}" x2="${sx(v)}" y1="${P.t}" y2="${H - P.b}"/><line class="grid" x1="${P.l}" x2="${W - P.r}" y1="${sy(v)}" y2="${sy(v)}"/><text x="${sx(v)}" y="${H - P.b + 16}" text-anchor="middle">${v}</text><text x="${P.l - 8}" y="${sy(v) + 4}" text-anchor="end">${v}</text>`;
-  svg += `<line x1="${sx(1)}" y1="${sy(1)}" x2="${sx(5)}" y2="${sy(5)}" stroke="#4a5060" stroke-dasharray="4 4"/>`;
-  svg += `<text x="${(P.l + W - P.r) / 2}" y="${H - 4}" text-anchor="middle">${t('stats.axis.ai')}</text><text x="12" y="${P.t + 4}" transform="rotate(-90 12 ${P.t + 4})" text-anchor="end">${t('stats.axis.human')}</text>`;
-  for (const g of both) svg += `<a href="game.html?id=${encodeURIComponent(g.id)}"><circle cx="${sx(g.ai.overall)}" cy="${sy(g.human.overall)}" r="${Math.min(10, 4 + Math.sqrt(g.human.votes) * 1.5)}" fill="${vendorColor(g.mainAI?.vendor)}" fill-opacity=".85" stroke="#0d0e12"><title>${esc(title(g))} (AI ${num(g.ai.overall)} / ${t('score.human')} ${num(g.human.overall)} · ${t('votes', { n: g.human.votes })})</title></circle></a>`;
-  if (!both.length) svg += `<text x="${W / 2}" y="${H / 2}" text-anchor="middle">${t('stats.scatter.empty')}</text>`;
-  document.getElementById('scatter').innerHTML = svg + '</svg>';
-
-  // ---------- 推移 ----------
-  const ts = games.slice().sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1));
-  const t0 = ts.length ? new Date(ts[0].createdAt).getTime() : 0, t1 = ts.length ? new Date(ts[ts.length - 1].createdAt).getTime() : 1;
-  const tx = (iso) => P.l + (t1 === t0 ? 0.5 : (new Date(iso).getTime() - t0) / (t1 - t0)) * (W - P.l - P.r);
-  let tl = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${t('stats.timeline')}">`;
-  for (let v = 1; v <= 5; v++) tl += `<line class="grid" x1="${P.l}" x2="${W - P.r}" y1="${sy(v)}" y2="${sy(v)}"/><text x="${P.l - 8}" y="${sy(v) + 4}" text-anchor="end">${v}</text>`;
-  if (ts.length) tl += `<text x="${P.l}" y="${H - P.b + 16}">${fmtDate(ts[0].createdAt)}</text><text x="${W - P.r}" y="${H - P.b + 16}" text-anchor="end">${fmtDate(ts[ts.length - 1].createdAt)}</text>`;
-  for (const g of ts) {
-    const x = tx(g.createdAt);
-    if (g.ai && g.human?.overall != null) tl += `<line x1="${x}" x2="${x}" y1="${sy(g.ai.overall)}" y2="${sy(g.human.overall)}" stroke="#3a3f4c"/>`;
-    if (g.ai) tl += `<rect x="${x - 4}" y="${sy(g.ai.overall) - 4}" width="8" height="8" fill="var(--ai)" transform="rotate(45 ${x} ${sy(g.ai.overall)})"><title>${esc(title(g))} AI ${num(g.ai.overall)}</title></rect>`;
-    if (g.human?.overall != null) tl += `<circle cx="${x}" cy="${sy(g.human.overall)}" r="5" fill="var(--human)"><title>${esc(title(g))} ${num(g.human.overall)}</title></circle>`;
-  }
-  document.getElementById('timeline').innerHTML = tl + '</svg>';
+  });
+  const cols = ['th.ai', 'th.games', 'th.votes', 'th.fun', 'th.meh', 'th.boring', 'th.broken', 'th.agree', 'th.thinking', 'th.turns', 'th.minutes', 'th.playtime', 'th.replay'];
+  $('by-ai').innerHTML = `<thead><tr>${cols.map((k) => `<th>${t(k)}</th>`).join('')}</tr></thead><tbody>${rows.map((r) => `<tr>
+    <td>${esc(r.ai?.name || '?')}</td><td>${r.n}</td><td>${r.votes}</td><td class="c-fun">${pct(r.fun)}</td><td>${pct(r.meh)}</td><td>${pct(r.boring)}</td><td>${r.broken}</td><td>${pct(r.agree)}</td>
+    <td>${kTokens(r.thinking)}</td><td>${r.turns == null ? '–' : Math.round(r.turns)}</td><td>${r.minutes == null ? '–' : t('m.min', { n: Math.round(r.minutes) })}</td>
+    <td>${r.playtime == null ? '–' : `${Math.round(r.playtime)}s`}</td><td>${pct(r.replay)}</td></tr>`).join('') || `<tr><td colspan="${cols.length}" class="muted">${t('empty')}</td></tr>`}</tbody>`;
 })();
 </script>
 </body>

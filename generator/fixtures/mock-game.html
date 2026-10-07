@@ -1,18 +1,25 @@
 <!DOCTYPE html>
-<html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mock Dodge</title>
-<style>html,body{margin:0;height:100%;background:#111;overflow:hidden}canvas{display:block;width:100vw;height:100vh;touch-action:none}</style></head>
+<html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><title>Mock Dodge</title>
+<style>html,body{margin:0;height:100%;background:#111;overflow:hidden}canvas{display:block;width:100vw;height:100dvh;touch-action:none}</style></head>
 <body><canvas id="c"></canvas><script>
+// パイプライン確認用のモック（スマホ縦画面・タッチ・日英・合図送信）
 const LANG=new URLSearchParams(location.search).get('lang')||(/^ja/i.test(navigator.language)?'ja':'en');
-const T={ja:{title:'モック・ドッジ Spaceかタップで開始',over:'ゲームオーバー スコア ',score:'スコア '},en:{title:'Mock Dodge - press Space or tap',over:'Game over - score ',score:'Score '}}[LANG];
-const c=document.getElementById('c'),g=c.getContext('2d');let W,H;function rs(){W=c.width=innerWidth;H=c.height=innerHeight}addEventListener('resize',rs);rs();
-let st='title',x=0.5,blocks=[],score=0,keys={},last=0;
-function start(){st='play';x=0.5;blocks=[];score=0}
-addEventListener('keydown',e=>{keys[e.code]=1;if(st!=='play'&&(e.code==='Space'||e.code==='Enter'))start()});addEventListener('keyup',e=>keys[e.code]=0);
-c.addEventListener('pointerdown',e=>{if(st!=='play')start();else x=e.clientX/W});
+const T={ja:{title:'モック・ドッジ',tap:'タップで開始',over:'ゲームオーバー',score:'スコア '},en:{title:'Mock Dodge',tap:'Tap to start',over:'Game over',score:'Score '}}[LANG];
+const signal=(type,data={})=>{try{parent.postMessage({agf:type,...data},'*')}catch(e){}};
+const c=document.getElementById('c'),g=c.getContext('2d');let W=1,H=1;
+function rs(){W=Math.max(1,innerWidth);H=Math.max(1,innerHeight);c.width=W;c.height=H}addEventListener('resize',rs);rs();
+let st='title',x=0.5,blocks=[],score=0,last=0,drag=false;
+function start(){st='play';x=0.5;blocks=[];score=0;signal('start')}
+c.addEventListener('pointerdown',e=>{if(st!=='play'){start();return}drag=true;x=e.clientX/W});
+c.addEventListener('pointermove',e=>{if(drag)x=e.clientX/W});addEventListener('pointerup',()=>drag=false);
 function f(t){const dt=Math.min(.05,(t-last)/1000||0);last=t;g.fillStyle='#111';g.fillRect(0,0,W,H);
-if(st==='play'){if(keys.ArrowLeft)x-=dt;if(keys.ArrowRight)x+=dt;x=Math.max(0,Math.min(1,x));if(Math.random()<dt*3)blocks.push({x:Math.random(),y:0});
-blocks.forEach(b=>b.y+=dt*.4);blocks=blocks.filter(b=>b.y<1.1);score+=dt;if(blocks.some(b=>Math.abs(b.x-x)<.04&&Math.abs(b.y-.9)<.04))st='over';}
-g.fillStyle='#e55';blocks.forEach(b=>g.fillRect(b.x*W-10,b.y*H-10,20,20));g.fillStyle='#5e5';g.fillRect(x*W-15,H*.9-8,30,16);
-g.fillStyle='#fff';g.font='16px sans-serif';g.textAlign='center';g.fillText(st==='title'?T.title:st==='over'?T.over+score.toFixed(1):T.score+score.toFixed(1),W/2,30);requestAnimationFrame(f)}
+if(st==='play'){x=Math.max(0,Math.min(1,x));if(Math.random()<dt*3)blocks.push({x:Math.random(),y:0});
+blocks.forEach(b=>b.y+=dt*.35);blocks=blocks.filter(b=>b.y<1.1);score+=dt;
+if(blocks.some(b=>Math.abs(b.x-x)<.05&&Math.abs(b.y-.88)<.03)){st='over';signal('end',{score:Math.floor(score*10)})}}
+g.fillStyle='#e55';blocks.forEach(b=>g.fillRect(b.x*W-12,b.y*H-12,24,24));g.fillStyle='#5e5';g.fillRect(x*W-20,H*.88-10,40,20);
+g.fillStyle='#fff';g.textAlign='center';g.font='bold 24px sans-serif';
+if(st==='title'){g.fillText(T.title,W/2,H*.4);g.font='16px sans-serif';g.fillText(T.tap,W/2,H*.5)}
+else{g.font='16px sans-serif';g.fillText(T.score+Math.floor(score*10),W/2,40);if(st==='over'){g.font='bold 22px sans-serif';g.fillText(T.over,W/2,H*.45)}}
+requestAnimationFrame(f)}
 requestAnimationFrame(f);
 </script></body></html>

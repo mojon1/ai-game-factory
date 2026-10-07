@@ -13,7 +13,7 @@ export function createProvider(cfg) {
   if (cfg.apiKeyEnv && !key && cfg.type !== 'mock') throw new Error(`環境変数 ${cfg.apiKeyEnv} が未設定です（${cfg.id}）`);
   if (cfg.type === 'gemini') return gemini(cfg, key);
   if (cfg.type === 'openai') return openai(cfg, key);
-  if (cfg.type === 'mock') return mock(cfg);
+  if (cfg.type === 'mock') return mock();
   throw new Error('未対応のプロバイダ種別: ' + cfg.type);
 }
 
@@ -58,7 +58,7 @@ function gemini(cfg, key) {
         const parts = d.candidates?.[0]?.content?.parts || [];
         return {
           text: parts.filter((p) => !p.thought).map((p) => p.text || '').join(''),
-          usage: { input: d.usageMetadata?.promptTokenCount, output: (d.usageMetadata?.candidatesTokenCount || 0) + (d.usageMetadata?.thoughtsTokenCount || 0) },
+          usage: { input: d.usageMetadata?.promptTokenCount, output: (d.usageMetadata?.candidatesTokenCount || 0) + (d.usageMetadata?.thoughtsTokenCount || 0), thinking: d.usageMetadata?.thoughtsTokenCount || 0 },
           modelVersion: d.modelVersion || cfg.model,
         };
       });
@@ -82,31 +82,26 @@ function openai(cfg, key) {
         const r = await fetch(`${base}/chat/completions`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...(key ? { Authorization: `Bearer ${key}` } : {}) }, body: JSON.stringify(body) });
         if (!r.ok) throw new Error(`${cfg.id} ${r.status}: ${(await r.text()).slice(0, 300)}`);
         const d = await r.json();
-        return { text: d.choices?.[0]?.message?.content || '', usage: { input: d.usage?.prompt_tokens, output: d.usage?.completion_tokens }, modelVersion: d.model || cfg.model };
+        return { text: d.choices?.[0]?.message?.content || '', usage: { input: d.usage?.prompt_tokens, output: d.usage?.completion_tokens, thinking: d.usage?.completion_tokens_details?.reasoning_tokens || 0 }, modelVersion: d.model || cfg.model };
       });
     },
   };
 }
 
-// 動作確認用: 固定のゲームを返し、プレイでは Space とランダム移動、採点は中間値
-function mock(cfg) {
+// 動作確認用: 固定のゲームを返し、プレイでは画面下をタップ、判定は「まあまあ」
+function mock() {
   const html = fs.readFileSync(new URL('./fixtures/mock-game.html', import.meta.url), 'utf8');
   let turn = 0;
+  const ok = (obj) => ({ text: JSON.stringify(obj), usage: { input: 0, output: 0, thinking: 0 }, modelVersion: 'mock' });
   return {
     vision: true,
     async chat(messages, { json } = {}) {
       const last = messages[messages.length - 1].text;
-      if (last.includes('"similar":[')) {
-        return { text: JSON.stringify({ similar: [{ title: 'モック類似作品', similarity: '中', note: 'パイプライン確認用' }], research: 'モック' }), usage: {}, modelVersion: 'mock' };
-      }
-      if (json && last.includes('"action"')) {
-        const mobile = last.includes('スマホ');
-        const keys = ['ArrowLeft', 'ArrowRight', 'Space'];
-        const action = mobile ? { tap: [0.2 + 0.3 * (turn++ % 3), 0.7], hold: 300 } : { keys: [keys[turn++ % 3]], hold: 300 };
-        return { text: JSON.stringify({ observation: 'モック: 画面を確認', action, note: 'モックの操作' }), usage: {}, modelVersion: 'mock' };
-      }
-      if (json) return { text: JSON.stringify({ playable_pc: 2, playable_mobile: 2, fun: 3, quality: 3, originality: 3, comment: 'モックによる仮の採点です。パイプライン確認用。', comment_en: 'Placeholder review by the mock provider for pipeline testing.', good: 'なし', bad: 'なし', thumb: 1 }), usage: {}, modelVersion: 'mock' };
-      return { text: '```json\n{"title":"モック・ドッジ","genre":"アクション","tags":["テスト"],"description":"パイプライン確認用のモックゲーム。落ちてくるブロックを避ける。","howToPlay":"左右に動いて避ける。","controls":[{"input":"← →","action":"移動"}],"i18n":{"en":{"title":"Mock Dodge","tags":["test"],"description":"A mock game for testing the pipeline. Dodge falling blocks.","howToPlay":"Move left and right to dodge.","controls":[{"input":"← →","action":"Move"}]}}}\n```\n\n```html\n' + html + '\n```', usage: { input: 0, output: 0 }, modelVersion: 'mock' };
+      if (last.includes('"similar":[')) return ok({ similar: [{ title: 'モック類似作品', similarity: '中', note: 'パイプライン確認用', note_en: 'for pipeline testing' }], research: 'モック', research_en: 'mock' });
+      if (json && last.includes('"action"')) return ok({ observation: 'モック', action: { tap: [0.2 + 0.3 * (turn++ % 3), 0.85], hold: 300 }, note: 'モックの操作', note_en: 'mock move' });
+      if (json) return ok({ verdict: 'meh', works: 'ok', comment: 'モックによる仮の判定です。パイプライン確認用。', comment_en: 'Placeholder verdict by the mock provider for pipeline testing.', thumb: 2 });
+      const meta = { title: 'モック・ドッジ', genre: 'アクション', concept: 'パイプライン確認用のモック。', howToPlay: '指で左右に動かして避ける。', i18n: { en: { title: 'Mock Dodge', concept: 'A mock for testing the pipeline.', howToPlay: 'Drag left and right to dodge.' } } };
+      return { text: '```json\n' + JSON.stringify(meta) + '\n```\n\n```html\n' + html + '\n```', usage: { input: 0, output: 0, thinking: 0 }, modelVersion: 'mock' };
     },
   };
 }

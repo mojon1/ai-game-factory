@@ -6,8 +6,6 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const GAMES_DIR = process.env.GAMES_DIR ? path.resolve(process.env.GAMES_DIR) : path.join(ROOT, 'games');
 
-// ゲーム画面の標準サイズ（サイト側の 16:10 プレイヤーと揃える）
-export const VIEW = { width: 640, height: 400 };
 
 export const gameDir = (id) => path.join(GAMES_DIR, id);
 export const gameUrl = (id, lang) => pathToFileURL(path.join(gameDir(id), 'index.html')).href + (lang ? `?lang=${lang}` : '');
@@ -42,10 +40,11 @@ export function jstNow() {
   return { date: iso.slice(0, 10), iso };
 }
 
-export function nextGameId(date = jstNow().date) {
-  const n = listGameIds().filter((id) => id.startsWith(date)).length;
-  let i = n + 1, id;
-  do { id = `${date}-${String(i++).padStart(2, '0')}`; } while (fs.existsSync(gameDir(id)));
+// ゲームID: <日付>-<制作者>-<連番>（例 2026-10-08-claude-1）。複数のAIが同じ日に作っても衝突しない。
+export function nextGameId(maker, date = jstNow().date) {
+  const slug = String(maker || 'ai').toLowerCase().replace(/[^a-z0-9]+/g, '').slice(0, 12) || 'ai';
+  let i = 1, id;
+  do { id = `${date}-${slug}-${i++}`; } while (fs.existsSync(gameDir(id)));
   return id;
 }
 
@@ -92,10 +91,11 @@ export const SEEDED_RANDOM_INIT = (seed) => `(() => {
 export function settings() {
   return {
     gamesPerDay: 3,
-    thumb: { maxWidth: 480, maxHeight: 300, quality: 0.72 },
-    playImage: { maxWidth: 400, maxHeight: 400, quality: 0.6 },
-    keepPlayImages: { pc: 5, mobile: 3 },
-    gameBudgetKB: 350,       // 1作品あたりの容量の目安（コード＋画像）
+    thumb: { maxWidth: 300, maxHeight: 534, quality: 0.72 },     // 縦長（9:16）
+    playImage: { maxWidth: 240, maxHeight: 427, quality: 0.6 },
+    keepPlayImages: 4,
+    gameMaxKB: 200,          // ゲーム本体（index.html）の容量上限
+    gameBudgetKB: 400,       // 1作品フォルダの容量の目安（コード＋画像）
     siteBudgetMB: 900,       // GitHub Pages の上限 1GB に対する安全ライン
     ...readJson(path.join(ROOT, 'factory', 'settings.json'), {}),
   };

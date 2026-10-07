@@ -1,25 +1,12 @@
 {
-  "_comment": "API経由で他のAIを参加させる設定。無料枠のあるものだけを使う。enabled=true かつ APIキーの環境変数があるものが使われる。",
+  "_comment": "APIしか使えないAIの参加枠（無料枠のみ）。リポジトリを直接操作できるAI（Claude Code / ChatGPT・Codex）は factory/DAILY_TASK.md で参加する。enabled=true かつ APIキーの環境変数があるものが使われる。",
   "gamesPerRun": 1,
   "maxFixAttempts": 3,
   "playSteps": 8,
-  "mobilePlaySteps": 3,
   "providers": [
     {
-      "id": "github-gpt-4.1",
-      "enabled": true,
-      "type": "openai",
-      "label": "GPT-4.1",
-      "vendor": "OpenAI",
-      "model": "openai/gpt-4.1",
-      "baseUrl": "https://models.github.ai/inference",
-      "apiKeyEnv": "GITHUB_TOKEN",
-      "via": "GitHub Models（無料枠）",
-      "maxTokens": 4000,
-      "temperature": 0.9
-    },
-    {
       "id": "gemini-flash",
+      "maker": "gemini",
       "enabled": true,
       "type": "gemini",
       "label": "Gemini 2.5 Flash",
@@ -32,7 +19,23 @@
       "temperature": 1
     },
     {
+      "id": "github-gpt-4.1",
+      "maker": "gpt",
+      "enabled": false,
+      "_note": "ChatGPT はリポジトリ接続（Codex）で参加するため無効。API で参加させる場合だけ true にする。",
+      "type": "openai",
+      "label": "GPT-4.1",
+      "vendor": "OpenAI",
+      "model": "openai/gpt-4.1",
+      "baseUrl": "https://models.github.ai/inference",
+      "apiKeyEnv": "GITHUB_TOKEN",
+      "via": "GitHub Models（無料枠）",
+      "maxTokens": 4000,
+      "temperature": 0.9
+    },
+    {
       "id": "ollama",
+      "maker": "local",
       "enabled": false,
       "type": "openai",
       "label": "Qwen2.5-Coder 14B",
@@ -46,6 +49,7 @@
     },
     {
       "id": "mock",
+      "maker": "mock",
       "enabled": false,
       "type": "mock",
       "label": "Mock",
