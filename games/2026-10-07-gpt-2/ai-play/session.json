@@ -1,0 +1,246 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-07T07:20:40.186Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.71
+        ]
+      },
+      "desc": "tap(0.50,0.71) 120ms",
+      "note": "ふたつの色と記号、タップで交換する説明が読める。開始して光の流れを見る。",
+      "noteEn": "The title explains swapping two colored and marked gates. I start to inspect the falling lights.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": {
+        "wait": 2800
+      },
+      "desc": "wait 2800ms",
+      "note": "左の水色、右の金色はどちらもゲートと一致。切り替えず、先頭の左の光が通るまで待つ。",
+      "noteEn": "The cyan left and gold right lights match their gates. I wait for the leading left light without swapping.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": {
+        "wait": 1200
+      },
+      "desc": "wait 1200ms",
+      "note": "左の水色がゲート目前、右の金色がその次。両方が通るまで待ち、右の水色に切り替える隙を狙う。",
+      "noteEn": "A cyan light is at the left gate, followed by a gold light on the right. I wait for both, then plan to swap for the right cyan light.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.87
+          ]
+        },
+        {
+          "wait": 1450
+        }
+      ],
+      "desc": "tap(0.50,0.87) 120ms → wait 1450ms",
+      "note": "20点で連続2。右の水色が近く、次は左の金色なので、今ゲートを交換すれば続けて通せそう。",
+      "noteEn": "Twenty points and a streak of two. The right cyan light is close, followed by left gold; a swap now should match both.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.87
+          ]
+        },
+        {
+          "wait": 1200
+        }
+      ],
+      "desc": "tap(0.50,0.87) 120ms → wait 1200ms",
+      "note": "連続4で45点。左に水色が2個続くため元の配置へ戻す。通過直後の粒子と加点表示が分かりやすい。",
+      "noteEn": "A streak of four gives 45 points. Two cyan lights follow on the left, so I restore the original layout. The particles and score feedback are clear.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.87
+          ]
+        },
+        {
+          "wait": 700
+        }
+      ],
+      "desc": "tap(0.50,0.87) 120ms → wait 700ms",
+      "note": "75点、連続6。左の金色が先頭、そのすぐ上は水色。金色だけを通す短い交換を試す。",
+      "noteEn": "Seventy-five points, streak six. Left gold leads, with cyan close behind. I try a short swap just for the gold light.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.87
+          ]
+        },
+        {
+          "wait": 1450
+        }
+      ],
+      "desc": "tap(0.50,0.87) 120ms → wait 1450ms",
+      "note": "90点、連続7。左の水色と右の金色が続くので戻す。先頭を見て切り替えるリズムが出てきた。",
+      "noteEn": "Ninety points, streak seven. Left cyan then right gold need the original gates. Reading the next arrival creates a satisfying switching rhythm.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": {
+        "wait": 15000
+      },
+      "desc": "wait 15000ms",
+      "note": "130点、連続9まで伸びた。操作を止め、色ちがいの減点と時間経過で流れが速くなる様子を確認する。",
+      "noteEn": "I reached 130 points with a streak of nine. I stop swapping to experience mismatch penalties and the faster flow later in the round.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.87
+          ]
+        },
+        {
+          "wait": 10000
+        }
+      ],
+      "desc": "tap(0.50,0.87) 120ms → wait 10000ms",
+      "note": "60点まで下がり、右に水色が4個続いている。交換してこのまとまりを通し、後半の流れも見る。",
+      "noteEn": "The score fell to 60. Four cyan lights line up on the right. I swap to catch this group and observe the later flow.",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "action": [
+        {
+          "wait": 10000
+        },
+        {
+          "wait": 10000
+        }
+      ],
+      "desc": "wait 10000ms → wait 10000ms",
+      "note": "85点で残り15秒。加点と減点を繰り返す様子を見たので、このまま時間切れの結果とベスト表示を確認する。",
+      "noteEn": "Eighty-five points with 15 seconds left. After experiencing gains and penalties, I wait for the result and best-score display.",
+      "image": "ai-play/step-10.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 50
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "action": {
+        "tap": [
+          0.5,
+          0.66
+        ]
+      },
+      "desc": "tap(0.50,0.66) 120ms",
+      "note": "結果は50点でベスト更新。最後まで待っても画面が崩れなかった。タップで再開し、同じページで遊べるか確認する。",
+      "noteEn": "The result is 50 points and a new best. The screen stayed intact through the end. I tap to verify a restart on the same page.",
+      "image": "ai-play/step-11.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 50
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}

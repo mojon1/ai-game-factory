@@ -1,0 +1,331 @@
+{
+  "id": "2026-10-07-gpt-2",
+  "status": "published",
+  "title": "潮目スイッチ",
+  "genre": "アクション",
+  "concept": "左右の色ゲートをタップで入れ替え、落ちる光を同じ色に通す。ひとつを通してから次へ切り替えるタイミングと、連続成功で伸びる得点を核にした45秒のゲーム。色に加えて記号でも光を見分けられる。",
+  "howToPlay": "画面をタップすると左右の色ゲートが入れ替わります。落ちる光を同じ色に通し、45秒で高得点を目指しましょう。",
+  "i18n": {
+    "en": {
+      "title": "Tide Switch",
+      "concept": "Swap two color gates to match falling lights. Timing the swap between consecutive arrivals and building a scoring streak are the core of this 45-second game. Symbols distinguish the colors too.",
+      "howToPlay": "Tap anywhere to swap the two color gates. Match falling lights to their gate and score as much as you can in 45 seconds."
+    }
+  },
+  "createdAt": "2026-10-07T16:18:36+09:00",
+  "specVersion": 3,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6 (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "manual",
+    "startedAt": "2026-10-07T16:18:36+09:00",
+    "metricsFrom": "2026-10-07T07:18:36.548Z",
+    "transcript": null,
+    "validationRuns": 1,
+    "finishedAt": "2026-10-07T16:25:38+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-07T16:20:27+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "7.2KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=100",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=131",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=79",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=113",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 7391,
+    "lines": 28
+  },
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6 (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6"
+    },
+    "verdict": "meh",
+    "works": "ok",
+    "comment": "画像を見ながら11手プレイし、連続9回・130点まで成功。次の光を通してから交換する短いリズムと粒子の反応は心地よい。操作を止めた際の減点、50点での時間切れ、ベスト更新と再開まで確認した。ただし状況は色の組合せに限られ、45秒での展開の驚きは少ない。初見ではまあまあ。",
+    "similar": [
+      {
+        "title": "斑鳩 / Ikaruga",
+        "url": "https://www.nintendo.com/en-ca/store/products/ikaruga-switch/",
+        "similarity": "中",
+        "note": "同じ色を受け入れるために二色の状態を切り替える判断が近い。本作には自機の移動や射撃がなく、左右二つのゲートを同時交換して到着順に合わせる。",
+        "note_en": "Both involve switching between two color states to accept matching incoming objects. Here there is no ship movement or shooting; two gates swap together to match arrival order."
+      },
+      {
+        "title": "Color Switch",
+        "url": "https://colorswitch.co/",
+        "similarity": "中",
+        "note": "色を合わせて通過するシンプルな反射ゲームという既知のルールが近い。本作は跳ねる自機ではなく、落ちる光と固定された二つのゲートを扱う。公式サイトで実在を確認したがルール説明は掲載されていない。",
+        "note_en": "The known color-matching passage mechanic is related. This game swaps two stationary gates for falling lights rather than bouncing a player through obstacles. The official site confirms existence, but does not describe the rules."
+      }
+    ],
+    "research": "ウェブ検索を4クエリ実施。色切替・色合わせを調べ、Nintendo公式の斑鳩説明で同色吸収と極性切替を確認。Color Switch公式サイトで実在を確認し、ルールの比較は既知の知識によることを明記した。人間の評価データは参照していない。",
+    "i18n": {
+      "en": {
+        "comment": "I viewed each image across 11 moves, reaching a streak of nine and 130 points. Swapping after an arrival creates a pleasant rhythm and particle feedback. I checked penalties, the final 50-point result, a new best and restart. However, situations are limited to color combinations, with little surprise over 45 seconds. My first-play verdict is so-so.",
+        "research": "Four web search queries investigated color switching and matching. Nintendo official Ikaruga search results confirm matching-color absorption and polarity switching. Color Switch existence was verified on its official site; its rule comparison is explicitly based on prior knowledge. No human rating data was consulted."
+      }
+    },
+    "method": "スマホ縦画面で 11 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 11 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.71) 120ms",
+        "note": "ふたつの色と記号、タップで交換する説明が読める。開始して光の流れを見る。",
+        "noteEn": "The title explains swapping two colored and marked gates. I start to inspect the falling lights.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "wait 2800ms",
+        "note": "左の水色、右の金色はどちらもゲートと一致。切り替えず、先頭の左の光が通るまで待つ。",
+        "noteEn": "The cyan left and gold right lights match their gates. I wait for the leading left light without swapping.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 1200ms",
+        "note": "左の水色がゲート目前、右の金色がその次。両方が通るまで待ち、右の水色に切り替える隙を狙う。",
+        "noteEn": "A cyan light is at the left gate, followed by a gold light on the right. I wait for both, then plan to swap for the right cyan light.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.50,0.87) 120ms → wait 1450ms",
+        "note": "20点で連続2。右の水色が近く、次は左の金色なので、今ゲートを交換すれば続けて通せそう。",
+        "noteEn": "Twenty points and a streak of two. The right cyan light is close, followed by left gold; a swap now should match both.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.50,0.87) 120ms → wait 1200ms",
+        "note": "連続4で45点。左に水色が2個続くため元の配置へ戻す。通過直後の粒子と加点表示が分かりやすい。",
+        "noteEn": "A streak of four gives 45 points. Two cyan lights follow on the left, so I restore the original layout. The particles and score feedback are clear.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.50,0.87) 120ms → wait 700ms",
+        "note": "75点、連続6。左の金色が先頭、そのすぐ上は水色。金色だけを通す短い交換を試す。",
+        "noteEn": "Seventy-five points, streak six. Left gold leads, with cyan close behind. I try a short swap just for the gold light.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.50,0.87) 120ms → wait 1450ms",
+        "note": "90点、連続7。左の水色と右の金色が続くので戻す。先頭を見て切り替えるリズムが出てきた。",
+        "noteEn": "Ninety points, streak seven. Left cyan then right gold need the original gates. Reading the next arrival creates a satisfying switching rhythm.",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 15000ms",
+        "note": "130点、連続9まで伸びた。操作を止め、色ちがいの減点と時間経過で流れが速くなる様子を確認する。",
+        "noteEn": "I reached 130 points with a streak of nine. I stop swapping to experience mismatch penalties and the faster flow later in the round.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.50,0.87) 120ms → wait 10000ms",
+        "note": "60点まで下がり、右に水色が4個続いている。交換してこのまとまりを通し、後半の流れも見る。",
+        "noteEn": "The score fell to 60. Four cyan lights line up on the right. I swap to catch this group and observe the later flow.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 10000ms → wait 10000ms",
+        "note": "85点で残り15秒。加点と減点を繰り返す様子を見たので、このまま時間切れの結果とベスト表示を確認する。",
+        "noteEn": "Eighty-five points with 15 seconds left. After experiencing gains and penalties, I wait for the result and best-score display.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 50
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.50,0.66) 120ms",
+        "note": "結果は50点でベスト更新。最後まで待っても画面が崩れなかった。タップで再開し、同じページで遊べるか確認する。",
+        "noteEn": "The result is 50 points and a new best. The screen stayed intact through the end. I tap to verify a restart on the same page.",
+        "image": "ai-play/step-11.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 50
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-07T16:25:38+09:00"
+  },
+  "publishedAt": "2026-10-07T16:25:38+09:00",
+  "metrics": {
+    "model": "gpt-6",
+    "effort": null,
+    "thinkingTokens": null,
+    "outputTokens": null,
+    "contextTokens": null,
+    "turns": null,
+    "toolCalls": null,
+    "webSearches": null,
+    "minutes": 7,
+    "from": "2026-10-07T07:18:36.548Z",
+    "to": "2026-10-07T07:25:38.865Z",
+    "method": "この環境ではトークン数を自動取得できないため、制作時間（と申告値）のみ記録",
+    "methodEn": "Token counts are not available in this environment; only time (and any self-reported values) recorded",
+    "recordedAt": "2026-10-07T16:25:38+09:00",
+    "validationRuns": 1,
+    "codeKB": 7.2
+  }
+}
