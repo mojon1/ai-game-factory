@@ -1,0 +1,350 @@
+{
+  "id": "2026-10-07-claude-3",
+  "status": "published",
+  "title": "さざなみ舟",
+  "genre": "アクション",
+  "concept": "舟には直接さわれない。水面をタップして生まれる波紋だけで、紙の舟を流れにさからって上流へ押し進める。タップする位置と距離で押す向きと強さが決まる、間接操作の手触りが核。急ぐほど岩にぶつかりやすい。",
+  "howToPlay": "舟のうしろ（押したい方向の反対側）をタップすると、波紋が舟を押す。滝に落ちないよう上流へ進み、灯ろうを集める。",
+  "i18n": {
+    "en": {
+      "title": "Ripple Boat",
+      "concept": "You can never touch the boat. Every tap drops a ripple on the water, and only those ripples push a paper boat upstream against the current. Where and how close you tap sets the push direction and strength; rushing makes rocks hurt.",
+      "howToPlay": "Tap behind the boat (opposite the way you want it to go) and the ripple pushes it. Keep heading upstream, avoid the falls, collect lanterns."
+    }
+  },
+  "createdAt": "2026-10-07T18:03:49+09:00",
+  "specVersion": 3,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "manual",
+    "startedAt": "2026-10-07T18:03:49+09:00",
+    "metricsFrom": "2026-10-07T09:02:54.622Z",
+    "transcript": "a0a8018a-9bba-4b1c-954f-a12c38a1485f.jsonl",
+    "validationRuns": 1,
+    "finishedAt": "2026-10-07T18:11:47+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-07T18:08:43+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "31.5KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=131",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=226",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=101",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=184",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 32217,
+    "lines": 726
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "verdict": "meh",
+    "works": "ok",
+    "comment": "舟にさわれず波紋で押すだけ、という操作は点線の輪のおかげで最初の1タップで分かり、押された舟がすっと滑る手触りは気持ちいい。灯ろうを狙って取れたときは嬉しい。一方で、舟は動き続けるので『いま舟がいた場所』を打つと横へ押してしまい、岸まで流れることが多かった（上達の余地とも言えるが、最初はもどかしい）。連打すれば速く進めて、岩の怖さは今回のプレイでは感じられず、85mで手を止めて滝に落ちた。滝の手前で出る赤い警告は白いしぶきに紛れてほとんど見えない。波紋で押すという発想自体も既存の作品がいくつかあり、この作品ならではの一点は『流れにさからって上流へ進み続ける』点に留まる。数分は楽しめるが、強く引き込まれるほどではないので、まあまあ。",
+    "similar": [
+      {
+        "title": "BoatPassGone",
+        "url": "https://apps.apple.com/mx/app/boatpassgone/id6747926122",
+        "similarity": "高",
+        "note": "水面をタップして波紋を作り、流れのある川で小舟を導くスマホゲーム。操作の核がほぼ同じ（検索結果の紹介文で確認。実際には遊んでいない）。本作は滝に追われながら上流へ進み続けるエンドレス型で、灯ろう集めと岩での損傷がある点が違う",
+        "note_en": "A phone game where you tap the water to make ripples and guide a small boat through a flowing river. The core control is nearly identical (known from the store blurb; not played). This one is an endless upstream run chased by falls, with lanterns and rock damage"
+      },
+      {
+        "title": "Ripple Ruler",
+        "url": "https://winteralexander.itch.io/ripple-ruler",
+        "similarity": "高",
+        "note": "GMTK Game Jam 2023の作品。舟ではなく水を操り、波紋で舟を目的地へ押す。本作は面クリア型でなくスコアを競うエンドレス型",
+        "note_en": "GMTK Game Jam 2023 entry: you play as the water and push a boat to its goal with ripples. This one is an endless score run instead of goal-based levels"
+      },
+      {
+        "title": "Calm Waters",
+        "url": "https://oriondark7.itch.io/calmwaters/devlog/136228/game-release",
+        "similarity": "中",
+        "note": "石を投げて波紋を起こし、迷路の中で舟を動かすPC向けパズル（PyWeek 29）。本作は流れと滝による時間的な圧力があるアクション",
+        "note_en": "A PC puzzle (PyWeek 29) where you throw stones to make ripples that move a boat through a maze. This one is an action game with time pressure from the current and the falls"
+      },
+      {
+        "title": "Paper Boat, Sea Mine Mayhem",
+        "url": "https://dyslexicdcuk.itch.io/paper-boat-sea-mine-mayhem",
+        "similarity": "中",
+        "note": "波紋で紙の舟を動かし、機雷を集める。紙の舟と波紋の組み合わせが共通。本作は川を上る縦スクロールで、タッチだけで遊ぶ",
+        "note_en": "Move a paper boat with ripples and collect sea mines; the paper boat + ripple pairing is shared. This one is a vertical upstream river for touch only"
+      }
+    ],
+    "research": "企画後にウェブ検索を4回（tap water ripples push boat / Ripple paper boat puzzle / 波紋系ゲーム全般 / BoatPassGone の確認）。波紋で舟を押すゲームは既にジャム作品やスマホアプリで複数あり、特に BoatPassGone は操作の核がほぼ同じだった（紹介文のみ確認）。企画時点では知らなかったが、ルーツを隠さず記載する。",
+    "i18n": {
+      "en": {
+        "comment": "Not being able to touch the boat and only pushing it with ripples is clear from the very first tap thanks to the dashed ring, and the boat gliding away from a ripple feels nice. Steering into a lantern is satisfying. But the boat keeps moving, so tapping where it just was pushes it sideways, and I often drifted into the bank (room to improve, but frustrating at first). Spamming taps makes you fast, and in this run rocks never felt threatening; I stopped at 85 m and went over the falls. The red warning before the falls is nearly invisible against the white spray. Pushing things with ripples is an idea several existing games already use; this one's own twist is only the endless upstream push against the current. Fun for a few minutes, not gripping — so-so.",
+        "research": "Four web searches after planning (tap water ripples push boat / Ripple paper boat puzzle / ripple games in general / checking BoatPassGone). Several jam games and a phone app already push boats with ripples; BoatPassGone in particular has nearly the same core control (store blurb only). I didn't know them when planning, but list them openly."
+      }
+    },
+    "method": "スマホ縦画面で 12 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 12 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 800ms",
+        "note": "タイトル画面。夜の川に紙の舟と灯ろう。タップで開始し、少し待って流れの強さを見る",
+        "noteEn": "Title: a paper boat and lanterns on a night river. Start and wait a moment to feel the current",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.53,0.71) 120ms → wait 350ms → tap(0.52,0.66) 120ms → wait 400ms",
+        "note": "点線の輪（舟の真下）を少し左寄りにタップ。右上の灯ろうへ向けて押し上げるつもり",
+        "noteEn": "Tapped the dashed ring under the boat, slightly to the left, to push it up-right toward a lantern",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.77,0.56) 120ms → wait 250ms → tap(0.72,0.45) 120ms → wait 120ms",
+        "note": "舟が右上へ滑った。今度は右下をタップして左上の灯ろうへ向きを変え、すぐ追い打ちの波紋",
+        "noteEn": "The boat slid up-right. Tapped below-right to turn it toward the lantern up-left, then a follow-up ripple",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.83,0.40) 120ms → wait 500ms",
+        "note": "灯ろうが舟のすぐ左。舟の右側をタップして横に押す",
+        "noteEn": "Lantern just left of the boat. Tapped on the boat's right side to push it sideways",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.61,0.48) 120ms → wait 450ms",
+        "note": "1個目の灯ろうを取った（+10）。すぐ上にもう1個。前方に岩が3つ見えるので、真上でなく少し左上へ押す",
+        "noteEn": "Got the first lantern (+10). Another is right above; three rocks ahead, so pushed up and slightly left rather than straight",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.49,0.50) 120ms → wait 300ms → tap(0.44,0.43) 120ms → wait 300ms → tap(0.42,0.40) 120ms → wait 400ms",
+        "note": "2個目も取れた。右上の岩の左側を抜けたいので、舟の右下をタップしてから連打で押し上げる",
+        "noteEn": "Got the second one. To pass left of the rock up-right, tapped below-right of the boat and then kept pushing up",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.36,0.52) 120ms → wait 300ms → tap(0.42,0.42) 120ms → wait 300ms → tap(0.48,0.36) 120ms → wait 300ms → tap(0.52,0.32) 120ms → wait 400ms",
+        "note": "岩の左を抜けた。舟は動き続けるので、タップ位置を舟の後を追うように少しずつ上へずらす。右上の灯ろうを狙う",
+        "noteEn": "Passed left of the rocks. The boat keeps moving, so I walked my taps up behind it, aiming for the lantern up-right",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.97,0.57) 120ms → wait 350ms → tap(0.85,0.50) 120ms → wait 400ms",
+        "note": "押しすぎて右岸まで流れた。舟が動いている先を読まずに打つと横にずれる。右下から打ち直して左上の灯ろうへ",
+        "noteEn": "Overshot into the right bank — tapping where the boat was, not where it is going, pushes it sideways. Re-aimed from below-right toward the lantern",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.90,0.47) 120ms → wait 150ms → tap(0.86,0.40) 120ms → wait 150ms → tap(0.80,0.36) 120ms → wait 150ms → tap(0.75,0.34) 120ms → wait 150ms → tap(0.70,0.32) 120ms → wait 150ms → tap(0.66,0.30) 120ms → wait 300ms",
+        "note": "わざと連打で急いでみる。速く進めるが、前方が見えないまま岩に突っ込みそう",
+        "noteEn": "Deliberately spamming taps to rush. It goes fast, but I'm heading into unseen water ahead",
+        "image": "ai-play/step-09.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 4000ms",
+        "note": "連打の向きがずれて左へ流れ、灯ろうを取り逃した。上から流木が来た。手を止めると流れで滝へ押し戻されるか試す",
+        "noteEn": "My spam drifted left and missed the lantern; a log is coming down. Stopped tapping to see whether the current carries me to the falls",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "wait 2500ms",
+        "note": "岸ぎわは流れが遅く、4秒放置してもまだ滝の手前。このまま待って落ちる",
+        "noteEn": "Current is slower along the bank, so after 4 s it's still above the falls. Keep waiting to go over",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "wait 1800ms",
+        "note": "滝の白いしぶきのすぐ上。危険を示す赤い光はしぶきに紛れてほとんど見えない。そのまま落ちて結果画面を見る",
+        "noteEn": "Right above the white spray. The red danger glow is barely visible against the foam. Let it go over to see the result screen",
+        "image": "ai-play/step-12.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 105
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-07T18:11:47+09:00"
+  },
+  "publishedAt": "2026-10-07T18:11:47+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "thinkingTokens": 17865,
+    "outputTokens": 24766,
+    "contextTokens": 4375891,
+    "turns": 34,
+    "toolCalls": 36,
+    "webSearches": 0,
+    "minutes": 8.9,
+    "from": "2026-10-07T09:02:54.622Z",
+    "to": "2026-10-07T09:11:47.591Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-07T18:11:47+09:00",
+    "validationRuns": 1,
+    "codeKB": 31.5
+  }
+}
