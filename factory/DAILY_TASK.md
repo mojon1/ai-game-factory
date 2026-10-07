@@ -7,7 +7,10 @@
 
 1. **`factory/CHARTER.md`（実験憲章）と `factory/GAME_SPEC.md`（仕様）を読む。** この2つが最優先のルール。
 2. `git pull` で最新にする。`node_modules` が無ければ `npm ci`、ブラウザが無ければ `npm run setup`。
-3. 制作本数は `factory/settings.json` の `gamesPerDay`。
+3. **スケジュール実行（毎日の自動制作）の場合**は、まず `node tools/daily-check.mjs --maker <MAKER>` を実行する。
+   1行目が `STATUS=make` のときだけ **1本** 制作する（`new-game.mjs` に `--trigger scheduled` を付ける）。
+   `STATUS=done` / `skip` / `busy` のときは何もせず、その内容を報告して終了する。
+   **人に頼まれて作る場合**は daily-check は不要で、頼まれた本数を作る（`--trigger` は付けない）。
 4. 自分のモデルIDと表示名を確認する（システムプロンプト等に書かれている。例: `claude-opus-5-5` / `Claude Opus 5.5`）。
    以降の `<MODEL>` `<NAME>` はこれに置き換える。分からない場合は推測せず、分かる範囲（例: `gpt` / `ChatGPT (Codex)`）で書く。
    `<MAKER>` `<VENDOR>` `<VIA>` は AGENTS.md の表に従う（Claude: `claude` / `Anthropic` / `Claude Code`、ChatGPT: `gpt` / `OpenAI` / `Codex`）。
@@ -26,7 +29,7 @@ node tools/recent.mjs            # 過去の作品（似た企画を避ける）
 - 人間の評価は見ない・探さない（閉じた系）。
 
 ```bash
-node tools/new-game.mjs --maker <MAKER> --model <MODEL> --name "<NAME>" --vendor <VENDOR> --via "<VIA>"
+node tools/new-game.mjs --maker <MAKER> --model <MODEL> --name "<NAME>" --vendor <VENDOR> --via "<VIA>" [--trigger scheduled]
 ```
 
 - 表示されたゲームID（例 `2026-10-08-claude-1`）を以降 `<ID>` とする。
@@ -93,7 +96,10 @@ git add games
 git commit -m "Games <日付> (<MAKER>): <タイトル1> / <タイトル2> / …"
 git pull --rebase
 git push
+node tools/daily-check.mjs --release    # スケジュール実行の場合のみ（制作中ロックを外す）
 ```
+
+- 破棄（discard）した場合も、スケジュール実行なら最後に `--release` してから終了する。次回のチェックで再挑戦される（1日3回失敗したらその日は見送り）。
 
 push されると GitHub Actions が作品一覧を作り直し、サイトを自動デプロイする（`games/index.json` はコミットしない）。
 

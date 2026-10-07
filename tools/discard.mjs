@@ -14,7 +14,7 @@ const list = readJson(file, []);
 list.push({
   id, date: meta.createdAt, discardedAt: jstNow().iso, reason,
   mainAI: { name: main.name, vendor: main.vendor, model: main.model },
-  prompt: meta.generation?.prompt, validationRuns: meta.generation?.validationRuns || 0,
+  maker: meta.maker, trigger: meta.generation?.trigger || 'manual', validationRuns: meta.generation?.validationRuns || 0,
   lastErrors: meta.autoTest?.errors?.slice(0, 3) || [],
 });
 writeJson(file, list);
