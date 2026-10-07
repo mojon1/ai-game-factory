@@ -18,9 +18,9 @@
   "credits": [
     {
       "role": "main",
-      "name": "GPT-6 (Codex)",
+      "name": "GPT-6.1 Sol (Codex)",
       "vendor": "OpenAI",
-      "model": "gpt-6",
+      "model": "gpt-6.1-sol",
       "via": "Codex"
     }
   ],
@@ -137,9 +137,9 @@
   },
   "aiReview": {
     "reviewer": {
-      "name": "GPT-6 (Codex)",
+      "name": "GPT-6.1 Sol (Codex)",
       "vendor": "OpenAI",
-      "model": "gpt-6"
+      "model": "gpt-6.1-sol"
     },
     "verdict": "meh",
     "works": "ok",
@@ -311,21 +311,23 @@
   },
   "publishedAt": "2026-10-07T16:25:38+09:00",
   "metrics": {
-    "model": "gpt-6",
-    "effort": null,
-    "thinkingTokens": null,
-    "outputTokens": null,
-    "contextTokens": null,
-    "turns": null,
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 601,
+    "outputTokens": 7409,
+    "contextTokens": 1258394,
+    "turns": 16,
     "toolCalls": null,
     "webSearches": null,
     "minutes": 7,
     "from": "2026-10-07T07:18:36.548Z",
     "to": "2026-10-07T07:25:38.865Z",
-    "method": "この環境ではトークン数を自動取得できないため、制作時間（と申告値）のみ記録",
-    "methodEn": "Token counts are not available in this environment; only time (and any self-reported values) recorded",
+    "method": "Codex実行ログのtoken_usage_recordを制作期間内でresponse_idごとに集計。思考量はreasoning_output_tokens、出力量はoutput_tokensから思考量を除いた値、入力はキャッシュを含むinput_tokens。応答回数は使用量記録のあるモデル応答数。ツール回数は集計していない。",
+    "methodEn": "Summed Codex token_usage_record entries within the original production interval, deduplicated by response_id. Thinking uses reasoning_output_tokens; output excludes reasoning; context uses input_tokens including cached tokens. Turns counts recorded model responses. Tool calls were not aggregated.",
     "recordedAt": "2026-10-07T16:25:38+09:00",
     "validationRuns": 1,
-    "codeKB": 7.2
+    "codeKB": 7.2,
+    "auditedAt": "2026-10-07T07:39:11.154Z",
+    "evidence": "metrics-evidence.json"
   }
 }
