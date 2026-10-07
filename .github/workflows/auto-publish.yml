@@ -1,0 +1,87 @@
+# プルリクエストで提出された作品（ChatGPT / Codex など）を、人間のマージを待たずに自動で公開する
+# 条件（tools/check-pr.mjs）: 変更が新しい games/<ID>/ と games/_failures.json への追記だけ、
+#   meta.json の status が published。さらにここで自動テスト（tools/validate.mjs）をやり直し、合格したらマージする。
+# 条件を満たさないPR（サイトの改修、既存作品の修正など）はマージせず、理由をコメントして人間の確認を待つ。
+# GITHUB_TOKEN によるマージでは push のワークフローが動かないため、デプロイは workflow_dispatch で起動する。
+name: Auto-publish game PRs
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+    paths: ['games/**']
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: '自動公開を試すPRの番号'
+        required: true
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+concurrency:
+  group: auto-publish-${{ github.event.pull_request.number || inputs.pr }}
+  cancel-in-progress: true
+jobs:
+  publish:
+    # 同じリポジトリのブランチから出たPRだけ（外部からのフォークPRは対象外）
+    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.head.repo.full_name == github.repository && !github.event.pull_request.draft)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PR: ${{ github.event.pull_request.number || inputs.pr }}
+    steps:
+      # ツールは必ず main のものを使う（PR側のツールは使わない）
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Inspect PR
+        id: pr
+        run: |
+          info=$(gh pr view "$PR" --json state,isDraft,isCrossRepository,baseRefName,headRefOid)
+          echo "$info"
+          [ "$(jq -r .state <<<"$info")" = OPEN ] || { echo "::notice::PR is not open"; echo "skip=1" >> "$GITHUB_OUTPUT"; exit 0; }
+          [ "$(jq -r .isDraft <<<"$info")" = false ] || { echo "::notice::PR is a draft"; echo "skip=1" >> "$GITHUB_OUTPUT"; exit 0; }
+          [ "$(jq -r .isCrossRepository <<<"$info")" = false ] || { echo "::notice::fork PR"; echo "skip=1" >> "$GITHUB_OUTPUT"; exit 0; }
+          [ "$(jq -r .baseRefName <<<"$info")" = main ] || { echo "::notice::base is not main"; echo "skip=1" >> "$GITHUB_OUTPUT"; exit 0; }
+          echo "sha=$(jq -r .headRefOid <<<"$info")" >> "$GITHUB_OUTPUT"
+          git fetch origin "pull/$PR/head:pr-head"
+      - name: Check scope
+        id: scope
+        if: steps.pr.outputs.skip != '1'
+        run: |
+          set -o pipefail
+          node tools/check-pr.mjs pr-head origin/main | tee scope.txt
+      - name: Run automated tests
+        id: test
+        if: steps.pr.outputs.skip != '1' && steps.scope.outputs.ids != ''
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium webkit
+          set -o pipefail
+          : > test.txt
+          for id in ${{ steps.scope.outputs.ids }}; do
+            git checkout pr-head -- "games/$id"
+            node tools/validate.mjs "$id" 2>&1 | tee -a test.txt
+          done
+      - name: Merge and deploy
+        if: steps.pr.outputs.skip != '1'
+        run: |
+          gh pr merge "$PR" --merge --match-head-commit "${{ steps.pr.outputs.sha }}" --delete-branch
+          gh workflow run deploy.yml --ref main
+          gh pr comment "$PR" --body "✅ 自動テストに合格したため、自動でマージして公開しました。 / Passed the automated test; merged and published automatically."
+      - name: Report why it was not published
+        if: failure() && steps.pr.outputs.skip != '1'
+        run: |
+          {
+            echo "⚠️ このPRは自動公開されませんでした（人間の確認待ち） / Not auto-published (waiting for a human)."
+            echo
+            echo '```'
+            cat scope.txt test.txt 2>/dev/null | grep -E '^(自動公開|- | - |❌|合格|不合格)' | head -40
+            echo '```'
+            echo
+            echo "自動公開の条件: 変更が新しい games/<ID>/ と games/_failures.json への追記だけで、meta.json の status が published、自動テストに合格していること。"
+            echo "Conditions: only a new games/<ID>/ folder (plus appends to games/_failures.json), meta.json status = published, and the automated test passes."
+          } > comment.md
+          gh pr comment "$PR" --body-file comment.md

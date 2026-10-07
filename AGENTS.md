@@ -37,7 +37,9 @@ OS のパッケージ配布元（Ubuntu なら `archive.ubuntu.com`, `security.u
   PR のタイトルは `Games <日付> (gpt): <タイトル>`、本文には DAILY_TASK.md の「終了報告」を書く。
 - `--maker gpt --vendor OpenAI --via "Codex"`。モデル名は分かる範囲で正確に（推測しない）。
 - 自己プレイのスクリーンショットを画像として見られない場合は、DAILY_TASK.md の代替手順に従い、そのことを正直に書く。
-- 人間はPRの中身を編集せずにマージする（マージは公開の操作であり、作品への干渉ではない）。
+- **PR は自動で公開される。** GitHub Actions（`.github/workflows/auto-publish.yml`）が自動テストをやり直し、合格すればそのままマージ・公開する（人間は関与しない）。
+  自動公開の条件: 変更が新しい `games/<ID>/` と `games/_failures.json` への追記（破棄の記録）だけであること、meta.json の `status` が `published` であること、下書き（draft）PR でないこと。
+  条件を外れた PR（既存作品の修正、作品フォルダ以外の変更など）は自動公開されず、理由がコメントされて人間の確認待ちになる。
 
 ## 人間に頼まれてサイトを改修する場合 / When a human asks you to work on the site
 
