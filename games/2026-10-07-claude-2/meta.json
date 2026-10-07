@@ -1,0 +1,367 @@
+{
+  "id": "2026-10-07-claude-2",
+  "status": "published",
+  "title": "まっぷたつ",
+  "genre": "アクション",
+  "concept": "図形をひとなぞりで切り、ぴったり半分を狙う。切った瞬間に「49.3%：50.7%」と答え合わせが出る、目分量の勝負が核。星やハートや三日月が回り・揺れ始め、直感と精度の両方が試される。",
+  "howToPlay": "画面を指でなぞると、その線で図形が切れる。50:50に近いほど高得点、大きく外すか時間切れでハートが減る。",
+  "i18n": {
+    "en": {
+      "title": "Dead Half",
+      "concept": "Slice a shape with one swipe and try to split it exactly in half. The instant you cut, the answer pops up (49.3% : 50.7%) — a pure test of your eye. Stars, hearts and crescents soon spin and sway.",
+      "howToPlay": "Swipe across the screen to cut the shape along that line. The closer to 50:50 the more points; a big miss or running out of time costs a heart."
+    }
+  },
+  "createdAt": "2026-10-07T16:10:50+09:00",
+  "specVersion": 3,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-07T16:10:50+09:00",
+    "metricsFrom": "2026-10-07T07:10:33.756Z",
+    "transcript": "a767ba82-1068-4de8-8bb7-fede7d3eda57.jsonl",
+    "validationRuns": 1,
+    "finishedAt": "2026-10-07T17:01:37+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-07T16:13:52+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "25.7KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=85",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=37",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=73",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=55",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 26322,
+    "lines": 563
+  },
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "verdict": "meh",
+    "works": "ok",
+    "comment": "切った瞬間に「47.1:52.9」と答えが出て破片が割れる手触りは気持ちよく、数ピクセルのずれで数%動く厳しさが「もう1回」を生む。ただ序盤の正方形・六角形などの点対称図形は中心を通せば誰でもパーフェクトで、最初の数個は退屈。矢印やハートなど非対称な図形からが本番。凹んだ図形を切ると破片の輪郭に細い線がはみ出す見た目の乱れ、結果の「○個切った」に時間切れも数える表示のずれ、連続表示が破片と重なることがあった（どれも遊びには支障なし）。題材は既存の「半分に切る」ゲームとほぼ同じで、独自なのは回転・漂流と時間制限の部分だけ。初見の人の評価は「まあまあ」と判断。",
+    "similar": [
+      {
+        "title": "Perfect 50/50",
+        "url": "https://toucharcade.com/community/threads/perfect-50-50-0-99-to-free.215849/",
+        "similarity": "高",
+        "note": "線を引いて図形を半分に分け、割合で判定する点がほぼ同じ。あちらはステージ制で47〜53%なら合格。こちらは時間制限・回転・ライフ制のエンドレス。",
+        "note_en": "Nearly the same core: draw a line, split a shape, judged by percentage. It is stage-based (47-53% to clear); mine is an endless run with a timer, spinning shapes and lives."
+      },
+      {
+        "title": "Cut in Half, Please!",
+        "url": "https://www.crazygames.com/game/cut-in-half-please",
+        "similarity": "高",
+        "note": "いろいろな物をぴったり半分に切る精度パズル（差5%未満で成功）。こちらは抽象図形と連続アーケード。",
+        "note_en": "Precision puzzle of slicing objects in half (under 5% difference). Mine uses abstract shapes in a continuous arcade loop."
+      },
+      {
+        "title": "Perfect Half",
+        "url": "https://playgama.com/game/perfect-half",
+        "similarity": "高",
+        "note": "任意の角度の直線で50%を狙い、近さで採点するブラウザゲーム。回転・漂流する図形と連続ボーナスはこちら独自。",
+        "note_en": "Browser game: drag a straight line at any angle, scored by closeness to 50%. Spinning/drifting shapes and combos are mine."
+      },
+      {
+        "title": "Slice It!",
+        "url": "https://www.mobygames.com/game/53722?s=platform",
+        "similarity": "中",
+        "note": "限られた回数の直線カットで等しい面積に分ける幾何パズルの代表作。複数ピースや手数の制約が中心で、こちらは1刀・時間勝負。",
+        "note_en": "Classic geometry puzzle: split shapes into equal areas with a limited number of straight cuts. It focuses on multi-piece planning; mine is one cut against the clock."
+      }
+    ],
+    "research": "WebSearch で「cut shape exactly in half percentage swipe」「Slice It! puzzle equal pieces」を検索。半分に切る精度ゲームは複数存在し、アイデアの新規性は低いことを確認した。",
+    "i18n": {
+      "en": {
+        "comment": "The moment of the cut — pieces fly apart and '47.1 : 52.9' appears — feels great, and the harshness (a few pixels = several percent) makes you want another go. But the opening point-symmetric shapes (square, hexagon) are a guaranteed perfect through the centre, so the first few rounds are dull; it gets real with arrows and hearts. Minor issues: a thin stray outline line on pieces from concave shapes, the 'shapes cut' count includes timed-out ones, and the combo text can overlap a piece (none affect play). The concept closely matches existing cut-in-half games; only the spinning/drifting shapes and timer are my own. Verdict for a first-time player: so-so.",
+        "research": "Searched the web for 'cut shape exactly in half percentage swipe' and 'Slice It! puzzle equal pieces'. Several cut-in-half precision games already exist, so the idea is not novel."
+      }
+    },
+    "method": "スマホ縦画面で 13 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 13 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.90) 120ms → wait 500ms",
+        "note": "タイトル。ハートが真ん中で割れるデモが分かりやすい。タップで開始。",
+        "noteEn": "Title. The heart-splitting demo explains the idea at a glance. Tap to start.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "swipe(0.20,0.41→0.80,0.65) 200ms → wait 300ms",
+        "note": "六角形。中心を通るように斜めに切ってみる。",
+        "noteEn": "A hexagon. Slicing diagonally through what looks like the centre.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 1300ms",
+        "note": "パーフェクト。点対称の図形は中心を通せば必ず50:50になるので、序盤は簡単すぎるかも。割れ方と%表示は気持ちいい。",
+        "noteEn": "Perfect. Point-symmetric shapes are always 50:50 through the centre, so the opening may be too easy. The split and % labels feel great.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "swipe(0.53,0.30→0.53,0.78) 200ms → wait 300ms",
+        "note": "長方形。あえて少し右にずらして縦に切り、ずれがどう表示されるか確かめる。",
+        "noteEn": "A rectangle. Cutting vertically a bit right of centre on purpose to see how the miss is shown.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 1300ms",
+        "note": "ほんの数ピクセルのずれで 45:55 になる。思ったより厳しくて面白い。",
+        "noteEn": "A few pixels off gives 45:55 — harsher than I expected, which is the fun part.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "swipe(0.10,0.52→0.90,0.54) 200ms → wait 1600ms",
+        "note": "また六角形。横にまっすぐ中心を切る。",
+        "noteEn": "Another hexagon. Straight horizontal cut through the middle.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "swipe(0.52,0.22→0.49,0.72) 200ms → wait 300ms",
+        "note": "三角形。ここから回転が始まる。頂点から底辺の中点へ（中線）切れば半分になるはず、と計算して狙う。",
+        "noteEn": "Triangle; rotation starts here. Aiming the median (apex to midpoint of base), which should halve it.",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 1300ms",
+        "note": "中線の計算でグレート。回転で少しずれた。「3連続」の文字が破片と少し重なっていた。",
+        "noteEn": "Great via the median; rotation shifted it a bit. The '3 combo' text slightly overlapped a piece.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "swipe(0.24,0.36→0.80,0.68) 200ms → wait 300ms",
+        "note": "矢印。対称ではないので目分量。頭が重そうなので、軸に直角に頭寄りで切る。",
+        "noteEn": "An arrow — not symmetric, so it's eyeballing. The head looks heavy, so cutting perpendicular to the shaft, closer to the head.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 1300ms → wait 7000ms",
+        "note": "グッド。凹んだ図形を切ると、破片の輪郭に細い線がはみ出す見た目の乱れがある（遊びには影響しない）。次は何もせず時間切れを試す。",
+        "noteEn": "Good. Cutting a concave shape leaves a thin stray outline line on a piece (cosmetic only). Next, letting the timer run out on purpose.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "swipe(0.10,0.40→0.90,0.42) 200ms → wait 300ms",
+        "note": "時間切れでハートが1つ減り、逆さまのハートが出た。わざと上の方を横に切って大外しを試す。",
+        "noteEn": "Time ran out and cost a heart; now an upside-down heart. Deliberately cutting high across it to test a big miss.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "wait 1200ms → wait 7500ms → wait 2000ms",
+        "note": "8:92 で大外し、ハートが減った。最後は時間切れでゲームオーバーまで進める。",
+        "noteEn": "8:92, a big miss, heart lost. Letting the last one time out to reach game over.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 419
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "tap(0.50,0.78) 120ms → wait 600ms",
+        "note": "ゲームオーバー画面。スコアとベスト更新が大きく出る。ただ「8個切った」は時間切れの図形も数えていて、実際に切ったのは6個。タップで再開を確かめる。",
+        "noteEn": "Game over screen with score and new best. But '8 shapes cut' also counts the timed-out ones (I actually cut 6). Tapping to check restart.",
+        "image": "ai-play/step-13.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 419
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-07T17:01:37+09:00"
+  },
+  "publishedAt": "2026-10-07T17:01:37+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 4755,
+    "outputTokens": 25951,
+    "contextTokens": 4492259,
+    "turns": 40,
+    "toolCalls": 45,
+    "webSearches": 0,
+    "minutes": 51.1,
+    "from": "2026-10-07T07:10:33.756Z",
+    "to": "2026-10-07T08:01:37.072Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-07T17:01:37+09:00",
+    "validationRuns": 1,
+    "codeKB": 25.7
+  }
+}

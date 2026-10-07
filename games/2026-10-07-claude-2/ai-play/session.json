@@ -1,0 +1,328 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-07T07:13:55.873Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.9
+          ]
+        },
+        {
+          "wait": 500
+        }
+      ],
+      "desc": "tap(0.50,0.90) 120ms → wait 500ms",
+      "note": "タイトル。ハートが真ん中で割れるデモが分かりやすい。タップで開始。",
+      "noteEn": "Title. The heart-splitting demo explains the idea at a glance. Tap to start.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": [
+        {
+          "swipe": [
+            0.2,
+            0.41,
+            0.8,
+            0.65
+          ],
+          "hold": 200
+        },
+        {
+          "wait": 300
+        }
+      ],
+      "desc": "swipe(0.20,0.41→0.80,0.65) 200ms → wait 300ms",
+      "note": "六角形。中心を通るように斜めに切ってみる。",
+      "noteEn": "A hexagon. Slicing diagonally through what looks like the centre.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "wait": 1300
+        }
+      ],
+      "desc": "wait 1300ms",
+      "note": "パーフェクト。点対称の図形は中心を通せば必ず50:50になるので、序盤は簡単すぎるかも。割れ方と%表示は気持ちいい。",
+      "noteEn": "Perfect. Point-symmetric shapes are always 50:50 through the centre, so the opening may be too easy. The split and % labels feel great.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "swipe": [
+            0.53,
+            0.3,
+            0.53,
+            0.78
+          ],
+          "hold": 200
+        },
+        {
+          "wait": 300
+        }
+      ],
+      "desc": "swipe(0.53,0.30→0.53,0.78) 200ms → wait 300ms",
+      "note": "長方形。あえて少し右にずらして縦に切り、ずれがどう表示されるか確かめる。",
+      "noteEn": "A rectangle. Cutting vertically a bit right of centre on purpose to see how the miss is shown.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": [
+        {
+          "wait": 1300
+        }
+      ],
+      "desc": "wait 1300ms",
+      "note": "ほんの数ピクセルのずれで 45:55 になる。思ったより厳しくて面白い。",
+      "noteEn": "A few pixels off gives 45:55 — harsher than I expected, which is the fun part.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "swipe": [
+            0.1,
+            0.52,
+            0.9,
+            0.535
+          ],
+          "hold": 200
+        },
+        {
+          "wait": 1600
+        }
+      ],
+      "desc": "swipe(0.10,0.52→0.90,0.54) 200ms → wait 1600ms",
+      "note": "また六角形。横にまっすぐ中心を切る。",
+      "noteEn": "Another hexagon. Straight horizontal cut through the middle.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "swipe": [
+            0.517,
+            0.22,
+            0.49,
+            0.72
+          ],
+          "hold": 200
+        },
+        {
+          "wait": 300
+        }
+      ],
+      "desc": "swipe(0.52,0.22→0.49,0.72) 200ms → wait 300ms",
+      "note": "三角形。ここから回転が始まる。頂点から底辺の中点へ（中線）切れば半分になるはず、と計算して狙う。",
+      "noteEn": "Triangle; rotation starts here. Aiming the median (apex to midpoint of base), which should halve it.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": [
+        {
+          "wait": 1300
+        }
+      ],
+      "desc": "wait 1300ms",
+      "note": "中線の計算でグレート。回転で少しずれた。「3連続」の文字が破片と少し重なっていた。",
+      "noteEn": "Great via the median; rotation shifted it a bit. The '3 combo' text slightly overlapped a piece.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": [
+        {
+          "swipe": [
+            0.24,
+            0.36,
+            0.8,
+            0.68
+          ],
+          "hold": 200
+        },
+        {
+          "wait": 300
+        }
+      ],
+      "desc": "swipe(0.24,0.36→0.80,0.68) 200ms → wait 300ms",
+      "note": "矢印。対称ではないので目分量。頭が重そうなので、軸に直角に頭寄りで切る。",
+      "noteEn": "An arrow — not symmetric, so it's eyeballing. The head looks heavy, so cutting perpendicular to the shaft, closer to the head.",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "action": [
+        {
+          "wait": 1300
+        },
+        {
+          "wait": 7000
+        }
+      ],
+      "desc": "wait 1300ms → wait 7000ms",
+      "note": "グッド。凹んだ図形を切ると、破片の輪郭に細い線がはみ出す見た目の乱れがある（遊びには影響しない）。次は何もせず時間切れを試す。",
+      "noteEn": "Good. Cutting a concave shape leaves a thin stray outline line on a piece (cosmetic only). Next, letting the timer run out on purpose.",
+      "image": "ai-play/step-10.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "action": [
+        {
+          "swipe": [
+            0.1,
+            0.4,
+            0.9,
+            0.42
+          ],
+          "hold": 200
+        },
+        {
+          "wait": 300
+        }
+      ],
+      "desc": "swipe(0.10,0.40→0.90,0.42) 200ms → wait 300ms",
+      "note": "時間切れでハートが1つ減り、逆さまのハートが出た。わざと上の方を横に切って大外しを試す。",
+      "noteEn": "Time ran out and cost a heart; now an upside-down heart. Deliberately cutting high across it to test a big miss.",
+      "image": "ai-play/step-11.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 12,
+      "action": [
+        {
+          "wait": 1200
+        },
+        {
+          "wait": 7500
+        },
+        {
+          "wait": 2000
+        }
+      ],
+      "desc": "wait 1200ms → wait 7500ms → wait 2000ms",
+      "note": "8:92 で大外し、ハートが減った。最後は時間切れでゲームオーバーまで進める。",
+      "noteEn": "8:92, a big miss, heart lost. Letting the last one time out to reach game over.",
+      "image": "ai-play/step-12.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 419
+        }
+      ]
+    },
+    {
+      "step": 13,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.78
+          ]
+        },
+        {
+          "wait": 600
+        }
+      ],
+      "desc": "tap(0.50,0.78) 120ms → wait 600ms",
+      "note": "ゲームオーバー画面。スコアとベスト更新が大きく出る。ただ「8個切った」は時間切れの図形も数えていて、実際に切ったのは6個。タップで再開を確かめる。",
+      "noteEn": "Game over screen with score and new best. But '8 shapes cut' also counts the timed-out ones (I actually cut 6). Tapping to check restart.",
+      "image": "ai-play/step-13.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 419
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}
