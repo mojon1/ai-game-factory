@@ -31,8 +31,7 @@
   <div class="wrap">
     <a class="logo" href="./"><span class="logo-mark">▶</span><span>AI GAME FACTORY</span></a>
     <nav class="nav">
-      <a href="stats.html" data-i18n="nav.stats">目的</a>
-      <a href="about.html" class="nav-q" data-i18n-attr="aria-label:nav.about;title:nav.about">?</a>
+      <a href="about.html" data-i18n="nav.purpose">目的</a>
       <span class="lang-slot"></span>
     </nav>
   </div>
@@ -54,14 +53,14 @@
 <main class="wrap">
   <div class="intro">
     <div class="seg" role="group" id="view">
-      <button type="button" data-view="list" aria-pressed="true" data-i18n="view.list"></button>
-      <button type="button" data-view="cal" data-i18n="view.cal"></button>
+      <button type="button" data-view="list" data-i18n="view.list"></button>
+      <button type="button" data-view="cal" aria-pressed="true" data-i18n="view.cal"></button>
     </div>
   </div>
 
-  <section id="list"></section>
+  <section id="list" hidden></section>
 
-  <section id="cal-view" hidden>
+  <section id="cal-view">
     <div class="month-nav">
       <button class="icon-btn" type="button" id="prev" data-i18n-attr="aria-label:month.prev">‹</button>
       <h2 id="month-label" aria-live="polite"></h2>
@@ -158,13 +157,13 @@
   $('prev').onclick = () => shift(-1);
   $('next').onclick = () => shift(1);
 
-  let view = store.get('agf_view', 'list') === 'cal' ? 'cal' : 'list';
+  let view = store.get('agf_view2', 'cal') === 'list' ? 'list' : 'cal';
   function show() {
     document.querySelectorAll('#view button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === view)));
     $('list').hidden = view !== 'list'; $('cal-view').hidden = view !== 'cal';
     view === 'list' ? renderList() : renderCal();
   }
-  $('view').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { view = b.dataset.view; store.set('agf_view', view); show(); } });
+  $('view').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { view = b.dataset.view; store.set('agf_view2', view); show(); } });
   show();
 })();
 </script>
