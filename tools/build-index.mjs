@@ -2,7 +2,7 @@
 // 一覧・カレンダー・統計に必要な最小限の項目だけを入れて軽く保つ。
 import fs from 'node:fs';
 import path from 'node:path';
-import { GAMES_DIR, listGameIds, readJson, writeJson, jstNow } from './lib.mjs';
+import { GAMES_DIR, listGameIds, readJson, writeJson, jstNow, detectLibraries } from './lib.mjs';
 
 const games = [];
 for (const id of listGameIds()) {
@@ -10,6 +10,9 @@ for (const id of listGameIds()) {
   if (!m || m.status !== 'published') continue;
   const main = m.credits?.find((c) => c.role === 'main') || m.credits?.[0] || {};
   const x = m.metrics || {};
+  const html = path.join(GAMES_DIR, id, 'index.html');
+  // 使用ライブラリ: 自動テストの記録が無い古い作品も、ゲーム本体から読み取って載せる
+  const libraries = m.libraries || (fs.existsSync(html) ? detectLibraries(fs.readFileSync(html, 'utf8')) : []);
   games.push({
     id,
     title: m.title,
@@ -19,6 +22,7 @@ for (const id of listGameIds()) {
     ai: { name: main.name, vendor: main.vendor, model: main.model },
     thumb: fs.existsSync(path.join(GAMES_DIR, id, 'thumb.webp')) ? `games/${id}/thumb.webp` : null,
     aiVerdict: m.aiReview?.verdict || null,
+    libraries,
     metrics: m.metrics ? { thinking: x.thinkingTokens, output: x.outputTokens, turns: x.turns, tools: x.toolCalls, minutes: x.minutes, runs: m.generation?.validationRuns ?? null, effort: x.effort || null } : null,
   });
 }

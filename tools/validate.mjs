@@ -5,7 +5,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { ROOT, gameDir, readMeta, writeMeta, readJson, parseArgs, codeStats, jstNow, settings } from './lib.mjs';
+import { ROOT, gameDir, readMeta, writeMeta, readJson, parseArgs, codeStats, jstNow, settings, detectLibraries } from './lib.mjs';
 import { openSession, launch } from './play-engine.mjs';
 
 export const CHECK_EN = {
@@ -127,6 +127,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   meta.generation.validationRuns = (meta.generation.validationRuns || 0) + 1;
   meta.autoTest = { passed: result.passed, testedAt: jstNow().iso, version: 3, checks: result.checks, errors: result.errors };
   if (result.code) meta.code = result.code;
+  const htmlFile = path.join(gameDir(id), 'index.html');
+  if (fs.existsSync(htmlFile)) meta.libraries = detectLibraries(fs.readFileSync(htmlFile, 'utf8'));   // 使用ライブラリ（作品ページの仕様に表示）
   writeMeta(id, meta);
   for (const c of result.checks) console.log(`${c.ok ? '✅' : '❌'} ${c.name}${c.detail ? `  (${c.detail})` : ''}`);
   if (result.errors.length) console.log('\nエラー詳細:\n - ' + result.errors.join('\n - '));

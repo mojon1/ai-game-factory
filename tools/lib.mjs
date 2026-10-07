@@ -149,3 +149,13 @@ export function dirSize(dir) {
 export function codeStats(html) {
   return { bytes: Buffer.byteLength(html, 'utf8'), lines: html.split('\n').length };
 }
+
+// ゲームが読み込んでいる共有ライブラリ（<script src="../../lib/…">）を、棚の登録内容（名前・版）と合わせて返す
+export function detectLibraries(html) {
+  const shelf = readJson(path.join(ROOT, 'lib', 'catalog.json'), { libraries: [] }).libraries || [];
+  const files = [...html.matchAll(/<script[^>]+src=["']\.\.\/\.\.\/lib\/([^"'?#]+)/gi)].map((m) => m[1]);
+  return [...new Set(files)].map((file) => {
+    const l = shelf.find((x) => x.file === file);
+    return { name: l?.name || file, version: l?.version || null, file };
+  });
+}
