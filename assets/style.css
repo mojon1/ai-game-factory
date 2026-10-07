@@ -81,14 +81,19 @@ html[data-lang="ja"] [data-only="en"], html[data-lang="en"] [data-only="ja"] { d
 .icon-btn { width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); cursor: pointer; font-size: 20px; }
 .cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
 .cal-head { background: var(--panel); text-align: center; font-size: 11px; color: var(--muted); padding: 4px 0; }
-.cal-day { background: var(--panel); min-height: 84px; position: relative; padding: 20px 2px 2px; }
+.cal-day { background: var(--panel); min-height: 74px; position: relative; padding: 20px 3px 3px; display: block; width: 100%; border: 0; text-align: left; color: inherit; font: inherit; }
 .cal-day.out { background: #111318; }
+.cal-day.has { cursor: pointer; }
+.cal-day.has:hover { background: var(--panel-2); }
+.cal-day.sel { box-shadow: inset 0 0 0 2px var(--signal); background: var(--panel-2); }
+.cal-day:focus-visible { outline: 2px solid var(--signal); outline-offset: -2px; }
 .cal-num { position: absolute; left: 4px; top: 2px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
 .cal-day.today .cal-num { color: #111; background: var(--signal); border-radius: 8px; padding: 0 5px; }
-.cal-thumbs { display: grid; gap: 2px; height: 100%; min-height: 60px; grid-auto-flow: column; }
-.cal-thumbs a { display: block; position: relative; overflow: hidden; border-radius: 4px; background: #0a0b0e; }
-.cal-thumbs img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-@media (min-width: 700px) { .cal-day { min-height: 140px; } }
+.cal-count { position: absolute; right: 4px; top: 2px; font-family: var(--mono); font-size: 10.5px; color: #111; background: var(--fun); border-radius: 8px; padding: 0 5px; line-height: 16px; }
+.cal-thumbs { display: flex; gap: 2px; height: 48px; pointer-events: none; }
+.cal-thumbs img, .cal-thumbs i { flex: 1 1 0; min-width: 0; height: 100%; object-fit: cover; border-radius: 3px; background: #0a0b0e; }
+.cal-list { margin: 18px 0 8px; scroll-margin-top: 64px; }
+@media (min-width: 700px) { .cal-day { min-height: 120px; } .cal-thumbs { height: 92px; } }
 
 /* ---------- ゲームページ ---------- */
 .back { display: inline-block; margin: 14px 0 4px; font-size: 13px; color: var(--muted); text-decoration: none; }

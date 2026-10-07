@@ -26,6 +26,7 @@
     'month.prev': ['前の月', 'Previous month'],
     'month.next': ['次の月', 'Next month'],
     'count.games': ['{n}本', '{n} games'],
+    'cal.none': ['この月の作品はまだありません。', 'No games this month yet.'],
     'day.n': ['観測 {n} 日目', 'Day {n}'],
     'by': ['作: {ai}', 'by {ai}'],
     'votes': ['{n}人', '{n} votes'],

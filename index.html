@@ -46,7 +46,8 @@
       <h2 id="month-label" aria-live="polite"></h2>
       <button class="icon-btn" type="button" id="next" data-i18n-attr="aria-label:month.next">›</button>
     </div>
-    <div class="cal" id="cal" role="grid" aria-labelledby="month-label"></div>
+    <div class="cal" id="cal" aria-labelledby="month-label"></div>
+    <section class="cal-list" id="cal-list" aria-live="polite"></section>
   </section>
 </main>
 
@@ -67,7 +68,6 @@
   try { scores = await Ratings.summary(); } catch (e) { console.warn(e); }
   const games = index.games.map((g) => ({ ...g, s: scores[g.id] || null, day: dayKey(g.createdAt) }));
   const page = (g) => `game.html?id=${encodeURIComponent(g.id)}`;
-  const href = page;                                   // カレンダーなどからは作品ページへ（すぐには遊ばない）
   const playHref = (g) => `${page(g)}&play=1`;         // すぐ全画面で遊ぶ
   const moreHref = (g) => `${page(g)}&more=1`;         // 仕様を開いた状態で作品ページへ
   const dayNo = (key) => Math.floor((Date.parse(key) - Date.parse(CFG.startDate || key)) / 864e5) + 1;
@@ -94,23 +94,45 @@
       <div class="ggrid">${days[k].map(card).join('')}</div></section>`).join('');
   }
 
-  // カレンダー（過去の作品を探す）
+  // カレンダー（過去の作品を探す）: マスを押すと、その日の作品一覧が下に出る
   const today = dayKey(new Date().toISOString());
+  const byDay = games.reduce((o, g) => ((o[g.day] ||= []).push(g), o), {});
   let month = (games[0]?.day || today).slice(0, 7);
+  let selected = null;
   function renderCal() {
     const [y, m] = month.split('-').map(Number);
     $('month-label').textContent = monthLabel(y, m);
-    const days = games.reduce((o, g) => ((o[g.day] ||= []).push(g), o), {});
+    // 選択日がこの月に無ければ、この月で一番新しい制作日を選ぶ
+    if (!selected || !selected.startsWith(month) || !byDay[selected]) selected = Object.keys(byDay).filter((k) => k.startsWith(month)).sort().pop() || null;
     const first = new Date(Date.UTC(y, m - 1, 1)).getUTCDay(), len = new Date(Date.UTC(y, m, 0)).getUTCDate();
     let html = WEEK.map((w) => `<div class="cal-head">${w}</div>`).join('');
     for (let i = 0; i < Math.ceil((first + len) / 7) * 7; i++) {
       const d = i - first + 1;
       if (d < 1 || d > len) { html += '<div class="cal-day out"></div>'; continue; }
-      const key = `${month}-${String(d).padStart(2, '0')}`, gs = days[key] || [];
-      html += `<div class="cal-day${key === today ? ' today' : ''}"><span class="cal-num">${d}</span>${gs.length ? `<div class="cal-thumbs n${Math.min(3, gs.length)}">${gs.slice(0, 3).map((g) => `<a href="${href(g)}" title="${esc(title(g))}">${g.thumb ? `<img src="${esc(g.thumb)}" alt="${esc(title(g))}" loading="lazy">` : ''}</a>`).join('')}</div>` : ''}</div>`;
+      const key = `${month}-${String(d).padStart(2, '0')}`, gs = byDay[key] || [];
+      const cls = `cal-day${key === today ? ' today' : ''}${key === selected ? ' sel' : ''}`;
+      const inner = `<span class="cal-num">${d}</span>${gs.length ? `<span class="cal-count">${gs.length}</span><span class="cal-thumbs n${Math.min(3, gs.length)}" aria-hidden="true">${gs.slice(0, 3).map((g) => (g.thumb ? `<img src="${esc(g.thumb)}" alt="" loading="lazy">` : '<i></i>')).join('')}</span>` : ''}`;
+      html += gs.length
+        ? `<button type="button" class="${cls} has" data-day="${key}" aria-pressed="${key === selected}" aria-label="${esc(fmtDate(gs[0].createdAt))} ${t('count.games', { n: gs.length })}">${inner}</button>`
+        : `<div class="${cls}">${inner}</div>`;
     }
     $('cal').innerHTML = html;
+    renderDayList();
   }
+  function renderDayList() {
+    const gs = selected ? byDay[selected] || [] : [];
+    $('cal-list').innerHTML = gs.length
+      ? `<h2 class="day-head"><span>${esc(fmtDate(gs[0].createdAt))}</span><small>${t('count.games', { n: gs.length })}</small></h2><div class="ggrid">${gs.map(card).join('')}</div>`
+      : `<p class="empty">${t('cal.none')}</p>`;
+  }
+  $('cal').addEventListener('click', (e) => {
+    const cell = e.target.closest('button.cal-day');
+    if (!cell) return;
+    selected = cell.dataset.day;
+    document.querySelectorAll('#cal button.cal-day').forEach((b) => { const on = b.dataset.day === selected; b.classList.toggle('sel', on); b.setAttribute('aria-pressed', String(on)); });
+    renderDayList();
+    $('cal-list').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
   const shift = (n) => { const [y, m] = month.split('-').map(Number); month = new Date(Date.UTC(y, m - 1 + n, 1)).toISOString().slice(0, 7); renderCal(); };
   $('prev').onclick = () => shift(-1);
   $('next').onclick = () => shift(1);
