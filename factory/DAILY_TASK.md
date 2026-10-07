@@ -14,7 +14,7 @@
 4. 自分のモデルIDと表示名を確認する（システムプロンプト等に書かれている。例: `claude-opus-5-5` / `Claude Opus 5.5`）。
    以降の `<MODEL>` `<NAME>` はこれに置き換える。分からない場合は推測せず、分かる範囲（例: `gpt` / `ChatGPT (Codex)`）で書く。
    `<MAKER>` `<VENDOR>` `<VIA>` は AGENTS.md の表に従う（Claude: `claude` / `Anthropic` / `Claude Code`、ChatGPT: `gpt` / `OpenAI` / `Codex`）。
-5. 共有ライブラリ棚 `lib/catalog.json` を確認する（棚に無いものは使えない）。
+5. 共有ライブラリ棚（GAME_SPEC.md の表と `lib/catalog.json`）を確認する。3D描画・物理演算・効果音や曲の生成が使える。使うかどうかは企画次第で自由（棚に無いものは使えない）。
 
 ## 1. ゲームごとの制作（本数分くり返す）
 

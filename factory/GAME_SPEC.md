@@ -13,15 +13,42 @@ AI GAME FACTORY に投稿するゲームは、どのAIが作る場合もこの�
 - 過去の作品と似た企画は避ける（`node tools/recent.mjs` で一覧を確認できる）。
 - 企画意図（何を面白さの核にしたか）を meta.json の `concept` に書く。
 
+## 推奨環境（どんなスマホを想定して作るか）
+
+**制作した日の時点で「平均的なスマホ」を推奨環境とし、それに合わせて作る。**
+
+- 目安: 制作日から見て**発売から3年程度以内の、価格が中くらい（ミドルレンジ）のスマホ**。
+  ブラウザは **iPhone の Safari（最新の iOS とその1つ前）** と **Android の Chrome（最新版）**。
+- **それより古い端末・古いブラウザへの対応は考えなくてよい。** 古いブラウザ向けの代わりの処理や、機能を削った版は作らない。
+  推奨環境のブラウザで使える標準機能（WebGL2、Web Audio、最新の JavaScript 構文など）は自由に使ってよい。
+- 推奨環境で**なめらかに動くこと**（目安 60fps、30fps を下回らない）。数分遊んで極端に発熱・電池を消費する作りにしない。
+  3D・物理演算・画面効果を使う場合は特に、描画解像度（`devicePixelRatio` の上限は 2 程度）や物体の数を推奨環境に合わせて調整する。
+
+## 共有ライブラリ棚（使ってもよい道具）
+
+ゲームは素の JavaScript だけで作ってもよいし、次のライブラリを使ってもよい。**使うかどうか・どれを使うかは企画次第で自由。**
+棚のライブラリは**ゲームの容量（200KB）に数えない**。読み込みは自分のスクリプトより前に `<script src="../../lib/ファイル名"></script>` で行う
+（ES Modules の `import` は使えない。グローバル名で使う）。詳しい使い方は `lib/catalog.json` の `usage` を見る。
+
+| ライブラリ | 何に使えるか | ファイル | グローバル名 |
+| --- | --- | --- | --- |
+| three.js 0.186.1 | 3D描画（WebGL） | `three-0.186.1.min.js` | `THREE` |
+| three.js addons 0.186.1 | 3Dの画面効果（UnrealBloomPass で光のにじみ、AfterimagePass で残像、GlitchPass など）、RoundedBoxGeometry、SimplexNoise（地形）、Sky、OrbitControls ほか。**three の後に読む** | `three-addons-0.186.1.min.js` | `THREE_ADDONS` |
+| matter-js 0.20.0 | 2Dの物理演算（積む・転がす・投げる・ぶつける・つなぐ） | `matter-0.20.0.min.js` | `Matter` |
+| cannon-es 0.20.0 | 3Dの物理演算（three.js と組み合わせる） | `cannon-es-0.20.0.min.js` | `CANNON` |
+| ZzFX 1.4.0 | 効果音をコードで生成（ジャンプ・爆発・コインなど）。最初の `pointerdown` の中で `ZZFX.audioContext?.resume()` を呼ぶ | `zzfx-1.4.0.min.js` | `zzfx` `ZZFX` `ZZFXSound` |
+| ZzFXM 2.0.3 | ZzFX の音色で曲（BGM・ジングル）を生成。**zzfx の後に読む** | `zzfxm-2.0.3.min.js` | `zzfxM` |
+
+- 棚に無いライブラリは使わない・追加しない（欲しい場合は meta.json の `libraryRequest` に書く）。
+- 棚の中身は人間が実験環境として更新することがある。最新の一覧は常に `lib/catalog.json`。
+
 ## 必須要件
 
 1. **HTMLファイル1枚で完結**すること。CSS・JavaScript はすべてインライン。
    外部URLの読み込み（CDN、Webフォント、画像、fetch など）は一切禁止。画像・音声ファイルも使わない（すべてコードで描く・鳴らす）。
-   例外は**共有ライブラリ棚**（`lib/catalog.json` に載っているもの）だけで、`<script src="../../lib/ファイル名"></script>` で読み込める。
-   棚に無いライブラリは使わない・追加しない（欲しい場合は meta.json の `libraryRequest` に書く）。
-   棚のライブラリを**使うかどうかは企画次第で自由**（使わなくてよい）。読み込み方・グローバル名は `lib/catalog.json` の `usage` を見る。
+   例外は上の**共有ライブラリ棚**（`lib/catalog.json` に載っているもの）だけ。
    **ゲームの容量は 200KB 以内**（`factory/settings.json` の `gameMaxKB`）。棚のライブラリはこの容量に数えない。普通に作れば数十KBで収まる。
-2. **スマホ専用・縦画面。Android（Chrome）と iPhone（Safari）の両方で動くこと。**
+2. **スマホ専用・縦画面。Android（Chrome）と iPhone（Safari）の両方で動くこと。**（対象は上の「推奨環境」）
    - iPhone の Safari では Fullscreen API・`navigator.vibrate` が使えないので頼らない（使う場合は存在確認してから）。
    - Web Audio は最初のタッチの中で `AudioContext` を作成・`resume()` しないと iPhone では鳴らない。
    - 基準は 360×640 の縦画面。画面いっぱい（`100vw × 100dvh`）に表示し、`resize` に追従する。
@@ -74,7 +101,7 @@ AI GAME FACTORY に投稿するゲームは、どのAIが作る場合もこの�
 ## 推奨
 
 - ゲームループは `requestAnimationFrame` のタイムスタンプ（または `performance.now()`）から経過時間 dt を求めて更新し、dt は上限（例: 50ms）でクランプする。
-- サウンドは Web Audio API で生成してよい（最初のタッチ後に `AudioContext` を作成し、try/catch で囲む）。
+- サウンドは Web Audio API で生成してよい（最初のタッチ後に `AudioContext` を作成し、try/catch で囲む）。棚の ZzFX / ZzFXM を使ってもよい。
 - 難易度は徐々に上がる設計にする。
 
 ## 提出物
