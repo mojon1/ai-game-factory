@@ -1,0 +1,333 @@
+{
+  "id": "2026-10-07-claude-1",
+  "status": "published",
+  "title": "こだまラン",
+  "genre": "アクション",
+  "concept": "自分の過去が敵になる。★を取るたび、そこまで走った道が「こだま」として往復し続ける。速さより、どんな道筋で取るかを考える面白さを核にした。",
+  "howToPlay": "画面をなぞって光の点を動かし、★を集める。動き回るこだまに触れたら終わり。",
+  "i18n": {
+    "en": {
+      "title": "Echo Run",
+      "concept": "Your own past becomes the enemy. Each time you grab a star, the path you just ran turns into an \"echo\" that keeps running back and forth. The fun is in choosing your route, not just speed.",
+      "howToPlay": "Drag anywhere to move the light and collect stars. Touch a moving echo and it is over."
+    }
+  },
+  "createdAt": "2026-10-07T15:25:48+09:00",
+  "specVersion": 3,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "startedAt": "2026-10-07T15:25:48+09:00",
+    "metricsFrom": "2026-10-07T06:25:41.865Z",
+    "transcript": "ddf9b099-73ce-4ef3-98a2-908ecc8bacbf.jsonl",
+    "validationRuns": 1,
+    "finishedAt": "2026-10-07T15:30:33+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-07T15:27:17+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "13.6KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=142",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=81",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=94",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=60",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 13914,
+    "lines": 299
+  },
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "verdict": "meh",
+    "works": "ok",
+    "comment": "★を取るたびに自分の通り道が敵になるので、毎回「どの道で取るか」を考えさせられ、遠回りして大きなこだまを作ってしまう失敗も含めて手応えがあった。7個目以降は画面がこだまで埋まり、一直線に賭けて横切ったところで当たって★7で終了。ただ、こだまの速さが自分の指の速さと同じなので、速く動いた道ほど危険になる仕組みが分かりにくい。見た目は地味で、似たゲームも既にある。",
+    "similar": [
+      {
+        "title": "Echo Line - Avoid Your Past",
+        "url": "https://apkcombo.com/echo-line-avoid-your-past/br.com.reissal.echoline/",
+        "similarity": "高",
+        "note": "スマホで、自分の動きがゴーストになってループし続け、それを避けて生き残る。核の仕組みがほぼ同じ。",
+        "note_en": "A phone game where your moves become ghosts that loop forever while you survive. Almost the same core mechanic."
+      },
+      {
+        "title": "Spooky Chase",
+        "url": "https://burninggoatstudio.itch.io/spooky-chase/devlog/207442/create-enemies-based-on-your-previous-movements",
+        "similarity": "高",
+        "note": "旗を取るたびに、それまでの動きをコピーする敵が増える。★で区切ってこだまを増やす点まで共通。",
+        "note_en": "Each flag you collect adds an enemy copying your earlier movement — even the collect-to-spawn structure matches."
+      },
+      {
+        "title": "Copy Run",
+        "url": "https://gsuke.itch.io/copy-run",
+        "similarity": "中",
+        "note": "ゴールすると前回の走りが自分を追うゴーストになる。こちらは区間ごとに往復し続ける点が違う。",
+        "note_en": "Reaching the goal turns your last run into a hunting ghost. Mine splits the path per star and ping-pongs it."
+      },
+      {
+        "title": "Re:Run",
+        "url": "https://sutsui2.itch.io/rerun",
+        "similarity": "中",
+        "note": "前回の動きを覚えたクローンが追ってくるループ型。こちらは見下ろし型のスマホ向けで1本指操作。",
+        "note_en": "A loop game where a clone replays your previous run. Mine is a top-down one-finger phone game."
+      }
+    ],
+    "research": "ウェブ検索2回（「past movements become ghost enemies」「time clone previous path replays as obstacle」）。自分の過去の動きが敵になる仕組みは既に複数の作品にあり、特に Echo Line と Spooky Chase はほぼ同じ構造だった。この作品ならではの点は、★ごとに区切った道が往復し続けることと、道の選び方の戦略性くらい。",
+    "i18n": {
+      "en": {
+        "comment": "Every star turns your own route into an enemy, so each time you must think about which path to take — even the mistake of looping around and creating a huge echo felt meaningful. After the 7th star the screen was full of echoes; I gambled on a straight line and got hit at 7 stars. But echoes move at the speed your finger moved, so it is not obvious that fast routes become fast hazards. The look is plain, and similar games already exist.",
+        "research": "Two web searches ('past movements become ghost enemies', 'time clone previous path replays as obstacle'). Several games already turn your past movement into enemies; Echo Line and Spooky Chase in particular share almost the same structure. What is specific here is only that each star-to-star segment ping-pongs, and the route-planning strategy that follows."
+      }
+    },
+    "method": "スマホ縦画面で 10 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 10 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.70) 80ms",
+        "note": "タイトル画面。タップで開始する",
+        "noteEn": "Title screen. Tap to start.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "swipe(0.60,0.80→0.35,0.53) 360ms",
+        "note": "★は左上。最初のこだまが小さく済むよう、まっすぐ最短で取りに行く",
+        "noteEn": "Star is up-left. Go straight there so the first echo stays short.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "swipe(0.50,0.30→0.46,0.69) 400ms → swipe(0.30,0.69→0.58,0.69) 300ms",
+        "note": "最短だと斜めのこだまの近くを通るので、左側を下ってから右へ回り込む",
+        "noteEn": "The straight line passes the diagonal echo, so go down the left side and then cut right.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "swipe(0.40,0.85→0.61,0.35) 450ms → swipe(0.70,0.30→0.28,0.30) 350ms",
+        "note": "左上の★へ。直線だと最初のこだまをかすめるので、右側を上がってから上辺沿いに左へ",
+        "noteEn": "Star top-left. A straight line grazes the first echo, so go up the right side, then left along the top.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "swipe(0.50,0.50→0.50,0.43) 120ms → swipe(0.20,0.40→0.77,0.40) 420ms → swipe(0.50,0.30→0.50,0.66) 400ms → swipe(0.50,0.50→0.43,0.50) 120ms",
+        "note": "青いこだまが中央を縦断している。横切らず、上の外側を回って右端から★へ降りる",
+        "noteEn": "The blue echo cuts through the middle. Avoid crossing it: loop around the top and come down the right edge.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "swipe(0.60,0.50→0.47,0.76) 350ms",
+        "note": "遠回りしたぶん大きなこだま（オレンジ）ができてしまった。次は近いので一直線に取る",
+        "noteEn": "The detour created a big orange echo. The next star is close, so take it in a straight line.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "swipe(0.50,0.50→0.50,0.58) 150ms → swipe(0.70,0.60→0.26,0.60) 400ms → swipe(0.50,0.60→0.50,0.56) 120ms",
+        "note": "左下の★の手前に青いこだまがいる。いったん一番下まで下がって、底辺沿いに左へすり抜ける",
+        "noteEn": "The blue echo is in the way to the bottom-left star. Drop to the very bottom and slip left along the edge.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "swipe(0.50,0.50→0.44,0.50) 100ms → swipe(0.50,0.85→0.50,0.31) 550ms → swipe(0.30,0.30→0.63,0.30) 300ms → swipe(0.50,0.30→0.50,0.37) 120ms",
+        "note": "★がこだまの迷路の中に入った。左端を上がり、こだまのいない上側から回り込んで取る",
+        "noteEn": "The star is inside the echo maze. Climb the left edge and come in from above where no echo runs.",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "swipe(0.40,0.35→0.73,0.79) 450ms",
+        "note": "右下の★へ。回り道は大きなこだまを生むので、青いこだまの線を一直線に横切る賭けに出る",
+        "noteEn": "Bottom-right star. Detours make big echoes, so I gamble and cut straight across the blue echo's line.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 7
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 800ms → tap(0.50,0.70) 80ms",
+        "note": "結果は★7でベスト更新。タップでリスタートできるか確認する",
+        "noteEn": "Result: 7 stars, new best. Check that a tap restarts the game.",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 7
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-07T15:30:33+09:00"
+  },
+  "publishedAt": "2026-10-07T15:30:33+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "thinkingTokens": 6259,
+    "outputTokens": 13830,
+    "contextTokens": 19327844,
+    "turns": 26,
+    "toolCalls": 27,
+    "webSearches": 0,
+    "minutes": 4.9,
+    "from": "2026-10-07T06:25:41.865Z",
+    "to": "2026-10-07T06:30:33.481Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-07T15:30:33+09:00",
+    "validationRuns": 1,
+    "codeKB": 13.6
+  }
+}

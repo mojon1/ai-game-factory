@@ -1,0 +1,360 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-07T06:27:22.441Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.7
+        ],
+        "hold": 80,
+        "wait": 300
+      },
+      "desc": "tap(0.50,0.70) 80ms",
+      "note": "タイトル画面。タップで開始する",
+      "noteEn": "Title screen. Tap to start.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": {
+        "swipe": [
+          0.6,
+          0.8,
+          0.353,
+          0.534
+        ],
+        "hold": 360,
+        "wait": 200
+      },
+      "desc": "swipe(0.60,0.80→0.35,0.53) 360ms",
+      "note": "★は左上。最初のこだまが小さく済むよう、まっすぐ最短で取りに行く",
+      "noteEn": "Star is up-left. Go straight there so the first echo stays short.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "swipe": [
+            0.5,
+            0.3,
+            0.455,
+            0.69
+          ],
+          "hold": 400,
+          "wait": 0
+        },
+        {
+          "swipe": [
+            0.3,
+            0.69,
+            0.58,
+            0.69
+          ],
+          "hold": 300,
+          "wait": 200
+        }
+      ],
+      "desc": "swipe(0.50,0.30→0.46,0.69) 400ms → swipe(0.30,0.69→0.58,0.69) 300ms",
+      "note": "最短だと斜めのこだまの近くを通るので、左側を下ってから右へ回り込む",
+      "noteEn": "The straight line passes the diagonal echo, so go down the left side and then cut right.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "swipe": [
+            0.4,
+            0.85,
+            0.606,
+            0.347
+          ],
+          "hold": 450,
+          "wait": 0
+        },
+        {
+          "swipe": [
+            0.7,
+            0.3,
+            0.278,
+            0.3
+          ],
+          "hold": 350,
+          "wait": 200
+        }
+      ],
+      "desc": "swipe(0.40,0.85→0.61,0.35) 450ms → swipe(0.70,0.30→0.28,0.30) 350ms",
+      "note": "左上の★へ。直線だと最初のこだまをかすめるので、右側を上がってから上辺沿いに左へ",
+      "noteEn": "Star top-left. A straight line grazes the first echo, so go up the right side, then left along the top.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": [
+        {
+          "swipe": [
+            0.5,
+            0.5,
+            0.5,
+            0.433
+          ],
+          "hold": 120,
+          "wait": 0
+        },
+        {
+          "swipe": [
+            0.2,
+            0.4,
+            0.767,
+            0.4
+          ],
+          "hold": 420,
+          "wait": 0
+        },
+        {
+          "swipe": [
+            0.5,
+            0.3,
+            0.5,
+            0.663
+          ],
+          "hold": 400,
+          "wait": 0
+        },
+        {
+          "swipe": [
+            0.5,
+            0.5,
+            0.433,
+            0.5
+          ],
+          "hold": 120,
+          "wait": 200
+        }
+      ],
+      "desc": "swipe(0.50,0.50→0.50,0.43) 120ms → swipe(0.20,0.40→0.77,0.40) 420ms → swipe(0.50,0.30→0.50,0.66) 400ms → swipe(0.50,0.50→0.43,0.50) 120ms",
+      "note": "青いこだまが中央を縦断している。横切らず、上の外側を回って右端から★へ降りる",
+      "noteEn": "The blue echo cuts through the middle. Avoid crossing it: loop around the top and come down the right edge.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": {
+        "swipe": [
+          0.6,
+          0.5,
+          0.467,
+          0.758
+        ],
+        "hold": 350,
+        "wait": 200
+      },
+      "desc": "swipe(0.60,0.50→0.47,0.76) 350ms",
+      "note": "遠回りしたぶん大きなこだま（オレンジ）ができてしまった。次は近いので一直線に取る",
+      "noteEn": "The detour created a big orange echo. The next star is close, so take it in a straight line.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "swipe": [
+            0.5,
+            0.5,
+            0.5,
+            0.581
+          ],
+          "hold": 150,
+          "wait": 0
+        },
+        {
+          "swipe": [
+            0.7,
+            0.6,
+            0.264,
+            0.6
+          ],
+          "hold": 400,
+          "wait": 0
+        },
+        {
+          "swipe": [
+            0.5,
+            0.6,
+            0.5,
+            0.559
+          ],
+          "hold": 120,
+          "wait": 250
+        }
+      ],
+      "desc": "swipe(0.50,0.50→0.50,0.58) 150ms → swipe(0.70,0.60→0.26,0.60) 400ms → swipe(0.50,0.60→0.50,0.56) 120ms",
+      "note": "左下の★の手前に青いこだまがいる。いったん一番下まで下がって、底辺沿いに左へすり抜ける",
+      "noteEn": "The blue echo is in the way to the bottom-left star. Drop to the very bottom and slip left along the edge.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": [
+        {
+          "swipe": [
+            0.5,
+            0.5,
+            0.436,
+            0.5
+          ],
+          "hold": 100,
+          "wait": 0
+        },
+        {
+          "swipe": [
+            0.5,
+            0.85,
+            0.5,
+            0.309
+          ],
+          "hold": 550,
+          "wait": 0
+        },
+        {
+          "swipe": [
+            0.3,
+            0.3,
+            0.625,
+            0.3
+          ],
+          "hold": 300,
+          "wait": 0
+        },
+        {
+          "swipe": [
+            0.5,
+            0.3,
+            0.5,
+            0.366
+          ],
+          "hold": 120,
+          "wait": 250
+        }
+      ],
+      "desc": "swipe(0.50,0.50→0.44,0.50) 100ms → swipe(0.50,0.85→0.50,0.31) 550ms → swipe(0.30,0.30→0.63,0.30) 300ms → swipe(0.50,0.30→0.50,0.37) 120ms",
+      "note": "★がこだまの迷路の中に入った。左端を上がり、こだまのいない上側から回り込んで取る",
+      "noteEn": "The star is inside the echo maze. Climb the left edge and come in from above where no echo runs.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": {
+        "swipe": [
+          0.4,
+          0.35,
+          0.733,
+          0.786
+        ],
+        "hold": 450,
+        "wait": 300
+      },
+      "desc": "swipe(0.40,0.35→0.73,0.79) 450ms",
+      "note": "右下の★へ。回り道は大きなこだまを生むので、青いこだまの線を一直線に横切る賭けに出る",
+      "noteEn": "Bottom-right star. Detours make big echoes, so I gamble and cut straight across the blue echo's line.",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 7
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "action": [
+        {
+          "wait": 800
+        },
+        {
+          "tap": [
+            0.5,
+            0.7
+          ],
+          "hold": 80,
+          "wait": 400
+        }
+      ],
+      "desc": "wait 800ms → tap(0.50,0.70) 80ms",
+      "note": "結果は★7でベスト更新。タップでリスタートできるか確認する",
+      "noteEn": "Result: 7 stars, new best. Check that a tap restarts the game.",
+      "image": "ai-play/step-10.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 7
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}
