@@ -84,9 +84,11 @@ meta.aiReview = {
 };
 
 const en = meta.i18n?.en || {};
+// 仕様4以降は、ライブラリを使う／使わない判断の理由（libraryDecision）も必須
+const keys = ['title', 'concept', 'howToPlay', ...((meta.specVersion || 0) >= 4 ? ['libraryDecision'] : [])];
 const missing = [
-  ...['title', 'genre', 'concept', 'howToPlay'].filter((k) => !meta[k]),
-  ...['title', 'concept', 'howToPlay'].filter((k) => !en[k]).map((k) => `i18n.en.${k}`),
+  ...['genre', ...keys].filter((k) => !meta[k]),
+  ...keys.filter((k) => !en[k]).map((k) => `i18n.en.${k}`),
 ];
 if (missing.length) console.warn(`⚠ meta.json の未記入項目: ${missing.join(', ')}（埋めてから再実行すると公開されます）`);
 if (!meta.autoTest?.passed) console.warn('⚠ 自動テストに合格していません（node tools/validate.mjs で確認）');

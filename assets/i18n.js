@@ -56,6 +56,7 @@
     'sec.more': ['このゲームの仕様を見る', 'See how this game was made'],
     'sec.concept': ['AIの企画意図', 'The AI\'s design intent'],
     'sec.libs': ['使用ライブラリ', 'Libraries used'],
+    'libs.why': ['判断の理由:', 'Why:'],
     'libs.none': ['なし（ライブラリを使わず、素の JavaScript だけで制作）', 'None (plain JavaScript only)'],
     'sec.metrics': ['制作記録', 'Production record'],
     'sec.similar': ['ルーツ・似ている作品（AI調べ）', 'Roots & similar works (AI research)'],

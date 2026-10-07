@@ -27,9 +27,10 @@ writeMeta(id, {
   genre: '',
   concept: '',
   howToPlay: '',
-  i18n: { en: { title: '', concept: '', howToPlay: '' } },
+  libraryDecision: '',
+  i18n: { en: { title: '', concept: '', howToPlay: '', libraryDecision: '' } },
   createdAt: now.iso,
-  specVersion: 3,
+  specVersion: 4,
   maker: String(a.maker).toLowerCase(),
   credits: [{ role: 'main', name: a.name, vendor: a.vendor || '', model: a.model, via: a.via || '' }],
   generation: {

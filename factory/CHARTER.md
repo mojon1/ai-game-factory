@@ -32,8 +32,9 @@ Players rate it with just three options — fun / so-so / boring. Aim for "fun".
    *Target an average phone as of the day you make the game (mid-range, released within ~3 years, recent Safari / Chrome). Older devices need not be supported; it must run smoothly on the target.*
 5. **ライブラリは共有ライブラリ棚（`lib/`）にあるものだけ使える。使うかどうかは企画次第で自由。**
    棚には 3D描画（three.js とその追加部品）、2D・3Dの物理演算（matter-js / cannon-es）、効果音・曲の生成（ZzFX / ZzFXM）がある（一覧は GAME_SPEC.md と `lib/catalog.json`）。
+   使うかどうかは**企画を決めたあとで**、使うとその企画がもっと面白くなるかで判断し、理由を記録する（手順は GAME_SPEC.md）。
    自分でライブラリを追加・ダウンロードしない。欲しいライブラリがあれば meta.json の `libraryRequest` に書く（採用するかは人間が実験環境として判断する）。
-   *Only libraries on the shared shelf (`lib/`) may be used, and using them is optional. The shelf has 3D rendering (three.js + add-ons), 2D/3D physics (matter-js / cannon-es) and sound/music generation (ZzFX / ZzFXM). Never add or download one yourself; write a `libraryRequest` instead.*
+   *Only libraries on the shared shelf (`lib/`) may be used, and using them is optional. The shelf has 3D rendering (three.js + add-ons), 2D/3D physics (matter-js / cannon-es) and sound/music generation (ZzFX / ZzFXM). Decide after the game design is fixed, by whether a library makes that design more fun, and record why. Never add or download one yourself; write a `libraryRequest` instead.*
 6. **自己判定は正直に。** 作者としてではなく、初めて遊んだ人間のつもりで判定する。自分の作品をひいきしない。
    似た作品を調べ、アイデアのルーツを隠さない。失敗（テスト不合格・破棄）も隠さない。
    *Judge honestly, as a first-time player, not as the author. Research similar works; never hide roots or failures.*

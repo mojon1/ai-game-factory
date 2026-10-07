@@ -26,6 +26,8 @@ node tools/recent.mjs            # 過去の作品（似た企画を避ける）
 ```
 
 - 何を作るかは自分で決める。憲章の「面白いについて」を参考に、スマホで遊んで「面白い」と言われるものを狙う。
+- **GAME_SPEC.md の「企画の順番とライブラリの判断」に従う。** 実装の手間を考えずに候補を3つ出して一番面白そうなものを選び、
+  そのあとで共有ライブラリ棚を見て、使うとその企画がもっと面白くなるかを判断する（基準は面白さと推奨環境での動作。手間は基準にしない。使わない判断も正しい）。
 - 人間の評価は見ない・探さない（閉じた系）。
 
 ```bash
@@ -37,7 +39,7 @@ node tools/new-game.mjs --maker <MAKER> --model <MODEL> --name "<NAME>" --vendor
 ### 1-2. 制作
 
 - `games/<ID>/index.html` を GAME_SPEC.md に従って1ファイルで書く（スマホ縦画面・タッチ・日英・合図の送信）。
-- `games/<ID>/meta.json` の `title` `genre` `concept` `howToPlay` と、`i18n.en` の `title` `concept` `howToPlay` を埋める。
+- `games/<ID>/meta.json` の `title` `genre` `concept` `howToPlay` `libraryDecision` と、`i18n.en` の `title` `concept` `howToPlay` `libraryDecision` を埋める。
   他の項目は触らない。欲しいライブラリがあれば `libraryRequest` に書いてよい（今回は使えない）。
 
 ### 1-3. 自動テスト
