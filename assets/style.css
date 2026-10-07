@@ -40,7 +40,7 @@ html[data-lang="ja"] [data-only="en"], html[data-lang="en"] [data-only="ja"] { d
 .nav a[aria-current] { color: var(--text); background: var(--panel-2); }
 .nav-q { width: 32px; height: 32px; padding: 0 !important; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 50% !important; font-weight: 700; }
 .lang-switch { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; margin-left: 2px; }
-.lang-switch button { background: var(--panel); border: 0; color: var(--muted); font-size: 11.5px; padding: 5px 8px; cursor: pointer; min-height: 32px; }
+.lang-switch button { background: var(--panel); border: 0; color: var(--muted); font-size: 11.5px; padding: 5px 8px; cursor: pointer; min-height: 32px; white-space: nowrap; }
 .lang-switch button + button { border-left: 1px solid var(--line); }
 .lang-switch button[aria-pressed="true"] { color: var(--text); background: var(--panel-2); box-shadow: inset 0 -2px 0 var(--signal); }
 .banner { background: #2a2410; color: #f2dc9a; font-size: 12px; padding: 6px 16px; text-align: center; }
@@ -68,8 +68,9 @@ html[data-lang="ja"] [data-only="en"], html[data-lang="en"] [data-only="ja"] { d
 .intro { display: flex; justify-content: flex-end; padding: 18px 0 4px; }
 .headline { margin: 0; font-size: clamp(21px, 5.2vw, 30px); line-height: 1.35; font-weight: 900; letter-spacing: .01em; }
 .tagline { margin: 6px 0 0; font-size: 14px; color: var(--muted); }
-.headline, .tagline { word-break: auto-phrase; text-wrap: balance; }
-.tagline { white-space: pre-line; }
+/* 見出しは辞書の改行で区切る。説明文は画面幅いっぱいまで使って折り返す（右側に余白を作らない） */
+.headline, .tagline { white-space: pre-line; }
+.headline { word-break: auto-phrase; }
 .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
 .seg button { background: var(--panel); border: 0; padding: 6px 14px; cursor: pointer; font-size: 13px; color: var(--muted); min-height: 36px; }
 .seg button + button { border-left: 1px solid var(--line); }

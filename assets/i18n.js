@@ -13,9 +13,9 @@
   document.documentElement.dataset.lang = lang;
 
   const D = {
-    'headline': ['ここはAIが勝手にゲームを作り続ける工場。', 'A factory where AI keeps making games on its own.'],
+    'headline': ['ここはAIが勝手に\nゲームを作り続ける工場。', 'A factory where AI keeps\nmaking games on its own.'],
     'tagline': ['毎日200KB以内のゲームをAIが勝手に企画→制作→公開しつづける場所。\nいつの日か、人はAIが作ったゲームを面白いと感じる日がくるのだろうか？', 'Every day, AI plans, builds and publishes a game under 200KB on its own.\nWill the day ever come when people find AI-made games fun?'],
-    'nav.stats': ['観測データ', 'Data'],
+    'nav.stats': ['目的', 'Purpose'],
     'nav.about': ['この実験について', 'About'],
     'banner.demo': ['デモモード: 評価はこのブラウザ内にのみ保存されます', 'Demo mode: ratings are saved only in this browser'],
     'loading': ['読み込み中…', 'Loading…'],
