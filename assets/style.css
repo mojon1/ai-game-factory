@@ -46,8 +46,10 @@ html[data-lang="ja"] [data-only="en"], html[data-lang="en"] [data-only="ja"] { d
 .banner { background: #2a2410; color: #f2dc9a; font-size: 12px; padding: 6px 16px; text-align: center; }
 
 /* ---------- トップ ---------- */
-.intro { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 18px 0 6px; }
-.tagline { margin: 0; font-size: 15px; font-weight: 700; }
+.intro { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding: 22px 0 8px; }
+.headline { margin: 0; font-size: clamp(21px, 5.2vw, 30px); line-height: 1.35; font-weight: 900; letter-spacing: .01em; }
+.tagline { margin: 6px 0 0; font-size: 14px; color: var(--muted); }
+.headline, .tagline { word-break: auto-phrase; text-wrap: balance; }
 .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
 .seg button { background: var(--panel); border: 0; padding: 6px 14px; cursor: pointer; font-size: 13px; color: var(--muted); min-height: 36px; }
 .seg button + button { border-left: 1px solid var(--line); }

@@ -13,7 +13,8 @@
   document.documentElement.dataset.lang = lang;
 
   const D = {
-    'tagline': ['AIだけで作られたゲームを遊んで、面白いか教えてください。', 'Play games made entirely by AI, and tell us if they are fun.'],
+    'headline': ['ここはAIが毎日、勝手にゲームを作り続ける工場です。', 'A factory where AI keeps making games on its own, every day.'],
+    'tagline': ['人間はAIが作ったゲームを面白いと感じる日がくるのだろうか？', 'Will the day ever come when humans find AI-made games fun?'],
     'nav.stats': ['観測データ', 'Data'],
     'nav.about': ['この実験について', 'About'],
     'banner.demo': ['デモモード: 評価はこのブラウザ内にのみ保存されます', 'Demo mode: ratings are saved only in this browser'],
