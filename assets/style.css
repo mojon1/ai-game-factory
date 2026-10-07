@@ -45,8 +45,29 @@ html[data-lang="ja"] [data-only="en"], html[data-lang="en"] [data-only="ja"] { d
 .lang-switch button[aria-pressed="true"] { color: var(--text); background: var(--panel-2); box-shadow: inset 0 -2px 0 var(--signal); }
 .banner { background: #2a2410; color: #f2dc9a; font-size: 12px; padding: 6px 16px; text-align: center; }
 
+/* ---------- トップ: HERO ---------- */
+.hero-banner { position: relative; background: #0b1222; }
+.hero-media { position: relative; overflow: hidden; }
+.hero-img { display: block; width: 100%; height: clamp(300px, 33vw, 520px); object-fit: cover; object-position: left center; }
+/* 左の余白側を暗くして文字を読みやすく、下端は背景色へなじませる（画像の上だけにかける） */
+.hero-media::after { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, rgba(10, 14, 26, .7) 0%, rgba(10, 14, 26, .35) 30%, rgba(10, 14, 26, 0) 45%),
+              linear-gradient(0deg, var(--bg) 0%, rgba(13, 14, 18, 0) 22%); }
+/* PC: 画像左側の暗い余白に文字を重ねる（画面の左端を基準に、どの幅でも余白に収める） */
+.hero-copy { position: absolute; top: 0; bottom: 0; left: clamp(16px, 5vw, 96px); z-index: 1; width: min(520px, 34vw); display: flex; flex-direction: column; justify-content: center; }
+.hero-kicker { margin: 0 0 10px; font-family: var(--mono); font-weight: 700; font-size: 13px; letter-spacing: .18em; color: var(--signal); }
+.hero-copy .headline { font-size: clamp(22px, 2.6vw, 38px); text-shadow: 0 2px 18px rgba(0, 0, 0, .55); }
+.hero-copy .tagline { color: #c3c8d6; font-size: clamp(12.5px, 1.15vw, 16px); text-shadow: 0 1px 10px rgba(0, 0, 0, .6); }
+@media (max-width: 760px) {
+  /* スマホ: 画像は横長の帯にして、文字はその下に置く */
+  .hero-img { height: 200px; object-position: 72% center; }
+  .hero-media::after { background: linear-gradient(0deg, var(--bg) 0%, rgba(13, 14, 18, 0) 35%); }
+  .hero-copy { position: relative; left: auto; width: auto; padding: 8px 16px 0; background: var(--bg); }
+  .hero-kicker { margin-bottom: 6px; font-size: 11.5px; }
+}
+
 /* ---------- トップ ---------- */
-.intro { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding: 22px 0 8px; }
+.intro { display: flex; justify-content: flex-end; padding: 18px 0 4px; }
 .headline { margin: 0; font-size: clamp(21px, 5.2vw, 30px); line-height: 1.35; font-weight: 900; letter-spacing: .01em; }
 .tagline { margin: 6px 0 0; font-size: 14px; color: var(--muted); }
 .headline, .tagline { word-break: auto-phrase; text-wrap: balance; }
