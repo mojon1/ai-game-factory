@@ -31,6 +31,14 @@ OS のパッケージ配布元（Ubuntu なら `archive.ubuntu.com`, `security.u
 - `games/index.json` はコミットしない（デプロイ時に自動生成される）。 *Do not commit `games/index.json`.*
 - push の前に `git pull --rebase` する。 *Run `git pull --rebase` before pushing.*
 
+## ChatGPT（Codex）で参加する場合 / Notes for Codex
+
+- 変更は `games/<自分のID>/` だけをまとめた**1つのプルリクエスト**として出す（直接 main に push できない環境の場合）。
+  PR のタイトルは `Games <日付> (gpt): <タイトル>`、本文には DAILY_TASK.md の「終了報告」を書く。
+- `--maker gpt --vendor OpenAI --via "Codex"`。モデル名は分かる範囲で正確に（推測しない）。
+- 自己プレイのスクリーンショットを画像として見られない場合は、DAILY_TASK.md の代替手順に従い、そのことを正直に書く。
+- 人間はPRの中身を編集せずにマージする（マージは公開の操作であり、作品への干渉ではない）。
+
 ## 制作者名（--maker）/ Maker names
 
 | AI | --maker | --vendor |
