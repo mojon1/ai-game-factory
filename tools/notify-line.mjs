@@ -31,26 +31,26 @@ function bubble(g, base, test) {
     body: {
       type: 'box', layout: 'vertical', spacing: 'sm',
       contents: [
-        { type: 'text', text: test ? 'テスト通知（表示の確認用）' : '新しいゲームが公開されました', size: 'xs', color: '#888888' },
+        { type: 'text', text: test ? 'テスト通知だよ（見え方の確認用）' : '新しいゲームが公開されたよ♪', size: 'xs', color: '#888888' },
         { type: 'text', text: `「${g.title}」`, weight: 'bold', size: 'lg', wrap: true },
-        { type: 'text', text: `制作: ${g.ai?.name || '不明'}`, size: 'xs', color: '#888888', wrap: true },
+        { type: 'text', text: `${g.ai?.name || 'AI'} が作ったよ`, size: 'xs', color: '#888888', wrap: true },
       ],
     },
     footer: {
       type: 'box', layout: 'vertical',
-      contents: [{ type: 'button', style: 'primary', color: '#222222', height: 'sm', action: { type: 'uri', label: 'あそぶ', uri: link } }],
+      contents: [{ type: 'button', style: 'primary', color: '#222222', height: 'sm', action: { type: 'uri', label: 'あそんでみる', uri: link } }],
     },
   };
   // 画像はデプロイ時に作った JPEG（tools/line-thumbs.mjs）。無ければ画像なしで送る
-  if (fs.existsSync(jpg)) b.hero = { type: 'image', url: `${base}games/${encodeURIComponent(g.id)}/line-thumb.jpg`, size: 'full', aspectRatio: '9:16', aspectMode: 'cover', action: { type: 'uri', label: 'あそぶ', uri: link } };
+  if (fs.existsSync(jpg)) b.hero = { type: 'image', url: `${base}games/${encodeURIComponent(g.id)}/line-thumb.jpg`, size: 'full', aspectRatio: '9:16', aspectMode: 'cover', action: { type: 'uri', label: 'あそんでみる', uri: link } };
   return b;
 }
 
 async function push(games, base, test = false) {
   const list = games.slice(0, 12);   // カルーセルは最大12枚
   const altText = (list.length === 1
-    ? `${test ? '【テスト】' : ''}新しいゲーム「${list[0].title}」が公開されました`
-    : `新しいゲームが ${list.length} 本公開されました：${list.map((g) => `「${g.title}」`).join('')}`).slice(0, 400);
+    ? `${test ? '【テスト】' : ''}新しいゲーム「${list[0].title}」が公開されたよ♪`
+    : `新しいゲームが ${list.length} 本公開されたよ♪ ${list.map((g) => `「${g.title}」`).join('')}`).slice(0, 400);
   const contents = list.length === 1 ? bubble(list[0], base, test) : { type: 'carousel', contents: list.map((g) => bubble(g, base, test)) };
   const message = { type: 'flex', altText, contents };
   if (dry) { console.log(JSON.stringify(message, null, 2)); return; }
