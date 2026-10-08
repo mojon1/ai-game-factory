@@ -1,0 +1,341 @@
+{
+  "id": "2026-10-08-gpt-1",
+  "status": "published",
+  "title": "ひと筆リバウンド",
+  "genre": "アクション",
+  "concept": "落ちる光の下に線を引き、反射角を変えて星へ導く。足場は常に一本だけで、描き直すと前の線が消える。次の着地点を読み、斜めの線で狙い通りに跳ねた瞬間と連続得点の気持ちよさを核にした60秒のゲーム。",
+  "howToPlay": "光の下をなぞって跳ねる線を引き、星を集めましょう。線は何度でも描き直せますが、前の線は消えます。",
+  "libraryDecision": "Matter.js 0.20.0を使う。選んだ企画の核である線の角度と跳ね返りを、球と足場の衝突で強めるため。再考では左右の壁でも反射する経路と、一本を描き直すたび古い足場が消える駆け引きを加えた。物体数は球1個と固定壁・足場だけに絞る。",
+  "i18n": {
+    "en": {
+      "title": "One-Stroke Rebound",
+      "concept": "Draw a line beneath a falling light and change its rebound angle to collect stars. Only one line exists: redrawing removes the old one. Reading the next landing and seeing a precisely aimed bounce build a streak are the core of this 60-second game.",
+      "howToPlay": "Draw below the light to create a springy line and collect stars. Redraw as often as you like; the previous line disappears.",
+      "libraryDecision": "Use Matter.js 0.20.0 to strengthen the core angle-and-rebound mechanic through ball-platform collisions. The rethink added side-wall rebounds and the risk of removing the old platform when redrawing. Only one ball and static walls/platform are simulated."
+    }
+  },
+  "createdAt": "2026-10-08T12:04:14+09:00",
+  "specVersion": 4,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-08T12:04:14+09:00",
+    "metricsFrom": "2026-10-08T03:03:42.422Z",
+    "transcript": null,
+    "validationRuns": 1,
+    "finishedAt": "2026-10-08T12:11:27+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-08T12:06:32+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "9.2KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=79",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=86",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=64",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=69",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 9437,
+    "lines": 31
+  },
+  "libraries": [
+    {
+      "name": "matter-js",
+      "version": "0.20.0",
+      "file": "matter-0.20.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "verdict": "meh",
+    "works": "ok",
+    "comment": "初期画面と毎手の画像を見ながら11手プレイ。斜めの線で狙った星へ跳ね、壁を使って連続2個を取れた手触りは心地よい。描き直しに失敗した落下と減点、復帰、285点での時間切れ、再開のstart通知まで確認した。ただ、線を放置しても偶然に星を拾えて得点が伸びるため、積極的な操作と上達の必要性は弱い。初見ではまあまあ。",
+    "similar": [
+      {
+        "title": "タッチ！カービィ / Kirby: Canvas Curse",
+        "url": "https://m1.nintendo.net/docvc/NTR/USA/ATKE/ATKE_E.pdf",
+        "similarity": "中",
+        "note": "描いた線で球状のキャラクターを間接操作する点が近い。本作は自由曲線の道を転がるのではなく、一本の直線の反射角で星を狙う60秒のスコアゲーム。",
+        "note_en": "Both indirectly guide a round character using drawn lines. Here a single straight line sets a rebound angle to aim for stars in a 60-second score game, rather than forming a freehand rolling path."
+      },
+      {
+        "title": "Line Rider: Plane and Simple",
+        "url": "https://vr.linerider.com/",
+        "similarity": "低",
+        "note": "線を描き、その上の運動を物理演算で観察する点が近い。公式サイトはVR続編で描線と物理エンジンを説明している。本作は走路の制作ではなく、進行中の光の下で一本の線を交換する。",
+        "note_en": "Both connect drawn lines to physics-based motion. The official VR sequel describes drawing and a physics engine. Here the player replaces a single line beneath a moving light, rather than constructing an entire riding track."
+      }
+    ],
+    "research": "ウェブ検索を4クエリ実施。Nitromeの描線作品、Nintendoの描線操作、Line Riderの公式情報を調べ、Nintendo公式のタッチ！カービィ説明書とLine Rider: Plane and Simple公式サイトを開いてルールを確認した。人間の実験評価データは見ていない。",
+    "i18n": {
+      "en": {
+        "comment": "I viewed the initial screen and every image across 11 moves. Aimed angled rebounds and collecting two stars via a wall felt pleasant. I checked a missed redraw, a drop penalty, respawn, the final 285-point result and restart start signal. However, leaving a line alone can collect stars by chance, weakening the need for active skill. My first-play verdict is so-so.",
+        "research": "Four web queries investigated drawn-line games at Nitrome, Nintendo touch controls and official Line Rider information. I opened Nintendo official Kirby: Canvas Curse instructions and the official Line Rider: Plane and Simple site to verify mechanics. No human experiment-rating data was consulted."
+      }
+    },
+    "method": "スマホ縦画面で 11 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 11 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.76) 120ms",
+        "note": "線を引いて跳ね返し、斜めの線で星を狙う説明を確認。開始して光の位置を見る。",
+        "noteEn": "The title explains drawing a line and tilting it to aim at stars. I start to inspect the light.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "swipe(0.21,0.80→0.79,0.73) 220ms → wait 1050ms",
+        "note": "光は中央の上、星は左上。右へ上がる斜めの線を光の下に描き、左向きに跳ねるか試す。",
+        "noteEn": "The light is high in the center and the star is upper left. I draw a line rising to the right below it to try a leftward bounce.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "swipe(0.08,0.64→0.67,0.75) 200ms → wait 700ms",
+        "note": "最初の星を取って25点。光は左上へ進み、次の星は右の中段。左側の下へ右下がりの線を描き、次は右へ飛ばしたい。",
+        "noteEn": "The first star gave 25 points. The light is upper left and the next star is middle right. I draw a line sloping down to the right under the left side to aim right next.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 700ms",
+        "note": "光は線から右上へ跳ねた。星はその先の右側なので線を変えず、壁で折り返したあとに取れるかを見る。",
+        "noteEn": "The light bounced up and right from the line. The star is farther right, so I leave the line and watch whether a wall rebound reaches it.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "swipe(0.36,0.87→0.95,0.68) 160ms → wait 750ms",
+        "note": "壁を回って2個目も獲得し55点。光は右側へ落ちているので、右下に線を移し、次の左上の星へ向けて強く傾ける。",
+        "noteEn": "A wall rebound collected the second star for 55 points. The light is falling on the right, so I move the line below it and tilt more strongly toward the upper-left star.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "swipe(0.21,0.80→0.79,0.73) 180ms → wait 1100ms",
+        "note": "描き直しが間に合わず落下し40点になったが、光は中央上へ戻った。先ほど成功した緩い左向きの線で左の星をもう一度狙う。",
+        "noteEn": "My redraw missed the falling light, dropping the score to 40, but it respawned above the center. I reuse the gentle leftward line that worked earlier.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "swipe(0.08,0.64→0.67,0.75) 180ms → wait 1000ms",
+        "note": "左の星を再び取り65点。光が左上にあるので、次の右側の星へ向けて線の向きを反転する。描き直しで古い線が消えるのははっきり見える。",
+        "noteEn": "The left star raised the score to 65. With the light upper left, I reverse the line for the next star on the right. The old line visibly disappears when I redraw.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 1000ms → swipe(0.43,0.82→0.95,0.72) 160ms → wait 8000ms",
+        "note": "光が右上へ進み、星は右の中段。少し待って右側の下に線を描き、長めに進めて反射の持続と落下の繰り返しを観察する。",
+        "noteEn": "The light is moving upper right and the star is middle right. I wait briefly, redraw below the right side, then observe sustained rebounds and repeated drops.",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 10000ms → wait 10000ms",
+        "note": "180点になり、右側の線で跳ね続けている。描き直さない状態でも何個か星を拾えるので、長く待って得点と落下の推移を確認する。",
+        "noteEn": "The score is 180 and the light keeps bouncing from the right-side line. Some stars can be collected without redrawing, so I wait longer to observe scoring and drops.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 10000ms → wait 10000ms → wait 7000ms",
+        "note": "255点、残り24秒。星を取る爽快感はあるが、線を放置しても得点できる場面がある。時間切れまで進め、結果と終了通知を確認する。",
+        "noteEn": "At 255 points with 24 seconds left, star catches feel good, but leaving a line alone can still score. I wait for the result and end signal.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 285
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.50,0.70) 120ms",
+        "note": "285点で時間切れとなり、ベスト更新の結果が出た。再びタップし、同じページで得点と時間がリセットされるか確かめる。",
+        "noteEn": "The round ended with 285 points and a new best. I tap again to check that score and time reset on the same page.",
+        "image": "ai-play/step-11.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 285
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-08T12:11:27+09:00"
+  },
+  "publishedAt": "2026-10-08T12:11:27+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 2438,
+    "outputTokens": 9947,
+    "contextTokens": 3437697,
+    "turns": 19,
+    "toolCalls": 19,
+    "webSearches": null,
+    "minutes": 8.2,
+    "from": "2026-10-08T03:03:42.422Z",
+    "to": "2026-10-08T03:11:56.381Z",
+    "method": "Codex実行ログのtoken_usage_recordを制作開始から集計終了までresponse_id別に集計。思考はreasoning_output_tokens、出力はoutput_tokensから思考を除いた値、入力はキャッシュを含むinput_tokens。応答数は使用量記録件数、ツール数はトップレベルのfunction_call/custom_tool_call件数（内包する呼び出しは別計上しない）。",
+    "methodEn": "Summed Codex token_usage_record entries from planning start through accounting cutoff, deduplicated by response_id. Thinking uses reasoning_output_tokens; output excludes reasoning; context includes cached input. Turns counts usage records; tools counts top-level function_call/custom_tool_call entries, not their nested calls.",
+    "recordedAt": "2026-10-08T12:11:56+09:00",
+    "validationRuns": 1,
+    "codeKB": 9.2,
+    "evidence": "metrics-evidence.json"
+  }
+}
