@@ -1,0 +1,568 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>かげあわせ / Shadow Fit</title>
+<style>
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#1b1a2a;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+canvas{position:absolute;left:0;display:block;touch-action:none}
+#bg{top:0;width:100vw;height:100dvh}
+#ui{top:0;width:100vw;height:100dvh}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+<canvas id="gl"></canvas>
+<canvas id="ui"></canvas>
+<script src="../../lib/three-0.186.1.min.js"></script>
+<script src="../../lib/three-addons-0.186.1.min.js"></script>
+<script src="../../lib/zzfx-1.4.0.min.js"></script>
+<script>
+'use strict';
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const DICT = {
+  ja: {
+    title: 'かげあわせ',
+    how1: '積み木をドラッグで回して',
+    how2: '壁の影を、光る枠の形にぴったり重ねよう',
+    how3: '外側の輪をなぞると、影がくるりと回る',
+    start: 'タップでスタート',
+    hint: 'ドラッグで回転 ・ 輪をなぞってひねる',
+    match: '一致', fit: 'ぴったり！', skip: 'パス', skipCost: '-5秒', plus: (s) => `+${s}秒`,
+    timeup: '時間切れ！', best: 'ベスト', newBest: 'ベスト更新！', again: 'タップでもう一度',
+    solved: (n) => `${n}個の影を合わせた`, no: (n) => `No.${n}`, sec: (s) => `${s}秒`
+  },
+  en: {
+    title: 'Shadow Fit',
+    how1: 'Drag to turn the blocks',
+    how2: 'Make the shadow fill the glowing outline',
+    how3: 'Trace the outer ring to spin the shadow',
+    start: 'Tap to start',
+    hint: 'Drag to turn · trace the ring to twist',
+    match: 'MATCH', fit: 'Perfect fit!', skip: 'SKIP', skipCost: '-5s', plus: (s) => `+${s}s`,
+    timeup: "Time's up!", best: 'BEST', newBest: 'New best!', again: 'Tap to play again',
+    solved: (n) => `${n} shadow${n === 1 ? '' : 's'} matched`, no: (n) => `No.${n}`, sec: (s) => `${s}s`
+  }
+};
+const TX = DICT[LANG === 'ja' ? 'ja' : 'en'];
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+
+// ---------- sound ----------
+let audioOn = false;
+const SND = {};
+function initAudio() {
+  if (audioOn) return; audioOn = true;
+  try { ZZFX.audioContext?.resume(); ZZFX.volume = 0.25; } catch (e) {}
+  try {
+    SND.tick = new ZZFXSound([.12, 0, 1700, 0, .004, .025, 1, 1]);
+    SND.solve = new ZZFXSound([.5, 0, 523, .01, .16, .45, 0, 1.4, 0, 0, 262, .07, 0, 0, 0, 0, .06]);
+    SND.skip = new ZZFXSound([.3, 0, 260, .01, .05, .18, 2, 1, -6]);
+    SND.over = new ZZFXSound([.45, 0, 330, .02, .25, .6, 0, 1, -1.5, 0, -60, .15]);
+    SND.go = new ZZFXSound([.3, 0, 660, .01, .05, .2, 0, 1, 0, 0, 220, .05]);
+    SND.near = new ZZFXSound([.08, 0, 880, .01, .02, .08, 0, 1]);
+  } catch (e) {}
+}
+const play = (k) => { try { SND[k] && SND[k].play(); } catch (e) {} };
+
+// ---------- canvases ----------
+const bg = document.getElementById('bg'), bctx = bg.getContext('2d');
+const ui = document.getElementById('ui'), uctx = ui.getContext('2d');
+const glc = document.getElementById('gl');
+let W = 360, H = 640, DPR = 1, U = 50, SHX = 180, SHY = 200, OBX = 180, OBY = 470, RING = 120, GLTOP = 0, GLH = 1;
+
+const renderer = new THREE.WebGLRenderer({ canvas: glc, antialias: true, alpha: true });
+renderer.setClearColor(0x000000, 0);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
+scene.add(new THREE.HemisphereLight(0xfff4e0, 0x2a2840, 1.4));
+const dir = new THREE.DirectionalLight(0xffffff, 2.2); dir.position.set(3, 6, 8); scene.add(dir);
+const dir2 = new THREE.DirectionalLight(0x8fa8ff, 0.6); dir2.position.set(-5, -2, 3); scene.add(dir2);
+const pivot = new THREE.Group(); scene.add(pivot);
+const CAM_DIST = 13, CAM_ELEV = 0.42, CAM_YAW = -0.22;
+
+function resize() {
+  W = window.innerWidth || 0; H = window.innerHeight || 0;
+  if (W < 10) W = 360; if (H < 10) H = 640;
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  for (const c of [bg, ui]) { c.width = Math.round(W * DPR); c.height = Math.round(H * DPR); }
+  U = Math.max(14, Math.min(W * 0.17, H * 0.075));
+  SHX = W / 2; SHY = Math.max(64 + 2.3 * U, H * 0.30);
+  GLTOP = Math.round(SHY + 2.3 * U); GLH = Math.max(1, H - GLTOP);
+  OBX = W / 2; OBY = GLTOP + GLH * 0.47;
+  RING = Math.max(60, Math.min(W * 0.43, GLH * 0.44));
+  glc.style.top = GLTOP + 'px'; glc.style.width = W + 'px'; glc.style.height = GLH + 'px';
+  renderer.setPixelRatio(DPR); renderer.setSize(W, GLH, false);
+  camera.aspect = W / GLH;
+  // fit ~5.2 units across the ring diameter
+  const want = 5.4 * (GLH / (RING * 2));
+  camera.fov = 2 * Math.atan((want / 2) / CAM_DIST) * 180 / Math.PI;
+  const yOff = (OBY - GLTOP - GLH / 2) / GLH; // shift object center in view
+  camera.position.set(Math.sin(CAM_YAW) * Math.cos(CAM_ELEV) * CAM_DIST, Math.sin(CAM_ELEV) * CAM_DIST, Math.cos(CAM_YAW) * Math.cos(CAM_ELEV) * CAM_DIST);
+  camera.lookAt(0, 0, 0);
+  camera.setViewOffset(W, GLH, 0, -yOff * GLH, W, GLH);
+  camera.updateProjectionMatrix();
+  buildTargetImage();
+}
+
+// ---------- geometry helpers ----------
+const CORNERS = [];
+for (let i = 0; i < 8; i++) CORNERS.push(new THREE.Vector3(i & 1 ? .5 : -.5, i & 2 ? .5 : -.5, i & 4 ? .5 : -.5));
+const tmpV = new THREE.Vector3();
+function hull(pts) {
+  pts.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const cr = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const lo = [], up = [];
+  for (const p of pts) { while (lo.length >= 2 && cr(lo[lo.length - 2], lo[lo.length - 1], p) <= 1e-9) lo.pop(); lo.push(p); }
+  for (let i = pts.length - 1; i >= 0; i--) { const p = pts[i]; while (up.length >= 2 && cr(up[up.length - 2], up[up.length - 1], p) <= 1e-9) up.pop(); up.push(p); }
+  up.pop(); lo.pop(); return lo.concat(up);
+}
+function silhouette(q, cubes) {
+  const polys = []; let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+  for (const c of cubes) {
+    const pts = [];
+    for (const k of CORNERS) {
+      tmpV.copy(k).add(c).applyQuaternion(q);
+      pts.push([tmpV.x, tmpV.y]);
+      if (tmpV.x < x0) x0 = tmpV.x; if (tmpV.x > x1) x1 = tmpV.x;
+      if (tmpV.y < y0) y0 = tmpV.y; if (tmpV.y > y1) y1 = tmpV.y;
+    }
+    polys.push(hull(pts));
+  }
+  return { polys, cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, w: x1 - x0, h: y1 - y0 };
+}
+function pathSil(ctx, sil, ox, oy, s) {
+  ctx.beginPath();
+  for (const p of sil.polys) {
+    for (let i = 0; i < p.length; i++) {
+      const x = ox + (p[i][0] - sil.cx) * s, y = oy - (p[i][1] - sil.cy) * s;
+      if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y);
+    }
+    ctx.closePath();
+  }
+}
+// low-res mask for matching
+const MS = 96, MU = 13;
+const mcv = document.createElement('canvas'); mcv.width = mcv.height = MS;
+const mctx = mcv.getContext('2d', { willReadFrequently: true });
+function mask(sil) {
+  mctx.clearRect(0, 0, MS, MS); mctx.fillStyle = '#fff';
+  pathSil(mctx, sil, MS / 2, MS / 2, MU); mctx.fill('nonzero');
+  const d = mctx.getImageData(0, 0, MS, MS).data, m = new Uint8Array(MS * MS);
+  for (let i = 0; i < m.length; i++) m[i] = d[i * 4 + 3] > 127 ? 1 : 0;
+  return m;
+}
+function iou(a, b) { let i = 0, u = 0; for (let k = 0; k < a.length; k++) { const x = a[k], y = b[k]; i += x & y; u += x | y; } return u ? i / u : 0; }
+
+// 24 axis-aligned rotations
+const ROTS = [];
+(() => {
+  const base = [new THREE.Quaternion()];
+  const gens = [new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 2)];
+  const key = (q) => { const m = new THREE.Matrix4().makeRotationFromQuaternion(q).elements; return [0, 1, 2, 4, 5, 6, 8, 9, 10].map(i => Math.round(m[i])).join(','); };
+  const seen = new Set([key(base[0])]); const out = [base[0]]; let frontier = [base[0]];
+  while (frontier.length) {
+    const nf = [];
+    for (const q of frontier) for (const g of gens) { const r = g.clone().multiply(q).normalize(); const k = key(r); if (!seen.has(k)) { seen.add(k); out.push(r); nf.push(r); } }
+    frontier = nf;
+  }
+  ROTS.push(...out);
+})();
+const AX = [new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1)];
+
+function rnd(n) { return Math.floor(Math.random() * n); }
+function makeCubes(n, needSolid) {
+  for (let tries = 0; tries < 200; tries++) {
+    const set = [[0, 0, 0]]; const has = (p) => set.some(s => s[0] === p[0] && s[1] === p[1] && s[2] === p[2]);
+    let guard = 0;
+    while (set.length < n && guard++ < 400) {
+      const b = set[rnd(set.length)], a = rnd(3), s = Math.random() < .5 ? -1 : 1;
+      const p = b.slice(); p[a] += s;
+      if (has(p)) continue;
+      const t = set.concat([p]); let ok = true;
+      for (let k = 0; k < 3; k++) { const v = t.map(q => q[k]); if (Math.max(...v) - Math.min(...v) > 2) ok = false; }
+      if (ok) set.push(p);
+    }
+    if (set.length < n) continue;
+    const spans = [0, 1, 2].map(k => { const v = set.map(q => q[k]); return Math.max(...v) - Math.min(...v); });
+    if (n >= 3 && spans.filter(s => s > 0).length < 2) continue; // no straight lines
+    if (needSolid && spans.some(s => s === 0)) continue; // not flat
+    const c = [0, 1, 2].map(k => set.reduce((a, q) => a + q[k], 0) / n);
+    return set.map(q => new THREE.Vector3(q[0] - c[0], q[1] - c[1], q[2] - c[2]));
+  }
+  return [new THREE.Vector3(-.5, 0, 0), new THREE.Vector3(.5, 0, 0), new THREE.Vector3(.5, 1, 0)];
+}
+
+// ---------- puzzle state ----------
+const PALETTE = [0xe8a25c, 0x6cc3a8, 0xe97a7a, 0x8fa4ec, 0xe6c75a, 0xc18be0, 0x6fb7e3, 0xef9a6a];
+const roundGeo = new THREE_ADDONS.RoundedBoxGeometry(0.94, 0.94, 0.94, 3, 0.11);
+let cubes = [], meshes = [], tgtQ = new THREE.Quaternion(), tgtSil = null, tgtMask = null;
+const curQ = new THREE.Quaternion();
+let curSil = null, match = 0, matchShown = 0, dirty = true;
+const tgtCv = document.createElement('canvas'), tgtCtx = tgtCv.getContext('2d');
+const shCv = document.createElement('canvas'), shCtx = shCv.getContext('2d');
+
+function buildTargetImage() {
+  if (!tgtSil) return;
+  const size = Math.ceil(7 * U * DPR); tgtCv.width = tgtCv.height = size; shCv.width = shCv.height = size;
+  const c = tgtCtx, s = U * DPR, o = size / 2;
+  c.clearRect(0, 0, size, size);
+  c.lineJoin = 'round';
+  c.strokeStyle = '#fff'; c.lineWidth = 0.14 * s * 2;
+  pathSil(c, tgtSil, o, o, s); c.stroke(); c.fillStyle = '#fff'; c.fill();
+  c.globalCompositeOperation = 'destination-out';
+  pathSil(c, tgtSil, o, o, s); c.fill();
+  c.globalCompositeOperation = 'source-over';
+}
+
+function clearMeshes() { for (const m of meshes) { pivot.remove(m); m.material.dispose(); } meshes = []; }
+function setupObject(color) {
+  clearMeshes();
+  const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.55, metalness: 0.05 });
+  for (const c of cubes) {
+    const m = new THREE.Mesh(roundGeo, mat.clone()); m.position.copy(c); pivot.add(m); meshes.push(m);
+  }
+  mat.dispose();
+}
+
+let level = 0;
+function newPuzzle() {
+  level++;
+  const n = level <= 1 ? 3 : level <= 4 ? 4 : level <= 7 ? 5 : 6;
+  cubes = makeCubes(n, level >= 5);
+  // pick a target with a reasonably large silhouette
+  let best = null;
+  for (let t = 0; t < 30; t++) {
+    const q = ROTS[rnd(ROTS.length)];
+    const sil = silhouette(q, cubes), m = mask(sil);
+    let area = 0; for (const v of m) area += v;
+    if (!best || area > best.area * (0.9 + Math.random() * .3)) best = { q, sil, m, area };
+  }
+  tgtQ.copy(best.q); tgtSil = best.sil; tgtMask = best.m;
+  // starting orientation: some turns away, then a 3D tilt
+  const moves = level <= 2 ? 1 : level <= 4 ? 2 : 3;
+  let start = null;
+  for (let t = 0; t < 60 && !start; t++) {
+    const q = tgtQ.clone();
+    for (let k = 0; k < moves; k++) {
+      const ax = level <= 2 ? AX[rnd(2)] : AX[rnd(3)];
+      q.premultiply(new THREE.Quaternion().setFromAxisAngle(ax, (Math.random() < .5 ? 1 : -1) * Math.PI / 2));
+    }
+    const tilt = new THREE.Quaternion().setFromEuler(new THREE.Euler((Math.random() - .5) * .5, (Math.random() < .5 ? -1 : 1) * (.22 + Math.random() * .2), 0));
+    q.premultiply(tilt).normalize();
+    // the axis-aligned base must not already match, nor the tilted one
+    let baseOk = true;
+    for (const r of ROTS) if (Math.abs(r.dot(q)) > 0.9 && iou(mask(silhouette(r, cubes)), tgtMask) > 0.9) baseOk = false;
+    if (baseOk && iou(mask(silhouette(q, cubes)), tgtMask) < 0.72) start = q;
+  }
+  if (!start) { const q = tgtQ.clone().premultiply(new THREE.Quaternion().setFromAxisAngle(AX[0], Math.PI / 2)); start = q; }
+  curQ.copy(start);
+  setupObject(PALETTE[(level - 1) % PALETTE.length]);
+  pivot.quaternion.copy(curQ);
+  buildTargetImage();
+  dirty = true; match = 0; matchShown = 0;
+  puzzleT = 0; popT = 0; snap = null;
+}
+
+// ---------- game state ----------
+let state = 'title', stateT = 0, score = 0, best = 0, timeLeft = 60, solvedN = 0, puzzleT = 0, popT = 0, isNewBest = false;
+let snap = null, solvedT = 0, hintT = 0, floaters = [], sparks = [], lastNearSound = 0;
+const START_TIME = 60;
+
+function startGame() {
+  initAudio();
+  state = 'play'; stateT = 0; score = 0; timeLeft = START_TIME; solvedN = 0; level = 0; hintT = 0; floaters = []; sparks = [];
+  newPuzzle(); play('go'); signal('start');
+}
+function endGame() {
+  state = 'over'; stateT = 0; drag = null;
+  isNewBest = score > best; if (isNewBest) best = score;
+  play('over'); signal('end', { score });
+}
+function solve() {
+  // find nearest axis-aligned orientation with a matching shadow
+  let bq = null, bd = -1;
+  for (const r of ROTS) {
+    const d = Math.abs(r.dot(curQ));
+    if (d > bd && iou(mask(silhouette(r, cubes)), tgtMask) > 0.97) { bd = d; bq = r; }
+  }
+  if (!bq) bq = tgtQ;
+  const to = bq.clone(); if (to.dot(curQ) < 0) to.set(-to.x, -to.y, -to.z, -to.w);
+  snap = { from: curQ.clone(), to, t: 0 };
+  state = 'solved'; solvedT = 0; drag = null;
+  solvedN++;
+  const quick = Math.max(0, Math.round(15 - puzzleT));
+  const gain = 100 + level * 20 + quick * 10;
+  score += gain;
+  const bonus = 6; timeLeft += bonus;
+  floaters.push({ text: '+' + gain, x: SHX, y: SHY - 2.2 * U, t: 0, col: '#ffe08a' });
+  floaters.push({ text: TX.plus(bonus), x: W - 60, y: 66, t: 0, col: '#9be8c4' });
+  for (let i = 0; i < 26; i++) { const a = Math.random() * Math.PI * 2, v = (1 + Math.random() * 2.5) * U; sparks.push({ x: SHX, y: SHY, vx: Math.cos(a) * v, vy: Math.sin(a) * v, t: 0, life: .6 + Math.random() * .5 }); }
+  play('solve'); try { navigator.vibrate && navigator.vibrate(30); } catch (e) {}
+}
+function doSkip() {
+  if (state !== 'play') return;
+  timeLeft -= 5; play('skip');
+  floaters.push({ text: TX.skipCost, x: W - 60, y: 66, t: 0, col: '#ff9a9a' });
+  if (timeLeft <= 0) { timeLeft = 0; endGame(); return; }
+  level = Math.max(0, level - 1); newPuzzle();
+}
+
+// ---------- input ----------
+let drag = null; const pts = new Map(); let lastTick = 0, accRot = 0;
+const SKIP = { x: 0, y: 0, r: 30 };
+function skipPos() { SKIP.r = 30; SKIP.x = W - 16 - SKIP.r; SKIP.y = H - 16 - SKIP.r - 14; }
+function rotWorld(axis, ang) {
+  curQ.premultiply(new THREE.Quaternion().setFromAxisAngle(axis, ang)).normalize();
+  dirty = true; accRot += Math.abs(ang);
+  if (accRot > 0.26) { accRot = 0; const now = performance.now(); if (now - lastTick > 45) { lastTick = now; play('tick'); } }
+}
+ui.addEventListener('pointerdown', (e) => {
+  e.preventDefault(); initAudio();
+  try { ui.setPointerCapture(e.pointerId); } catch (er) {}
+  const x = e.clientX, y = e.clientY;
+  if (state === 'title') { startGame(); return; }
+  if (state === 'over') { if (stateT > 0.7) startGame(); return; }
+  if (state !== 'play') return;
+  if (Math.hypot(x - SKIP.x, y - SKIP.y) < SKIP.r + 8) { doSkip(); return; }
+  pts.set(e.pointerId, { x, y });
+  if (pts.size === 2) {
+    const [a, b] = [...pts.values()];
+    drag = { mode: 'two', ang: Math.atan2(b.y - a.y, b.x - a.x) };
+  } else if (pts.size === 1) {
+    const d = Math.hypot(x - OBX, y - OBY);
+    const twist = d > RING - 26 && d < RING + 34 && y > GLTOP - 10;
+    drag = { mode: twist ? 'twist' : 'turn', id: e.pointerId, x, y, ang: Math.atan2(y - OBY, x - OBX) };
+  }
+});
+ui.addEventListener('pointermove', (e) => {
+  if (!pts.has(e.pointerId)) return;
+  const x = e.clientX, y = e.clientY; pts.set(e.pointerId, { x, y });
+  if (!drag || state !== 'play') return;
+  if (drag.mode === 'two' && pts.size >= 2) {
+    const [a, b] = [...pts.values()]; const ang = Math.atan2(b.y - a.y, b.x - a.x);
+    let d = ang - drag.ang; d = Math.atan2(Math.sin(d), Math.cos(d)); drag.ang = ang;
+    rotWorld(AX[2], -d);
+  } else if (drag.mode === 'twist' && e.pointerId === drag.id) {
+    const ang = Math.atan2(y - OBY, x - OBX);
+    let d = ang - drag.ang; d = Math.atan2(Math.sin(d), Math.cos(d)); drag.ang = ang;
+    rotWorld(AX[2], -d);
+  } else if (drag.mode === 'turn' && e.pointerId === drag.id) {
+    const k = 3.2 / Math.max(260, Math.min(W, H));
+    const dx = x - drag.x, dy = y - drag.y; drag.x = x; drag.y = y;
+    if (dx) rotWorld(AX[1], dx * k);
+    if (dy) rotWorld(AX[0], dy * k);
+  }
+});
+function up(e) {
+  pts.delete(e.pointerId);
+  if (drag && (drag.id === e.pointerId || drag.mode === 'two')) drag = null;
+  if (pts.size === 1 && state === 'play') { const [id, p] = [...pts.entries()][0]; drag = { mode: 'turn', id, x: p.x, y: p.y }; }
+}
+ui.addEventListener('pointerup', up); ui.addEventListener('pointercancel', up);
+
+// ---------- drawing ----------
+function fitText(ctx, txt, size, maxW, weight = 700) {
+  let s = size; ctx.font = `${weight} ${s}px ${FONT}`;
+  while (s > 12 && ctx.measureText(txt).width > maxW) { s -= 1; ctx.font = `${weight} ${s}px ${FONT}`; }
+  return s;
+}
+function drawWall(t) {
+  const c = bctx; c.setTransform(DPR, 0, 0, DPR, 0, 0);
+  const g = c.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#2a2740'); g.addColorStop(1, '#141322'); c.fillStyle = g; c.fillRect(0, 0, W, H);
+  // the wall (lit screen)
+  const wy1 = GLTOP + 6;
+  const wg = c.createRadialGradient(SHX, SHY, U * .5, SHX, SHY, Math.max(W, wy1) * .75);
+  wg.addColorStop(0, '#fff3dc'); wg.addColorStop(.55, '#e9d3b2'); wg.addColorStop(1, '#8a7a6e');
+  c.fillStyle = wg; c.fillRect(0, 0, W, wy1);
+  // floor edge
+  const fg = c.createLinearGradient(0, wy1, 0, wy1 + 40); fg.addColorStop(0, 'rgba(0,0,0,.45)'); fg.addColorStop(1, 'rgba(0,0,0,0)');
+  c.fillStyle = fg; c.fillRect(0, wy1, W, 40);
+  if (!tgtSil || state === 'title') return;
+  const size = tgtCv.width / DPR;
+  // target fill hint
+  const near = Math.max(0, Math.min(1, (matchShown - .45) / .4));
+  const solvedGlow = state === 'solved' ? 1 : 0;
+  c.save();
+  c.globalAlpha = .16 + .12 * near;
+  c.fillStyle = '#ffb347'; pathSil(c, tgtSil, SHX, SHY, U); c.fill();
+  c.restore();
+  // player shadow (union, flat alpha)
+  if (curSil) {
+    const s = shCtx, sz = shCv.width;
+    s.clearRect(0, 0, sz, sz); s.fillStyle = '#000'; s.strokeStyle = '#000'; s.lineWidth = 1.2; s.lineJoin = 'round';
+    pathSil(s, curSil, sz / 2, sz / 2, U * DPR); s.fill(); s.stroke();
+    c.save(); c.globalAlpha = state === 'solved' ? .55 * (1 - Math.min(1, solvedT * 1.5)) + .3 : .62;
+    c.drawImage(shCv, SHX - size / 2, SHY - size / 2, size, size); c.restore();
+  }
+  // outline (glows brighter as you get close)
+  c.save();
+  const pulse = .5 + .5 * Math.sin(t * 5);
+  c.shadowColor = solvedGlow ? '#fff3a0' : '#ffb347'; c.shadowBlur = 6 + 14 * near + 18 * solvedGlow;
+  c.globalAlpha = .7 + .3 * Math.max(near, solvedGlow) * (solvedGlow ? 1 : pulse);
+  c.filter = 'none';
+  c.drawImage(tgtCv, SHX - size / 2, SHY - size / 2, size, size);
+  c.restore();
+  if (state === 'solved') {
+    c.save(); c.globalAlpha = Math.max(0, 1 - solvedT * 1.2) * .8; c.fillStyle = '#fff7c4';
+    pathSil(c, tgtSil, SHX, SHY, U * (1 + solvedT * .25)); c.fill(); c.restore();
+  }
+  for (const p of sparks) {
+    const k = p.t / p.life; if (k >= 1) continue;
+    c.globalAlpha = 1 - k; c.fillStyle = '#fff1a8';
+    c.beginPath(); c.arc(p.x + p.vx * p.t, p.y + p.vy * p.t + 40 * p.t * p.t, 3 * (1 - k) + 1, 0, Math.PI * 2); c.fill();
+  }
+  c.globalAlpha = 1;
+}
+function drawUI(t) {
+  const c = uctx; c.setTransform(DPR, 0, 0, DPR, 0, 0); c.clearRect(0, 0, W, H);
+  c.textBaseline = 'middle';
+  if (state === 'title') {
+    c.fillStyle = 'rgba(20,18,34,.55)'; c.fillRect(0, 0, W, H);
+    c.fillStyle = '#fff3dc'; c.textAlign = 'center';
+    const ts = fitText(c, TX.title, Math.min(56, W * .15), W - 40, 800);
+    c.shadowColor = 'rgba(255,180,80,.7)'; c.shadowBlur = 18;
+    c.fillText(TX.title, W / 2, H * .17); c.shadowBlur = 0;
+    c.fillStyle = '#f2e6d2';
+    const ls = Math.min(17, W * .045);
+    [TX.how1, TX.how2, TX.how3].forEach((s, i) => { fitText(c, s, ls, W - 36, 500); c.fillText(s, W / 2, H * .17 + ts * .9 + 8 + i * (ls + 10)); });
+    c.globalAlpha = .6 + .4 * Math.sin(t * 4);
+    fitText(c, TX.start, 22, W - 40, 700); c.fillStyle = '#ffd27a'; c.fillText(TX.start, W / 2, H - 70);
+    c.globalAlpha = 1;
+    return;
+  }
+  // ring (twist zone)
+  if (state === 'play' || state === 'solved') {
+    const act = drag && (drag.mode === 'twist' || drag.mode === 'two');
+    c.strokeStyle = act ? 'rgba(255,210,122,.55)' : 'rgba(255,255,255,.13)'; c.lineWidth = act ? 5 : 3;
+    c.setLineDash([6, 10]); c.beginPath(); c.arc(OBX, OBY, RING, 0, Math.PI * 2); c.stroke(); c.setLineDash([]);
+    // little arrows on ring
+    c.fillStyle = act ? 'rgba(255,210,122,.8)' : 'rgba(255,255,255,.3)';
+    for (const a0 of [Math.PI * .2, Math.PI * 1.2]) {
+      const x = OBX + Math.cos(a0) * RING, y = OBY + Math.sin(a0) * RING;
+      c.save(); c.translate(x, y); c.rotate(a0 + Math.PI / 2);
+      c.beginPath(); c.moveTo(7, 0); c.lineTo(-5, -6); c.lineTo(-5, 6); c.closePath(); c.fill(); c.restore();
+    }
+  }
+  // HUD
+  c.fillStyle = 'rgba(20,18,34,.72)'; c.fillRect(0, 0, W, 48);
+  c.font = `800 22px ${FONT}`; c.textAlign = 'left'; c.fillStyle = '#fff';
+  c.fillText(String(score), 14, 25);
+  c.textAlign = 'right';
+  const tl = Math.max(0, Math.ceil(timeLeft));
+  c.fillStyle = timeLeft < 10 && state === 'play' && (t * 2 % 1 < .5) ? '#ff8a8a' : '#fff';
+  c.fillText(TX.sec(tl), W - 14, 25);
+  c.textAlign = 'center'; c.font = `600 15px ${FONT}`; c.fillStyle = '#cbbfe8';
+  c.fillText(TX.no(Math.max(1, level)), W / 2, 25);
+  // match meter under the wall
+  if (state === 'play' || state === 'solved') {
+    const mw = Math.min(200, W * .5), mx = W / 2 - mw / 2, my = GLTOP - 16;
+    c.fillStyle = 'rgba(0,0,0,.25)'; c.fillRect(mx, my - 4, mw, 8);
+    const v = state === 'solved' ? 1 : matchShown;
+    c.fillStyle = v > .8 ? '#ffd27a' : '#c08a52'; c.fillRect(mx, my - 4, mw * Math.min(1, v / .86), 8);
+    c.font = `700 13px ${FONT}`; c.fillStyle = '#5b4632'; c.textAlign = 'right';
+    c.fillText(TX.match, mx - 8, my); c.textAlign = 'left';
+    c.fillText(Math.round(Math.min(1, v / .86) * 100) + '%', mx + mw + 8, my);
+  }
+  // skip
+  if (state === 'play') {
+    c.fillStyle = 'rgba(255,255,255,.12)'; c.beginPath(); c.arc(SKIP.x, SKIP.y, SKIP.r, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = 'rgba(255,255,255,.35)'; c.lineWidth = 2; c.stroke();
+    c.fillStyle = '#fff'; c.textAlign = 'center'; c.font = `700 14px ${FONT}`;
+    c.fillText(TX.skip, SKIP.x, SKIP.y - 6); c.font = `600 12px ${FONT}`; c.fillStyle = '#ffb0b0';
+    c.fillText(TX.skipCost, SKIP.x, SKIP.y + 10);
+  }
+  // hint
+  if (state === 'play' && hintT < 5 && solvedN === 0) {
+    c.globalAlpha = Math.min(1, (5 - hintT) / 1); c.textAlign = 'center';
+    fitText(c, TX.hint, 15, W - SKIP.r * 2 - 50, 600);
+    c.fillStyle = '#f5ead6'; c.fillText(TX.hint, (W - SKIP.r * 2 - 20) / 2 + 4, H - 30); c.globalAlpha = 1;
+  }
+  if (state === 'solved') {
+    c.textAlign = 'center'; c.fillStyle = '#ffe9a8';
+    const k = Math.min(1, solvedT * 4);
+    fitText(c, TX.fit, 30 * (0.6 + .4 * k), W - 40, 800);
+    c.shadowColor = 'rgba(0,0,0,.4)'; c.shadowBlur = 8;
+    c.fillText(TX.fit, W / 2, GLTOP + 26); c.shadowBlur = 0;
+  }
+  for (const f of floaters) {
+    c.globalAlpha = Math.max(0, 1 - f.t / 1.1); c.fillStyle = f.col; c.textAlign = 'center';
+    c.font = `800 20px ${FONT}`; c.fillText(f.text, f.x, f.y - f.t * 30);
+  }
+  c.globalAlpha = 1;
+  if (state === 'over') {
+    c.fillStyle = 'rgba(20,18,34,.78)'; c.fillRect(0, 0, W, H);
+    c.textAlign = 'center'; c.fillStyle = '#ffd27a';
+    fitText(c, TX.timeup, 30, W - 40, 800); c.fillText(TX.timeup, W / 2, H * .24);
+    c.fillStyle = '#fff'; c.font = `900 ${Math.min(72, W * .2)}px ${FONT}`; c.fillText(String(score), W / 2, H * .38);
+    c.fillStyle = '#e8dcc8'; fitText(c, TX.solved(solvedN), 17, W - 40, 600); c.fillText(TX.solved(solvedN), W / 2, H * .38 + 52);
+    c.font = `700 18px ${FONT}`; c.fillStyle = isNewBest ? '#9be8c4' : '#cbbfe8';
+    c.fillText(isNewBest ? TX.newBest : `${TX.best} ${best}`, W / 2, H * .38 + 86);
+    if (stateT > 0.7) {
+      c.globalAlpha = .6 + .4 * Math.sin(t * 4); c.fillStyle = '#ffd27a';
+      fitText(c, TX.again, 21, W - 40, 700); c.fillText(TX.again, W / 2, H * .72); c.globalAlpha = 1;
+    }
+  }
+}
+
+// ---------- loop ----------
+let last = performance.now(), T = 0;
+// title demo object
+cubes = makeCubes(5, true); setupObject(PALETTE[0]);
+tgtQ.copy(ROTS[3]); tgtSil = silhouette(tgtQ, cubes); tgtMask = mask(tgtSil);
+resize(); skipPos();
+window.addEventListener('resize', () => { resize(); skipPos(); });
+
+function frame(now) {
+  let dt = Math.min(0.05, Math.max(0, (now - last) / 1000)); last = now; T += dt; stateT += dt;
+  if (state === 'title') {
+    curQ.setFromEuler(new THREE.Euler(T * .4, T * .55, T * .2)); dirty = true;
+  }
+  if (state === 'play') {
+    timeLeft -= dt; puzzleT += dt; hintT += dt;
+    if (timeLeft <= 0) { timeLeft = 0; endGame(); }
+  }
+  if (state === 'solved') {
+    solvedT += dt;
+    if (snap) {
+      snap.t = Math.min(1, snap.t + dt / .22);
+      const e = 1 - Math.pow(1 - snap.t, 3);
+      curQ.slerpQuaternions(snap.from, snap.to, e); dirty = true;
+      if (snap.t >= 1) snap = null;
+    }
+    if (solvedT > 1.0) { state = 'play'; newPuzzle(); popT = 0; }
+  }
+  if (dirty) {
+    curSil = silhouette(curQ, cubes);
+    if (state === 'play' && tgtMask) {
+      match = iou(mask(curSil), tgtMask);
+      if (match >= 0.86) solve();
+      else if (match > 0.72 && T - lastNearSound > .5 && matchShown < .72) { lastNearSound = T; play('near'); }
+    }
+    dirty = false;
+  }
+  matchShown += (match - matchShown) * Math.min(1, dt * 12);
+  popT += dt;
+  // pop-in animation for the object
+  const ps = state === 'solved' ? Math.max(0.001, 1 - Math.max(0, solvedT - .55) * 2.4) : Math.min(1, 1 - Math.pow(1 - Math.min(1, popT / .35), 3) * 1) * (1 + .12 * Math.sin(Math.min(1, popT / .35) * Math.PI));
+  pivot.scale.setScalar(state === 'title' ? 1 : Math.max(0.001, ps));
+  pivot.quaternion.copy(curQ);
+  pivot.position.y = state === 'solved' ? Math.max(0, solvedT - .4) * 1.5 : 0;
+  for (const f of floaters) f.t += dt; floaters = floaters.filter(f => f.t < 1.1);
+  for (const p of sparks) p.t += dt; sparks = sparks.filter(p => p.t < p.life);
+  if (state === 'title' && curSil) { tgtSil = curSil; }
+  drawWall(T);
+  if (state === 'title') drawTitleShadow();
+  renderer.render(scene, camera);
+  drawUI(T);
+  requestAnimationFrame(frame);
+}
+function drawTitleShadow() {
+  const c = bctx; c.save(); c.globalAlpha = .6; c.fillStyle = '#000';
+  pathSil(c, curSil, SHX, SHY, U); c.fill(); c.restore();
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

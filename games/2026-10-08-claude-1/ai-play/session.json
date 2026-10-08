@@ -1,0 +1,326 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-08T01:58:53.624Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "wait": 500
+        }
+      ],
+      "desc": "tap(0.50,0.50) 120ms → wait 500ms",
+      "note": "タイトル。壁に影、手前に積み木。説明3行で分かりやすい。タップして開始。",
+      "noteEn": "Title: shadow on the wall, blocks in front. Three-line instructions are clear. Tapping to start.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": {
+        "swipe": [
+          0.3,
+          0.72,
+          0.75,
+          0.72
+        ],
+        "hold": 400
+      },
+      "desc": "swipe(0.30,0.72→0.75,0.72) 400ms",
+      "note": "目標はL字の枠。影はまだ斜めにずれている。横にドラッグして積み木を回してみる。",
+      "noteEn": "Target is an L-shaped outline; my shadow is skewed. Dragging sideways to turn the blocks.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "swipe": [
+            0.15,
+            0.62,
+            0.64,
+            0.62
+          ],
+          "hold": 400
+        },
+        {
+          "swipe": [
+            0.15,
+            0.62,
+            0.64,
+            0.62
+          ],
+          "hold": 400
+        },
+        {
+          "wait": 300
+        }
+      ],
+      "desc": "swipe(0.15,0.62→0.64,0.62) 400ms → swipe(0.15,0.62→0.64,0.62) 400ms → wait 300ms",
+      "note": "影がL字の左右反対になった。もう半回転させれば向きがそろうはず。",
+      "noteEn": "The shadow became a mirrored L. Another half-turn should flip it into place.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": {
+        "wait": 1200
+      },
+      "desc": "wait 1200ms",
+      "note": "ぴったり！で影が光って枠が埋まる。+250点と時間ボーナス。気持ちいい。次の形を待つ。",
+      "noteEn": "Perfect fit! The outline lights up and fills in: +250 points and bonus time. Satisfying. Waiting for the next shape.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": {
+        "swipe": [
+          0.92,
+          0.72,
+          0.5,
+          0.95
+        ],
+        "hold": 500
+      },
+      "desc": "swipe(0.92,0.72→0.50,0.95) 500ms",
+      "note": "No.2は縦長のT字。影は横向きなので、外側の輪をなぞって90度ひねってみる。",
+      "noteEn": "No.2 is an upright T. My shadow lies sideways, so I trace the outer ring to twist it 90 degrees.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": {
+        "swipe": [
+          0.5,
+          0.68,
+          0.38,
+          0.68
+        ],
+        "hold": 300
+      },
+      "desc": "swipe(0.50,0.68→0.38,0.68) 300ms",
+      "note": "ひねったら縦向きになったが、奥行き方向に少し傾いていて影が太い。左に少しだけドラッグして傾きを直す。",
+      "noteEn": "After the twist it is upright, but tilted in depth so the shadow is thick. A small drag left to straighten it.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": {
+        "swipe": [
+          0.5,
+          0.62,
+          0.5,
+          0.72
+        ],
+        "hold": 300
+      },
+      "desc": "swipe(0.50,0.62→0.50,0.72) 300ms",
+      "note": "一致74%。枠が明るくなってきた。下の段が足りないので、縦に少しドラッグして前後の傾きを変える。",
+      "noteEn": "74% match, the outline brightens. The bottom part is short, so a small vertical drag to change the forward tilt.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": {
+        "swipe": [
+          0.5,
+          0.75,
+          0.5,
+          0.55
+        ],
+        "hold": 400
+      },
+      "desc": "swipe(0.50,0.75→0.50,0.55) 400ms",
+      "note": "61%に下がった。向きが逆だったので、今度は上へ大きめにドラッグ。",
+      "noteEn": "Dropped to 61% — wrong way. Now a bigger drag upward.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": {
+        "swipe": [
+          0.4,
+          0.68,
+          0.55,
+          0.68
+        ],
+        "hold": 300
+      },
+      "desc": "swipe(0.40,0.68→0.55,0.68) 300ms",
+      "note": "68%。でっぱりが下に移ってしまった。3Dの向きを頭の中で追うのが意外と難しい。横に少し回してみる。",
+      "noteEn": "68%. The bump moved to the bottom. Tracking the 3D orientation in my head is surprisingly hard. Turning a little sideways.",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "action": [
+        {
+          "tap": [
+            0.87,
+            0.89
+          ]
+        },
+        {
+          "wait": 600
+        }
+      ],
+      "desc": "tap(0.87,0.89) 120ms → wait 600ms",
+      "note": "58%に下がり、迷子になった。パス（-5秒）で次の形へ。",
+      "noteEn": "Down to 58% and I'm lost. Using SKIP (-5s) to get a new shape.",
+      "image": "ai-play/step-10.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "action": {
+        "swipe": [
+          0.5,
+          0.38,
+          0.5,
+          0.93
+        ],
+        "hold": 600
+      },
+      "desc": "swipe(0.50,0.38→0.50,0.93) 600ms",
+      "note": "新しい形。目標は「Γ」、影は「L」。上下をひっくり返せばいいはずなので、縦に大きくドラッグ。",
+      "noteEn": "New shape: target is a Γ, my shadow is an L. Flipping it upside down with a long vertical drag.",
+      "image": "ai-play/step-11.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 12,
+      "action": [
+        {
+          "swipe": [
+            0.44,
+            0.68,
+            0.53,
+            0.68
+          ],
+          "hold": 250
+        },
+        {
+          "wait": 1500
+        }
+      ],
+      "desc": "swipe(0.44,0.68→0.53,0.68) 250ms → wait 1500ms",
+      "note": "79%。形はそろったが少し斜め。ほんの少し横に回して傾きを取る。",
+      "noteEn": "79%: right shape, slightly skewed. A tiny sideways turn to remove the tilt.",
+      "image": "ai-play/step-12.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 13,
+      "action": [
+        {
+          "wait": 60000
+        },
+        {
+          "wait": 60000
+        },
+        {
+          "wait": 60000
+        },
+        {
+          "wait": 60000
+        },
+        {
+          "wait": 60000
+        },
+        {
+          "wait": 60000
+        }
+      ],
+      "desc": "wait 60000ms → wait 60000ms → wait 60000ms → wait 60000ms → wait 60000ms → wait 60000ms",
+      "note": "表示は97%で見た目はほぼ重なっているのに、まだ判定されない。あと一押しが必要らしい。ここで手を止めて時間切れまで待ち、結果画面を確認。",
+      "noteEn": "It shows 97% and looks almost perfect, yet it doesn't count yet — needs one more nudge. I stop here and let time run out to see the result screen.",
+      "image": "ai-play/step-13.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 250
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}
