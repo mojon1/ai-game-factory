@@ -26,13 +26,23 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - id: pages
+        uses: actions/configure-pages@v5
+      # LINE 通知用: 公開中の作品一覧（公開前の状態）を取っておく
+      - name: Fetch published game index
+        run: curl -fsSL "${{ steps.pages.outputs.base_url }}/games/index.json?t=$(date +%s)" -o "$RUNNER_TEMP/prev-index.json" || echo "no published index"
       - name: Build game index
         run: node tools/build-index.mjs
       - name: Stamp asset versions (avoid stale browser cache)
         run: sed -i "s/__V__/${GITHUB_SHA::8}/g" *.html
-      - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
           path: .
       - id: deployment
         uses: actions/deploy-pages@v4
+      # 新しく公開された作品を LINE に通知（Secrets 未設定なら何もしない）
+      - name: Notify LINE about new games
+        env:
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+        run: node tools/notify-line.mjs "$RUNNER_TEMP/prev-index.json" games/index.json "${{ steps.deployment.outputs.page_url }}"
