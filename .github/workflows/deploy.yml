@@ -5,6 +5,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      line_test:
+        description: 'LINE にテスト通知を1通送る（最新の作品を例にする）'
+        type: boolean
+        default: false
   workflow_call:
 permissions:
   contents: read
@@ -35,6 +40,12 @@ jobs:
         run: node tools/build-index.mjs
       - name: Stamp asset versions (avoid stale browser cache)
         run: sed -i "s/__V__/${GITHUB_SHA::8}/g" *.html
+      # LINE は WebP を表示できないので、通知用のサムネイルを JPEG で作る（失敗しても公開は続ける）
+      - name: Make JPEG thumbnails for LINE
+        continue-on-error: true
+        run: |
+          npm install --prefix "$RUNNER_TEMP/img" --no-save --no-audit --no-fund sharp@0.34 > /dev/null
+          SHARP_PREFIX="$RUNNER_TEMP/img" node tools/line-thumbs.mjs
       - uses: actions/upload-pages-artifact@v3
         with:
           path: .
@@ -45,4 +56,6 @@ jobs:
         env:
           LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
           LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
-        run: node tools/notify-line.mjs "$RUNNER_TEMP/prev-index.json" games/index.json "${{ steps.deployment.outputs.page_url }}"
+        run: |
+          node tools/notify-line.mjs send "$RUNNER_TEMP/prev-index.json" games/index.json "${{ steps.deployment.outputs.page_url }}"
+          if [ "${{ inputs.line_test }}" = "true" ]; then node tools/notify-line.mjs test "${{ steps.deployment.outputs.page_url }}"; fi
