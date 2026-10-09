@@ -1,0 +1,354 @@
+{
+  "id": "2026-10-09-gpt-3",
+  "status": "published",
+  "title": "灯台まで、あと一歩",
+  "genre": "ターン制タクティクス",
+  "concept": "次に光が走る赤いマスを避け、迷子の旅人3人を灯台へ連れ帰る。1歩ごとに敵の光が90度回るので、安全な道も次の手で変わる。待つ選択を交え、先の配置を読みながら小さな島を渡る。",
+  "howToPlay": "隣のマスをタップして移動。赤いマスにいると次の攻撃で傷つきます。旅人3人を集めて灯台へ。待つと敵だけ回ります。",
+  "libraryDecision": "共有棚のライブラリは使わない。面白さは敵の予告とターン順の読みで、離散的なマスをCanvasで明確に示す方が判断しやすい。物理の揺らぎや3Dの重なりは入れない。",
+  "soundDecision": "移動は短い木の音、救出は明るい2音、被弾は低い音をWeb Audioで鳴らし、結果を聞き分けられるようにする。BGMを付けず、手を止めて考える時間を落ち着かせる。",
+  "planning": {
+    "genreDraw": {
+      "ja": "ターン制タクティクス",
+      "en": "Turn-based tactics",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "予告された敵の光を避け、旅人3人を灯台へ送るターン制の救出。移動と待機で攻撃方向を読む。",
+        "ideaEn": "Turn-based rescue: evade telegraphed rotating beams and bring three travelers to a lighthouse using movement and waits.",
+        "fromDraw": true
+      },
+      {
+        "idea": "音の郵便局。聞こえる短い旋律を並べ替え、宛先の旋律を完成させる。",
+        "ideaEn": "Melody Post: reorder short audible phrases to complete a recipient tune.",
+        "fromDraw": false
+      },
+      {
+        "idea": "浮島の糸。一本の糸を引いて島を近づけ、道をつなぐ探索。",
+        "ideaEn": "Island Threads: pull a thread to bring floating islands together and connect a route.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "One Step to the Lighthouse",
+      "concept": "Avoid the red cells where the next beam will strike and bring three lost travelers to the lighthouse. Enemy beams rotate ninety degrees after each step, changing safe routes. Use waits to plan across a small island.",
+      "howToPlay": "Tap an adjacent tile to move. Red tiles take damage on the next attack. Collect three travelers and reach the lighthouse. Wait to rotate enemies without moving.",
+      "libraryDecision": "Use no shelf libraries. The core is reading telegraphs and turn order. Discrete Canvas tiles make decisions clear; physical variance and 3D overlap would obscure them.",
+      "soundDecision": "Web Audio plays a wooden movement note, two bright rescue notes and a low hit note for distinct outcomes. No BGM keeps planning pauses calm."
+    }
+  },
+  "createdAt": "2026-10-09T22:51:46+09:00",
+  "specVersion": 7,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "manual",
+    "startedAt": "2026-10-09T22:51:46+09:00",
+    "metricsFrom": "2026-10-09T13:50:51.442Z",
+    "transcript": null,
+    "validationRuns": 1,
+    "finishedAt": "2026-10-09T22:57:52+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-09T22:53:25+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "6.4KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=57",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=103",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=38",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=96",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 6529,
+    "lines": 13
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "10手の画像付きプレイで旅人3人を救出し、15ターン・体力3で帰還。赤い予告を避けて進路を変え、待機で敵だけ回る動作と再開始も確認。情報は読みやすいが外周に安全な道が多く、待機が必須でなく戦術の深さは控えめ。星3。",
+    "similar": [
+      {
+        "title": "Into the Breach",
+        "url": "https://subsetgames.com/itb.html",
+        "similarity": "中",
+        "note": "敵の攻撃を予告してから手を選ぶターン制という共通点。相手は複数機体の攻撃と防衛、こちらは1人の移動と待機で3人を救出する固定の小島。",
+        "note_en": "Both reveal enemy attacks before turn-based decisions. The other combines squad combat and defense; this uses one mover and waits to rescue three travelers on a fixed small island."
+      }
+    ],
+    "research": "2検索で攻撃予告型タクティクスとHoplite系移動を調査。Subset Games公式検索結果で予告攻撃の説明と実在URLを確認。ページ本文の取得は403だったため検索結果の説明範囲で比較。",
+    "i18n": {
+      "en": {
+        "comment": "Ten image-guided moves rescued all three travelers and returned home in fifteen turns with full health. I changed route to avoid warnings, tested waiting and restarted. Telegraphs are readable, but safe outer routes make waits optional and limit tactical depth. Three stars.",
+        "research": "Two searches explored telegraphed tactics and Hoplite-style movement. The Subset Games official search result verified the URL and attack telegraphs. Opening the page returned 403, so comparison is limited to the official search excerpt."
+      }
+    },
+    "method": "スマホ縦画面で 10 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 10 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.78) 120ms",
+        "note": "赤いマスは次の攻撃、旅人を3人集めて灯台へと読める。時間を気にせず配置を見たいので開始する。",
+        "noteEn": "Red tiles mark the next attack and the goal is to bring three travelers to the lighthouse. I start to study the board without a timer.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.11,0.53) 120ms → tap(0.11,0.45) 120ms",
+        "note": "左下が自分で左中段に旅人がいる。赤い予告は右側なので、左端を2歩進んで最初の旅人を迎える。",
+        "noteEn": "I am at the lower left and a traveler is above me. Red warnings lie on the right, so I take two steps along the left edge to rescue the first traveler.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.11,0.36) 120ms → tap(0.11,0.27) 120ms",
+        "note": "同行1/3に増え、敵の矢印も回った。中央の岩が横の光を遮っている。上端へ進み右上の旅人を目指す。",
+        "noteEn": "The party rose to one and enemy arrows rotated. A central rock blocks the horizontal beam. I move to the top edge toward the traveler on the right.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.27,0.27) 120ms → tap(0.42,0.27) 120ms",
+        "note": "上端は今は安全。まず灯台へ2歩進むが、同行が1人なので到着だけでは終わらないはず。",
+        "noteEn": "The top edge is currently safe. I take two steps to the lighthouse with only one traveler, checking that arriving alone does not finish the rescue.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.58,0.27) 120ms → tap(0.73,0.27) 120ms",
+        "note": "旅人3人を探そうと表示された。上の道から右上の旅人を迎えに行く。",
+        "noteEn": "The lighthouse asks for all three travelers. I follow the top path to the traveler at the upper right.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.58,0.27) 120ms → tap(0.58,0.36) 120ms",
+        "note": "同行2/3。真下は赤なので降りず、左へ戻ってから内側を降りる。予告を読む理由がここで現れた。",
+        "noteEn": "Two travelers are with me. The tile directly below is red, so I step left before descending inward. Here the attack warning changes my route.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.58,0.45) 120ms → tap(0.58,0.36) 120ms",
+        "note": "最後の旅人のマスは赤くない。1歩下で迎え、中央の敵がこちらへ向く前に上へ戻る。",
+        "noteEn": "The final traveler tile is not red. I step down to collect them and return upward before the central enemy faces this way again.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.58,0.27) 120ms → tap(0.50,0.83) 120ms",
+        "note": "同行3/3、体力3。灯台の隣の上端へ戻り、待つを押して自分が動かず予告だけ回るかを見る。",
+        "noteEn": "All three are rescued with full health. I return to the top edge beside the lighthouse and wait to check that enemies rotate while I stay still.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.42,0.27) 120ms",
+        "note": "待つで自分は同じマス、矢印が回って歩数14になった。灯台は赤くないので全員を連れて入る。",
+        "noteEn": "Waiting kept me in place, rotated the arrows and raised the turn count to fourteen. The lighthouse is safe, so I bring everyone home.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 900ms → tap(0.50,0.65) 120ms",
+        "note": "15歩、体力を失わず全員帰還。成功は分かりやすいが外周が安全で、待機を使わなくても進めそう。再開して初期化を確認する。",
+        "noteEn": "Everyone returned in fifteen turns without damage. The success is clear, but safe edges make waiting largely optional. I restart to check the reset.",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-09T22:57:52+09:00"
+  },
+  "publishedAt": "2026-10-09T22:57:52+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 1762,
+    "outputTokens": 7265,
+    "contextTokens": 2978932,
+    "turns": 23,
+    "toolCalls": 23,
+    "webSearches": null,
+    "minutes": 7.2,
+    "from": "2026-10-09T13:50:51.442Z",
+    "to": "2026-10-09T13:58:00.497Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力から思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated Codex token_usage_record entries by unique response_id from planning through review. Input includes cached tokens; output excludes reasoning. Tools count top-level calls only.",
+    "recordedAt": "2026-10-09T22:58:00+09:00",
+    "validationRuns": 1,
+    "codeKB": 6.4,
+    "evidence": "metrics-evidence.json"
+  }
+}

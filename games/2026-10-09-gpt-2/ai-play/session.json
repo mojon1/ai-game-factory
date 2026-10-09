@@ -1,0 +1,196 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-09T13:47:26.757Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.77
+          ]
+        },
+        {
+          "wait": 1000
+        }
+      ],
+      "desc": "tap(0.50,0.77) 120ms → wait 1000ms",
+      "note": "月を動かして水平を待つ、3夜の天秤と読める。開始して重りの関係を見る。",
+      "noteEn": "The title explains moving a moon and waiting for balance across three nights. I start to inspect the weights.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": [
+        {
+          "swipe": [
+            0.205,
+            0.797,
+            0.633,
+            0.797
+          ],
+          "hold": 900
+        },
+        {
+          "wait": 4500
+        }
+      ],
+      "desc": "swipe(0.20,0.80→0.63,0.80) 900ms → wait 4500ms",
+      "note": "左右は同じ重さ1。右の月が支点に近く左が下がっているので、右の月を左と同じ距離まで動かす。",
+      "noteEn": "Both weights are one. The right moon is closer to the pivot and the left side is lower, so I slide the right moon out to match the left distance.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": {
+        "tap": [
+          0.5,
+          0.62
+        ]
+      },
+      "desc": "tap(0.50,0.62) 120ms",
+      "note": "揺れが落ち着き星が灯った。左右同じ重さなら距離をそろえる感覚が分かる。次の夜へ進む。",
+      "noteEn": "The swing settled and lit a star. Matching distances makes sense for equal weights. I continue to the next night.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "swipe": [
+            0.205,
+            0.797,
+            0.45,
+            0.797
+          ],
+          "hold": 800
+        },
+        {
+          "wait": 5500
+        }
+      ],
+      "desc": "swipe(0.20,0.80→0.45,0.80) 800ms → wait 5500ms",
+      "note": "左2、右3の重り。重い右は短い距離でつり合いそうなので、前の夜より内側を試す。",
+      "noteEn": "The left weight is two and the right is three. The heavier right side should balance at a shorter distance, so I try a closer position.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": {
+        "tap": [
+          0.5,
+          0.62
+        ]
+      },
+      "desc": "tap(0.50,0.62) 120ms",
+      "note": "重さ3を内側に置くと2夜目も達成。次は複数の重りの合力を読むことになるか、最後の夜を見る。",
+      "noteEn": "Putting weight three closer completed night two. I continue to see whether the final night combines multiple weights.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "swipe": [
+            0.205,
+            0.797,
+            0.545,
+            0.797
+          ],
+          "hold": 900
+        },
+        {
+          "wait": 6000
+        }
+      ],
+      "desc": "swipe(0.20,0.80→0.55,0.80) 900ms → wait 6000ms",
+      "note": "左は遠い2と近い1、右は3。2夜目より右を少し外に動かして、左2つのつり合いを狙う。",
+      "noteEn": "The left combines a distant two and a nearer one; the right is three. I move a little farther out than night two to balance both left weights.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}
