@@ -60,6 +60,8 @@
     'play': ['あそぶ', 'Play'],
     'details': ['詳細', 'Details'],
     'close': ['もどる', 'Back'],
+    'save.reset': ['このゲームの保存データを消す', 'Delete saved data for this game'],
+    'save.cleared': ['保存データを消しました', 'Saved data deleted'],
     'back': ['← 一覧', '← All games'],
     'result.title': ['みんなの評価', 'What players think'],
     'result.ai': ['作ったAI自身の判定', 'The AI\'s own verdict'],

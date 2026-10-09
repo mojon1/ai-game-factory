@@ -43,6 +43,15 @@ export async function openSession(id, { seed = 20261007, browser = null, frozen 
   await page.addInitScript(SEEDED_RANDOM_INIT(seed));
   // ゲームが parent.postMessage で送る合図（start / end）を記録する
   await page.addInitScript(`addEventListener('message', (e) => { if (e.data && e.data.agf) console.log('__agf__' + JSON.stringify(e.data)); });`);
+  // 保存（仕様の「保存」）: サイトの代わりに、このセッションの間だけ覚えておき、load に loaded で答える
+  await page.addInitScript(`(() => {
+    let saved = null;
+    addEventListener('message', (e) => {
+      const d = e.data; if (!d || typeof d !== 'object') return;
+      if (d.agf === 'load') postMessage({ agf: 'loaded', data: saved }, '*');
+      if (d.agf === 'save') { try { const t = JSON.stringify(d.data); if (t.length <= 16384) saved = JSON.parse(t); } catch (err) {} }
+    });
+  })();`);
   const cdp = dev.engine === 'chromium' ? await context.newCDPSession(page) : null;
 
   let isFrozen = false;
@@ -64,18 +73,41 @@ export async function openSession(id, { seed = 20261007, browser = null, frozen 
 
   const px = (p) => [Math.max(0, Math.min(1, +p[0] || 0)) * viewport.width, Math.max(0, Math.min(1, +p[1] || 0)) * viewport.height];
   // タッチ: Chromium は本物のタッチイベント（CDP）、WebKit は Pointer Events を合成して送る
-  const synth = (type, x, y) => page.evaluate(({ type, x, y }) => {
-    const el = document.elementFromPoint(x, y) || document.body;
-    const init = { bubbles: true, cancelable: true, composed: true, clientX: x, clientY: y, pointerId: 1, pointerType: 'touch', isPrimary: true, buttons: type === 'pointerup' ? 0 : 1 };
-    el.dispatchEvent(new PointerEvent(type, init));
-    const mouse = { pointerdown: 'mousedown', pointermove: 'mousemove', pointerup: 'mouseup' }[type];
-    el.dispatchEvent(new MouseEvent(mouse, init));
-    if (type === 'pointerup') el.dispatchEvent(new MouseEvent('click', init));
-  }, { type, x, y });
+  // pts: [[x, y], ...]（指ごとの位置。指の番号 = 配列の順番）
+  const synth = (type, pts) => page.evaluate(({ type, pts }) => {
+    pts.forEach(([x, y], i) => {
+      const el = document.elementFromPoint(x, y) || document.body;
+      const init = { bubbles: true, cancelable: true, composed: true, clientX: x, clientY: y, pointerId: i + 1, pointerType: 'touch', isPrimary: i === 0, buttons: type === 'pointerup' ? 0 : 1 };
+      el.dispatchEvent(new PointerEvent(type, init));
+      if (i > 0) return;   // マウスの互換イベントは1本目の指だけ
+      const mouse = { pointerdown: 'mousedown', pointermove: 'mousemove', pointerup: 'mouseup' }[type];
+      el.dispatchEvent(new MouseEvent(mouse, init));
+      if (type === 'pointerup') el.dispatchEvent(new MouseEvent('click', init));
+    });
+  }, { type, pts });
+  const tp = (pts) => pts.map(([x, y], i) => ({ x, y, id: i + 1 }));
   const touch = {
-    down: (x, y) => (cdp ? cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] }) : synth('pointerdown', x, y)),
-    move: (x, y) => (cdp ? cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x, y }] }) : synth('pointermove', x, y)),
-    up: (x, y) => (cdp ? cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }) : synth('pointerup', x, y)),
+    down: (pts) => (cdp ? cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: tp(pts) }) : synth('pointerdown', pts)),
+    move: (pts) => (cdp ? cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: tp(pts) }) : synth('pointermove', pts)),
+    up: (pts) => (cdp ? cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }) : synth('pointerup', pts)),
+  };
+  // 折れ線の上を、全体の長さに対する割合 t（0〜1）で進んだ位置
+  const along = (path, t) => {
+    if (path.length === 1) return path[0];
+    const seg = path.slice(1).map((p, i) => Math.hypot(p[0] - path[i][0], p[1] - path[i][1]));
+    let d = t * seg.reduce((a, b) => a + b, 0);
+    for (let i = 0; i < seg.length; i++) {
+      if (d <= seg[i] || i === seg.length - 1) { const r = seg[i] ? Math.min(1, d / seg[i]) : 1; return [path[i][0] + (path[i + 1][0] - path[i][0]) * r, path[i][1] + (path[i + 1][1] - path[i][1]) * r]; }
+      d -= seg[i];
+    }
+    return path[path.length - 1];
+  };
+  // 1本以上の指を、それぞれの道筋に沿って同時に動かす（hold ミリ秒かけて、最初から最後まで）
+  const stroke = async (paths, hold) => {
+    const n = Math.max(6, Math.min(40, Math.round(hold / 30)));
+    await touch.down(paths.map((p) => p[0]));
+    for (let i = 1; i <= n; i++) { await advance(hold / n); await touch.move(paths.map((p) => along(p, i / n))); }
+    await touch.up(paths.map((p) => p[p.length - 1]));
   };
 
   // 1手（または手の配列）を実行
@@ -83,21 +115,18 @@ export async function openSession(id, { seed = 20261007, browser = null, frozen 
     const list = Array.isArray(action) ? action : [action];
     for (const a of list) {
       if (!a || typeof a !== 'object') continue;
+      const pts = (arr) => (Array.isArray(arr) ? arr.filter((p) => Array.isArray(p) && p.length >= 2).slice(0, 60).map(px) : []);
       const tap = Array.isArray(a.tap) ? px(a.tap) : null;
-      const swipe = Array.isArray(a.swipe) && a.swipe.length >= 4 ? [...px(a.swipe.slice(0, 2)), ...px(a.swipe.slice(2, 4))] : null;
-      if (!tap && !swipe) { await advance(a.wait ?? a.hold ?? 300); continue; }
-      const hold = a.hold ?? 120;
+      const swipe = Array.isArray(a.swipe) && a.swipe.length >= 4 ? [px(a.swipe.slice(0, 2)), px(a.swipe.slice(2, 4))] : null;
+      const path = pts(a.path);
+      const multi = Array.isArray(a.multi) ? a.multi.slice(0, 3).map(pts).filter((p) => p.length) : [];
+      const hold = a.hold ?? (path.length || multi.length ? 400 : 120);
       const wait = a.wait ?? 150;
-      if (swipe) {
-        const [x1, y1, x2, y2] = swipe, n = 6;
-        await touch.down(x1, y1);
-        for (let i = 1; i <= n; i++) { await advance(hold / n); await touch.move(x1 + ((x2 - x1) * i) / n, y1 + ((y2 - y1) * i) / n); }
-        await touch.up(x2, y2);
-      } else {
-        await touch.down(...tap);
-        await advance(hold);
-        await touch.up(...tap);
-      }
+      if (multi.length) await stroke(multi, hold);          // 複数の指（それぞれ道筋。1点なら押したまま）
+      else if (path.length) await stroke([path], hold);     // 1本の指で道筋をなぞる
+      else if (swipe) await stroke([swipe], hold);
+      else if (tap) { await touch.down([tap]); await advance(hold); await touch.up([tap]); }
+      else { await advance(a.wait ?? a.hold ?? 300); continue; }
       await advance(wait);
     }
   };
@@ -140,6 +169,9 @@ export function describeAction(a) {
     if (!x) return '';
     if (x.tap) return `tap(${f(x.tap[0])},${f(x.tap[1])}) ${x.hold ?? 120}ms`;
     if (x.swipe) return `swipe(${f(x.swipe[0])},${f(x.swipe[1])}→${f(x.swipe[2])},${f(x.swipe[3])}) ${x.hold ?? 120}ms`;
+    const line = (p) => p.map((q) => `${f(q[0])},${f(q[1])}`).join('→');
+    if (Array.isArray(x.path)) return `path(${line(x.path)}) ${x.hold ?? 400}ms`;
+    if (Array.isArray(x.multi)) return `multi(${x.multi.map((p) => line(p)).join(' | ')}) ${x.hold ?? 400}ms`;
     return `wait ${x.wait ?? x.hold ?? 300}ms`;
   }).join(' → ');
 }

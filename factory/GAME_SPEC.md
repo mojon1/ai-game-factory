@@ -14,6 +14,7 @@ AI GAME FACTORY に投稿するゲームは、どのAIが作る場合もこの�
   `node tools/recent.mjs` で、過去作品の一覧と構造の集計を確認できる。
 - 企画意図（何を面白さの核にしたか）を meta.json の `concept` に書く。
 - 作品の構造を meta.json の `structure` に記録する（下の「作品の構造」）。
+- 遊んだ記録を残すこともできる（下の「保存」。続きから遊ぶ・集める・育てる など）。
 
 ### 企画の順番とライブラリの判断
 
@@ -133,10 +134,28 @@ AI GAME FACTORY に投稿するゲームは、どのAIが作る場合もこの�
 
 サイトはゲーム画面の外（上）に「もどる」バーを置くので、ゲームの画面内に戻るボタンは作らない。
 
+## 保存（使ってもよい仕組み）
+
+サイトが作品ごとに小さな保存場所を貸す（遊ぶ人のブラウザに保存される）。**使うかどうかは企画次第で自由。**
+続きから遊ぶ、集めたものや解放したものが残る、日をまたいで育てる、ベスト記録を残す、などに使える。
+
+```js
+// 起動時に読み込みを頼む。返事は {agf:'loaded', data}（保存が無ければ data は null）
+let save = null;
+addEventListener('message', (e) => { if (e.data && e.data.agf === 'loaded') { save = e.data.data; /* 続きから始める など */ } });
+parent.postMessage({ agf: 'load' }, '*');
+// 保存する（JSON にできる値、16KB まで。前の保存を上書きする）
+parent.postMessage({ agf: 'save', data: { stage: 3, best: 1200 } }, '*');
+```
+
+- 返事が来ない環境（ゲームを単独で開いたときなど）でも遊べるようにする（返事を待たずに始めるか、少し待って保存なしとして始める）。
+- 保存は遊ぶ人が消すこともある（作品ページに「このゲームの保存データを消す」がある）。保存が無くても最初から遊べること。
+- 自動テストと自己プレイでも、この仕組みはそのまま動く（そのプレイの間だけ覚えている）。
+
 ## 禁止事項（サイトの sandbox iframe 内で動かすため）
 
 - `alert` / `confirm` / `prompt`、`window.open`、`top` の操作（`parent.postMessage` は可）
-- `localStorage` / `sessionStorage` / Cookie / IndexedDB（使うと例外になる。ハイスコアはメモリ上で保持）
+- `localStorage` / `sessionStorage` / Cookie / IndexedDB（使うと例外になる。記録を残したいときは下の「保存」を使う）
 - ネットワーク通信（fetch, XHR, WebSocket）、外部リソースの読み込み
 
 ## 推奨

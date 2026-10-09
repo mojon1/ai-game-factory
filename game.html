@@ -40,7 +40,7 @@
 <!-- 全画面プレイヤー -->
 <div class="player" id="player" hidden>
   <div class="player-top"><button class="player-close" id="close" type="button"><span aria-hidden="true">✕</span> <span data-i18n="close"></span></button></div>
-  <div class="phone"><iframe id="frame" title="game" sandbox="allow-scripts allow-pointer-lock" allow="autoplay"></iframe></div>
+  <div class="phone" id="phone"></div>
 </div>
 
 <!-- 遊んだ後の評価シート -->
@@ -56,7 +56,7 @@
 <script src="assets/app.js?v=__V__"></script>
 <script>
 (async () => {
-  const { t, lang, EN, esc, fmtDate, genre, kTokens, loadIndex, loadMeta, Ratings, starBar, starIcons, aiStars, modeBanner } = AGF;
+  const { t, lang, EN, esc, fmtDate, genre, kTokens, loadIndex, loadMeta, Ratings, starBar, starIcons, aiStars, modeBanner, store } = AGF;
   const tr = I18N.tr;
   I18N.apply();
   modeBanner(document.getElementById('banner'));
@@ -91,6 +91,7 @@
   </button>
   <p class="howto">${esc(tr(meta, 'howToPlay') || '')}</p>
   <p class="pc-note">${t('pc.note')}</p>
+  <p class="save-reset-wrap"><button type="button" class="linkish" id="save-reset" hidden>${t('save.reset')}</button></p>
 
   <section class="rate-box" id="rate-box">
     <p class="sheet-q">${t('rate.q')}</p>
@@ -171,26 +172,48 @@
   if (Ratings.mine(id)) showResult('');
 
   // ---------- 全画面プレイヤー ----------
-  const player = $('player'), frame = $('frame');
+  // ゲームの iframe は開くたびに作り直し、閉じたら取り除く（src を変えるとブラウザの履歴が増え、「もどる」で閉じられなくなるため）
+  const player = $('player');
+  let frame = null;
   let openedAt = 0, pushed = false;
+  // 保存（仕様の「保存」）: 作品ごとの保存場所をこのブラウザに貸す。load には loaded で答え、save は 16KB まで上書き保存
+  const saveKey = `agf_save_${id}`;
   addEventListener('message', (e) => {
-    if (e.source !== frame.contentWindow || !e.data || !e.data.agf) return;
+    if (!frame || e.source !== frame.contentWindow || !e.data || !e.data.agf) return;
     if (e.data.agf === 'start') session.plays++;
+    if (e.data.agf === 'load') frame.contentWindow.postMessage({ agf: 'loaded', data: store.get(saveKey, null) }, '*');
+    if (e.data.agf === 'save') {
+      try { const text = JSON.stringify(e.data.data ?? null); if (text.length <= 16384) { store.set(saveKey, JSON.parse(text)); showSaveReset(); } } catch (err) {}
+    }
   });
+  // 保存データがある作品には「保存データを消す」を出す
+  function showSaveReset() {
+    const has = store.get(saveKey, null) != null;
+    $('save-reset').hidden = !has;
+    if (has) { $('save-reset').textContent = t('save.reset'); $('save-reset').disabled = false; }
+  }
+  $('save-reset').onclick = () => { try { localStorage.removeItem(saveKey); } catch (err) {} $('save-reset').textContent = t('save.cleared'); $('save-reset').disabled = true; };
+  showSaveReset();
   function openPlayer() {
     session = { plays: 0, seconds: 0 };
-    frame.src = src;
+    frame = document.createElement('iframe');
+    frame.title = 'game';
+    frame.setAttribute('sandbox', 'allow-scripts allow-pointer-lock');
+    frame.setAttribute('allow', 'autoplay');
     player.hidden = false;
+    // 表示されて大きさが決まってから読み込む（大きさ 0 のまま始まるとゲームの初期化が崩れるため）
+    const f = frame;
+    requestAnimationFrame(() => { if (frame !== f) return; f.src = src; $('phone').replaceChildren(f); });
     document.body.classList.add('locked');
     openedAt = performance.now();
     history.pushState({ player: 1 }, ''); pushed = true;
-    setTimeout(() => frame.focus(), 300);
+    setTimeout(() => frame?.focus(), 300);
   }
   function closePlayer() {
     if (player.hidden) return;
     session.seconds = (performance.now() - openedAt) / 1000;
     player.hidden = true;
-    frame.src = 'about:blank';
+    $('phone').replaceChildren(); frame = null;
     document.body.classList.remove('locked');
     Ratings.logPlay(id, session.plays, session.seconds);
     if (!Ratings.mine(id) && session.seconds > 3) openSheet();
