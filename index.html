@@ -52,13 +52,17 @@
 
 <main class="wrap">
   <div class="intro">
+    <p class="total" id="total" hidden></p>
     <div class="seg" role="group" id="view">
       <button type="button" data-view="list" data-i18n="view.list"></button>
       <button type="button" data-view="cal" aria-pressed="true" data-i18n="view.cal"></button>
+      <button type="button" data-view="rank" data-i18n="view.rank"></button>
     </div>
   </div>
 
   <section id="list" hidden></section>
+
+  <section id="rank-view" hidden></section>
 
   <section id="cal-view">
     <div class="month-nav">
@@ -92,13 +96,17 @@
   const moreHref = (g) => `${page(g)}&more=1`;         // 仕様を開いた状態で作品ページへ
   const dayNo = (key) => Math.floor((Date.parse(key) - Date.parse(CFG.startDate || key)) / 864e5) + 1;
 
-  // 作品カード（「あそぶ」と「詳細」を分ける）
-  const card = (g) => `<article class="gcard">
-      <a class="gthumb" href="${page(g)}" aria-label="${esc(title(g))}">${g.thumb ? `<img src="${esc(g.thumb)}" alt="" loading="lazy" width="300" height="534">` : ''}</a>
+  // 累計本数
+  if (games.length) { $('total').innerHTML = t('total', { n: `<b>${games.length}</b>` }); $('total').hidden = false; }
+
+  // 作品カード（「あそぶ」と「詳細」を分ける）。rank を渡すとランキングの順位を付ける
+  const card = (g, rank) => `<article class="gcard">
+      <a class="gthumb" href="${page(g)}" aria-label="${esc(title(g))}">${g.thumb ? `<img src="${esc(g.thumb)}" alt="" loading="lazy" width="300" height="534">` : ''}${rank ? `<span class="rank${rank <= 3 ? ` r${rank}` : ''}">${rank}</span>` : ''}</a>
       <div class="gbody">
         <h3><a href="${page(g)}">${esc(title(g))}</a></h3>
         <p class="gmeta">${esc(genre(g.genre))} · ${esc(t('by', { ai: g.ai?.name || '' }))}</p>
-        <p class="gscore">${g.s?.votes ? `<b>${t('v.2')} ${pct(g.s.funRate)}</b> <span>${t('votes', { n: g.s.votes })}</span>` : `<span>${t('unrated')}</span>`}</p>
+        <p class="gscore">${rank ? `<b>${t('rank.fun', { n: g.s.fun })}</b> <span>${pct(g.s.funRate)} · ${t('votes', { n: g.s.votes })}</span>`
+          : g.s?.votes ? `<b>${t('v.2')} ${pct(g.s.funRate)}</b> <span>${t('votes', { n: g.s.votes })}</span>` : `<span>${t('unrated')}</span>`}</p>
         <div class="gactions">
           <a class="gbtn play" href="${playHref(g)}"><span aria-hidden="true">▶</span> ${t('play')}</a>
           <a class="gbtn" href="${moreHref(g)}">${t('details')}</a>
@@ -111,7 +119,16 @@
     const days = games.reduce((m, g) => ((m[g.day] ||= []).push(g), m), {});
     $('list').innerHTML = Object.keys(days).sort().reverse().map((k) => `<section class="day">
       <h2 class="day-head"><span>${esc(fmtDate(days[k][0].createdAt))}</span>${CFG.startDate && dayNo(k) > 0 ? `<small>${t('day.n', { n: dayNo(k) })}</small>` : ''}</h2>
-      <div class="ggrid">${days[k].map(card).join('')}</div></section>`).join('');
+      <div class="ggrid">${days[k].map((g) => card(g)).join('')}</div></section>`).join('');
+  }
+
+  // 人気ランキング: 「面白い」の票が多い順（同数なら面白い率 → 評価数 → プレイ数の順）。評価がまだの作品は載せない
+  function renderRank() {
+    const ranked = games.filter((g) => g.s?.votes > 0)
+      .sort((a, b) => b.s.fun - a.s.fun || b.s.funRate - a.s.funRate || b.s.votes - a.s.votes || b.s.sessions - a.s.sessions);
+    $('rank-view').innerHTML = `<p class="rank-note">${t('rank.note')}</p>` + (ranked.length
+      ? `<div class="ggrid">${ranked.map((g, i) => card(g, i + 1)).join('')}</div>`
+      : `<p class="empty">${t('rank.none')}</p>`);
   }
 
   // カレンダー（過去の作品を探す）: マスを押すと、その日の作品一覧が下に出る
@@ -142,7 +159,7 @@
   function renderDayList() {
     const gs = selected ? byDay[selected] || [] : [];
     $('cal-list').innerHTML = gs.length
-      ? `<h2 class="day-head"><span>${esc(fmtDate(gs[0].createdAt))}</span><small>${t('count.games', { n: gs.length })}</small></h2><div class="ggrid">${gs.map(card).join('')}</div>`
+      ? `<h2 class="day-head"><span>${esc(fmtDate(gs[0].createdAt))}</span><small>${t('count.games', { n: gs.length })}</small></h2><div class="ggrid">${gs.map((g) => card(g)).join('')}</div>`
       : `<p class="empty">${t('cal.none')}</p>`;
   }
   $('cal').addEventListener('click', (e) => {
@@ -157,11 +174,13 @@
   $('prev').onclick = () => shift(-1);
   $('next').onclick = () => shift(1);
 
-  let view = store.get('agf_view2', 'cal') === 'list' ? 'list' : 'cal';
+  const VIEWS = { list: renderList, cal: renderCal, rank: renderRank };
+  let view = store.get('agf_view2', 'cal');
+  if (!VIEWS[view]) view = 'cal';
   function show() {
     document.querySelectorAll('#view button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === view)));
-    $('list').hidden = view !== 'list'; $('cal-view').hidden = view !== 'cal';
-    view === 'list' ? renderList() : renderCal();
+    $('list').hidden = view !== 'list'; $('cal-view').hidden = view !== 'cal'; $('rank-view').hidden = view !== 'rank';
+    VIEWS[view]();
   }
   $('view').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { view = b.dataset.view; store.set('agf_view2', view); show(); } });
   show();

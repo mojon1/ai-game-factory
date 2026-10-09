@@ -65,7 +65,15 @@ html[data-lang="ja"] [data-only="en"], html[data-lang="en"] [data-only="ja"] { d
 }
 
 /* ---------- トップ ---------- */
-.intro { display: flex; justify-content: flex-end; padding: 18px 0 4px; }
+.intro { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; padding: 18px 0 4px; }
+.intro .seg { margin-left: auto; }
+.total { margin: 0; font-size: 13px; color: var(--muted); white-space: nowrap; }
+.total b { font-family: var(--mono); font-size: 22px; color: var(--text); margin: 0 3px; }
+.rank-note { margin: 16px 0 12px; font-size: 12px; color: var(--muted); }
+.rank { position: absolute; top: 6px; left: 6px; min-width: 30px; height: 30px; padding: 0 6px; border-radius: 999px; display: grid; place-items: center; font-family: var(--mono); font-weight: 700; font-size: 14px; background: rgba(13, 14, 18, .82); color: var(--text); border: 1px solid var(--line); }
+.rank.r1 { background: #ffd34d; color: #111; border-color: #ffd34d; }
+.rank.r2 { background: #d6dbe4; color: #111; border-color: #d6dbe4; }
+.rank.r3 { background: #e0a26b; color: #111; border-color: #e0a26b; }
 .headline { margin: 0; font-size: clamp(21px, 5.2vw, 30px); line-height: 1.35; font-weight: 900; letter-spacing: .01em; }
 .tagline { margin: 6px 0 0; font-size: 14px; color: var(--muted); }
 /* 見出しは辞書の改行で区切る。説明文は画面幅いっぱいまで使って折り返す（右側に余白を作らない） */
