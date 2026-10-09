@@ -1,0 +1,621 @@
+{
+  "id": "2026-10-09-claude-2",
+  "status": "published",
+  "title": "ひと筆ダンジョン",
+  "genre": "ローグライク",
+  "concept": "ダンジョンの各階を、勇者から階段までの「ひと筆書き」で攻略する。同じマスは2度通れず、敵の数字ぶんHPが減り、HPは階をまたいで残る。描いている間は残りHPが先に見えるので、宝石をどこまで欲張るかを線の形で考える。階ごとに宝物を1つ選び、地下10階をめざす。",
+  "howToPlay": "勇者から指でなぞり、階段まで一本の線をつなぐと歩き出す。敵を通ると数字ぶんHPが減り、宝石が得点。",
+  "libraryDecision": "効果音のためにZzFXだけを使う。画面は升目と線だけで足り、3D描画や物理演算を入れても「どの道を描くか」という面白さの核は強まらないので使わない。",
+  "soundDecision": "勇者が一歩進むたびに五音音階が一音ずつ上がり、描いた道がそのまま短いメロディになる（描いている間も小さく鳴る）。敵・宝石・回復・鍵には短い効果音。じっくり道を考えるゲームなのでBGMは入れず、静けさの中で歩く音を主役にした。",
+  "planning": {
+    "genreDraw": {
+      "ja": "ローグライク",
+      "en": "Roguelike",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "ローグライク: 各階を勇者から階段までの「ひと筆書き」で進む。同じマスは2度通れず、敵の数字ぶんHPが減る。階ごとに宝物を選んで強くなり、地下10階をめざす。",
+        "ideaEn": "Roguelike: clear each dungeon floor with one continuous stroke from the hero to the stairs. No cell twice; enemies cost HP equal to their number. Pick a treasure each floor and aim for floor B10.",
+        "fromDraw": true
+      },
+      {
+        "idea": "終わりのない遊び場: 画面を指でなでると砂紋が残り、置いた石に当たって模様が変わる、枯山水の庭づくり。目標はない。",
+        "ideaEn": "Endless sandbox: stroke the screen to rake sand patterns that flow around stones you place, a zen-garden toy with no goal.",
+        "fromDraw": false
+      },
+      {
+        "idea": "2本指で糸の両端を持ち、張った糸の上で落ちてくる玉を弾ませて籠へ運ぶ。指の間隔で糸の張りが変わる。",
+        "ideaEn": "Hold both ends of a string with two fingers and bounce falling balls into a basket; finger distance changes the tension.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "fail",
+    "input": [
+      "draw"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "One-Stroke Dungeon",
+      "concept": "Each dungeon floor is solved with a single stroke from the hero to the stairs. No cell twice, enemies cost HP equal to their number, and HP carries over between floors. While you draw, your remaining HP is shown in advance, so you decide how greedy to be for gems through the shape of your line. Pick a treasure each floor and aim for B10.",
+      "howToPlay": "Drag from the hero and connect one line to the stairs; the hero then walks it. Enemies cost HP equal to their number; gems are your score.",
+      "libraryDecision": "Only ZzFX is used, for sound effects. A grid and a line are all the visuals need; 3D or physics would not strengthen the core of choosing which path to draw, so they are not used.",
+      "soundDecision": "Each step of the hero raises a pentatonic note, so the path you drew becomes a short melody (it also plays softly while drawing). Enemies, gems, healing and keys have short effects. It is a game of quiet planning, so there is no BGM; the walking notes are the music."
+    }
+  },
+  "createdAt": "2026-10-09T22:45:36+09:00",
+  "specVersion": 7,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "manual",
+    "startedAt": "2026-10-09T22:45:36+09:00",
+    "metricsFrom": "2026-10-09T13:44:51.029Z",
+    "transcript": "daebcbb5-00c1-41dd-a609-7e759b75517a.jsonl",
+    "validationRuns": 1,
+    "finishedAt": "2026-10-09T22:58:53+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-09T22:50:06+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "35.5KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=127",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=201",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=85",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=150",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 36309,
+    "lines": 766
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "ZzFX",
+      "version": "1.4.0",
+      "file": "zzfx-1.4.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "勇者から階段まで一本の線を描くと、残りHPが線の先に先に見えるので、「この宝石まで回り道しても平気か」を線の形で考えるのが楽しい。歩くたびに音階が上がり、描いた道がメロディになるのも心地よい。宝物（剣・牙・磁石・つるはしなど）の組み合わせで道の描き方が変わるのはローグライクらしい。一方で、必ず生き残れる道がある作りと宝物の強さのせいで、7階までHPが7を下回らず緊張感が薄かった。欲張るほど危ない場面がもっと欲しい。宝物画面は表示直後のタップを0.5秒受け付けないので、最初は押せないと感じた。10階までは届いていない。",
+    "similar": [
+      {
+        "title": "Hitofude Dungeon（ひとふでダンジョン）",
+        "url": "https://skich.app/games/hitofude-dungeon",
+        "similarity": "高",
+        "note": "一筆書きで升目のダンジョンを進み、モンスターを倒して通るローグライト。名前も発想もほぼ同じ。こちらは描いてから歩く・残りHPの先読み・宝物の組み合わせが違い",
+        "note_en": "A one-stroke rogue-lite on a grid where you must defeat monsters to pass; nearly the same idea and name. Mine differs in draw-then-walk, HP preview and treasure builds"
+      },
+      {
+        "title": "Fidel Dungeon Rescue",
+        "url": "https://thinkygames.com/games/fidel-dungeon-rescue/similar",
+        "similarity": "高",
+        "note": "自分の通った道を横切れない犬が進むパズル・ローグライク。同じマスを2度通れない点が同じ。あちらは1歩ずつ進み、巻き戻しができる",
+        "note_en": "A puzzle roguelike where a dog cannot cross its own path; same no-revisit rule. It moves step by step with rewind"
+      },
+      {
+        "title": "Desktop Dungeons",
+        "url": "https://store.steampowered.com/app/226620/Desktop Dungeons",
+        "similarity": "中",
+        "note": "升目で数字の敵とHPを管理しながら道を選ぶ短いパズル型ローグライク。こちらは一筆の線で1階を一度に決める",
+        "note_en": "A short puzzle roguelike of managing HP against numbered foes on a grid; mine commits a whole floor with one stroke"
+      },
+      {
+        "title": "Dungeon Raid",
+        "url": "https://www.pocketgamer.com/dungeon-raid/review-8465",
+        "similarity": "低",
+        "note": "指でなぞってタイルをつなぐ戦闘のローグライク。なぞる操作は同じだが、あちらはマッチ3の連鎖",
+        "note_en": "A roguelike where you trace chains of tiles; same tracing input but it is match-3 chaining"
+      }
+    ],
+    "research": "WebSearchで「一筆 ダンジョン ローグライク 線を描く」「Dungeon Raid」「Desktop Dungeons」を3回検索。同名に近いHitofude Dungeonが見つかり、発想のルーツとして最も近い。",
+    "i18n": {
+      "en": {
+        "comment": "Drawing one line from the hero to the stairs while the remaining HP is shown at the tip makes you plan greed through the line's shape, which is fun. Each step raises a note, so your path becomes a melody. Treasures (sword, fang, magnet, pickaxe...) change how you draw, which feels roguelike. However, every floor guarantees a survivable path and the treasures are strong, so my HP never dropped below 7 through B7 and tension was thin; I wanted more moments where greed is truly dangerous. The treasure screen ignores taps for 0.5s, which at first felt unresponsive. I did not reach B10.",
+        "research": "Three WebSearch queries (one-stroke draw-path dungeon roguelike, Dungeon Raid, Desktop Dungeons). Found Hitofude Dungeon, almost the same idea and name, as the closest root."
+      }
+    },
+    "method": "スマホ縦画面で 20 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 20 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "タイトル画面をタップして開始",
+        "noteEn": "Tapped the title to start",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "path(0.42,0.82→0.58,0.82→0.58,0.73→0.58,0.64→0.73,0.64→0.73,0.55→0.58,0.55→0.58,0.46) 900ms",
+        "note": "敵を避けて宝石を拾う道を途中まで描く。線の先に残りHPが出る",
+        "noteEn": "Drew part of a route that picks gems and avoids enemies; remaining HP shows at the line's tip",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "path(0.58,0.46→0.58,0.37→0.58,0.28→0.58,0.19→0.42,0.19→0.26,0.19→0.10,0.19) 800ms → wait 600ms",
+        "note": "線の先から続けて描き、上の宝石を拾って階段へ。指を離すと勇者が歩き出す",
+        "noteEn": "Continued from the tip, took the top gems and reached the stairs; releasing makes the hero walk",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 1500ms",
+        "note": "勇者が線をたどって歩き、一歩ごとに音が上がる。宝石を拾うと+表示",
+        "noteEn": "The hero walks the line with rising notes; gems pop with +numbers",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 600ms → tap(0.50,0.55) 120ms",
+        "note": "宝物の画面は誤タップ防止で少し待つ。鉄の剣を選ぶ",
+        "noteEn": "The treasure screen ignores taps briefly (mis-tap guard). Chose the Iron Sword",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "path(0.73,0.82→0.58,0.82→0.42,0.82→0.26,0.82→0.26,0.73→0.26,0.64→0.26,0.55→0.42,0.55→0.42,0.46→0.58,0.46→0.58,0.37→0.73,0.37→0.89,0.37→0.89,0.28→0.73,0.28→0.58,0.28→0.42,0.28→0.42,0.19) 1400ms → wait 300ms",
+        "note": "剣のおかげで敵の多くが0に。ぐるっと遠回りして宝石4つを拾う長い一本道を描く",
+        "noteEn": "With the sword most enemies show 0. Drew a long winding stroke collecting four gems",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 2800ms → tap(0.50,0.38) 120ms",
+        "note": "歩き終えて2階突破。宝物から一番上を選ぶ",
+        "noteEn": "Finished walking, floor 2 cleared; picked the top treasure",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "path(0.58,0.82→0.73,0.82→0.89,0.82→0.89,0.73→0.89,0.64→0.89,0.55→0.73,0.55→0.58,0.55→0.42,0.55→0.42,0.46→0.58,0.46→0.73,0.46→0.73,0.37→0.73,0.28→0.89,0.28→0.89,0.19) 1300ms",
+        "note": "吸血の牙を取った。3階は敵2を1体だけ通って宝石4つを回る道。階段手前で止めて残りHPを確認",
+        "noteEn": "Got the Vampire Fang. Floor 3: a route through just one 2-enemy for four gems; stopped before the stairs to check HP",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "path(0.89,0.19→0.73,0.19) 300ms → wait 3000ms",
+        "note": "階段へつないで出発。敵に当たるとHPが減り、牙で1回復",
+        "noteEn": "Connected to the stairs; the enemy hit cost HP and the fang healed 1",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 300ms → tap(0.50,0.40) 120ms",
+        "note": "磁石を選ぶ。4階は階段に鍵がかかっているはず",
+        "noteEn": "Chose the Magnet. Floor 4 should have locked stairs",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "path(0.89,0.82→0.89,0.73→0.73,0.73→0.58,0.73→0.58,0.64→0.42,0.64→0.42,0.55→0.26,0.55→0.10,0.55→0.10,0.46→0.10,0.37→0.10,0.28) 1300ms",
+        "note": "4階は階段に鍵。目玉の紫のマスを避け、磁石でとなりの宝石も拾いながら鍵へ",
+        "noteEn": "Floor 4 has locked stairs. Avoided the eye's purple zone and used the magnet to grab adjacent gems on the way to the key",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "path(0.10,0.28→0.10,0.19) 300ms → wait 2400ms",
+        "note": "鍵を通ったので階段につなげられた。歩くと磁石でとなりの宝石も吸い寄せる",
+        "noteEn": "Since the key is on the path, the stairs accepted the line; the magnet pulled in neighboring gems",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "wait 300ms → tap(0.50,0.55) 120ms",
+        "note": "金の袋を選ぶ（宝石の価値×2）。欲張りたくなる",
+        "noteEn": "Picked the Gold Pouch (gems ×2) — now I want to be greedy",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "path(0.73,0.82→0.58,0.82→0.42,0.82→0.26,0.82→0.10,0.82→0.10,0.73→0.26,0.73→0.42,0.73→0.42,0.64→0.42,0.55→0.58,0.55→0.73,0.55→0.73,0.46→0.73,0.37→0.73,0.28→0.58,0.28) 1500ms",
+        "note": "宝箱+22を取り、左下の宝石へ遠回り。目玉のとなりを1マスだけ通る（1ダメージ）覚悟で右上へ",
+        "noteEn": "Grabbed the +22 chest, detoured to the bottom-left gem, and accepted one cell beside the eye (1 damage) to head up-right",
+        "image": "ai-play/step-14.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "path(0.58,0.28→0.58,0.19) 300ms → wait 3200ms",
+        "note": "出発。宝箱と磁石で一気に宝が増えるのが気持ちいい",
+        "noteEn": "Set off. The chest plus magnet makes the gold jump nicely",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "wait 300ms → tap(0.50,0.69) 120ms",
+        "note": "つるはしを選ぶ。壁を1つ抜けられる",
+        "noteEn": "Picked the Pickaxe: can pass through one wall",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 17,
+        "action": "path(0.42,0.82→0.26,0.82→0.26,0.73→0.26,0.64→0.10,0.64→0.10,0.55→0.10,0.46→0.26,0.46→0.26,0.37→0.26,0.28→0.42,0.28→0.58,0.28→0.73,0.28→0.73,0.19→0.58,0.19→0.42,0.19) 1600ms → wait 300ms",
+        "note": "鍵→左の壁ぞい→敵2を倒して宝石→つるはしで壁を抜けて右上の宝箱→階段。目玉の紫ゾーンは避ける",
+        "noteEn": "Key, up the left side, beat a 2 for a gem, pickaxe through a wall to the top-right chest, then the stairs, avoiding the eye's zone",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 18,
+        "action": "wait 2500ms",
+        "note": "鍵を拾い、0の敵でも牙で回復。壁を砕いて宝箱へ",
+        "noteEn": "Picked up the key; even a 0-enemy heals via the fang. Smashed the wall to reach the chest",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 19,
+        "action": "wait 300ms → tap(0.50,0.69) 120ms",
+        "note": "金の袋をもう1つ（×4）。ここまでHPに余裕があり、少し易しく感じる",
+        "noteEn": "A second Gold Pouch (×4). HP has stayed comfortable so far; it feels a bit easy",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 20,
+        "action": "path(0.26,0.82→0.42,0.82→0.42,0.73→0.42,0.64→0.42,0.55→0.42,0.46→0.26,0.46→0.26,0.37→0.26,0.28→0.26,0.19→0.42,0.19→0.58,0.19→0.73,0.19) 1400ms → wait 2600ms",
+        "note": "7階は+52の宝箱が左上に。0の敵を通って宝箱→上の宝石→階段のほぼ無傷の道",
+        "noteEn": "Floor 7 has a +52 chest top-left. Through a 0-enemy to the chest, the top gem, then the stairs, almost no damage",
+        "image": "ai-play/step-20.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-09T22:58:53+09:00"
+  },
+  "publishedAt": "2026-10-09T22:58:53+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 15563,
+    "outputTokens": 32503,
+    "contextTokens": 6946440,
+    "turns": 51,
+    "toolCalls": 56,
+    "webSearches": 0,
+    "minutes": 14,
+    "from": "2026-10-09T13:44:51.029Z",
+    "to": "2026-10-09T13:58:53.671Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-09T22:58:53+09:00",
+    "validationRuns": 1,
+    "codeKB": 35.5
+  }
+}

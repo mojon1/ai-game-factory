@@ -1,0 +1,1030 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-09T13:50:09.406Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.5
+        ]
+      },
+      "desc": "tap(0.50,0.50) 120ms",
+      "note": "タイトル画面をタップして開始",
+      "noteEn": "Tapped the title to start",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": {
+        "path": [
+          [
+            0.4181,
+            0.8164
+          ],
+          [
+            0.5764,
+            0.8164
+          ],
+          [
+            0.5764,
+            0.7273
+          ],
+          [
+            0.5764,
+            0.6383
+          ],
+          [
+            0.7347,
+            0.6383
+          ],
+          [
+            0.7347,
+            0.5492
+          ],
+          [
+            0.5764,
+            0.5492
+          ],
+          [
+            0.5764,
+            0.4602
+          ]
+        ],
+        "hold": 900
+      },
+      "desc": "path(0.42,0.82→0.58,0.82→0.58,0.73→0.58,0.64→0.73,0.64→0.73,0.55→0.58,0.55→0.58,0.46) 900ms",
+      "note": "敵を避けて宝石を拾う道を途中まで描く。線の先に残りHPが出る",
+      "noteEn": "Drew part of a route that picks gems and avoids enemies; remaining HP shows at the line's tip",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "path": [
+            [
+              0.5764,
+              0.4602
+            ],
+            [
+              0.5764,
+              0.3711
+            ],
+            [
+              0.5764,
+              0.282
+            ],
+            [
+              0.5764,
+              0.193
+            ],
+            [
+              0.4181,
+              0.193
+            ],
+            [
+              0.2597,
+              0.193
+            ],
+            [
+              0.1014,
+              0.193
+            ]
+          ],
+          "hold": 800
+        },
+        {
+          "wait": 600
+        }
+      ],
+      "desc": "path(0.58,0.46→0.58,0.37→0.58,0.28→0.58,0.19→0.42,0.19→0.26,0.19→0.10,0.19) 800ms → wait 600ms",
+      "note": "線の先から続けて描き、上の宝石を拾って階段へ。指を離すと勇者が歩き出す",
+      "noteEn": "Continued from the tip, took the top gems and reached the stairs; releasing makes the hero walk",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": {
+        "wait": 1500
+      },
+      "desc": "wait 1500ms",
+      "note": "勇者が線をたどって歩き、一歩ごとに音が上がる。宝石を拾うと+表示",
+      "noteEn": "The hero walks the line with rising notes; gems pop with +numbers",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": [
+        {
+          "wait": 600
+        },
+        {
+          "tap": [
+            0.5,
+            0.547
+          ]
+        }
+      ],
+      "desc": "wait 600ms → tap(0.50,0.55) 120ms",
+      "note": "宝物の画面は誤タップ防止で少し待つ。鉄の剣を選ぶ",
+      "noteEn": "The treasure screen ignores taps briefly (mis-tap guard). Chose the Iron Sword",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "path": [
+            [
+              0.7347,
+              0.8164
+            ],
+            [
+              0.5764,
+              0.8164
+            ],
+            [
+              0.4181,
+              0.8164
+            ],
+            [
+              0.2597,
+              0.8164
+            ],
+            [
+              0.2597,
+              0.7273
+            ],
+            [
+              0.2597,
+              0.6383
+            ],
+            [
+              0.2597,
+              0.5492
+            ],
+            [
+              0.4181,
+              0.5492
+            ],
+            [
+              0.4181,
+              0.4602
+            ],
+            [
+              0.5764,
+              0.4602
+            ],
+            [
+              0.5764,
+              0.3711
+            ],
+            [
+              0.7347,
+              0.3711
+            ],
+            [
+              0.8931,
+              0.3711
+            ],
+            [
+              0.8931,
+              0.282
+            ],
+            [
+              0.7347,
+              0.282
+            ],
+            [
+              0.5764,
+              0.282
+            ],
+            [
+              0.4181,
+              0.282
+            ],
+            [
+              0.4181,
+              0.193
+            ]
+          ],
+          "hold": 1400
+        },
+        {
+          "wait": 300
+        }
+      ],
+      "desc": "path(0.73,0.82→0.58,0.82→0.42,0.82→0.26,0.82→0.26,0.73→0.26,0.64→0.26,0.55→0.42,0.55→0.42,0.46→0.58,0.46→0.58,0.37→0.73,0.37→0.89,0.37→0.89,0.28→0.73,0.28→0.58,0.28→0.42,0.28→0.42,0.19) 1400ms → wait 300ms",
+      "note": "剣のおかげで敵の多くが0に。ぐるっと遠回りして宝石4つを拾う長い一本道を描く",
+      "noteEn": "With the sword most enemies show 0. Drew a long winding stroke collecting four gems",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "wait": 2800
+        },
+        {
+          "tap": [
+            0.5,
+            0.38
+          ]
+        }
+      ],
+      "desc": "wait 2800ms → tap(0.50,0.38) 120ms",
+      "note": "歩き終えて2階突破。宝物から一番上を選ぶ",
+      "noteEn": "Finished walking, floor 2 cleared; picked the top treasure",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": [
+        {
+          "path": [
+            [
+              0.5764,
+              0.8164
+            ],
+            [
+              0.7347,
+              0.8164
+            ],
+            [
+              0.8931,
+              0.8164
+            ],
+            [
+              0.8931,
+              0.7273
+            ],
+            [
+              0.8931,
+              0.6383
+            ],
+            [
+              0.8931,
+              0.5492
+            ],
+            [
+              0.7347,
+              0.5492
+            ],
+            [
+              0.5764,
+              0.5492
+            ],
+            [
+              0.4181,
+              0.5492
+            ],
+            [
+              0.4181,
+              0.4602
+            ],
+            [
+              0.5764,
+              0.4602
+            ],
+            [
+              0.7347,
+              0.4602
+            ],
+            [
+              0.7347,
+              0.3711
+            ],
+            [
+              0.7347,
+              0.282
+            ],
+            [
+              0.8931,
+              0.282
+            ],
+            [
+              0.8931,
+              0.193
+            ]
+          ],
+          "hold": 1300
+        }
+      ],
+      "desc": "path(0.58,0.82→0.73,0.82→0.89,0.82→0.89,0.73→0.89,0.64→0.89,0.55→0.73,0.55→0.58,0.55→0.42,0.55→0.42,0.46→0.58,0.46→0.73,0.46→0.73,0.37→0.73,0.28→0.89,0.28→0.89,0.19) 1300ms",
+      "note": "吸血の牙を取った。3階は敵2を1体だけ通って宝石4つを回る道。階段手前で止めて残りHPを確認",
+      "noteEn": "Got the Vampire Fang. Floor 3: a route through just one 2-enemy for four gems; stopped before the stairs to check HP",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": [
+        {
+          "path": [
+            [
+              0.8931,
+              0.193
+            ],
+            [
+              0.7347,
+              0.193
+            ]
+          ],
+          "hold": 300
+        },
+        {
+          "wait": 3000
+        }
+      ],
+      "desc": "path(0.89,0.19→0.73,0.19) 300ms → wait 3000ms",
+      "note": "階段へつないで出発。敵に当たるとHPが減り、牙で1回復",
+      "noteEn": "Connected to the stairs; the enemy hit cost HP and the fang healed 1",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "action": [
+        {
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.5,
+            0.4
+          ]
+        }
+      ],
+      "desc": "wait 300ms → tap(0.50,0.40) 120ms",
+      "note": "磁石を選ぶ。4階は階段に鍵がかかっているはず",
+      "noteEn": "Chose the Magnet. Floor 4 should have locked stairs",
+      "image": "ai-play/step-10.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "action": [
+        {
+          "path": [
+            [
+              0.8931,
+              0.8164
+            ],
+            [
+              0.8931,
+              0.7273
+            ],
+            [
+              0.7347,
+              0.7273
+            ],
+            [
+              0.5764,
+              0.7273
+            ],
+            [
+              0.5764,
+              0.6383
+            ],
+            [
+              0.4181,
+              0.6383
+            ],
+            [
+              0.4181,
+              0.5492
+            ],
+            [
+              0.2597,
+              0.5492
+            ],
+            [
+              0.1014,
+              0.5492
+            ],
+            [
+              0.1014,
+              0.4602
+            ],
+            [
+              0.1014,
+              0.3711
+            ],
+            [
+              0.1014,
+              0.282
+            ]
+          ],
+          "hold": 1300
+        }
+      ],
+      "desc": "path(0.89,0.82→0.89,0.73→0.73,0.73→0.58,0.73→0.58,0.64→0.42,0.64→0.42,0.55→0.26,0.55→0.10,0.55→0.10,0.46→0.10,0.37→0.10,0.28) 1300ms",
+      "note": "4階は階段に鍵。目玉の紫のマスを避け、磁石でとなりの宝石も拾いながら鍵へ",
+      "noteEn": "Floor 4 has locked stairs. Avoided the eye's purple zone and used the magnet to grab adjacent gems on the way to the key",
+      "image": "ai-play/step-11.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 12,
+      "action": [
+        {
+          "path": [
+            [
+              0.1014,
+              0.282
+            ],
+            [
+              0.1014,
+              0.193
+            ]
+          ],
+          "hold": 300
+        },
+        {
+          "wait": 2400
+        }
+      ],
+      "desc": "path(0.10,0.28→0.10,0.19) 300ms → wait 2400ms",
+      "note": "鍵を通ったので階段につなげられた。歩くと磁石でとなりの宝石も吸い寄せる",
+      "noteEn": "Since the key is on the path, the stairs accepted the line; the magnet pulled in neighboring gems",
+      "image": "ai-play/step-12.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 13,
+      "action": [
+        {
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.5,
+            0.547
+          ]
+        }
+      ],
+      "desc": "wait 300ms → tap(0.50,0.55) 120ms",
+      "note": "金の袋を選ぶ（宝石の価値×2）。欲張りたくなる",
+      "noteEn": "Picked the Gold Pouch (gems ×2) — now I want to be greedy",
+      "image": "ai-play/step-13.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 14,
+      "action": [
+        {
+          "path": [
+            [
+              0.7347,
+              0.8164
+            ],
+            [
+              0.5764,
+              0.8164
+            ],
+            [
+              0.4181,
+              0.8164
+            ],
+            [
+              0.2597,
+              0.8164
+            ],
+            [
+              0.1014,
+              0.8164
+            ],
+            [
+              0.1014,
+              0.7273
+            ],
+            [
+              0.2597,
+              0.7273
+            ],
+            [
+              0.4181,
+              0.7273
+            ],
+            [
+              0.4181,
+              0.6383
+            ],
+            [
+              0.4181,
+              0.5492
+            ],
+            [
+              0.5764,
+              0.5492
+            ],
+            [
+              0.7347,
+              0.5492
+            ],
+            [
+              0.7347,
+              0.4602
+            ],
+            [
+              0.7347,
+              0.3711
+            ],
+            [
+              0.7347,
+              0.282
+            ],
+            [
+              0.5764,
+              0.282
+            ]
+          ],
+          "hold": 1500
+        }
+      ],
+      "desc": "path(0.73,0.82→0.58,0.82→0.42,0.82→0.26,0.82→0.10,0.82→0.10,0.73→0.26,0.73→0.42,0.73→0.42,0.64→0.42,0.55→0.58,0.55→0.73,0.55→0.73,0.46→0.73,0.37→0.73,0.28→0.58,0.28) 1500ms",
+      "note": "宝箱+22を取り、左下の宝石へ遠回り。目玉のとなりを1マスだけ通る（1ダメージ）覚悟で右上へ",
+      "noteEn": "Grabbed the +22 chest, detoured to the bottom-left gem, and accepted one cell beside the eye (1 damage) to head up-right",
+      "image": "ai-play/step-14.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 15,
+      "action": [
+        {
+          "path": [
+            [
+              0.5764,
+              0.282
+            ],
+            [
+              0.5764,
+              0.193
+            ]
+          ],
+          "hold": 300
+        },
+        {
+          "wait": 3200
+        }
+      ],
+      "desc": "path(0.58,0.28→0.58,0.19) 300ms → wait 3200ms",
+      "note": "出発。宝箱と磁石で一気に宝が増えるのが気持ちいい",
+      "noteEn": "Set off. The chest plus magnet makes the gold jump nicely",
+      "image": "ai-play/step-15.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 16,
+      "action": [
+        {
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.5,
+            0.69
+          ]
+        }
+      ],
+      "desc": "wait 300ms → tap(0.50,0.69) 120ms",
+      "note": "つるはしを選ぶ。壁を1つ抜けられる",
+      "noteEn": "Picked the Pickaxe: can pass through one wall",
+      "image": "ai-play/step-16.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 17,
+      "action": [
+        {
+          "path": [
+            [
+              0.4181,
+              0.8164
+            ],
+            [
+              0.2597,
+              0.8164
+            ],
+            [
+              0.2597,
+              0.7273
+            ],
+            [
+              0.2597,
+              0.6383
+            ],
+            [
+              0.1014,
+              0.6383
+            ],
+            [
+              0.1014,
+              0.5492
+            ],
+            [
+              0.1014,
+              0.4602
+            ],
+            [
+              0.2597,
+              0.4602
+            ],
+            [
+              0.2597,
+              0.3711
+            ],
+            [
+              0.2597,
+              0.282
+            ],
+            [
+              0.4181,
+              0.282
+            ],
+            [
+              0.5764,
+              0.282
+            ],
+            [
+              0.7347,
+              0.282
+            ],
+            [
+              0.7347,
+              0.193
+            ],
+            [
+              0.5764,
+              0.193
+            ],
+            [
+              0.4181,
+              0.193
+            ]
+          ],
+          "hold": 1600
+        },
+        {
+          "wait": 300
+        }
+      ],
+      "desc": "path(0.42,0.82→0.26,0.82→0.26,0.73→0.26,0.64→0.10,0.64→0.10,0.55→0.10,0.46→0.26,0.46→0.26,0.37→0.26,0.28→0.42,0.28→0.58,0.28→0.73,0.28→0.73,0.19→0.58,0.19→0.42,0.19) 1600ms → wait 300ms",
+      "note": "鍵→左の壁ぞい→敵2を倒して宝石→つるはしで壁を抜けて右上の宝箱→階段。目玉の紫ゾーンは避ける",
+      "noteEn": "Key, up the left side, beat a 2 for a gem, pickaxe through a wall to the top-right chest, then the stairs, avoiding the eye's zone",
+      "image": "ai-play/step-17.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 18,
+      "action": {
+        "wait": 2500
+      },
+      "desc": "wait 2500ms",
+      "note": "鍵を拾い、0の敵でも牙で回復。壁を砕いて宝箱へ",
+      "noteEn": "Picked up the key; even a 0-enemy heals via the fang. Smashed the wall to reach the chest",
+      "image": "ai-play/step-18.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 19,
+      "action": [
+        {
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.5,
+            0.69
+          ]
+        }
+      ],
+      "desc": "wait 300ms → tap(0.50,0.69) 120ms",
+      "note": "金の袋をもう1つ（×4）。ここまでHPに余裕があり、少し易しく感じる",
+      "noteEn": "A second Gold Pouch (×4). HP has stayed comfortable so far; it feels a bit easy",
+      "image": "ai-play/step-19.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 20,
+      "action": [
+        {
+          "path": [
+            [
+              0.2597,
+              0.8164
+            ],
+            [
+              0.4181,
+              0.8164
+            ],
+            [
+              0.4181,
+              0.7273
+            ],
+            [
+              0.4181,
+              0.6383
+            ],
+            [
+              0.4181,
+              0.5492
+            ],
+            [
+              0.4181,
+              0.4602
+            ],
+            [
+              0.2597,
+              0.4602
+            ],
+            [
+              0.2597,
+              0.3711
+            ],
+            [
+              0.2597,
+              0.282
+            ],
+            [
+              0.2597,
+              0.193
+            ],
+            [
+              0.4181,
+              0.193
+            ],
+            [
+              0.5764,
+              0.193
+            ],
+            [
+              0.7347,
+              0.193
+            ]
+          ],
+          "hold": 1400
+        },
+        {
+          "wait": 2600
+        }
+      ],
+      "desc": "path(0.26,0.82→0.42,0.82→0.42,0.73→0.42,0.64→0.42,0.55→0.42,0.46→0.26,0.46→0.26,0.37→0.26,0.28→0.26,0.19→0.42,0.19→0.58,0.19→0.73,0.19) 1400ms → wait 2600ms",
+      "note": "7階は+52の宝箱が左上に。0の敵を通って宝箱→上の宝石→階段のほぼ無傷の道",
+      "noteEn": "Floor 7 has a +52 chest top-left. Through a 0-enemy to the chest, the top gem, then the stairs, almost no damage",
+      "image": "ai-play/step-20.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}
