@@ -159,3 +159,24 @@ export function detectLibraries(html) {
     return { name: l?.name || file, version: l?.version || null, file };
   });
 }
+
+// 作品の構造（meta.json の structure）。recent.mjs で過去作品の偏りを集計して、企画のときに見せる
+export const STRUCTURE = {
+  goal: { score: '点数を伸ばす', clear: 'クリアを目指す（ステージ・目標）', survive: 'できるだけ長く生き延びる', complete: '完成させる・集めきる', none: '目標なし（遊び場・体験）', other: 'その他' },
+  ending: { time: '時間切れで終わる', fail: 'ミス・やられたら終わる', goal: '目標を達成したら終わる', limit: '手数・回数を使い切ったら終わる', none: '終わりなし（自分でやめる）', other: 'その他' },
+  input: { tap: 'タップ', hold: '長押し', swipe: 'スワイプ・はじく', drag: 'ドラッグ・動かす', draw: 'なぞる・線を描く', multi: '複数の指' },
+};
+// 構造の記録が無い初期の作品は、後から付けた分類（factory/structure-backfill.json）を使う
+export function structureOf(id, meta) {
+  if (meta?.structure?.goal) return meta.structure;
+  return readJson(path.join(ROOT, 'factory', 'structure-backfill.json'), {}).games?.[id] || null;
+}
+// structure の値が正しいか（問題があれば説明の配列を返す）
+export function checkStructure(s) {
+  const err = [];
+  if (!s || typeof s !== 'object') return ['structure がありません'];
+  if (!STRUCTURE.goal[s.goal]) err.push(`structure.goal は ${Object.keys(STRUCTURE.goal).join(' / ')} のいずれか`);
+  if (!STRUCTURE.ending[s.ending]) err.push(`structure.ending は ${Object.keys(STRUCTURE.ending).join(' / ')} のいずれか`);
+  if (!Array.isArray(s.input) || !s.input.length || s.input.length > 2 || !s.input.every((k) => STRUCTURE.input[k])) err.push(`structure.input は ${Object.keys(STRUCTURE.input).join(' / ')} から1〜2個の配列`);
+  return err;
+}

@@ -77,6 +77,8 @@
   const aiN = ai ? aiStars(ai) : null;
   // 使用ライブラリ（自動テストの記録。無ければ一覧データの読み取り結果）
   const libs = meta.libraries || index?.games?.find((g) => g.id === meta.id)?.libraries || null;
+  // 作品の構造（制作AIの記録。初期の作品は後から付けた分類が一覧データに入っている）
+  const st = (meta.structure?.goal ? meta.structure : null) || index?.games?.find((g) => g.id === meta.id)?.structure || null;
 
   $('main').innerHTML = `
   <a class="back" href="./">${t('back')}</a>
@@ -110,7 +112,13 @@
   <details class="more" open>
     <summary>${t('sec.more')}</summary>
     ${tr(meta, 'concept') ? `<h3>${t('sec.concept')}</h3><p>${esc(tr(meta, 'concept'))}</p>` : ''}
-    ${libs ? `<h3>${t('sec.libs')}</h3>
+    ${st ? `<h3>${t('sec.structure')}</h3>
+    <ul class="libs">
+      <li><span class="muted">${t('st.goal')}</span> <b>${esc(t('goal.' + st.goal))}</b></li>
+      <li><span class="muted">${t('st.ending')}</span> <b>${esc(t('ending.' + st.ending))}</b></li>
+      <li><span class="muted">${t('st.input')}</span> <b>${(st.input || []).map((k) => esc(t('input.' + k))).join('・')}</b></li>
+    </ul>` : ''}
+    ${libs ?`<h3>${t('sec.libs')}</h3>
     ${libs.length ? `<ul class="libs">${libs.map((l) => `<li><b>${esc(l.name)}</b>${l.version ? ` <span class="muted">${esc(l.version)}</span>` : ''}</li>`).join('')}</ul>` : `<p class="muted">${t('libs.none')}</p>`}
     ${tr(meta, 'libraryDecision') ? `<p class="lib-why"><span class="muted">${t('libs.why')}</span> ${esc(tr(meta, 'libraryDecision'))}</p>` : ''}` : ''}
     ${x ? `<h3>${t('sec.metrics')}</h3>

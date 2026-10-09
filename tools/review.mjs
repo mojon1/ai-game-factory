@@ -12,7 +12,7 @@
 // 実行すると、プレイ画像は数枚だけ WebP に縮小して残し、残りは削除する（操作ログ session.json は残る）。
 import fs from 'node:fs';
 import path from 'node:path';
-import { gameDir, readMeta, writeMeta, readJson, parseArgs, jstNow, settings, toWebp, dirSize } from './lib.mjs';
+import { gameDir, readMeta, writeMeta, readJson, parseArgs, jstNow, settings, toWebp, dirSize, checkStructure } from './lib.mjs';
 
 const a = parseArgs();
 const id = a._[0];
@@ -91,6 +91,8 @@ const keys = ['title', 'concept', 'howToPlay', ...((meta.specVersion || 0) >= 4 
 const missing = [
   ...['genre', ...keys].filter((k) => !meta[k]),
   ...keys.filter((k) => !en[k]).map((k) => `i18n.en.${k}`),
+  // 仕様5以降は、作品の構造（structure）も必須
+  ...((meta.specVersion || 0) >= 5 ? checkStructure(meta.structure) : []),
 ];
 if (missing.length) console.warn(`⚠ meta.json の未記入項目: ${missing.join(', ')}（埋めてから再実行すると公開されます）`);
 if (!meta.autoTest?.passed) console.warn('⚠ 自動テストに合格していません（node tools/validate.mjs で確認）');

@@ -2,7 +2,7 @@
 // 一覧・カレンダー・統計に必要な最小限の項目だけを入れて軽く保つ。
 import fs from 'node:fs';
 import path from 'node:path';
-import { GAMES_DIR, listGameIds, readJson, writeJson, jstNow, detectLibraries } from './lib.mjs';
+import { GAMES_DIR, listGameIds, readJson, writeJson, jstNow, detectLibraries, structureOf } from './lib.mjs';
 
 const games = [];
 for (const id of listGameIds()) {
@@ -24,6 +24,7 @@ for (const id of listGameIds()) {
     // AIの自己判定（星1〜5）。2026-10-09 までの3段階は 面白い=★5 / まあまあ=★3 / つまらない=★1 として扱う
     aiStars: m.aiReview?.stars ?? ({ fun: 5, meh: 3, boring: 1 })[m.aiReview?.verdict] ?? null,
     libraries,
+    structure: structureOf(id, m),
     metrics: m.metrics ? { thinking: x.thinkingTokens, output: x.outputTokens, turns: x.turns, tools: x.toolCalls, minutes: x.minutes, runs: m.generation?.validationRuns ?? null, effort: x.effort || null } : null,
   });
 }

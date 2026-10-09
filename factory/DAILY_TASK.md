@@ -40,7 +40,7 @@ node tools/new-game.mjs --maker <MAKER> --model <MODEL> --name "<NAME>" --vendor
 ### 1-2. 制作
 
 - `games/<ID>/index.html` を GAME_SPEC.md に従って1ファイルで書く（スマホ縦画面・タッチ・日英・合図の送信）。
-- `games/<ID>/meta.json` の `title` `genre` `concept` `howToPlay` `libraryDecision` と、`i18n.en` の `title` `concept` `howToPlay` `libraryDecision` を埋める。
+- `games/<ID>/meta.json` の `title` `genre` `concept` `howToPlay` `libraryDecision` `structure`（作品の構造。GAME_SPEC.md「作品の構造」）と、`i18n.en` の `title` `concept` `howToPlay` `libraryDecision` を埋める。
   他の項目は触らない。欲しいライブラリがあれば `libraryRequest` に書いてよい（今回は使えない）。
 
 ### 1-3. 自動テスト
