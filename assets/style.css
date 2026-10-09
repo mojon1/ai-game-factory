@@ -203,15 +203,11 @@ html[data-lang="ja"] [data-only="en"], html[data-lang="en"] [data-only="ja"] { d
 .phone iframe { width: 100%; height: 100%; border: 0; display: block; background: #000; }
 .player-close { background: transparent; border: 0; color: #cfd3df; border-radius: 999px; padding: 4px 10px; font-size: 13px; cursor: pointer; min-height: 32px; }
 .player-close:active { background: #1d2028; }
-.player-top { justify-content: space-between; }
-.player-sound { background: transparent; border: 0; color: #cfd3df; border-radius: 999px; padding: 4px 10px; font-size: 13px; cursor: pointer; min-height: 32px; }
-.player-sound[aria-pressed="false"] { color: #7d8396; }
-.player-sound:active { background: #1d2028; }
 /* PC: スマホ型の枠で表示し、もどるは枠の外の左上 */
 @media (pointer: fine) and (min-width: 700px) {
   .player { display: grid; place-items: center; background: radial-gradient(circle at 50% 30%, #1d2028, #050506); }
-  .player-top { position: fixed; left: 16px; right: 16px; top: 16px; height: auto; padding: 0; background: none; border: 0; }
-  .player-close, .player-sound { border: 1px solid rgba(255, 255, 255, .25); background: rgba(0, 0, 0, .4); padding: 6px 14px; }
+  .player-top { position: fixed; left: 16px; top: 16px; height: auto; padding: 0; background: none; border: 0; }
+  .player-close { border: 1px solid rgba(255, 255, 255, .25); background: rgba(0, 0, 0, .4); padding: 6px 14px; }
   .phone { flex: none; width: min(420px, calc((100vh - 40px) * 9 / 16)); height: min(calc(100vh - 40px), 747px); border-radius: 28px; overflow: hidden; box-shadow: 0 0 0 10px #1a1c22, 0 20px 80px rgba(0, 0, 0, .7); }
 }
 

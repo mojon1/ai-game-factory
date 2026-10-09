@@ -24,7 +24,6 @@ export const CHECK_EN = {
   'iPhone: タッチで開始・操作でき、画面が変化する': 'iPhone: starts and responds to touch',
   'iPhone: 画面からはみ出さない': 'iPhone: no overflow',
   'プレイ開始の合図（start）を送っている': 'Sends the play "start" signal',
-  'サイトの音のオン/オフに対応している': "Follows the site's sound on/off",
   'JavaScript エラーが出ない': 'No JavaScript errors',
 };
 const drawn = (i) => (i.canvasVariety ?? 99) > 1 || i.text.length > 0;
@@ -87,10 +86,8 @@ export async function validateGame(id) {
   const banned = html.match(/\b(alert|confirm|prompt)\s*\(|window\.open\s*\(/);
   add('alert/confirm/prompt/window.open を使っていない', !banned, banned ? banned[0] : '');
   add('Pointer Events でタッチ操作に対応している', /pointerdown/i.test(html));
-  // 仕様6以降: 音を鳴らすかどうかはAIの判断。鳴らすゲームは、サイトの「音あり／音なし」の合図（agf: 'sound'）に従う
-  const v6 = (readMeta(id)?.specVersion || 0) >= 6;
+  // 音を鳴らすかどうかはAIの判断（仕様6「音の判断」）。音を使っているかと、その様子は記録だけ残す（合否には使わない）
   const usesSound = /AudioContext|\bzzfx\b|ZZFX/.test(html);
-  if (v6 && usesSound) add('サイトの音のオン/オフに対応している', /['"]sound['"]/.test(html) && /addEventListener\(\s*['"]message['"]|onmessage\s*=/.test(html));
   add('touch-action を指定している', /touch-action\s*:\s*none/i.test(html));
 
   const errors = [];

@@ -60,8 +60,6 @@
     'play': ['あそぶ', 'Play'],
     'details': ['詳細', 'Details'],
     'close': ['もどる', 'Back'],
-    'sound.on': ['音あり', 'Sound on'],
-    'sound.off': ['音なし', 'Sound off'],
     'back': ['← 一覧', '← All games'],
     'result.title': ['みんなの評価', 'What players think'],
     'result.ai': ['作ったAI自身の判定', 'The AI\'s own verdict'],
