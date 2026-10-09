@@ -6,9 +6,8 @@
   --text: #ecebe6;
   --muted: #8e93a1;
   --signal: #c8f051;
-  --fun: #ffb547;      /* 面白い */
-  --meh: #7c8aa6;      /* まあまあ */
-  --boring: #4a5062;   /* つまらない */
+  --fun: #ffb547;      /* 星・高評価 */
+  --star-off: #3a3f4d; /* 星の未評価部分 */
   --bad: #ff6b7a;
   --radius: 14px;
   --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
@@ -69,7 +68,9 @@ html[data-lang="ja"] [data-only="en"], html[data-lang="en"] [data-only="ja"] { d
 .intro .seg { margin-left: auto; }
 .total { margin: 0; font-size: 13px; color: var(--muted); white-space: nowrap; }
 .total b { font-family: var(--mono); font-size: 22px; color: var(--text); margin: 0 3px; }
-.rank-note { margin: 16px 0 12px; font-size: 12px; color: var(--muted); }
+.rank-head { display: flex; align-items: center; gap: 8px 12px; flex-wrap: wrap; margin: 16px 0 12px; }
+.rank-note { margin: 0; font-size: 12px; color: var(--muted); }
+.seg.small button { min-height: 32px; padding: 4px 12px; font-size: 12.5px; }
 .rank { position: absolute; top: 6px; left: 6px; min-width: 30px; height: 30px; padding: 0 6px; border-radius: 999px; display: grid; place-items: center; font-family: var(--mono); font-weight: 700; font-size: 14px; background: rgba(13, 14, 18, .82); color: var(--text); border: 1px solid var(--line); }
 .rank.r1 { background: #ffd34d; color: #111; border-color: #ffd34d; }
 .rank.r2 { background: #d6dbe4; color: #111; border-color: #d6dbe4; }
@@ -102,7 +103,7 @@ html[data-lang="ja"] [data-only="en"], html[data-lang="en"] [data-only="ja"] { d
 .gbody h3 { margin: 0; font-size: 14.5px; line-height: 1.35; }
 .gmeta { margin: 2px 0 0; font-size: 11.5px; color: var(--muted); }
 .gscore { margin: 4px 0 0; font-size: 12px; color: var(--muted); }
-.gscore b { color: var(--fun); font-weight: 700; }
+.gtime { margin: 4px 0 0; font-size: 12.5px; font-weight: 700; color: var(--signal); }
 
 /* カレンダー */
 .month-nav { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 0; }
@@ -138,26 +139,38 @@ html[data-lang="ja"] [data-only="en"], html[data-lang="en"] [data-only="ja"] { d
 
 .rate-box, .result { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 16px; margin: 22px 0; }
 .sheet-q { text-align: center; font-weight: 700; margin: 0 0 12px; font-size: 16px; }
-.vbtns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.vbtn { border: 1px solid var(--line); background: var(--panel-2); border-radius: 12px; padding: 14px 4px; font-weight: 700; font-size: 15px; cursor: pointer; min-height: 56px; }
-.vbtn.v2 { border-color: var(--fun); color: var(--fun); }
-.vbtn:active { transform: scale(.97); }
-.vbtn:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
+/* 星の入力: DOM は ★5→★1 の順。row-reverse で ★1 を左に置き、押した星（とそれより左）を光らせる */
+.stars-input { display: flex; flex-direction: row-reverse; justify-content: center; gap: 2px; }
+.sbtn { background: none; border: 0; padding: 2px 6px; font-size: 40px; line-height: 1; color: var(--star-off); cursor: pointer; min-width: 52px; min-height: 52px; transition: color .1s, transform .1s; }
+.sbtn:hover, .sbtn:hover ~ .sbtn, .sbtn:focus-visible, .sbtn:focus-visible ~ .sbtn { color: var(--fun); }
+.sbtn:active { transform: scale(.9); }
+.sbtn:focus-visible { outline: 2px solid var(--signal); outline-offset: -2px; border-radius: 8px; }
+.stars-ends { display: flex; justify-content: space-between; max-width: 290px; margin: 2px auto 0; font-size: 11.5px; color: var(--muted); }
 .sheet-foot { display: flex; justify-content: center; gap: 22px; margin-top: 12px; }
 .linkish { background: none; border: 0; color: var(--muted); font-size: 12.5px; text-decoration: underline; cursor: pointer; padding: 6px; }
 .result h2 { font-size: 14px; margin: 14px 0 8px; color: var(--muted); font-weight: 700; }
 .result h2:first-of-type { margin-top: 0; }
 .result-thanks { text-align: center; font-weight: 700; color: var(--signal); margin: 0 0 6px; }
 .result-thanks:empty { display: none; }
-.vbar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; background: var(--panel-2); }
-.vbar.compact { height: 6px; }
-.vbar i.v2 { background: var(--fun); } .vbar i.v1 { background: var(--meh); } .vbar i.v0 { background: var(--boring); }
-.vlegend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12.5px; margin-top: 8px; }
-.vlegend .d { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 5px; }
-.d.v2 { background: var(--fun); } .d.v1 { background: var(--meh); } .d.v0 { background: var(--boring); }
-.ai-verdict { display: flex; align-items: center; gap: 10px; font-size: 13px; }
-.vchip { font-weight: 700; padding: 3px 12px; border-radius: 999px; border: 1px solid var(--line); }
-.vchip.v2 { color: var(--fun); border-color: var(--fun); }
+/* 星の表示（--v の割合まで塗る） */
+.stars { display: inline-block; letter-spacing: 1px; font-size: 13px; line-height: 1; background: linear-gradient(90deg, var(--fun) var(--v), var(--star-off) var(--v)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.stars.big { font-size: 20px; }
+.starline { display: inline-flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.starline b { color: var(--fun); font-family: var(--mono); font-size: 13px; }
+.starline .muted { font-size: 11.5px; }
+.starsum { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: center; }
+.starsum-avg { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 92px; }
+.starsum-avg > b { font-family: var(--mono); font-size: 34px; line-height: 1; color: var(--fun); }
+.starsum-avg .muted { font-size: 12px; }
+.starsum-dist { display: grid; gap: 4px; font-size: 12px; }
+.srow { display: grid; grid-template-columns: 26px 1fr 26px; align-items: center; gap: 6px; }
+.srow > span:last-child { text-align: right; color: var(--muted); font-family: var(--mono); }
+.srow i { height: 8px; border-radius: 4px; background: var(--panel-2); overflow: hidden; }
+.srow i b { display: block; height: 100%; background: var(--fun); border-radius: 4px; }
+.yours { font-size: 13px; margin: 10px 0 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.yours b { color: var(--fun); }
+.ai-verdict { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; }
+.ai-verdict > b { color: var(--fun); font-family: var(--mono); font-size: 16px; }
 .ai-comment { font-size: 14px; margin: 8px 0 4px; }
 
 .more { margin: 10px 0 40px; border-top: 1px solid var(--line); }
@@ -206,16 +219,10 @@ html[data-lang="ja"] [data-only="en"], html[data-lang="en"] [data-only="ja"] { d
 /* ---------- 観測データ ---------- */
 .panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; margin: 0 0 16px; }
 .panel h2 { font-size: 14px; margin: 0 0 10px; }
-.observe { text-align: center; padding: 18px 0 22px; }
-.observe-status { display: inline-block; font-size: 20px; font-weight: 900; padding: 8px 20px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
-.observe-status.yes { color: #111; background: var(--signal); border-color: var(--signal); }
-.observe p { margin: 8px 0 0; }
 .chart { width: 100%; height: auto; max-height: 300px; display: block; }
 .chart text { fill: var(--muted); font: 11px var(--mono); }
 .chart .grid { stroke: #23262f; }
-.chart .line-goal { stroke: var(--signal); stroke-dasharray: 5 5; }
-.chart .dot { fill: var(--fun); }
-.chart .dot.faint { fill-opacity: .4; }
+.chart .dot { fill: var(--fun); fill-opacity: .85; }
 .table-wrap { overflow-x: auto; }
 .data { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 760px; }
 .data th, .data td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }

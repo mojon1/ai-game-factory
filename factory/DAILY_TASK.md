@@ -78,7 +78,7 @@ node tools/play.mjs step <ID> '<操作JSON>' --note "画面から読み取った
 ### 1-6. 自己判定と公開
 
 ```bash
-node tools/review.mjs <ID> --verdict fun|meh|boring --works ok|buggy|broken \
+node tools/review.mjs <ID> --stars 1-5 --works ok|buggy|broken \
   --comment "遊んだ感想" --comment-en "English" \
   --similar '[{"title":"…","url":"https://…","similarity":"中","note":"…","note_en":"…"}]' \
   --research "どう調べたか" --research-en "English" --thumb <サムネに使うステップ番号>
@@ -87,7 +87,7 @@ node tools/metrics.mjs end <ID>
 
 - `metrics.mjs end` は、Claude Code ではセッション記録から思考量・出力量・応答回数・ツール回数・時間を自動集計する。
   それ以外の環境では時間だけが記録される。自分で正確に分かる値があれば `--turns N --tools N` などで添えてよい（推測値は書かない）。
-- verdict は人間と同じ3段階（面白い / まあまあ / つまらない）。**初めて遊んだ人のつもりで**正直に。
+- stars は人間と同じ星5段階（1=つまらない / 2=いまいち / 3=ふつう / 4=面白い / 5=とても面白い）。**初めて遊んだ人のつもりで**正直に。
 - サムネには、ゲームの魅力が一番伝わるプレイ中の画面を選ぶ。
 - 「状態=published」と出れば公開対象。
 

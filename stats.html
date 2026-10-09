@@ -40,7 +40,6 @@
 
 <main class="wrap">
   <h1 class="page-title" data-i18n="stats.title"></h1>
-  <section class="observe" id="observe"></section>
 
   <section class="panel">
     <h2 data-i18n="stats.chart"></h2>
@@ -59,7 +58,7 @@
 <script src="assets/app.js?v=__V__"></script>
 <script>
 (async () => {
-  const { t, CFG, esc, fmtDate, title, pct, kTokens, loadIndex, Ratings, modeBanner, VERDICT } = AGF;
+  const { t, esc, fmtDate, title, pct, kTokens, fmtStars, fmtDuration, loadIndex, Ratings, modeBanner } = AGF;
   I18N.apply();
   modeBanner(document.getElementById('banner'));
   const $ = (id) => document.getElementById(id);
@@ -67,29 +66,22 @@
   let scores = {};
   try { scores = await Ratings.summary(); } catch (e) { console.warn(e); }
   const games = index.games.map((g) => ({ ...g, s: scores[g.id] || null }));
-  const line = CFG.observe || { minVotes: 20, funRate: 50 };
   const avg = (a) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : null);
+  const signed = (v) => (v == null ? '–' : `${v > 0 ? '+' : ''}${v.toFixed(1)}`);
 
-  // ---------- 観測の状況 ----------
-  const passed = games.filter((g) => g.s && g.s.votes >= line.minVotes && g.s.funRate >= line.funRate)
-    .sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1));
-  $('observe').innerHTML = `<div class="observe-status ${passed.length ? 'yes' : ''}">${t(passed.length ? 'stats.status.yes' : 'stats.status.none')}</div>
-    ${passed.length ? `<p>${t('stats.first', { t: `<a href="game.html?id=${encodeURIComponent(passed[0].id)}">${esc(title(passed[0]))}</a>`, d: esc(fmtDate(passed[0].createdAt)) })}</p>` : ''}
-    <p class="muted small">${t('stats.line', { n: line.minVotes, p: line.funRate })}</p>`;
-
-  // ---------- 作品ごとの「面白い」の割合 ----------
+  // ---------- 作品ごとの星の平均（横軸は制作日。点が大きいほど評価した人が多い） ----------
   const rated = games.filter((g) => g.s?.votes).sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1));
   const W = 640, H = 260, P = { l: 36, r: 12, t: 12, b: 28 };
-  const sy = (v) => H - P.b - (v / 100) * (H - P.t - P.b);
+  const sy = (v) => H - P.b - ((v - 1) / 4) * (H - P.t - P.b);
   let svg = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${t('stats.chart')}">`;
-  for (const v of [0, 25, 50, 75, 100]) svg += `<line class="grid" x1="${P.l}" x2="${W - P.r}" y1="${sy(v)}" y2="${sy(v)}"/><text x="${P.l - 6}" y="${sy(v) + 4}" text-anchor="end">${v}%</text>`;
-  svg += `<line x1="${P.l}" x2="${W - P.r}" y1="${sy(line.funRate)}" y2="${sy(line.funRate)}" class="line-goal"/>`;
+  for (const v of [1, 2, 3, 4, 5]) svg += `<line class="grid" x1="${P.l}" x2="${W - P.r}" y1="${sy(v)}" y2="${sy(v)}"/><text x="${P.l - 6}" y="${sy(v) + 4}" text-anchor="end">★${v}</text>`;
   if (rated.length) {
     const t0 = Date.parse(rated[0].createdAt), t1 = Date.parse(rated[rated.length - 1].createdAt);
     const sx = (iso) => P.l + (t1 === t0 ? 0.5 : (Date.parse(iso) - t0) / (t1 - t0)) * (W - P.l - P.r);
+    const maxVotes = Math.max(...rated.map((g) => g.s.votes));
     for (const g of rated) {
-      const big = g.s.votes >= line.minVotes;
-      svg += `<a href="game.html?id=${encodeURIComponent(g.id)}"><circle cx="${sx(g.createdAt)}" cy="${sy(g.s.funRate)}" r="${big ? 6 : 4}" class="${big ? 'dot' : 'dot faint'}"><title>${esc(title(g))}: ${pct(g.s.funRate)} (${t('votes', { n: g.s.votes })})</title></circle></a>`;
+      const r = 3 + 5 * Math.sqrt(g.s.votes / maxVotes);
+      svg += `<a href="game.html?id=${encodeURIComponent(g.id)}"><circle cx="${sx(g.createdAt)}" cy="${sy(g.s.avg)}" r="${r.toFixed(1)}" class="dot"><title>${esc(title(g))}: ★${fmtStars(g.s.avg)} (${t('votes', { n: g.s.votes })})</title></circle></a>`;
     }
     svg += `<text x="${P.l}" y="${H - 8}">${esc(fmtDate(rated[0].createdAt))}</text><text x="${W - P.r}" y="${H - 8}" text-anchor="end">${esc(fmtDate(rated[rated.length - 1].createdAt))}</text>`;
   } else svg += `<text x="${W / 2}" y="${H / 2}" text-anchor="middle">${t('stats.chart.empty')}</text>`;
@@ -99,25 +91,25 @@
   const byAi = new Map();
   for (const g of games) { const k = g.ai?.model || '?'; if (!byAi.has(k)) byAi.set(k, { ai: g.ai, games: [] }); byAi.get(k).games.push(g); }
   const rows = [...byAi.values()].map(({ ai, games: gs }) => {
-    const sum = (k) => gs.reduce((a, g) => a + (g.s?.[k] || 0), 0);
-    const votes = sum('votes'), voted = gs.filter((g) => g.s?.votes);
-    const majority = (s) => [['fun', 2], ['meh', 1], ['boring', 0]].sort((a, b) => s[b[0]] - s[a[0]])[0][1];
-    const agree = voted.filter((g) => g.aiVerdict && VERDICT[g.aiVerdict] === majority(g.s));
+    const sum = (f) => gs.reduce((a, g) => a + (f(g) || 0), 0);
+    const votes = sum((g) => g.s?.votes);
+    const voted = gs.filter((g) => g.s?.votes);
+    const gaps = voted.filter((g) => g.aiStars != null).map((g) => g.aiStars - g.s.avg);
     const m = gs.filter((g) => g.metrics);
     const played = gs.filter((g) => g.s?.sessions);
     return {
       ai, n: gs.length, votes,
-      fun: votes ? (sum('fun') / votes) * 100 : null, meh: votes ? (sum('meh') / votes) * 100 : null, boring: votes ? (sum('boring') / votes) * 100 : null,
-      broken: sum('broken'), agree: voted.length ? (agree.length / voted.length) * 100 : null,
+      stars: votes ? sum((g) => (g.s?.votes ? g.s.avg * g.s.votes : 0)) / votes : null,   // 評価1件ずつの平均
+      gap: avg(gaps), broken: sum((g) => g.s?.broken),
       thinking: avg(m.map((g) => g.metrics.thinking).filter((v) => v != null)), turns: avg(m.map((g) => g.metrics.turns).filter((v) => v != null)), minutes: avg(m.map((g) => g.metrics.minutes).filter((v) => v != null)),
-      playtime: avg(played.map((g) => g.s.avgSeconds).filter((v) => v != null)), replay: avg(played.map((g) => g.s.replayRate).filter((v) => v != null)),
+      playtime: avg(played.map((g) => g.s.avgSeconds).filter((v) => v != null)), total: sum((g) => g.s?.totalSeconds), replay: avg(played.map((g) => g.s.replayRate).filter((v) => v != null)),
     };
   });
-  const cols = ['th.ai', 'th.games', 'th.votes', 'th.fun', 'th.meh', 'th.boring', 'th.broken', 'th.agree', 'th.thinking', 'th.turns', 'th.minutes', 'th.playtime', 'th.replay'];
+  const cols = ['th.ai', 'th.games', 'th.votes', 'th.stars', 'th.aigap', 'th.broken', 'th.thinking', 'th.turns', 'th.minutes', 'th.playtime', 'th.totaltime', 'th.replay'];
   $('by-ai').innerHTML = `<thead><tr>${cols.map((k) => `<th>${t(k)}</th>`).join('')}</tr></thead><tbody>${rows.map((r) => `<tr>
-    <td>${esc(r.ai?.name || '?')}</td><td>${r.n}</td><td>${r.votes}</td><td class="c-fun">${pct(r.fun)}</td><td>${pct(r.meh)}</td><td>${pct(r.boring)}</td><td>${r.broken}</td><td>${pct(r.agree)}</td>
+    <td>${esc(r.ai?.name || '?')}</td><td>${r.n}</td><td>${r.votes}</td><td class="c-fun">${r.stars == null ? '–' : `★${fmtStars(r.stars)}`}</td><td>${signed(r.gap)}</td><td>${r.broken}</td>
     <td>${kTokens(r.thinking)}</td><td>${r.turns == null ? '–' : Math.round(r.turns)}</td><td>${r.minutes == null ? '–' : t('m.min', { n: Math.round(r.minutes) })}</td>
-    <td>${r.playtime == null ? '–' : `${Math.round(r.playtime)}s`}</td><td>${pct(r.replay)}</td></tr>`).join('') || `<tr><td colspan="${cols.length}" class="muted">${t('empty')}</td></tr>`}</tbody>`;
+    <td>${fmtDuration(r.playtime)}</td><td>${fmtDuration(r.total)}</td><td>${pct(r.replay)}</td></tr>`).join('') || `<tr><td colspan="${cols.length}" class="muted">${t('empty')}</td></tr>`}</tbody>`;
 })();
 </script>
 </body>

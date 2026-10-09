@@ -52,8 +52,7 @@
   </ul>
 
   <h2>あなたにお願いしたいこと</h2>
-  <p>遊んで、<b>面白い / まあまあ / つまらない</b> のどれかを押すだけです。</p>
-  <p>「面白い」が評価{n}人以上で{p}%を超えた作品が現れたとき、その日を「観測された日」として記録します。</p>
+  <p>遊んで、<b>星5段階</b>（★1 つまらない 〜 ★5 とても面白い）で評価するだけです。</p>
 
   <h2>記録していること</h2>
   <p>評価のほか、プレイ回数とプレイ時間を匿名で記録しています。作品ごとに、制作したAI・制作日・制作記録（思考量、手数、時間）を公開しています。</p>
@@ -67,6 +66,8 @@
     <li>2026-10-07: プルリクエストで作品を提出するAI（ChatGPT / Codex など）の作品も、自動テストに合格すれば人間のマージを待たずに自動で公開されるようにした。これでどのAIの作品も、自動テストの合否だけで公開が決まる。</li>
     <li>2026-10-07: 企画の手順を変更（仕様の版 4）。実装の手間を考えずに企画の候補を3つ出して選び、そのあとで「ライブラリを使うとこの企画がもっと面白くなるか」を判断する（基準は面白さと推奨環境での動作。使わない判断も同じく正しい）。判断の理由は作品ページに公開する。棚の追加後に作られた2本がどちらもライブラリを使っていなかったため、作りやすさで企画が狭まっていないかを確かめる目的。</li>
     <li>2026-10-07: 上の手順に追記。ライブラリを使うと決めた場合は、企画の「面白さの核」は変えずに、そのライブラリで核をさらに強める方法を考え直す（機能を見せるための要素は足さない。核そのものが変わるなら別の候補として比べ直す）。再考で足した・変えたことも判断の理由に書く。</li>
+    <li>2026-10-09: 人間の評価を「面白い / まあまあ / つまらない」の3段階から<b>星5段階</b>（★1 つまらない / ★2 いまいち / ★3 ふつう / ★4 面白い / ★5 とても面白い）に変更。それまでの評価は 面白い→★5、まあまあ→★3、つまらない→★1 に置き換えた。AIの自己判定も同じ星5段階にした（それまでの自己判定も同じ対応で星として表示する）。</li>
+    <li>2026-10-09: 「評価20人以上で『面白い』が50%を超えたら観測された日とする」という判定ラインを取りやめた。数値の線を先に決めることは、この実験の問いの立て方と少しずれていると考えたため。</li>
   </ul>
 </div>
 
@@ -84,8 +85,7 @@
   </ul>
 
   <h2>What we ask of you</h2>
-  <p>Play, then tap <b>Fun / So-so / Boring</b>. That's it.</p>
-  <p>When a game with {n}+ ratings goes over {p}% "fun", we will record that day as the day it was observed.</p>
+  <p>Play, then rate it with <b>1–5 stars</b> (★1 boring – ★5 great fun). That's it.</p>
 
   <h2>What we record</h2>
   <p>Besides ratings, we anonymously record play counts and play time. Each game shows the AI that made it, the date, and its production record (thinking, turns, time).</p>
@@ -99,14 +99,11 @@
     <li>2026-10-07: Games submitted as pull requests (ChatGPT / Codex, etc.) are now published automatically when they pass the automated test, without waiting for a human to merge them. For every AI, publication is now decided by the automated test alone.</li>
     <li>2026-10-07: Changed the design process (spec version 4). The AI first comes up with three ideas without thinking about implementation effort and picks one, then decides whether a shelf library would make that design more fun (judged only on fun and smooth play on the target phone; not using one is equally valid). The reason is shown on each game page. This was prompted by both games made after the shelf was added using no library, to check whether ease of building was narrowing the designs.</li>
     <li>2026-10-07: Addition to the process above. If the AI decides to use a library, it rethinks how that library can strengthen the design's core fun, without changing the core (no features added just to show off the library; if the core itself changes, that idea is compared again as a separate candidate). What the rethink added or changed is included in the stated reason.</li>
+    <li>2026-10-09: Changed human ratings from three options (fun / so-so / boring) to <b>1–5 stars</b> (★1 boring / ★2 meh / ★3 okay / ★4 fun / ★5 great fun). Earlier ratings were converted: fun → ★5, so-so → ★3, boring → ★1. The AI's self-judgment now uses the same 1–5 stars (earlier self-judgments are shown as stars with the same mapping).</li>
+    <li>2026-10-09: Dropped the threshold "a game with N+ ratings and over P% 'fun' marks the day it was observed". Fixing a numeric line in advance felt slightly at odds with how the experiment's question is posed.</li>
   </ul>
 </div>
 </main>
 <footer><div class="wrap"><a href="./">AI GAME FACTORY</a></div></footer>
-<script src="assets/config.js?v=__V__"></script>
-<script>
-  const o = (window.AGF_CONFIG || {}).observe || { minVotes: 20, funRate: 50 };
-  document.querySelectorAll('main p').forEach((p) => { p.innerHTML = p.innerHTML.replace('{n}', o.minVotes).replace('{p}', o.funRate); });
-</script>
 </body>
 </html>

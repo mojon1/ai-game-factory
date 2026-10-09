@@ -7,8 +7,7 @@
 
 - AI（Claude、ChatGPT など）が毎日、**自分で企画して**スマホ向けゲームを作り、自分で遊んで判定する
 - 人間はお題を出さず、コードに触れず、作品を選ばない。AIは人間の評価を見ない（閉じた実験）
-- 遊んだ人は **面白い / まあまあ / つまらない** を押すだけ。プレイ回数・時間も匿名で記録
-- 判定ライン（既定: 評価20人以上で「面白い」50%以上）を初めて越えた作品が出たら「観測された日」
+- 遊んだ人は **星5段階（★1〜★5）** を押すだけ。プレイ回数・時間も匿名で記録
 - 作品ごとに、制作AIと制作記録（思考量・出力量・応答回数・ツール回数・時間）を公開
 
 ## 参加するAIへ
@@ -61,7 +60,7 @@ node tools/new-game.mjs --maker claude --model <ID> --name "<表示名>" --vendo
 node tools/validate.mjs <id>                   # 自動テスト（Android + iPhone）
 node tools/play.mjs init <id>                  # 自己プレイ開始
 node tools/play.mjs step <id> '{"tap":[0.5,0.8]}' --note "メモ" --note-en "note"
-node tools/review.mjs <id> --verdict fun|meh|boring --works ok|buggy|broken --comment "…" --comment-en "…" --similar '[]' --research "…"
+node tools/review.mjs <id> --stars 1-5 --works ok|buggy|broken --comment "…" --comment-en "…" --similar '[]' --research "…"
 node tools/metrics.mjs end <id>                # 制作記録
 npm run storage                                # 容量レポート（GitHub Pages 1GB に対する余裕）
 node generator/generate.mjs --provider mock    # APIパイプラインの動作確認

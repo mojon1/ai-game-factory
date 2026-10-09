@@ -123,8 +123,8 @@ async function researchSimilar(provider, cfg, meta) {
 
 const REVIEW_SYSTEM = [
   'あなたは今プレイしたスマホゲームを判定します。作者としてではなく、初めて遊んだ人間のつもりで正直に判定してください。',
-  '返答は JSON のみ: {"verdict":"fun|meh|boring","works":"ok|buggy|broken","comment":"感想（日本語・60〜160字、実際のプレイを根拠に）","comment_en":"the same in English","thumb":サムネに最適なステップ番号}',
-  'verdict: fun=面白い / meh=まあまあ / boring=つまらない。works: ok=問題なく動いた / buggy=不具合はあるが遊べた / broken=遊べなかった。',
+  '返答は JSON のみ: {"stars":1〜5の整数,"works":"ok|buggy|broken","comment":"感想（日本語・60〜160字、実際のプレイを根拠に）","comment_en":"the same in English","thumb":サムネに最適なステップ番号}',
+  'stars（人間の評価と同じ星5段階）: 1=つまらない / 2=いまいち / 3=ふつう / 4=面白い / 5=とても面白い。works: ok=問題なく動いた / buggy=不具合はあるが遊べた / broken=遊べなかった。',
 ].join('\n');
 
 async function selfReview(provider, id, meta, session, test) {
@@ -137,7 +137,7 @@ async function selfReview(provider, id, meta, session, test) {
   const r = parseJson(res.text);
   const oneOf = (v, list, d) => (list.includes(v) ? v : d);
   return {
-    verdict: oneOf(r.verdict, ['fun', 'meh', 'boring'], 'meh'), works: oneOf(r.works, ['ok', 'buggy', 'broken'], 'ok'),
+    stars: Math.max(1, Math.min(5, Math.round(+r.stars) || 3)), works: oneOf(r.works, ['ok', 'buggy', 'broken'], 'ok'),
     comment: String(r.comment || '').padEnd(10, '。'), commentEn: String(r.comment_en || r.comment || '').padEnd(10, '.'),
     thumb: Math.max(1, Math.min(n || 1, Math.round(+r.thumb) || n || 1)),
   };
@@ -184,7 +184,7 @@ async function makeGame(cfg) {
     const session = provider.vision ? await selfPlay(provider, id, meta, config.playSteps) : null;
     const research = await researchSimilar(provider, cfg, meta);
     const r = await selfReview(provider, id, meta, session, test);
-    const list = ['--verdict', r.verdict, '--works', r.works, '--comment', r.comment, '--comment-en', r.commentEn,
+    const list = ['--stars', String(r.stars), '--works', r.works, '--comment', r.comment, '--comment-en', r.commentEn,
       '--similar', JSON.stringify(research.similar), '--research', research.research.padEnd(10, '。'), '--research-en', research.researchEn];
     if (session) list.push('--thumb', String(r.thumb));
     console.log('  ' + node('tools/review.mjs', [id, ...list]));

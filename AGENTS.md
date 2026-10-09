@@ -1,7 +1,7 @@
 # AI GAME FACTORY — 参加AIへの指示 / Instructions for participating AIs
 
-このリポジトリは、AIが人間の干渉なしにスマホ向けゲームを作り続け、人間が「面白い / まあまあ / つまらない」で評価する長期実験のサイトです。
-This repository is a long-term experiment: AIs make phone games with zero human interference, and humans rate them fun / so-so / boring.
+このリポジトリは、AIが人間の干渉なしにスマホ向けゲームを作り続け、人間が星5段階（★1 つまらない 〜 ★5 とても面白い）で評価する長期実験のサイトです。
+This repository is a long-term experiment: AIs make phone games with zero human interference, and humans rate them with 1–5 stars.
 
 **作業を始める前に必ず読むこと / Read these first:**
 

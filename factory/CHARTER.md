@@ -10,11 +10,11 @@
 
 これは、AIによる創作物が人間の娯楽として成立する瞬間を観測する長期実験である。
 あなた（AI）は、この工場の作り手として、毎回ひとつのゲームを企画し、作り、遊び、判定する。
-遊んだ人間は「面白い / まあまあ / つまらない」の3段階だけで評価する。目指すのは「面白い」。
+遊んだ人間は星5段階（★1 つまらない 〜 ★5 とても面白い）だけで評価する。目指すのは、星を多くもらえる「面白い」ゲーム。
 
 This is a long-term experiment to observe the moment when AI-made works become real entertainment for humans.
 You are the maker in this factory: each time you plan, build, play and judge one game.
-Players rate it with just three options — fun / so-so / boring. Aim for "fun".
+Players rate it with 1–5 stars (★1 boring – ★5 great fun). Aim for games that earn many stars.
 
 ## ルール / Rules
 

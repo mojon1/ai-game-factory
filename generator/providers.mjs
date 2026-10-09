@@ -88,7 +88,7 @@ function openai(cfg, key) {
   };
 }
 
-// 動作確認用: 固定のゲームを返し、プレイでは画面下をタップ、判定は「まあまあ」
+// 動作確認用: 固定のゲームを返し、プレイでは画面下をタップ、判定は★3（ふつう）
 function mock() {
   const html = fs.readFileSync(new URL('./fixtures/mock-game.html', import.meta.url), 'utf8');
   let turn = 0;
@@ -99,7 +99,7 @@ function mock() {
       const last = messages[messages.length - 1].text;
       if (last.includes('"similar":[')) return ok({ similar: [{ title: 'モック類似作品', similarity: '中', note: 'パイプライン確認用', note_en: 'for pipeline testing' }], research: 'モック', research_en: 'mock' });
       if (json && last.includes('"action"')) return ok({ observation: 'モック', action: { tap: [0.2 + 0.3 * (turn++ % 3), 0.85], hold: 300 }, note: 'モックの操作', note_en: 'mock move' });
-      if (json) return ok({ verdict: 'meh', works: 'ok', comment: 'モックによる仮の判定です。パイプライン確認用。', comment_en: 'Placeholder verdict by the mock provider for pipeline testing.', thumb: 2 });
+      if (json) return ok({ stars: 3, works: 'ok', comment: 'モックによる仮の判定です。パイプライン確認用。', comment_en: 'Placeholder verdict by the mock provider for pipeline testing.', thumb: 2 });
       const meta = { title: 'モック・ドッジ', genre: 'アクション', concept: 'パイプライン確認用のモック。', howToPlay: '指で左右に動かして避ける。', libraryDecision: 'モックのため使わない。', i18n: { en: { title: 'Mock Dodge', concept: 'A mock for testing the pipeline.', howToPlay: 'Drag left and right to dodge.', libraryDecision: 'None; this is a mock.' } } };
       return { text: '```json\n' + JSON.stringify(meta) + '\n```\n\n```html\n' + html + '\n```', usage: { input: 0, output: 0, thinking: 0 }, modelVersion: 'mock' };
     },

@@ -47,7 +47,7 @@
 <div class="sheet" id="sheet" hidden>
   <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sheet-q">
     <p id="sheet-q" class="sheet-q" data-i18n="rate.q"></p>
-    <div class="vbtns" data-rate></div>
+    <div data-rate></div>
     <div class="sheet-foot"><button type="button" class="linkish" data-broken data-i18n="v.broken"></button><button type="button" class="linkish" id="later" data-i18n="rate.later"></button></div>
   </div>
 </div>
@@ -56,7 +56,7 @@
 <script src="assets/app.js?v=__V__"></script>
 <script>
 (async () => {
-  const { t, lang, EN, esc, fmtDate, genre, kTokens, loadIndex, loadMeta, Ratings, verdictBar, modeBanner, VERDICT } = AGF;
+  const { t, lang, EN, esc, fmtDate, genre, kTokens, loadIndex, loadMeta, Ratings, starBar, starIcons, aiStars, modeBanner } = AGF;
   const tr = I18N.tr;
   I18N.apply();
   modeBanner(document.getElementById('banner'));
@@ -71,8 +71,10 @@
   const ai = meta.aiReview, x = meta.metrics, main = meta.credits?.find((c) => c.role === 'main') || {};
   const src = `games/${encodeURIComponent(meta.id)}/index.html?lang=${lang}`;
   const thumb = `games/${encodeURIComponent(meta.id)}/thumb.webp`;
-  const vBtns = [2, 1, 0].map((v) => `<button type="button" class="vbtn v${v}" data-v="${v}">${t('v.' + v)}</button>`).join('');
-  const aiV = ai ? VERDICT[ai.verdict] : null;
+  // 星の入力（★1〜★5）。DOM は ★5→★1 の順に並べ、CSS で左右を反転して「押した星まで光る」を表現する
+  const vBtns = `<div class="stars-input">${[5, 4, 3, 2, 1].map((n) => `<button type="button" class="sbtn" data-v="${n}" aria-label="${t('stars.n', { n })} ${t('stars.' + n)}">★</button>`).join('')}</div>
+    <div class="stars-ends"><span>${t('stars.1')}</span><span>${t('stars.5')}</span></div>`;
+  const aiN = ai ? aiStars(ai) : null;
   // 使用ライブラリ（自動テストの記録。無ければ一覧データの読み取り結果）
   const libs = meta.libraries || index?.games?.find((g) => g.id === meta.id)?.libraries || null;
 
@@ -90,7 +92,7 @@
 
   <section class="rate-box" id="rate-box">
     <p class="sheet-q">${t('rate.q')}</p>
-    <div class="vbtns" data-rate>${vBtns}</div>
+    <div data-rate>${vBtns}</div>
     <div class="sheet-foot"><button type="button" class="linkish" data-broken>${t('v.broken')}</button></div>
   </section>
 
@@ -98,8 +100,9 @@
     <p class="result-thanks" id="thanks"></p>
     <h2>${t('result.title')}</h2>
     <div id="dist"></div>
+    <p class="yours" id="yours" hidden></p>
     ${ai ? `<h2>${t('result.ai')}</h2>
-    <div class="ai-verdict"><span class="vchip v${aiV}">${t('v.' + aiV)}</span><span class="muted">${t('works.' + ai.works)}</span></div>
+    <div class="ai-verdict">${aiN ? `${starIcons(aiN, 'big')}<b>★${aiN}</b><span>${t('stars.' + aiN)}</span>` : ''}<span class="muted">${t('works.' + ai.works)}</span></div>
     <p class="ai-comment">${esc(EN && ai.i18n?.en?.comment ? ai.i18n.en.comment : ai.comment)}</p>` : ''}
     <button type="button" class="linkish" id="change">${t('rate.change')}</button>
   </section>
@@ -135,14 +138,17 @@
   async function showResult(note) {
     let s = null;
     try { s = (await Ratings.summary())[id] || null; } catch (e) { console.warn(e); }
-    $('dist').innerHTML = verdictBar(s);
+    $('dist').innerHTML = starBar(s);
+    const my = Ratings.mine(id);
+    $('yours').hidden = !my?.stars;
+    if (my?.stars) $('yours').innerHTML = `${t('rate.yours')}: ${starIcons(my.stars)} <b>★${my.stars}</b> ${t('stars.' + my.stars)}`;
     $('thanks').textContent = note || '';
     $('result').hidden = false;
     $('rate-box').hidden = true;
   }
-  async function rate(verdict, broken) {
+  async function rate(stars, broken) {
     try {
-      await Ratings.submit(id, { verdict, broken, plays: session.plays, seconds: session.seconds });
+      await Ratings.submit(id, { stars, broken, plays: session.plays, seconds: session.seconds });
       closeSheet();
       showResult(broken ? t('rate.broken.done') : t('rate.thanks'));
     } catch (e) { closeSheet(); $('thanks').textContent = t('rate.err'); }

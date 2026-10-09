@@ -21,7 +21,8 @@ for (const id of listGameIds()) {
     createdAt: m.createdAt,
     ai: { name: main.name, vendor: main.vendor, model: main.model },
     thumb: fs.existsSync(path.join(GAMES_DIR, id, 'thumb.webp')) ? `games/${id}/thumb.webp` : null,
-    aiVerdict: m.aiReview?.verdict || null,
+    // AIの自己判定（星1〜5）。2026-10-09 までの3段階は 面白い=★5 / まあまあ=★3 / つまらない=★1 として扱う
+    aiStars: m.aiReview?.stars ?? ({ fun: 5, meh: 3, boring: 1 })[m.aiReview?.verdict] ?? null,
     libraries,
     metrics: m.metrics ? { thinking: x.thinkingTokens, output: x.outputTokens, turns: x.turns, tools: x.toolCalls, minutes: x.minutes, runs: m.generation?.validationRuns ?? null, effort: x.effort || null } : null,
   });

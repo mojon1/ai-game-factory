@@ -1,43 +1,21 @@
--- AI GAME FACTORY 評価データベース（Supabase 無料プラン用）
--- Supabase の SQL Editor にこのファイルの内容を貼り付けて実行してください。
--- テーブルへの直接アクセスは禁止し、下の関数（RPC）経由でのみ読み書きします。
+-- 2026-10-09: 評価を「面白い / まあまあ / つまらない」の3段階から、星5段階（★1〜★5）に変更する
+-- Supabase の SQL Editor にこのファイルの内容を貼り付けて、1回だけ実行してください（何度実行しても同じ結果になります）。
 --
--- ratings : 1人1作品1件の評価（星 1〜5、動かなかった報告）。verdict は 2026-10-09 までの3段階評価の名残（今は使わない）
--- 変更履歴: supabase/migrations/ （既存のデータベースには、そこにあるファイルを順に実行する）
--- plays   : 1回の訪問ごとのプレイ回数と時間（遊ぶ人には見えない計測）
+-- ・ratings に stars（1〜5）を追加し、これまでの3段階の評価を 面白い→★5 / まあまあ→★3 / つまらない→★1 に置き換える
+-- ・submit_rating は p_stars を受け取る（古い画面からの p_verdict も星に置き換えて受け付ける）
+-- ・get_scores は星の平均・★1〜★5 の人数・総プレイ時間を返す
 
-create table if not exists public.ratings (
-  id          bigserial primary key,
-  game_id     text        not null check (game_id ~ '^[A-Za-z0-9_-]{1,64}$'),
-  voter_id    uuid        not null,
-  device      text        not null default 'mobile' check (device in ('pc', 'mobile')),
-  stars       smallint    check (stars between 1 and 5),
-  verdict     smallint    check (verdict between 0 and 2),
-  broken      boolean     not null default false,
-  plays       integer     not null default 0 check (plays between 0 and 10000),
-  seconds     integer     not null default 0 check (seconds between 0 and 86400),
-  created_at  timestamptz not null default now(),
-  updated_at  timestamptz not null default now(),
-  unique (game_id, voter_id),
-  constraint ratings_has_value check (stars is not null or verdict is not null or broken)
-);
-create index if not exists ratings_game_idx on public.ratings (game_id);
+-- ---------- 評価テーブル ----------
+alter table public.ratings add column if not exists stars smallint check (stars between 1 and 5);
+update public.ratings
+   set stars = case verdict when 2 then 5 when 1 then 3 when 0 then 1 end
+ where stars is null and verdict is not null;
 
-create table if not exists public.plays (
-  id          bigserial primary key,
-  game_id     text        not null check (game_id ~ '^[A-Za-z0-9_-]{1,64}$'),
-  voter_id    uuid        not null,
-  device      text        not null default 'mobile' check (device in ('pc', 'mobile')),
-  plays       integer     not null default 0 check (plays between 0 and 10000),
-  seconds     integer     not null default 0 check (seconds between 0 and 86400),
-  created_at  timestamptz not null default now()
-);
-create index if not exists plays_game_idx on public.plays (game_id);
-
-alter table public.ratings enable row level security;
-alter table public.plays enable row level security;
-revoke all on public.ratings from anon, authenticated;
-revoke all on public.plays from anon, authenticated;
+-- 「評価か動かなかった報告のどちらかがある」の条件を、星も含めた形に付け替える
+alter table public.ratings drop constraint if exists ratings_check;
+do $$ begin
+  alter table public.ratings add constraint ratings_has_value check (stars is not null or verdict is not null or broken);
+exception when duplicate_object then null; end $$;
 
 -- ---------- 評価の登録・更新 ----------
 drop function if exists public.submit_rating(text, uuid, text, int, boolean, int, int);
@@ -58,16 +36,6 @@ begin
     set device = excluded.device, stars = excluded.stars, verdict = null, broken = excluded.broken,
         plays = greatest(ratings.plays, excluded.plays), seconds = greatest(ratings.seconds, excluded.seconds), updated_at = now();
 end $$;
-
--- 1回の訪問のプレイ記録
-create or replace function public.log_play(
-  p_game_id text, p_voter_id uuid, p_device text default 'mobile', p_plays int default 0, p_seconds int default 0
-) returns void
-language sql security definer set search_path = public as $$
-  insert into plays (game_id, voter_id, device, plays, seconds)
-  values (p_game_id, p_voter_id, case when p_device = 'pc' then 'pc' else 'mobile' end,
-          least(greatest(coalesce(p_plays, 0), 0), 10000), least(greatest(coalesce(p_seconds, 0), 0), 86400));
-$$;
 
 -- ---------- 全作品の集計 ----------
 drop function if exists public.get_scores();
@@ -97,8 +65,9 @@ language sql stable security definer set search_path = public as $$
 $$;
 
 revoke execute on function public.submit_rating(text, uuid, text, int, boolean, int, int, int) from public;
-revoke execute on function public.log_play(text, uuid, text, int, int) from public;
 revoke execute on function public.get_scores() from public;
 grant execute on function public.submit_rating(text, uuid, text, int, boolean, int, int, int) to anon, authenticated;
-grant execute on function public.log_play(text, uuid, text, int, int) to anon, authenticated;
 grant execute on function public.get_scores() to anon, authenticated;
+
+-- 画面側（PostgREST）に関数の変更をすぐ反映させる
+notify pgrst, 'reload schema';
