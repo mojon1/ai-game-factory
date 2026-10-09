@@ -26,7 +26,7 @@ export const CHECK_EN = {
   'プレイ開始の合図（start）を送っている': 'Sends the play "start" signal',
   '音を鳴らす仕組みがある（BGM・効果音）': 'Has sound (BGM and sound effects)',
   'サイトの音のオン/オフに対応している': "Follows the site's sound on/off",
-  'Android: BGMが鳴っている（操作していない間も音が続く）': 'Android: BGM plays (sound continues without input)',
+  'Android: BGMが流れている（操作していない間も音楽が聞こえる）': 'Android: background music plays (heard even without input)',
   'JavaScript エラーが出ない': 'No JavaScript errors',
 };
 const drawn = (i) => (i.canvasVariety ?? 99) > 1 || i.text.length > 0;
@@ -40,11 +40,13 @@ async function deviceCheck(id, device, browser, add, label, checkBgm = false) {
     const before = await s.page.screenshot({ type: 'jpeg', quality: 60 });
     await s.act({ tap: [0.5, 0.5], hold: 80, wait: 300 });
     if (checkBgm) {
-      // BGM: 開始してから何も操作しない間も、音が鳴り続けているか（ループ再生か、新しい音が鳴り始めている）
-      const t0 = await s.page.evaluate(() => performance.now());
-      await s.page.waitForTimeout(2500);
-      const au = await s.page.evaluate((t) => ({ idle: (window.__agfAudio?.starts || []).filter((x) => x > t).length, loops: window.__agfAudio?.loops || 0, all: (window.__agfAudio?.starts || []).length }), t0);
-      add(`${label}: BGMが鳴っている（操作していない間も音が続く）`, au.loops > 0 || au.idle >= 2, `操作なし2.5秒間に鳴り始めた音=${au.idle} / ループ再生=${au.loops} / 合計=${au.all}`);
+      // BGM: 開始してから何も操作しない2.5秒間、音が聞こえている時間の割合（0.25秒ごとに確認）。
+      // 音楽の形（ループ・展開する曲・伸ばす音・状況で変わる音楽など）は問わない。休符で途切れる分を見込んで、聞こえている割合が3割以上か、その間に3回以上音が鳴り始めていれば合格
+      const au = await s.page.evaluate(() => new Promise((done) => {
+        const a = window.__agfAudio, t = performance.now(), n0 = a ? a.starts.length : 0; let hit = 0, k = 0;
+        const id = setInterval(() => { if (a && a.playing.size > 0) hit++; if (++k >= 10) { clearInterval(id); done({ rate: hit / k, started: a ? a.starts.length - n0 : 0, all: a ? a.starts.length : 0 }); } }, 250);
+      }));
+      add(`${label}: BGMが流れている（操作していない間も音楽が聞こえる）`, au.rate >= 0.3 || au.started >= 3, `操作なし2.5秒間に音が聞こえていた割合=${Math.round(au.rate * 100)}% / その間に鳴り始めた音=${au.started} / 合計=${au.all}`);
     }
     for (let i = 0; i < 8; i++) {
       const x = 0.15 + Math.random() * 0.7, y = 0.3 + Math.random() * 0.6;

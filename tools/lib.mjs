@@ -80,8 +80,15 @@ export const SANDBOX_INIT = `(() => {
   }
   window.alert = window.confirm = window.prompt = () => { throw new Error('alert/confirm/prompt は使用禁止です'); };
   // 音の検査用: 音を鳴らし始めた時刻とループ再生（BGM）の数を記録する（鳴り方は変えない）
-  window.__agfAudio = { starts: [], loops: 0 };
-  const noteStart = (node) => { window.__agfAudio.starts.push(performance.now()); if (node.loop) window.__agfAudio.loops++; };
+  // 鳴っている音（始まって、まだ終わっていないもの）も数え、「今、何か音が聞こえているか」を確かめられるようにする
+  window.__agfAudio = { starts: [], loops: 0, playing: new Set() };
+  const noteStart = (node) => {
+    const a = window.__agfAudio;
+    a.starts.push(performance.now());
+    if (node.loop) a.loops++;
+    a.playing.add(node);
+    try { node.addEventListener('ended', () => a.playing.delete(node)); } catch (e) {}
+  };
   // 検査用の WebKit（iPhone 相当）は Web Audio を持たない。実機の iPhone にはあるので、音の出ない代わりの部品を置き、
   // 「AudioContext が無い」という検査環境だけのエラーで不合格にならないようにする
   if (!window.AudioContext && !window.webkitAudioContext) {
