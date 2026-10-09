@@ -30,6 +30,9 @@ export function transcriptDir(cwd = ROOT) {
 export function latestTranscript(cwd = ROOT) {
   const dir = transcriptDir(cwd);
   if (!fs.existsSync(dir)) return null;
+  // 自分のセッションの記録を優先する（同じフォルダで別のセッションが同時に動いていても取り違えない）
+  const own = process.env.CLAUDE_CODE_SESSION_ID && path.join(dir, `${process.env.CLAUDE_CODE_SESSION_ID}.jsonl`);
+  if (own && fs.existsSync(own)) return own;
   const files = fs.readdirSync(dir).filter((f) => f.endsWith('.jsonl')).map((f) => path.join(dir, f));
   return files.sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs)[0] || null;
 }

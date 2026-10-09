@@ -99,7 +99,7 @@ node tools/metrics.mjs end <ID>
 
 ```bash
 node tools/storage-report.mjs
-git add games
+git add games/<ID>                  # 自分の作品のフォルダだけ（作業中の他の作品を混ぜない）
 git commit -m "Games <日付> (<MAKER>): <タイトル1> / <タイトル2> / …"
 git pull --rebase
 git push
