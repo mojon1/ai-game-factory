@@ -1,0 +1,335 @@
+{
+  "id": "2026-10-09-gpt-1",
+  "status": "published",
+  "title": "雨つぶ連花",
+  "genre": "パズル",
+  "concept": "雨をひと粒落として芽を育て、4枚で開花すると隣の芽も育つ。雨は庭ごとに6粒だけ。3枚の芽をどの順で咲かせるか読み、連鎖が広がる瞬間と、残った芽を最後に咲かせる判断を核にした60秒のパズル。",
+  "howToPlay": "芽をタップして花びらを1枚増やします。4枚で開花し、上下左右にも1枚ずつ広がります。庭ごとの雨6粒で大きな連鎖を狙いましょう。",
+  "libraryDecision": "共有棚のライブラリは使わない。面白さの核は離散的な隣接連鎖と残り雨粒の読み合いで、物理演算や3D化は芽の枚数と隣接関係を読みづらくする。Canvasの段階表示と短いWeb Audio音で、連鎖の進行を明確にする。",
+  "i18n": {
+    "en": {
+      "title": "Raindrop Bloom",
+      "concept": "One raindrop grows a bud; four petals make it bloom and grow adjacent buds. Each garden has only six drops. Reading the order of three-petal blooms, watching a chain spread and finishing the remaining buds are the core of this 60-second puzzle.",
+      "howToPlay": "Tap a bud to add a petal. Four petals make it bloom and add a petal to each orthogonal neighbor. Build big chains with six drops per garden.",
+      "libraryDecision": "Use no shelf libraries. The core is discrete neighbor propagation and planning with limited drops; physics and 3D would make petal counts and adjacency harder to read. Canvas stages and brief Web Audio tones communicate the cascade clearly."
+    }
+  },
+  "createdAt": "2026-10-09T11:59:41+09:00",
+  "specVersion": 4,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-09T11:59:41+09:00",
+    "metricsFrom": "2026-10-09T02:57:58.305Z",
+    "transcript": null,
+    "validationRuns": 1,
+    "finishedAt": "2026-10-09T12:07:36+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-09T12:00:29+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "7.9KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=83",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=95",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=65",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=79",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 8115,
+    "lines": 25
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "verdict": "meh",
+    "works": "ok",
+    "comment": "11手の画像付きプレイで6連花48点、雨切れの減点と庭の更新、95点での時間切れ、再開始を確認。3枚の芽から連鎖を予測する楽しさはあるが、孤立した芽が残ると6粒では処理が厳しく、初回の快感が続きにくい。致命的な不具合はなく、バランスは変更しない。",
+    "similar": [
+      {
+        "title": "ChainReaction (jubich)",
+        "url": "https://github.com/jubich/ChainReaction",
+        "similarity": "高",
+        "note": "閾値で上下左右へ1個ずつ伝播する仕組みが近い。こちらは4枚固定で開花後に消え、6粒の単独スコアパズル。原作は隣接数が閾値の多人数陣取り。",
+        "note_en": "Both cascade one unit to orthogonal neighbors at a threshold. Here four petals remove a bud in a six-drop solo score puzzle; the other uses degree-based thresholds and multiplayer ownership."
+      },
+      {
+        "title": "Chain Reaction (HeliosphereStudio)",
+        "url": "https://heliospherestudio.itch.io/chain-reaction",
+        "similarity": "低",
+        "note": "連鎖で盤上の要素を消す点は共通。こちらは隣接マスの枚数を読む離散パズルで、相手はドラッグして粒子を衝突させる物理サバイバル。",
+        "note_en": "Both remove board elements through reactions. This is a discrete neighbor-count puzzle; the other drags particles into collisions in physics survival."
+      }
+    ],
+    "research": "4検索（Nintendoの連鎖、itch.ioの水滴連鎖、Splash Backのルール、Chain Reactionの閾値）で探索。実装者のGitHubルールと開発者itch.ioの操作説明を確認し2作品を比較。",
+    "i18n": {
+      "en": {
+        "comment": "Eleven image-guided moves confirmed a six-bloom chain worth 48 points, depleted-drop penalty, next garden, timeout at 95 and restart. Predicting chains from three-petal buds is enjoyable, but isolated buds are hard to finish with six drops, making the initial satisfaction difficult to sustain. No fatal bugs; balance was not changed.",
+        "research": "Four queries covered Nintendo chains, itch.io water-drop chains, Splash Back rules, and Chain Reaction thresholds. Compared two games using an implementer GitHub rules page and the developer itch.io instructions."
+      }
+    },
+    "method": "スマホ縦画面で 11 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 11 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.77) 120ms",
+        "note": "3行の説明で、4枚から開花して隣にも広がるルールを確認。開始して3枚の芽が集まる場所を探す。",
+        "noteEn": "The three-line rules explain four-petal blooms and neighbor propagation. I start to look for clusters of three-petal buds.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.40,0.45) 120ms → wait 650ms",
+        "note": "2行目2列目の3枚の芽は、左と右と上にも3枚の芽が隣接。ここへ雨を1粒落とせば大きく連鎖しそう。",
+        "noteEn": "The three-petal bud in row two, column two touches three-petal buds above and on both sides. One drop here looks likely to start a large chain.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.40,0.56) 120ms → wait 450ms",
+        "note": "雨1粒で6連花、48点。残った3行目2列目の3枚の芽は下にも3枚がある。下側を育てる連鎖を狙う。",
+        "noteEn": "One drop produced a six-bloom chain and 48 points. The remaining three-petal bud in row three, column two has another below it. I try a chain through the lower garden.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.60,0.56) 120ms → wait 650ms",
+        "note": "58点、雨は4粒。3行目3列目の3枚から右と下に連鎖できそう。2枚だった芽が3枚に育った変化も読み取れる。",
+        "noteEn": "Fifty-eight points with four drops left. The three-petal bud in row three, column three can chain right and down. I can read how earlier two-petal buds grew to three.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.80,0.45) 120ms → wait 450ms",
+        "note": "右側に残った3枚の芽を開花させ、上の1枚の芽を育てる。離れた芽を雨3粒で片付けられるかを考える。",
+        "noteEn": "I bloom the three-petal bud on the right to grow the one-petal bud above it, considering whether three drops can finish the separated buds.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.20,0.56) 120ms → wait 400ms",
+        "note": "95点、雨2粒。左の3枚を咲かせるが、離れた2枚の芽は残る。序盤の連鎖後に孤立した芽が難所になる。",
+        "noteEn": "At 95 points with two drops, I bloom the left three-petal bud. The separated two-petal buds remain; isolated buds make cleanup difficult after the initial cascade.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.80,0.33) 120ms → wait 1500ms",
+        "note": "100点、雨1粒では2枚の芽を咲かせられない。最後の雨を右上へ使い、雨切れの減点と次の庭への移行を見る。",
+        "noteEn": "At 100 points, one drop cannot bloom the two-petal bud. I use it at the top right and observe the depleted-drop penalty and next garden.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.80,0.45) 120ms → wait 500ms",
+        "note": "90点に減点され庭2へ、雨は6粒に補充。右端の3枚の芽を咲かせ、隣の小さい芽の成長を確かめる。",
+        "noteEn": "The score fell to 90 and garden two restored six drops. I bloom the three-petal bud at the right edge to check neighboring growth.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 10000ms → wait 10000ms → wait 10000ms",
+        "note": "95点で隣接3マスの成長を確認。入力せず待ち、残り時間が進むことを確かめる。",
+        "noteEn": "At 95 points, three adjacent cells grew. I wait without input to verify the countdown continues.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 10000ms → wait 10000ms → wait 6000ms",
+        "note": "残り24秒、95点。追加入力なしで時間切れまで進め、結果と最高点を確認する。",
+        "noteEn": "Twenty-four seconds remain at 95 points. I wait for timeout to inspect the result and best score.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 95
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.50,0.70) 120ms",
+        "note": "雨上がりの結果は95点、ベスト更新を表示。もう一度をタップし、得点と時間が初期化されるかを見る。",
+        "noteEn": "The result shows 95 points and a new best. I tap again to verify the score and timer reset.",
+        "image": "ai-play/step-11.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 95
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-09T12:07:36+09:00"
+  },
+  "publishedAt": "2026-10-09T12:07:36+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 1184,
+    "outputTokens": 13931,
+    "contextTokens": 2889666,
+    "turns": 28,
+    "toolCalls": 27,
+    "webSearches": null,
+    "minutes": 10.1,
+    "from": "2026-10-09T02:57:58.305Z",
+    "to": "2026-10-09T03:08:02.106Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力から思考を控除。ツールはトップレベル呼出のみ（内包呼出は除外）。",
+    "methodEn": "Aggregated Codex token_usage_record entries by unique response_id from planning through review. Input includes cached tokens; output excludes reasoning. Tools count top-level calls only, excluding nested calls.",
+    "recordedAt": "2026-10-09T12:08:02+09:00",
+    "validationRuns": 1,
+    "codeKB": 7.9,
+    "evidence": "metrics-evidence.json"
+  }
+}
