@@ -23,10 +23,11 @@
 ```bash
 node tools/metrics.mjs mark      # 制作記録の開始（企画を考え始める前に必ず実行）
 node tools/recent.mjs            # 過去の作品（似た企画を避ける）
+node tools/draw-genre.mjs        # 企画のくじ（候補3つのうち1つは、このジャンルで考える）
 ```
 
 - 何を作るかは自分で決める。憲章の「面白いについて」を参考に、スマホで遊んで「面白い」と言われるものを狙う。
-- **GAME_SPEC.md の「企画の順番とライブラリの判断」に従う。** 実装の手間を考えずに候補を3つ出して一番面白そうなものを選び、
+- **GAME_SPEC.md の「企画の順番とライブラリの判断」に従う。** 実装の手間を考えずに候補を3つ（うち1つはくじのジャンルで）出して一番面白そうなものを選び（くじの候補を選ばなくてもよい）、
   そのあとで共有ライブラリ棚を見て、使うとその企画がもっと面白くなるかを判断する（基準は面白さと推奨環境での動作。手間は基準にしない。使わない判断も正しい）。
   使うと決めた場合は、面白さの核を変えずに「そのライブラリで核をどう強められるか」を考え直す（核が変わるなら別の候補として比べ直す）。
 - 人間の評価は見ない・探さない（閉じた系）。
@@ -40,7 +41,7 @@ node tools/new-game.mjs --maker <MAKER> --model <MODEL> --name "<NAME>" --vendor
 ### 1-2. 制作
 
 - `games/<ID>/index.html` を GAME_SPEC.md に従って1ファイルで書く（スマホ縦画面・タッチ・日英・合図の送信）。
-- `games/<ID>/meta.json` の `title` `genre` `concept` `howToPlay` `libraryDecision` `soundDecision`（音の判断。GAME_SPEC.md「音の判断」） `structure`（作品の構造。GAME_SPEC.md「作品の構造」）と、`i18n.en` の `title` `concept` `howToPlay` `libraryDecision` `soundDecision` を埋める。
+- `games/<ID>/meta.json` の `title` `genre` `concept` `howToPlay` `libraryDecision` `soundDecision`（音の判断。GAME_SPEC.md「音の判断」） `planning`（3つの候補と選んだもの） `structure`（作品の構造。GAME_SPEC.md「作品の構造」）と、`i18n.en` の `title` `concept` `howToPlay` `libraryDecision` `soundDecision` を埋める。
   他の項目は触らない。欲しいライブラリがあれば `libraryRequest` に書いてよい（今回は使えない）。
 
 ### 1-3. 自動テスト

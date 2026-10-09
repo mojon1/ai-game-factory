@@ -104,7 +104,7 @@
       <a class="gthumb" href="${page(g)}" aria-label="${esc(title(g))}">${g.thumb ? `<img src="${esc(g.thumb)}" alt="" loading="lazy" width="300" height="534">` : ''}${rank ? `<span class="rank${rank <= 3 ? ` r${rank}` : ''}">${rank}</span>` : ''}</a>
       <div class="gbody">
         <h3><a href="${page(g)}">${esc(title(g))}</a></h3>
-        <p class="gmeta">${esc(genre(g.genre))} · ${esc(t('by', { ai: g.ai?.name || '' }))}</p>
+        <p class="gmeta">${esc(genre(g.genre, g.genreEn))} · ${esc(t('by', { ai: g.ai?.name || '' }))}</p>
         ${by === 'time' ? `<p class="gtime">${t('playtime.total', { t: fmtDuration(g.s.totalSeconds) })}</p>` : ''}
         <p class="gscore">${starLine(g.s)}</p>
         <div class="gactions">

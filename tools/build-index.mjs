@@ -2,7 +2,7 @@
 // 一覧・カレンダー・統計に必要な最小限の項目だけを入れて軽く保つ。
 import fs from 'node:fs';
 import path from 'node:path';
-import { GAMES_DIR, listGameIds, readJson, writeJson, jstNow, detectLibraries, structureOf } from './lib.mjs';
+import { GAMES_DIR, listGameIds, readJson, writeJson, jstNow, detectLibraries, structureOf, genreEn } from './lib.mjs';
 
 const games = [];
 for (const id of listGameIds()) {
@@ -18,6 +18,9 @@ for (const id of listGameIds()) {
     title: m.title,
     titleEn: m.i18n?.en?.title || null,
     genre: m.genre,
+    genreEn: genreEn(m.genre),
+    // 企画のくじ（仕様7以降）: 引いたジャンルと、くじの候補を選んだか
+    draw: m.planning?.genreDraw ? { ja: m.planning.genreDraw.ja, en: m.planning.genreDraw.en, chosen: m.planning.candidates?.[m.planning.chosen]?.fromDraw === true } : null,
     createdAt: m.createdAt,
     ai: { name: main.name, vendor: main.vendor, model: main.model },
     thumb: fs.existsSync(path.join(GAMES_DIR, id, 'thumb.webp')) ? `games/${id}/thumb.webp` : null,

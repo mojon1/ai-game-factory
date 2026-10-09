@@ -78,12 +78,15 @@
   // 使用ライブラリ（自動テストの記録。無ければ一覧データの読み取り結果）
   const libs = meta.libraries || index?.games?.find((g) => g.id === meta.id)?.libraries || null;
   // 作品の構造（制作AIの記録。初期の作品は後から付けた分類が一覧データに入っている）
-  const st = (meta.structure?.goal ? meta.structure : null) || index?.games?.find((g) => g.id === meta.id)?.structure || null;
+  const idx = index?.games?.find((g) => g.id === meta.id) || null;
+  const st = (meta.structure?.goal ? meta.structure : null) || idx?.structure || null;
+  // 企画の候補（仕様7以降）: くじのジャンルと3つの候補、選んだもの
+  const plan = meta.planning?.candidates?.length ? meta.planning : null;
 
   $('main').innerHTML = `
   <a class="back" href="./">${t('back')}</a>
   <h1 class="gtitle">${esc(gTitle)}</h1>
-  <p class="gmeta">${esc(genre(meta.genre))} · ${esc(t('by', { ai: main.name || '' }))} · ${esc(fmtDate(meta.createdAt))}</p>
+  <p class="gmeta">${esc(genre(meta.genre, idx?.genreEn))} · ${esc(t('by', { ai: main.name || '' }))} · ${esc(fmtDate(meta.createdAt))}</p>
 
   <button class="hero" id="hero" type="button" aria-label="${t('play')}">
     <img src="${thumb}" alt="" width="300" height="534">
@@ -113,6 +116,9 @@
   <details class="more" open>
     <summary>${t('sec.more')}</summary>
     ${tr(meta, 'concept') ? `<h3>${t('sec.concept')}</h3><p>${esc(tr(meta, 'concept'))}</p>` : ''}
+    ${plan ? `<h3>${t('sec.plan')}</h3>
+    <p class="muted small">${t('plan.draw', { g: esc(EN ? plan.genreDraw?.en || '' : plan.genreDraw?.ja || '') })}</p>
+    <ol class="plan">${plan.candidates.map((c, i) => `<li class="${i === plan.chosen ? 'chosen' : ''}">${c.fromDraw ? `<span class="tag">${t('plan.fromDraw')}</span> ` : ''}${esc(EN && c.ideaEn ? c.ideaEn : c.idea)}${i === plan.chosen ? ` <b class="tag on">${t('plan.chosen')}</b>` : ''}</li>`).join('')}</ol>` : ''}
     ${st ? `<h3>${t('sec.structure')}</h3>
     <ul class="libs">
       <li><span class="muted">${t('st.goal')}</span> <b>${esc(t('goal.' + st.goal))}</b></li>

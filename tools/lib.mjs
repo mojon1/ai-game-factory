@@ -233,3 +233,24 @@ export function checkStructure(s) {
   if (!Array.isArray(s.input) || !s.input.length || s.input.length > 2 || !s.input.every((k) => STRUCTURE.input[k])) err.push(`structure.input は ${Object.keys(STRUCTURE.input).join(' / ')} から1〜2個の配列`);
   return err;
 }
+
+// ジャンルの一覧（factory/genres.json）と、企画のくじ
+export const genres = () => readJson(path.join(ROOT, 'factory', 'genres.json'), { genres: [] }).genres;
+export const genreEn = (ja) => genres().find((g) => g.ja === ja)?.en || null;
+export const DRAW_FILE = path.join(ROOT, '.genre-draw.json');
+
+// 企画の記録（meta.json の planning）が正しいか（問題があれば説明の配列を返す）
+//   planning: { genreDraw: {ja, en}, candidates: [{ idea, ideaEn, fromDraw }, ×3], chosen: 0〜2 }
+export function checkPlanning(p, genre) {
+  const err = [];
+  if (!p?.genreDraw?.ja) err.push('planning.genreDraw がありません（node tools/draw-genre.mjs でくじを引いてから new-game.mjs を実行）');
+  const c = p?.candidates;
+  if (!Array.isArray(c) || c.length !== 3) err.push('planning.candidates は候補3つの配列');
+  else {
+    if (c.some((x) => !x?.idea || !x?.ideaEn)) err.push('planning.candidates の各候補に idea と ideaEn（英訳）を書く');
+    if (c.filter((x) => x?.fromDraw === true).length !== 1) err.push('planning.candidates のうち、くじのジャンルで考えた候補1つだけを fromDraw: true にする');
+  }
+  if (![0, 1, 2].includes(p?.chosen)) err.push('planning.chosen は作ることにした候補の番号（0〜2）');
+  if (genre && !genres().some((g) => g.ja === genre)) err.push('genre は factory/genres.json の ja のいずれか');
+  return err;
+}

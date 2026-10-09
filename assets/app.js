@@ -17,7 +17,8 @@
   }
   const monthLabel = (y, m) => (EN ? `${MONTHS[m - 1]} ${y}` : `${y}年${m}月`);
   const GENRE_EN = { アクション: 'Action', シューティング: 'Shooter', パズル: 'Puzzle', レース: 'Racing', リズム: 'Rhythm', スポーツ: 'Sports', ストラテジー: 'Strategy', アドベンチャー: 'Adventure', その他: 'Other' };
-  const genre = (g) => (EN ? GENRE_EN[g] || g : g);
+  // 英語名は一覧データ（genreEn）を優先し、無ければ古い対応表を使う
+  const genre = (g, en) => (EN ? en || GENRE_EN[g] || g : g);
   const title = (g) => (EN && g.titleEn ? g.titleEn : g.title);
   // 評価は星 1〜5。2026-10-09 までの3段階（AIの自己判定 fun/meh/boring を含む）は ★5 / ★3 / ★1 として扱う
   const STARS_OF_VERDICT = { fun: 5, meh: 3, boring: 1 };

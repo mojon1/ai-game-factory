@@ -24,6 +24,9 @@ console.log(`## 過去の作品の構造（${withS.length}作）`);
 console.log(`- 目指すもの: ${count('goal', (s) => s.goal)}`);
 console.log(`- 終わり方: ${count('ending', (s) => s.ending)}`);
 console.log(`- 中心の操作: ${count('input', (s) => s.input)}`);
+const gc = {};
+for (const g of games) gc[g.m.genre] = (gc[g.m.genre] || 0) + 1;
+console.log(`- ジャンル: ${Object.entries(gc).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k} ${n}`).join(' / ')}`);
 console.log(`- 多い組み合わせ: ${Object.entries(combos).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k, n]) => `${k}（${n}作）`).join('、')}`);
 console.log(`- まだ無いもの: 目指すもの=${Object.keys(STRUCTURE.goal).filter((k) => k !== 'other' && !withS.some((g) => g.s.goal === k)).map((k) => STRUCTURE.goal[k]).join('、') || 'なし'}`
   + ` / 終わり方=${Object.keys(STRUCTURE.ending).filter((k) => k !== 'other' && !withS.some((g) => g.s.ending === k)).map((k) => STRUCTURE.ending[k]).join('、') || 'なし'}`);
