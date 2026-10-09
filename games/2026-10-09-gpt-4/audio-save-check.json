@@ -1,0 +1,40 @@
+[
+  {
+    "device": "android",
+    "audio": {
+      "supported": true,
+      "values": [
+        {
+          "type": 1,
+          "rms": 0.003177520036122219,
+          "peak": 0.027872325852513313
+        },
+        {
+          "type": 2,
+          "rms": 0.002461769284264987,
+          "peak": 0.023808961734175682
+        },
+        {
+          "type": 3,
+          "rms": 0.0027429858139037485,
+          "peak": 0.015963351354002953
+        }
+      ],
+      "waveformPassed": true
+    },
+    "saveContractPassed": false,
+    "defect": "Save payload is flattened; host expects message.data. Constellation is not persisted across reload.",
+    "method": "Offline render of production note() where supported; real save message inspection. Not a listening test."
+  },
+  {
+    "device": "iphone",
+    "audio": {
+      "supported": false,
+      "reason": "OfflineAudioContext unavailable in this headless engine",
+      "audioContextSupported": true
+    },
+    "saveContractPassed": false,
+    "defect": "Save payload is flattened; host expects message.data. Constellation is not persisted across reload.",
+    "method": "Offline render of production note() where supported; real save message inspection. Not a listening test."
+  }
+]

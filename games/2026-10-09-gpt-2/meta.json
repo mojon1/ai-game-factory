@@ -1,0 +1,352 @@
+{
+  "id": "2026-10-09-gpt-2",
+  "status": "published",
+  "title": "月灯りの天秤",
+  "genre": "物理おもちゃ",
+  "concept": "吊り下げた月の位置を指でずらし、重さと距離を見ながら天秤を水平にする。動かした直後の揺れを待ち、つり合いが落ち着くと星が灯る。異なる重りの3つの天秤を解く、急がず観察する物理パズル。",
+  "howToPlay": "下の月を左右にドラッグして重りの位置を動かします。手を離して天秤を水平に保つと次の夜へ。3夜を灯しましょう。",
+  "libraryDecision": "Matter.jsで実際の重りと吊りひもを計算する。位置を動かした後に月が揺れる手触りと、待つ判断を強めるため、重りを剛体にして天秤へ拘束した。物体数を抑え、2Dで重さと距離を読みやすくする。",
+  "soundDecision": "操作時に小さい弦の音、つり合い達成時に上昇する和音をWeb Audioで鳴らす。BGMは入れず、揺れを眺める静かな間を残す。",
+  "planning": {
+    "genreDraw": {
+      "ja": "物理おもちゃ",
+      "en": "Physics toy",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "月灯りの天秤。重りの位置を変え、揺れが静まるまで見守って星を灯す。",
+        "ideaEn": "Moonlit Balance: slide hanging weights and watch their motion settle to light stars.",
+        "fromDraw": true
+      },
+      {
+        "idea": "鏡の小径。鏡を一度だけ裏返し、光が全ての花へ届く配置を探す。",
+        "ideaEn": "Mirror Path: flip mirrors to route a beam to every flower.",
+        "fromDraw": false
+      },
+      {
+        "idea": "砂時計の交換屋。残り砂の異なる時計を交換し、列車の到着順を整える。",
+        "ideaEn": "Hourglass Exchange: trade timers to synchronize arriving trains.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Moonlit Balance",
+      "concept": "Slide a hanging moon to balance weight against distance. Wait for the swing to settle and stars light up. Solve three differently weighted balances in a quiet physics puzzle with no timer.",
+      "howToPlay": "Drag the moon slider left or right to move the hanging weight. Release and hold the beam level to reach the next night. Light all three nights.",
+      "libraryDecision": "Matter.js simulates rigid weights and hanging constraints. Pendulum motion after moving a weight strengthens the tactile response and the decision to wait. Few bodies and a 2D view keep weight and distance readable.",
+      "soundDecision": "Web Audio provides soft plucked notes on input and an ascending chord on balance. No BGM leaves quiet space to watch the swing."
+    }
+  },
+  "createdAt": "2026-10-09T22:45:23+09:00",
+  "specVersion": 7,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "manual",
+    "startedAt": "2026-10-09T22:45:23+09:00",
+    "metricsFrom": "2026-10-09T13:44:38.699Z",
+    "transcript": null,
+    "validationRuns": 1,
+    "finishedAt": "2026-10-09T22:50:41+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-09T22:47:26+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "6.5KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=63",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=72",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=43",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=57",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 6666,
+    "lines": 14
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "matter-js",
+      "version": "0.20.0",
+      "file": "matter-0.20.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "6手の画像付きプレイで3夜をクリア。重さが変わると内側へ動かす読みと、揺れが静まるのを待つ手触りは分かりやすい。3面で終わり発展は控えめなので星3。致命的な不具合なし。",
+    "similar": [
+      {
+        "title": "Perfect Balance (ttursas)",
+        "url": "https://www.kongregate.com/en/games/ttursas/perfect-balance",
+        "similarity": "中",
+        "note": "物理的に安定する配置を探し、静まるまで待つ点が共通。相手は図形を回転して積む多数の試練、こちらは吊った重りの距離を調整する3面の天秤。",
+        "note_en": "Both seek stable physical arrangements and wait for settling. The other rotates and stacks shapes across many trials; this slides hanging weights across three balances."
+      }
+    ],
+    "research": "2検索で重り・物理バランスの類似作品を調査。ttursasによる公開ページの説明と操作を確認して比較。",
+    "i18n": {
+      "en": {
+        "comment": "Six image-guided moves cleared all three nights. Moving heavier weights inward and waiting for the swing to settle are readable and tactile. Three short stages offer limited development, so three stars. No fatal bugs.",
+        "research": "Two searches explored weights and physics balance games. Compared the description and controls on the ttursas publishing page."
+      }
+    },
+    "method": "スマホ縦画面で 6 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 6 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.77) 120ms → wait 1000ms",
+        "note": "月を動かして水平を待つ、3夜の天秤と読める。開始して重りの関係を見る。",
+        "noteEn": "The title explains moving a moon and waiting for balance across three nights. I start to inspect the weights.",
+        "image": "ai-play/step-01.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "swipe(0.20,0.80→0.63,0.80) 900ms → wait 4500ms",
+        "note": "左右は同じ重さ1。右の月が支点に近く左が下がっているので、右の月を左と同じ距離まで動かす。",
+        "noteEn": "Both weights are one. The right moon is closer to the pivot and the left side is lower, so I slide the right moon out to match the left distance.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.50,0.62) 120ms",
+        "note": "揺れが落ち着き星が灯った。左右同じ重さなら距離をそろえる感覚が分かる。次の夜へ進む。",
+        "noteEn": "The swing settled and lit a star. Matching distances makes sense for equal weights. I continue to the next night.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "swipe(0.20,0.80→0.45,0.80) 800ms → wait 5500ms",
+        "note": "左2、右3の重り。重い右は短い距離でつり合いそうなので、前の夜より内側を試す。",
+        "noteEn": "The left weight is two and the right is three. The heavier right side should balance at a shorter distance, so I try a closer position.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.50,0.62) 120ms",
+        "note": "重さ3を内側に置くと2夜目も達成。次は複数の重りの合力を読むことになるか、最後の夜を見る。",
+        "noteEn": "Putting weight three closer completed night two. I continue to see whether the final night combines multiple weights.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "swipe(0.20,0.80→0.55,0.80) 900ms → wait 6000ms",
+        "note": "左は遠い2と近い1、右は3。2夜目より右を少し外に動かして、左2つのつり合いを狙う。",
+        "noteEn": "The left combines a distant two and a nearer one; the right is three. I move a little farther out than night two to balance both left weights.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-09T22:50:41+09:00"
+  },
+  "publishedAt": "2026-10-09T22:50:41+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 1381,
+    "outputTokens": 6673,
+    "contextTokens": 1877486,
+    "turns": 17,
+    "toolCalls": 17,
+    "webSearches": null,
+    "minutes": 6.2,
+    "from": "2026-10-09T13:44:38.699Z",
+    "to": "2026-10-09T13:50:51.325Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力から思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated Codex token_usage_record entries by unique response_id from planning through review. Input includes cached tokens; output excludes reasoning. Tools count top-level calls only.",
+    "recordedAt": "2026-10-09T22:50:51+09:00",
+    "validationRuns": 1,
+    "codeKB": 6.5,
+    "evidence": "metrics-evidence.json"
+  }
+}
