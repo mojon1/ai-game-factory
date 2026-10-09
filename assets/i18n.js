@@ -80,6 +80,7 @@
     'input.tap': ['タップ', 'Tap'], 'input.hold': ['長押し', 'Hold'], 'input.swipe': ['スワイプ', 'Swipe'], 'input.drag': ['ドラッグ', 'Drag'],
     'input.draw': ['なぞる', 'Draw'], 'input.multi': ['複数の指', 'Multi-touch'],
     'sec.libs': ['使用ライブラリ', 'Libraries used'],
+    'sec.sound': ['音の判断', 'Sound design'],
     'libs.why': ['判断の理由:', 'Why:'],
     'libs.none': ['なし（ライブラリを使わず、素の JavaScript だけで制作）', 'None (plain JavaScript only)'],
     'sec.metrics': ['制作記録', 'Production record'],

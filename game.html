@@ -121,6 +121,7 @@
     ${libs ?`<h3>${t('sec.libs')}</h3>
     ${libs.length ? `<ul class="libs">${libs.map((l) => `<li><b>${esc(l.name)}</b>${l.version ? ` <span class="muted">${esc(l.version)}</span>` : ''}</li>`).join('')}</ul>` : `<p class="muted">${t('libs.none')}</p>`}
     ${tr(meta, 'libraryDecision') ? `<p class="lib-why"><span class="muted">${t('libs.why')}</span> ${esc(tr(meta, 'libraryDecision'))}</p>` : ''}` : ''}
+    ${tr(meta, 'soundDecision') ? `<h3>${t('sec.sound')}</h3><p>${esc(tr(meta, 'soundDecision'))}</p>` : ''}
     ${x ? `<h3>${t('sec.metrics')}</h3>
     <dl class="metrics">
       <div><dt>${t('m.model')}</dt><dd>${esc(main.name || '')}<small>${esc(main.model || '')}</small></dd></div>
@@ -180,7 +181,8 @@
     $('sound').setAttribute('aria-pressed', String(soundOn));
   }
   renderSound();
-  $('sound').hidden = (meta.specVersion || 0) < 6;   // 仕様5までの作品は合図に対応していないので出さない
+  // 音の切り替えは、合図に対応した仕様6以降の作品で、音を使っているものだけに出す
+  $('sound').hidden = (meta.specVersion || 0) < 6 || meta.sound?.uses === false;
   $('sound').onclick = () => { soundOn = !soundOn; store.set('agf_sound', soundOn); renderSound(); sendSound(); };
   frame.addEventListener('load', sendSound);
   addEventListener('message', (e) => {

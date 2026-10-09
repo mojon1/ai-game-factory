@@ -24,29 +24,26 @@ export const CHECK_EN = {
   'iPhone: タッチで開始・操作でき、画面が変化する': 'iPhone: starts and responds to touch',
   'iPhone: 画面からはみ出さない': 'iPhone: no overflow',
   'プレイ開始の合図（start）を送っている': 'Sends the play "start" signal',
-  '音を鳴らす仕組みがある（BGM・効果音）': 'Has sound (BGM and sound effects)',
   'サイトの音のオン/オフに対応している': "Follows the site's sound on/off",
-  'Android: BGMが流れている（操作していない間も音楽が聞こえる）': 'Android: background music plays (heard even without input)',
   'JavaScript エラーが出ない': 'No JavaScript errors',
 };
 const drawn = (i) => (i.canvasVariety ?? 99) > 1 || i.text.length > 0;
 
 // 1端末分の検査: タップで開始 → ランダムなタップ・長押し・スワイプ → 画面の変化を確認
-async function deviceCheck(id, device, browser, add, label, checkBgm = false) {
+async function deviceCheck(id, device, browser, add, label, measureSound = false) {
   const s = await openSession(id, { browser, frozen: false, device });
   try {
     const first = await s.inspect();
     add(`${label}: 描画されている`, drawn(first), `canvas色数=${first.canvasVariety ?? '-'}`);
     const before = await s.page.screenshot({ type: 'jpeg', quality: 60 });
     await s.act({ tap: [0.5, 0.5], hold: 80, wait: 300 });
-    if (checkBgm) {
-      // BGM: 開始してから何も操作しない2.5秒間、音が聞こえている時間の割合（0.25秒ごとに確認）。
-      // 音楽の形（ループ・展開する曲・伸ばす音・状況で変わる音楽など）は問わない。休符で途切れる分を見込んで、聞こえている割合が3割以上か、その間に3回以上音が鳴り始めていれば合格
-      const au = await s.page.evaluate(() => new Promise((done) => {
-        const a = window.__agfAudio, t = performance.now(), n0 = a ? a.starts.length : 0; let hit = 0, k = 0;
-        const id = setInterval(() => { if (a && a.playing.size > 0) hit++; if (++k >= 10) { clearInterval(id); done({ rate: hit / k, started: a ? a.starts.length - n0 : 0, all: a ? a.starts.length : 0 }); } }, 250);
+    let audio = null;
+    if (measureSound) {
+      // 記録のみ（合否には使わない）: 開始してから何も操作しない2.5秒間に、音が聞こえていた時間の割合（0.25秒ごとに確認）
+      audio = await s.page.evaluate(() => new Promise((done) => {
+        const a = window.__agfAudio, n0 = a ? a.starts.length : 0; let hit = 0, k = 0;
+        const id = setInterval(() => { if (a && a.playing.size > 0) hit++; if (++k >= 10) { clearInterval(id); done({ idleHeard: Math.round((hit / k) * 100) / 100, idleStarts: a ? a.starts.length - n0 : 0 }); } }, 250);
       }));
-      add(`${label}: BGMが流れている（操作していない間も音楽が聞こえる）`, au.rate >= 0.3 || au.started >= 3, `操作なし2.5秒間に音が聞こえていた割合=${Math.round(au.rate * 100)}% / その間に鳴り始めた音=${au.started} / 合計=${au.all}`);
     }
     for (let i = 0; i < 8; i++) {
       const x = 0.15 + Math.random() * 0.7, y = 0.3 + Math.random() * 0.6;
@@ -57,7 +54,7 @@ async function deviceCheck(id, device, browser, add, label, checkBgm = false) {
     const info = await s.inspect();
     add(`${label}: タッチで開始・操作でき、画面が変化する`, !before.equals(after) && drawn(info), `canvas色数=${info.canvasVariety ?? '-'}`);
     add(`${label}: 画面からはみ出さない`, !info.overflow);
-    return { errors: s.errors.map((e) => `[${label}] ${e}`), signals: s.signals, page: s.page, close: () => s.close() };
+    return { errors: s.errors.map((e) => `[${label}] ${e}`), signals: s.signals, page: s.page, audio, close: () => s.close() };
   } catch (e) {
     await s.close();
     throw e;
@@ -90,16 +87,15 @@ export async function validateGame(id) {
   const banned = html.match(/\b(alert|confirm|prompt)\s*\(|window\.open\s*\(/);
   add('alert/confirm/prompt/window.open を使っていない', !banned, banned ? banned[0] : '');
   add('Pointer Events でタッチ操作に対応している', /pointerdown/i.test(html));
-  // 仕様6以降: BGM と効果音が必須。サイトの「音のオン/オフ」の合図（agf: 'sound'）に従う
+  // 仕様6以降: 音を鳴らすかどうかはAIの判断。鳴らすゲームは、サイトの「音あり／音なし」の合図（agf: 'sound'）に従う
   const v6 = (readMeta(id)?.specVersion || 0) >= 6;
-  if (v6) {
-    add('音を鳴らす仕組みがある（BGM・効果音）', /AudioContext|\bzzfx\b|ZZFX/.test(html));
-    add('サイトの音のオン/オフに対応している', /['"]sound['"]/.test(html) && /addEventListener\(\s*['"]message['"]|onmessage\s*=/.test(html));
-  }
+  const usesSound = /AudioContext|\bzzfx\b|ZZFX/.test(html);
+  if (v6 && usesSound) add('サイトの音のオン/オフに対応している', /['"]sound['"]/.test(html) && /addEventListener\(\s*['"]message['"]|onmessage\s*=/.test(html));
   add('touch-action を指定している', /touch-action\s*:\s*none/i.test(html));
 
   const errors = [];
   const signals = [];
+  let soundInfo = null;
   const chromium = await launch('chromium');
   const webkit = await launch('webkit');
   try {
@@ -113,7 +109,9 @@ export async function validateGame(id) {
     add('日本語/英語で表示が切り替わる', !shots.ja.equals(shots.en));
 
     // Android
-    const a = await deviceCheck(id, 'android', chromium, add, 'Android', v6);   // 音の確認は Chromium のみ（検査用の WebKit は音を出せない）
+    // 音の様子の記録（合否には使わない）は Chromium のみ（検査用の WebKit は音を出せない）
+    const a = await deviceCheck(id, 'android', chromium, add, 'Android', usesSound);
+    soundInfo = a.audio || null;
     if (!fs.existsSync(path.join(dir, 'thumb.jpg')) && !fs.existsSync(path.join(dir, 'thumb.webp')) || process.argv.includes('--thumb')) {
       await a.page.screenshot({ path: path.join(dir, 'thumb.jpg'), type: 'jpeg', quality: 80, scale: 'css' });
     }
@@ -132,7 +130,7 @@ export async function validateGame(id) {
   add('JavaScript エラーが出ない', uniq.length === 0, uniq.slice(0, 3).join(' | '));
   for (const c of checks) c.nameEn = CHECK_EN[c.name] || c.name;
 
-  return { passed: checks.every((c) => c.ok), checks, errors: uniq, code: stats };
+  return { passed: checks.every((c) => c.ok), checks, errors: uniq, code: stats, sound: { uses: usesSound, ...(soundInfo || {}) } };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
@@ -145,6 +143,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   meta.generation.validationRuns = (meta.generation.validationRuns || 0) + 1;
   meta.autoTest = { passed: result.passed, testedAt: jstNow().iso, version: 3, checks: result.checks, errors: result.errors };
   if (result.code) meta.code = result.code;
+  if (result.sound) meta.sound = result.sound;   // 音を使っているか・操作しない間に音が聞こえていた割合（記録のみ）
   const htmlFile = path.join(gameDir(id), 'index.html');
   if (fs.existsSync(htmlFile)) meta.libraries = detectLibraries(fs.readFileSync(htmlFile, 'utf8'));   // 使用ライブラリ（作品ページの仕様に表示）
   writeMeta(id, meta);

@@ -41,6 +41,15 @@ AI GAME FACTORY に投稿するゲームは、どのAIが作る場合もこの�
 | `ending`（1回の遊びの終わり方） | `time` 時間切れ / `fail` ミス・やられたら終わる / `goal` 目標を達成したら終わる / `limit` 手数・回数を使い切ったら終わる / `none` 終わりなし（自分でやめる） / `other` その他 |
 | `input`（中心の操作、1〜2個） | `tap` タップ / `hold` 長押し / `swipe` スワイプ・はじく / `drag` ドラッグ・動かす / `draw` なぞる・線を描く / `multi` 複数の指 |
 
+### 音の判断
+
+音は、遊びの手触り・気持ちよさ・雰囲気を大きく左右する。**音をどうするかを必ず考え、「遊ぶ人がもっと楽しめるか」で決める。**
+
+- BGM を付けるか、効果音を付けるか、どんな音にするか（繰り返す曲、展開していく曲、プレイの状況に合わせて変わる音楽、環境音、操作そのものが音楽になる、など）は自由。
+- **あえて音を付けない・BGM を入れない、という判断も正しい選択になり得る。** 大事なのは、考えずに決めるのではなく、楽しさのために選ぶこと。
+- 作り方も自由（Web Audio API で自作する、共有ライブラリ棚の ZzFX（効果音）・ZzFXM（曲）を使う など）。
+- **判断と理由を meta.json の `soundDecision` に書く**（何を鳴らす／鳴らさないか、なぜそれが楽しさにつながるか。英訳は `i18n.en.soundDecision`）。作品ページに公開される。
+
 ## 推奨環境（どんなスマホを想定して作るか）
 
 **制作した日の時点で「平均的なスマホ」を推奨環境とし、それに合わせて作る。**
@@ -106,22 +115,17 @@ AI GAME FACTORY に投稿するゲームは、どのAIが作る場合もこの�
    signal('start');                 // 1プレイ開始ごと（タイトルから開始・リスタートのたび）
    signal('end', { score: 123 });   // 1回の区切りのたび（ゲームオーバー／クリア／ステージの終わりなど。スコアが無ければ省略可）
    ```
-9. **BGM と効果音（SE）を必ず付ける。**
-   - **BGM**: プレイが始まったら（最初のタップの直後から）、背景に音楽が流れていること。操作していない間も音楽が聞こえること。
-     **どんな音楽にするかは自由**（繰り返す曲、展開していく曲、プレイの状況に合わせて変わる音楽、環境音のような音楽 など。形は企画に合わせて決める）。
-     タイトル画面で流すかも自由（ただし最初のタップより前は、ブラウザの決まりで鳴らせない）。
-   - **効果音**: 主な操作と、得点・ミス・クリア・区切りなどの出来事に付ける。
-   - 作り方は自由（Web Audio API で自作する、共有ライブラリ棚の ZzFX（効果音）・ZzFXM（曲）を使う など）。音のファイルは使えないので、すべてコードで作る。
-   - 音量は BGM を効果音より小さめに。iPhone では最初のタップの中で `AudioContext` を作るか `resume()` しないと鳴らない。
-   - **サイトの「音あり／音なし」に従う。** サイトはプレイ画面の上のバーに音の切り替えボタンを置き、ゲームに次の合図を送る。
-     受け取ったら、鳴っている途中の BGM も含めてすべての音を止める（全体の音量を 0 にする）／元に戻す。合図が来ないとき（単独で開いたとき）は音ありで始める。
-     ```js
-     let soundOn = true;
-     addEventListener('message', (e) => {
-       if (e.data && e.data.agf === 'sound') { soundOn = !!e.data.on; /* 例: master.gain.value = soundOn ? 1 : 0 */ }
-     });
-     ```
-   - 自動テストは、音を鳴らす仕組みがあるか、音の合図を受け取る仕組みがあるか、プレイ開始後に何も操作しない2.5秒間も音楽が聞こえるか（BGM）を確かめる（音楽の形は問わない）。
+9. **音を鳴らす場合は、サイトの「音あり／音なし」に従う。**（音を付けるかどうかは「企画」の「音の判断」で自分で決める）
+   サイトはプレイ画面の上のバーに音の切り替えボタンを置き、ゲームに次の合図を送る。受け取ったら、鳴っている途中の音も含めてすべての音を止める（全体の音量を 0 にする）／元に戻す。
+   合図が来ないとき（単独で開いたとき）は音ありで始める。
+   ```js
+   let soundOn = true;
+   addEventListener('message', (e) => {
+     if (e.data && e.data.agf === 'sound') { soundOn = !!e.data.on; /* 例: master.gain.value = soundOn ? 1 : 0 */ }
+   });
+   ```
+   - iPhone では最初のタップの中で `AudioContext` を作るか `resume()` しないと鳴らない。音のファイルは使えないので、音はすべてコードで作る。
+   - 自動テストは、音を鳴らすゲームがこの合図を受け取る仕組みを持っているかを確かめる。
 
 ## 共通の画面ルール（どのAIのゲームでも同じ感覚で遊べるように）
 
@@ -135,7 +139,7 @@ AI GAME FACTORY に投稿するゲームは、どのAIが作る場合もこの�
 | 区切りの画面（ゲームオーバー・クリアなど） | 結果を大きく（点数があれば、その下にベスト。更新時は「ベスト更新！」）。最後に「タップでもう一度 / Tap to play again」（続きがあるなら「タップで次へ / Tap to continue」）。誤タップ防止のため、表示から 0.7 秒は再開しない。 |
 | 最初の数秒 | 操作のヒントを1行だけ画面下部に出し、数秒で消す（長い説明やチュートリアル画面は作らない）。 |
 | 文字 | フォントは `system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif`。画面幅からはみ出す文字は縮めて収める。 |
-| 音 | BGM と効果音は必須（必須要件 9）。音量は控えめに、BGM は効果音より小さめに。サイトの「音あり／音なし」に従う。 |
+| 音 | 付けるかどうか・どんな音かは「音の判断」で決める。鳴らす場合は、聞いていて疲れない音量にし、サイトの「音あり／音なし」に従う（必須要件 9）。 |
 | 一時停止 | 不要（サイトの「もどる」で閉じればそのプレイは終わる）。 |
 
 サイトはゲーム画面の外（上）に「もどる」バーを置くので、ゲームの画面内に戻るボタンは作らない。
@@ -149,7 +153,7 @@ AI GAME FACTORY に投稿するゲームは、どのAIが作る場合もこの�
 ## 推奨
 
 - ゲームループは `requestAnimationFrame` のタイムスタンプ（または `performance.now()`）から経過時間 dt を求めて更新し、dt は上限（例: 50ms）でクランプする。
-- 音（必須要件 9）は、最初のタッチ後に `AudioContext` を作成し、try/catch で囲む。ZzFX を使う場合は、最初の `pointerdown` で `ZZFX.audioContext?.resume()`、音なしの合図では `ZZFX.volume = 0` にし、鳴らしている BGM（`ZZFX.playSamples` が返すもの）は `node.gainNode.gain.value = 0` で止める。
+- 音を鳴らす場合は、最初のタッチ後に `AudioContext` を作成し、try/catch で囲む。ZzFX を使う場合は、最初の `pointerdown` で `ZZFX.audioContext?.resume()`、音なしの合図では `ZZFX.volume = 0` にし、鳴らしている BGM（`ZZFX.playSamples` が返すもの）は `node.gainNode.gain.value = 0` で止める。
 - 遊び進めるほど変化や新しい発見があるようにする（難しさを上げる、新しい要素やステージを出す、遊び場が広がる など、形は企画に合わせて自由）。
 
 ## 提出物
@@ -172,13 +176,15 @@ AI GAME FACTORY に投稿するゲームは、どのAIが作る場合もこの�
   "concept": "企画意図: 何を面白さの核にしたか（60〜120文字）",
   "howToPlay": "遊び方（1〜2文）",
   "libraryDecision": "ライブラリを使う／使わない判断とその理由。使う場合は再考で足した・変えたこと（1〜3文）",
+  "soundDecision": "音をどうしたか（BGM・効果音を付ける／付けない、どんな音か）と、それが楽しさにつながる理由（1〜3文）",
   "structure": { "goal": "score | clear | survive | complete | none | other", "ending": "time | fail | goal | limit | none | other", "input": ["tap | hold | swipe | drag | draw | multi（1〜2個）"] },
   "i18n": {
     "en": {
       "title": "English title",
       "concept": "Design intent in English",
       "howToPlay": "How to play in English",
-      "libraryDecision": "Library decision, why, and (if used) what the rethink added or changed, in English"
+      "libraryDecision": "Library decision, why, and (if used) what the rethink added or changed, in English",
+      "soundDecision": "Sound decision and why it makes the game more fun, in English"
     }
   }
 }

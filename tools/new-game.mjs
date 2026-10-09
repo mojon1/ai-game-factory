@@ -28,8 +28,9 @@ writeMeta(id, {
   concept: '',
   howToPlay: '',
   libraryDecision: '',
+  soundDecision: '',   // 音の判断（GAME_SPEC.md「音の判断」）
   structure: { goal: '', ending: '', input: [] },   // 作品の構造（GAME_SPEC.md「作品の構造」）
-  i18n: { en: { title: '', concept: '', howToPlay: '', libraryDecision: '' } },
+  i18n: { en: { title: '', concept: '', howToPlay: '', libraryDecision: '', soundDecision: '' } },
   createdAt: now.iso,
   specVersion: 6,
   maker: String(a.maker).toLowerCase(),

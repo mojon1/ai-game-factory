@@ -87,7 +87,8 @@ meta.aiReview = {
 
 const en = meta.i18n?.en || {};
 // 仕様4以降は、ライブラリを使う／使わない判断の理由（libraryDecision）も必須
-const keys = ['title', 'concept', 'howToPlay', ...((meta.specVersion || 0) >= 4 ? ['libraryDecision'] : [])];
+// 仕様6以降は、音の判断の理由（soundDecision）も必須
+const keys = ['title', 'concept', 'howToPlay', ...((meta.specVersion || 0) >= 4 ? ['libraryDecision'] : []), ...((meta.specVersion || 0) >= 6 ? ['soundDecision'] : [])];
 const missing = [
   ...['genre', ...keys].filter((k) => !meta[k]),
   ...keys.filter((k) => !en[k]).map((k) => `i18n.en.${k}`),

@@ -39,13 +39,13 @@ function buildPrompt(cfg) {
     'あなたはこの実験に参加するゲーム制作AIです。以下の憲章と仕様を必ず守ってください。',
     '', CHARTER, '', SPEC, '', '## 共有ライブラリ棚（lib/catalog.json）', SHELF, '',
     '## 出力形式（厳守）',
-    '1. まず ```json コードブロックで meta: {"title","genre","concept","howToPlay","libraryDecision","structure":{"goal","ending","input":[]},"i18n":{"en":{"title","concept","howToPlay","libraryDecision"}}}（structure の値は仕様の「作品の構造」から選ぶ）',
+    '1. まず ```json コードブロックで meta: {"title","genre","concept","howToPlay","libraryDecision","soundDecision","structure":{"goal","ending","input":[]},"i18n":{"en":{"title","concept","howToPlay","libraryDecision","soundDecision"}}}（structure の値は仕様の「作品の構造」から選ぶ）',
     '2. 次に ```html コードブロックでゲーム本体の完全なHTML',
     'それ以外の説明文は不要です。',
     compact ? '\n※ 出力できる長さに上限があります。コードは簡潔に（目安 300 行以内）書き、必ず </html> まで出力しきってください。' : '',
   ].join('\n');
   const recent = node('tools/recent.mjs', ['--limit', '40']);
-  const user = `何を作るかはあなたが決めてください。スマホで遊んだ人間が「面白い」と言うゲームを目指してください。仕様の「企画の順番とライブラリの判断」に従い、企画を決めてからライブラリを使うかを判断し、使う場合は面白さの核を変えずにそのライブラリで核をどう強められるかを考え直してください。判断の理由（使う場合は再考で足した・変えたことも）を libraryDecision に書いてください。\n\n過去の作品（似た企画は避ける）:\n${recent}`;
+  const user = `何を作るかはあなたが決めてください。スマホで遊んだ人間が「面白い」と言うゲームを目指してください。仕様の「企画の順番とライブラリの判断」に従い、企画を決めてからライブラリを使うかを判断し、使う場合は面白さの核を変えずにそのライブラリで核をどう強められるかを考え直してください。判断の理由（使う場合は再考で足した・変えたことも）を libraryDecision に書いてください。音をどうするか（付けない選択も含む）も、遊ぶ人がもっと楽しめるかで決め、理由を soundDecision に書いてください。\n\n過去の作品（似た企画は避ける）:\n${recent}`;
   return { system, user };
 }
 function parseOutput(text) {
@@ -58,10 +58,10 @@ function parseOutput(text) {
 }
 function pickMeta(m) {
   const out = {};
-  for (const k of ['title', 'genre', 'concept', 'howToPlay', 'libraryDecision', 'libraryRequest']) if (typeof m[k] === 'string') out[k] = m[k].slice(0, 400);
+  for (const k of ['title', 'genre', 'concept', 'howToPlay', 'libraryDecision', 'soundDecision', 'libraryRequest']) if (typeof m[k] === 'string') out[k] = m[k].slice(0, 400);
   if (m.structure && typeof m.structure === 'object') out.structure = { goal: String(m.structure.goal || ''), ending: String(m.structure.ending || ''), input: Array.isArray(m.structure.input) ? m.structure.input.map(String).slice(0, 2) : [] };
   const en = m.i18n?.en;
-  if (en) out.i18n = { en: Object.fromEntries(['title', 'concept', 'howToPlay', 'libraryDecision'].filter((k) => typeof en[k] === 'string').map((k) => [k, en[k].slice(0, 400)])) };
+  if (en) out.i18n = { en: Object.fromEntries(['title', 'concept', 'howToPlay', 'libraryDecision', 'soundDecision'].filter((k) => typeof en[k] === 'string').map((k) => [k, en[k].slice(0, 400)])) };
   return out;
 }
 
