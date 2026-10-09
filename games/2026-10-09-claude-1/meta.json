@@ -1,0 +1,354 @@
+{
+  "id": "2026-10-09-claude-1",
+  "status": "published",
+  "title": "ぶらんこ登り",
+  "genre": "アクション",
+  "concept": "つかむピンを自分の指で選び、押している間はロープが縮んで振りが速くなる。いつ離すかで飛ぶ高さが決まる、振り子の手触りが核。下からは水が迫り、落ちれば終わり。高く行くほどピンの間が広がり、崩れるピン・動くピンも混ざる。",
+  "howToPlay": "届くピン（光っているもの）を押すとロープでぶら下がり、押している間ロープが縮んで加速する。指を離して飛び、次のピンへ。水に追いつかれたら終わり。",
+  "libraryDecision": "効果音だけ ZzFX を使う。つかむ・離す・コイン・崩れる・水没の音が、振り子の手応えを耳でも伝えて面白さを強めるため。振り子は1本のロープと1つの体だけなので、物理演算ライブラリは使わず自前の簡単な計算で十分（なめらかさも保てる）。",
+  "i18n": {
+    "en": {
+      "title": "Swing Climb",
+      "concept": "You pick the peg to grab with your own finger; while you hold, the rope reels in and the swing speeds up. When you let go decides how high you fly — the feel of the pendulum is the core. Water rises from below, and a fall means the end. Higher up, pegs spread apart and crumbling and moving pegs appear.",
+      "howToPlay": "Press a reachable (glowing) peg to hang from it; while held, the rope reels in and you speed up. Release to fly to the next peg. Don't let the water catch you.",
+      "libraryDecision": "Only ZzFX for sound effects: grab, release, coin, crumble and splash sounds carry the pendulum's feedback to the ear. With just one rope and one body, no physics library is needed; a small hand-written integrator is enough and stays smooth."
+    }
+  },
+  "createdAt": "2026-10-09T12:10:48+09:00",
+  "specVersion": 4,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-09T12:10:48+09:00",
+    "metricsFrom": "2026-10-09T00:06:18.300Z",
+    "transcript": "df02f989-9de8-4689-8171-43512f56f8fa.jsonl",
+    "validationRuns": 1,
+    "finishedAt": "2026-10-09T12:15:22+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-09T12:12:57+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "22.6KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=120",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=115",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=91",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=92",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 23124,
+    "lines": 554
+  },
+  "libraries": [
+    {
+      "name": "ZzFX",
+      "version": "1.4.0",
+      "file": "zzfx-1.4.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "verdict": "meh",
+    "works": "ok",
+    "comment": "ピンを押すと体がグイッと引き上げられ、離した瞬間に飛ぶ感触は気持ちよく、ピンの上まで振り上がれたときは「おっ」となった。ただ初見では、どれだけ押せば上へ飛べるのかが分かりにくく、短く離して落ちる失敗を何度かした。水が常にすぐ下にいるので、一度落ちるとほぼ即終了で、取り返す余地が少ない。コツをつかめば伸びそうだが、最初の1分の分かりやすさが足りず、まあまあ。",
+    "similar": [
+      {
+        "title": "Stickman Hook",
+        "url": "https://sites.google.com/view/classroom6x-games/stickman-hook",
+        "similarity": "高",
+        "note": "押してロープでぶら下がり、離すタイミングで飛ぶ一本指の振り子操作が同じ。こちらは縦に登り、つかむピンを自分で選び、押している間ロープが縮んで加速する点が違う。",
+        "note_en": "Same one-finger hook-and-release pendulum. Here you climb vertically, choose the peg yourself, and the rope reels in to speed you up while held."
+      },
+      {
+        "title": "Grapple Jump",
+        "url": "https://www.indiedb.com/games/grapple-jump",
+        "similarity": "高",
+        "note": "グラップルを巻き取って上へ登り、下から迫る危険から逃げる構成がよく似ている。こちらはパワーアップが無く、振り子と離すタイミングだけで勝負する。",
+        "note_en": "Very similar: reel a grapple to climb upward while fleeing a rising hazard. This game has no power-ups; it is only pendulum and release timing."
+      },
+      {
+        "title": "Grapple Phroggo",
+        "url": "https://libodev.itch.io/grappel-phroggo",
+        "similarity": "中",
+        "note": "舌で振り子のように振って、上がってくる溶岩から逃げる。迫る危険から縦に登る点が同じ。PC向けで操作も異なる。",
+        "note_en": "Swing with a tongue to escape rising lava; same vertical escape structure, but for PC with different controls."
+      },
+      {
+        "title": "Hang Line: Mountain Climber",
+        "url": "https://apps.apple.com/us/app/-/id1372005090",
+        "similarity": "中",
+        "note": "スマホでロープを引っ掛けて振りながら山を登る。危険は落石や動物で、水が迫る仕組みは無い。",
+        "note_en": "Mobile rope-swing mountain climbing; hazards are rocks and animals, not rising water."
+      }
+    ],
+    "research": "WebSearchで「Stickman Hook」と「振り子・グラップルで登る・水がせり上がる」系を2回検索。一本指で掛けて離す操作は Stickman Hook、迫る危険から巻き取りで登る構成は Grapple Jump がルーツとして近い。",
+    "i18n": {
+      "en": {
+        "comment": "Being yanked up when you press a peg and flying the moment you let go feels good, and swinging up above a peg gave a little thrill. But as a first-timer it was unclear how long to hold to fly upward, and I fell a few times by releasing too early. The water always sits just below, so one fall ends the run with little chance to recover. It could grow on you once you get the knack, but the first minute isn\\x27t clear enough: so-so.",
+        "research": "Two WebSearch queries: Stickman Hook, and swing/grapple climbers with a rising hazard. The one-finger hook-and-release comes from Stickman Hook; reeling up away from a rising hazard is close to Grapple Jump."
+      }
+    },
+    "method": "スマホ縦画面で 11 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 11 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "タイトル画面。ロープでぶら下がる猿のデモが揺れている。タップして開始",
+        "noteEn": "Title screen with a swinging monkey demo. Tapping to start.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.66,0.35) 1100ms",
+        "note": "右上の光るピンを長押し。ロープが縮んで体が引き上げられるはず",
+        "noteEn": "Holding the glowing peg to the upper right; the rope should reel me up.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.30,0.31) 900ms",
+        "note": "引き上げられて離した。次は左上のピンを長押しして振り子で左へ",
+        "noteEn": "Got pulled up and released. Now holding the upper-left peg to swing left.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.30,0.52) 700ms → wait 150ms",
+        "note": "右上のピンは届かない（灰色）。すぐ横のピンでひと振りして勢いをつけ、離して上へ飛ぶ",
+        "noteEn": "The upper-right peg is out of reach (grey). Swinging on the nearby peg to build speed, then releasing to fly up.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.66,0.63) 1000ms",
+        "note": "離すのが早すぎて落ちている。右のピンをつかみ直して大きく振る",
+        "noteEn": "Released too early and I'm falling. Re-grabbing the right peg for a big swing.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.30,0.37) 1000ms",
+        "note": "勢いよく左へ飛んだ。左上のピンをつかんで振り上がる",
+        "noteEn": "Flew left with speed. Grabbing the upper-left peg to swing upward.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.64,0.37) 1000ms",
+        "note": "ピンの上まで振り上がれた。右上のピンへ乗り換える。コツがつかめてきた",
+        "noteEn": "Swung above the peg. Switching to the upper-right peg; getting the hang of it.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.64,0.51) 1300ms → tap(0.37,0.28) 800ms",
+        "note": "届くのは近くのピンだけ。長めに振ってから左上のピンへ連続でつかみにいく",
+        "noteEn": "Only the near peg is in reach. Swinging longer, then chaining to the upper-left peg.",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.34,0.26) 900ms → wait 300ms",
+        "note": "53m。上にコインが並んでいる。左上のピンで振ってコインの列へ飛び込む",
+        "noteEn": "53m. Coins lined up above. Swinging on the upper-left peg to fly through them.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 3000ms",
+        "note": "コインを取り損ねて落下中。何もつかまずに落ちたらどうなるか見る",
+        "noteEn": "Missed the coins and falling. Letting go to see what happens without grabbing.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 67
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.50,0.70) 120ms → wait 300ms",
+        "note": "水に追いつかれて67点で終了。落ちると水がすぐ下にいるので即アウト。タップでリスタート",
+        "noteEn": "Caught by the water at 67. Falling is deadly since the water stays right below. Tapping to restart.",
+        "image": "ai-play/step-11.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 67
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-09T12:15:22+09:00"
+  },
+  "publishedAt": "2026-10-09T12:15:22+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 4152,
+    "outputTokens": 20195,
+    "contextTokens": 3516940,
+    "turns": 31,
+    "toolCalls": 32,
+    "webSearches": 0,
+    "minutes": 189.1,
+    "from": "2026-10-09T00:06:18.300Z",
+    "to": "2026-10-09T03:15:22.606Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-09T12:15:22+09:00",
+    "validationRuns": 1,
+    "codeKB": 22.6
+  }
+}

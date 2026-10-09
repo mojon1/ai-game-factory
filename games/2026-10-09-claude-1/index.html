@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>ぶらんこ登り / Swing Climb</title>
+<style>
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#0d1530;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+canvas{display:block;width:100vw;height:100dvh;touch-action:none}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script src="../../lib/zzfx-1.4.0.min.js"></script>
+<script>
+(() => {
+'use strict';
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const T = {
+  ja: {
+    title: 'ぶらんこ登り',
+    how1: 'ピンを押すと ロープでぶら下がる',
+    how2: '押している間ロープが縮んで 加速する',
+    how3: '指を離して とび上がれ！ 水に追いつかれたら終わり',
+    start: 'タップでスタート',
+    score: 'スコア', best: 'ベスト', height: '高さ',
+    hint: 'ピンを押して ぶら下がる・離して とぶ',
+    over: 'しずんだ…', newBest: 'ベスト更新！', again: 'タップでもう一度',
+    coins: 'コイン', far: 'とどかない！'
+  },
+  en: {
+    title: 'Swing Climb',
+    how1: 'Press a peg to hang from it on a rope',
+    how2: 'While held, the rope reels in and you speed up',
+    how3: 'Let go to fly up! Don\'t let the water catch you',
+    start: 'Tap to start',
+    score: 'SCORE', best: 'BEST', height: 'HEIGHT',
+    hint: 'Hold a peg to swing, release to fly',
+    over: 'Sunk...', newBest: 'New best!', again: 'Tap to play again',
+    coins: 'Coins', far: 'Too far!'
+  }
+}[LANG === 'ja' ? 'ja' : 'en'];
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+
+// ---------- sound ----------
+let audioOK = false;
+const S = {};
+function initAudio() {
+  if (audioOK) return;
+  try {
+    if (typeof ZZFX === 'undefined') return;
+    ZZFX.audioContext?.resume();
+    ZZFX.volume = 0.22;
+    S.grab = new ZZFXSound([1.2,.05,520,.01,.02,.06,1,1.8,24,,,,,,,,,.6]);
+    S.release = new ZZFXSound([.8,.05,260,.02,.05,.12,0,1.4,12,,,,,.3]);
+    S.coin = new ZZFXSound([.9,.02,1150,,.03,.12,1,1.6,,,420,.05]);
+    S.miss = new ZZFXSound([.6,.05,140,,.03,.07,3,1,-8]);
+    S.crack = new ZZFXSound([.8,.1,300,,.02,.15,4,2,-5,,,,,1.2]);
+    S.splash = new ZZFXSound([1.4,.1,90,.02,.15,.5,4,1.5,-3,,,,,1.6,,.1]);
+    S.boost = new ZZFXSound([.6,.05,700,,.04,.1,1,2,30]);
+    audioOK = true;
+  } catch (e) {}
+}
+const play = (k) => { try { if (audioOK && S[k]) S[k].play(); } catch (e) {} };
+
+// ---------- canvas ----------
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d');
+let W = 360, H = 640, DPR = 1, SC = 1, VH = 640; // VH: view height in world units
+function resize() {
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = Math.max(1, window.innerWidth || 360);
+  H = Math.max(1, window.innerHeight || 640);
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+  SC = W / 360;
+  VH = H / SC;
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ---------- world ----------
+const WW = 360;           // world width
+const GRAV = 1500;
+const REACH = 210;        // max rope length to grab
+const MINROPE = 34;
+const REEL = 150;         // rope reel speed (units/s)
+const PR = 13;            // player radius
+
+let state = 'title';      // title | play | over
+let overAt = 0;
+let best = 0, newBest = false;
+let P, pegs, coins, parts, waterY, camY, rope, score, maxH, coinCount, t0, lastPegY, hintUntil, pops, nextId, shake;
+
+function reset() {
+  P = { x: WW / 2, y: -30, px: WW / 2, py: -30, rot: 0 };
+  pegs = []; coins = []; parts = []; pops = [];
+  rope = null; nextId = 1; shake = 0;
+  waterY = 260; camY = -VH * 0.62;
+  score = 0; maxH = 0; coinCount = 0;
+  lastPegY = -40;
+  // starter pegs: an easy ladder
+  addPeg(WW / 2 + 60, -150, 'n');
+  addPeg(WW / 2 - 70, -270, 'n');
+  addPeg(WW / 2 + 50, -400, 'n');
+  lastPegY = -400; lastPegX = WW / 2 + 50;
+  genUntil(camY - 600);
+}
+let lastPegX = WW / 2;
+function addPeg(x, y, kind) {
+  const p = { id: nextId++, x, y, bx: x, kind, t: Math.random() * 6, life: 1, dead: false, held: false, amp: 0, spd: 0 };
+  if (kind === 'm') { p.amp = 50 + Math.random() * 40; p.spd = 0.9 + Math.random() * 0.7; p.bx = Math.max(40 + p.amp, Math.min(WW - 40 - p.amp, x)); }
+  pegs.push(p);
+  return p;
+}
+function genUntil(topY) {
+  while (lastPegY > topY) {
+    const h = -lastPegY;
+    const gap = 105 + Math.min(h / 60, 70) + Math.random() * 45;
+    const y = lastPegY - gap;
+    let x;
+    for (let i = 0; i < 8; i++) {
+      x = 40 + Math.random() * (WW - 80);
+      if (Math.abs(x - lastPegX) > 70 && Math.abs(x - lastPegX) < 220) break;
+    }
+    let kind = 'n';
+    const r = Math.random();
+    if (h > 900 && r < Math.min(0.35, (h - 900) / 4000 + 0.15)) kind = 'c';
+    else if (h > 1800 && r < 0.6 && r > 0.4) kind = 'm';
+    addPeg(x, y, kind);
+    // occasional side peg for choice
+    if (Math.random() < Math.max(0.15, 0.55 - h / 8000)) {
+      const sx = x < WW / 2 ? x + 120 + Math.random() * 80 : x - 120 - Math.random() * 80;
+      if (sx > 30 && sx < WW - 30) addPeg(sx, y - 30 + Math.random() * 60, h > 1200 && Math.random() < 0.3 ? 'c' : 'n');
+    }
+    // coins on arcs between pegs
+    if (Math.random() < 0.55) {
+      const cx = (x + lastPegX) / 2 + (Math.random() - 0.5) * 60, cy = (y + lastPegY) / 2 - 20;
+      const n = 1 + (Math.random() * 3 | 0);
+      for (let i = 0; i < n; i++) coins.push({ x: cx + (i - (n - 1) / 2) * 26, y: cy - Math.abs(i - (n - 1) / 2) * -8, got: false, t: Math.random() * 6 });
+    }
+    lastPegY = y; lastPegX = x;
+  }
+}
+
+// ---------- input ----------
+let pointerDown = false, holdId = null;
+function toWorld(cx, cy) { return { x: cx / SC, y: cy / SC + camY }; }
+cv.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  initAudio();
+  try { cv.setPointerCapture(e.pointerId); } catch (er) {}
+  const now = performance.now();
+  if (state === 'title') { startGame(); return; }
+  if (state === 'over') { if (now - overAt > 700) startGame(); return; }
+  holdId = e.pointerId; pointerDown = true;
+  tryGrab(e.clientX, e.clientY);
+});
+const up = (e) => {
+  if (e.pointerId !== holdId) return;
+  pointerDown = false; holdId = null;
+  if (state === 'play' && rope) releaseRope();
+};
+cv.addEventListener('pointerup', up);
+cv.addEventListener('pointercancel', up);
+cv.addEventListener('contextmenu', e => e.preventDefault());
+
+function tryGrab(cx, cy) {
+  const w = toWorld(cx, cy);
+  let bestP = null, bd = Infinity;
+  for (const p of pegs) {
+    if (p.dead) continue;
+    const dp = Math.hypot(p.x - P.x, p.y - P.y);
+    if (dp > REACH) continue;
+    const dt = Math.hypot(p.x - w.x, p.y - w.y);
+    if (dt < bd) { bd = dt; bestP = p; }
+  }
+  if (bestP && bd < 150) {
+    const L = Math.max(MINROPE, Math.hypot(bestP.x - P.x, bestP.y - P.y));
+    rope = { peg: bestP, L };
+    bestP.held = true;
+    if (bestP.kind === 'c' && bestP.life >= 1) bestP.life = 0.999;
+    play('grab');
+    pops.push({ x: bestP.x, y: bestP.y, r: 6, a: 1, c: '#fff' });
+  } else {
+    play('miss');
+    pops.push({ x: w.x, y: w.y, r: 4, a: 1, c: '#ff8a8a', txt: T.far });
+  }
+}
+function releaseRope() {
+  if (!rope) return;
+  rope.peg.held = false;
+  rope = null;
+  play('release');
+  // small burst
+  for (let i = 0; i < 5; i++) parts.push({ x: P.x, y: P.y, vx: (Math.random() - 0.5) * 120, vy: (Math.random() - 0.5) * 120, l: 0.35, c: '#ffe9a8' });
+}
+
+function startGame() {
+  reset();
+  state = 'play';
+  t0 = performance.now();
+  hintUntil = t0 + 4000;
+  newBest = false;
+  signal('start');
+}
+function gameOver() {
+  state = 'over';
+  overAt = performance.now();
+  if (rope) { rope.peg.held = false; rope = null; }
+  play('splash');
+  for (let i = 0; i < 24; i++) parts.push({ x: P.x, y: waterY, vx: (Math.random() - 0.5) * 300, vy: -Math.random() * 380, l: 0.8, c: '#9fe3ff', g: 1 });
+  if (score > best) { best = score; newBest = true; }
+  signal('end', { score });
+}
+
+// ---------- physics ----------
+const STEP = 1 / 120;
+let acc = 0;
+function physics(dt) {
+  const el = (performance.now() - t0) / 1000;
+  // pegs move / crumble
+  for (const p of pegs) {
+    p.t += dt;
+    if (p.kind === 'm') p.x = p.bx + Math.sin(p.t * p.spd) * p.amp;
+    if (p.kind === 'c' && p.life < 1 && !p.dead) {
+      p.life -= dt / 1.1;
+      if (p.life <= 0) {
+        p.dead = true; play('crack');
+        for (let i = 0; i < 8; i++) parts.push({ x: p.x, y: p.y, vx: (Math.random() - 0.5) * 160, vy: -Math.random() * 120, l: 0.7, c: '#ff8f6b', g: 1 });
+        if (rope && rope.peg === p) { rope = null; }
+      }
+    }
+  }
+  // rope reel
+  if (rope) rope.L = Math.max(MINROPE, rope.L - REEL * dt);
+  // verlet
+  let vx = (P.x - P.px), vy = (P.y - P.py);
+  vx *= 0.9995; vy *= 0.9995;
+  // speed cap
+  const sp = Math.hypot(vx, vy) / dt, MAXS = 1500;
+  if (sp > MAXS) { vx *= MAXS / sp; vy *= MAXS / sp; }
+  P.px = P.x; P.py = P.y;
+  P.x += vx; P.y += vy + GRAV * dt * dt;
+  if (rope) {
+    const a = rope.peg;
+    const dx = P.x - a.x, dy = P.y - a.y, d = Math.hypot(dx, dy) || 1;
+    if (d > rope.L) {
+      // project onto circle; also move prev so radial outward velocity is removed but tangential kept
+      const nx = dx / d, ny = dy / d;
+      P.x = a.x + nx * rope.L; P.y = a.y + ny * rope.L;
+      let ux = P.x - P.px, uy = P.y - P.py;
+      const radial = ux * nx + uy * ny;
+      if (radial > 0) { ux -= radial * nx; uy -= radial * ny; P.px = P.x - ux; P.py = P.y - uy; }
+    }
+  }
+  // walls
+  if (P.x < PR) { const v = P.x - P.px; P.x = PR; P.px = P.x + v * 0.6; }
+  if (P.x > WW - PR) { const v = P.x - P.px; P.x = WW - PR; P.px = P.x + v * 0.6; }
+  // start floor (only near the beginning)
+  if (P.y > -PR && waterY > 0 && P.py <= -PR + 1) { P.y = -PR; P.py = P.y; P.px = P.x - (P.x - P.px) * 0.8; }
+  P.rot += (P.x - P.px) * 0.08;
+  // water
+  const h = -P.y;
+  const wspeed = el < 2.5 ? 0 : 28 + Math.min(el * 1.6, 90);
+  waterY = Math.min(waterY - wspeed * dt, P.y + VH * 0.95);
+  // coins
+  for (const c of coins) {
+    if (c.got) continue;
+    if (Math.hypot(c.x - P.x, c.y - P.y) < PR + 12) {
+      c.got = true; coinCount++; play('coin');
+      pops.push({ x: c.x, y: c.y, r: 4, a: 1, c: '#ffd34d', txt: '+5' });
+    }
+  }
+  if (h > maxH) maxH = h;
+  score = Math.floor(maxH / 10) + coinCount * 5;
+  if (P.y > waterY + 6) gameOver();
+}
+
+// ---------- render helpers ----------
+function sx(x) { return x * SC; }
+function sy(y) { return (y - camY) * SC; }
+function fitText(txt, size, maxW, weight = 700) {
+  let s = size;
+  ctx.font = `${weight} ${s}px ${FONT}`;
+  while (ctx.measureText(txt).width > maxW && s > 12) { s -= 1; ctx.font = `${weight} ${s}px ${FONT}`; }
+  return s;
+}
+
+const stars = Array.from({ length: 70 }, () => ({ x: Math.random(), y: Math.random(), s: Math.random() * 1.6 + 0.4, p: Math.random() * 0.5 + 0.1 }));
+
+function drawBG() {
+  const h = Math.max(0, -camY);
+  const k = Math.min(1, h / 6000);
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  const top = `hsl(${230 - k * 20},${55 - k * 10}%,${16 - k * 8}%)`;
+  const bot = `hsl(${205 - k * 40},${60}%,${34 - k * 20}%)`;
+  g.addColorStop(0, top); g.addColorStop(1, bot);
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#fff';
+  for (const s of stars) {
+    const yy = ((s.y * H - camY * SC * s.p * 0.15) % H + H) % H;
+    ctx.globalAlpha = 0.25 + s.p;
+    ctx.fillRect(s.x * W, yy, s.s, s.s);
+  }
+  ctx.globalAlpha = 1;
+  // height markers
+  ctx.strokeStyle = 'rgba(255,255,255,0.07)'; ctx.lineWidth = 1;
+  ctx.font = `600 ${Math.max(12, 12 * SC) | 0}px ${FONT}`; ctx.fillStyle = 'rgba(255,255,255,0.22)'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+  const stepM = 500;
+  const first = Math.floor(-(camY + VH) / stepM) * stepM;
+  for (let m = Math.max(0, first); m < -camY + stepM; m += stepM) {
+    if (m === 0) continue;
+    const y = sy(-m);
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    ctx.fillText(`${m / 10}m`, 6, y - 2);
+  }
+}
+
+function drawPeg(p, reachable) {
+  if (p.dead) return;
+  const x = sx(p.x), y = sy(p.y);
+  const r = 9 * SC;
+  let col = p.kind === 'c' ? '#ff8f6b' : p.kind === 'm' ? '#8fe08a' : '#8ad4ff';
+  if (reachable && state === 'play') {
+    ctx.beginPath(); ctx.arc(x, y, r * 2.1 + Math.sin(p.t * 5) * 1.5 * SC, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.10)'; ctx.fill();
+  }
+  ctx.save();
+  if (p.kind === 'c' && p.life < 1) { ctx.translate((Math.random() - 0.5) * 3 * SC, 0); ctx.globalAlpha = 0.4 + 0.6 * p.life; }
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fillStyle = reachable ? col : 'rgba(255,255,255,0.18)';
+  ctx.fill();
+  ctx.lineWidth = 3 * SC; ctx.strokeStyle = reachable ? '#fff' : 'rgba(255,255,255,0.35)'; ctx.stroke();
+  ctx.beginPath(); ctx.arc(x, y, r * 0.35, 0, Math.PI * 2); ctx.fillStyle = 'rgba(20,30,60,0.8)'; ctx.fill();
+  if (p.kind === 'c') { // crack marks
+    ctx.strokeStyle = 'rgba(60,20,10,0.8)'; ctx.lineWidth = 1.5 * SC;
+    ctx.beginPath(); ctx.moveTo(x - r * 0.8, y - r * 0.2); ctx.lineTo(x - r * 0.2, y + r * 0.1); ctx.lineTo(x + r * 0.1, y - r * 0.5); ctx.stroke();
+  }
+  if (p.kind === 'm') {
+    ctx.strokeStyle = 'rgba(143,224,138,0.35)'; ctx.lineWidth = 2 * SC;
+    ctx.beginPath(); ctx.moveTo(sx(p.bx - p.amp), y); ctx.lineTo(sx(p.bx + p.amp), y); ctx.setLineDash([4 * SC, 6 * SC]); ctx.stroke(); ctx.setLineDash([]);
+  }
+  ctx.restore();
+}
+
+function drawPlayer() {
+  const x = sx(P.x), y = sy(P.y), r = PR * SC;
+  // trail
+  const vx = P.x - P.px, vy = P.y - P.py;
+  const spd = Math.hypot(vx, vy) / STEP;
+  if (spd > 500) {
+    ctx.strokeStyle = `rgba(255,220,120,${Math.min(0.5, (spd - 500) / 1500)})`;
+    ctx.lineWidth = r * 1.4; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - vx * SC * 9, y - vy * SC * 9); ctx.stroke();
+  }
+  ctx.save(); ctx.translate(x, y);
+  // body
+  ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fillStyle = '#c47a3c'; ctx.fill();
+  // ears
+  ctx.fillStyle = '#c47a3c';
+  ctx.beginPath(); ctx.arc(-r * 0.95, -r * 0.2, r * 0.38, 0, Math.PI * 2); ctx.arc(r * 0.95, -r * 0.2, r * 0.38, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#f2c08a';
+  ctx.beginPath(); ctx.arc(-r * 0.95, -r * 0.2, r * 0.2, 0, Math.PI * 2); ctx.arc(r * 0.95, -r * 0.2, r * 0.2, 0, Math.PI * 2); ctx.fill();
+  // face
+  ctx.beginPath(); ctx.ellipse(0, r * 0.18, r * 0.68, r * 0.58, 0, 0, Math.PI * 2); ctx.fillStyle = '#f2c08a'; ctx.fill();
+  const lx = Math.max(-1, Math.min(1, vx * 0.2)) * r * 0.15;
+  ctx.fillStyle = '#222';
+  ctx.beginPath(); ctx.arc(-r * 0.28 + lx, -r * 0.05, r * 0.12, 0, Math.PI * 2); ctx.arc(r * 0.28 + lx, -r * 0.05, r * 0.12, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = '#6b3a17'; ctx.lineWidth = 1.6 * SC; ctx.lineCap = 'round';
+  ctx.beginPath();
+  if (rope) ctx.arc(lx, r * 0.3, r * 0.22, 0.15 * Math.PI, 0.85 * Math.PI);
+  else { ctx.arc(lx, r * 0.42, r * 0.14, 0, Math.PI * 2); }
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawWater() {
+  const y = sy(waterY);
+  if (y > H + 20) return;
+  const t = performance.now() / 1000;
+  ctx.beginPath(); ctx.moveTo(0, H);
+  for (let i = 0; i <= 24; i++) {
+    const x = W * i / 24;
+    ctx.lineTo(x, y + Math.sin(i * 0.9 + t * 3) * 4 * SC + Math.sin(i * 0.37 - t * 2) * 3 * SC);
+  }
+  ctx.lineTo(W, H); ctx.closePath();
+  const g = ctx.createLinearGradient(0, y, 0, y + 200 * SC);
+  g.addColorStop(0, 'rgba(80,200,255,0.85)'); g.addColorStop(1, 'rgba(20,70,160,0.95)');
+  ctx.fillStyle = g; ctx.fill();
+  ctx.strokeStyle = 'rgba(220,250,255,0.9)'; ctx.lineWidth = 2.5 * SC;
+  ctx.beginPath();
+  for (let i = 0; i <= 24; i++) {
+    const x = W * i / 24, yy = y + Math.sin(i * 0.9 + t * 3) * 4 * SC + Math.sin(i * 0.37 - t * 2) * 3 * SC;
+    i ? ctx.lineTo(x, yy) : ctx.moveTo(x, yy);
+  }
+  ctx.stroke();
+}
+
+function drawHUD() {
+  const pad = 12;
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(0, 0, W, 50);
+  ctx.fillStyle = '#fff'; ctx.textAlign = 'left';
+  ctx.font = `600 13px ${FONT}`; ctx.fillText(T.score, pad, 6);
+  ctx.font = `800 22px ${FONT}`; ctx.fillText(String(score), pad, 22);
+  ctx.textAlign = 'right';
+  ctx.font = `600 13px ${FONT}`; ctx.fillText(T.best, W - pad, 6);
+  ctx.font = `800 22px ${FONT}`; ctx.fillText(String(Math.max(best, state === 'play' ? 0 : best)), W - pad, 22);
+  ctx.textAlign = 'center';
+  ctx.font = `600 13px ${FONT}`; ctx.fillStyle = 'rgba(255,255,255,0.8)';
+  ctx.fillText(`${T.height} ${(Math.max(0, -P.y) / 10).toFixed(0)}m · ●${coinCount}`, W / 2, 16);
+  // water distance warning
+  const dist = waterY - P.y;
+  if (state === 'play' && dist < VH * 0.35) {
+    ctx.fillStyle = `rgba(80,200,255,${0.25 + 0.2 * Math.sin(performance.now() / 120)})`;
+    ctx.fillRect(0, H - 8, W, 8);
+  }
+}
+
+// ---------- main loop ----------
+let last = performance.now();
+let titleT = 0;
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (W < 2 || H < 2) { resize(); requestAnimationFrame(frame); return; }
+  if (state === 'play') {
+    acc += dt;
+    while (acc >= STEP) { physics(STEP); acc -= STEP; if (state !== 'play') break; }
+    // camera
+    const target = P.y - VH * 0.55;
+    camY += (target - camY) * Math.min(1, dt * 5);
+    genUntil(camY - 500);
+    // cull
+    const cut = camY + VH + 400;
+    if (pegs.length > 80) pegs = pegs.filter(p => p.y < cut || (rope && rope.peg === p));
+    if (coins.length > 80) coins = coins.filter(c => c.y < cut);
+  } else if (state === 'over') {
+    const target = Math.min(P.y, waterY) - VH * 0.55;
+    camY += (target - camY) * Math.min(1, dt * 3);
+  }
+  // particles
+  for (const p of parts) { p.x += p.vx * dt; p.y += p.vy * dt; if (p.g) p.vy += 900 * dt; p.l -= dt; }
+  parts = parts.filter(p => p.l > 0);
+  for (const p of pops) { p.r += 60 * dt; p.a -= dt * 1.8; }
+  pops = pops.filter(p => p.a > 0);
+
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  drawBG();
+  if (state === 'title') { drawTitle(now); requestAnimationFrame(frame); return; }
+
+  // start ground
+  const gy = sy(0);
+  if (gy < H + 10) { ctx.fillStyle = '#2b3f2a'; ctx.fillRect(0, gy, W, H - gy); ctx.fillStyle = '#4f7a3c'; ctx.fillRect(0, gy, W, 6 * SC); }
+
+  // reach circle
+  if (state === 'play') {
+    ctx.beginPath(); ctx.arc(sx(P.x), sy(P.y), REACH * SC, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.07)'; ctx.lineWidth = 2; ctx.setLineDash([6, 8]); ctx.stroke(); ctx.setLineDash([]);
+  }
+  // coins
+  for (const c of coins) {
+    if (c.got) continue;
+    const y = sy(c.y); if (y < -20 || y > H + 20) continue;
+    c.t += dt;
+    const w = Math.abs(Math.cos(c.t * 3)) * 8 * SC + 2 * SC;
+    ctx.beginPath(); ctx.ellipse(sx(c.x), y, w, 9 * SC, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffd34d'; ctx.fill(); ctx.strokeStyle = '#b8860b'; ctx.lineWidth = 1.5 * SC; ctx.stroke();
+  }
+  // pegs
+  for (const p of pegs) {
+    const y = sy(p.y); if (y < -30 || y > H + 30) continue;
+    drawPeg(p, Math.hypot(p.x - P.x, p.y - P.y) <= REACH);
+  }
+  // rope
+  if (rope) {
+    ctx.strokeStyle = '#f5e6c8'; ctx.lineWidth = 3 * SC; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(sx(rope.peg.x), sy(rope.peg.y)); ctx.lineTo(sx(P.x), sy(P.y)); ctx.stroke();
+  }
+  drawPlayer();
+  // particles
+  for (const p of parts) { ctx.globalAlpha = Math.max(0, Math.min(1, p.l * 2)); ctx.fillStyle = p.c; ctx.fillRect(sx(p.x) - 2 * SC, sy(p.y) - 2 * SC, 4 * SC, 4 * SC); }
+  ctx.globalAlpha = 1;
+  for (const p of pops) {
+    ctx.globalAlpha = Math.max(0, p.a);
+    if (p.txt) { ctx.fillStyle = p.c; ctx.font = `800 ${Math.round(15 * Math.max(1, SC))}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(p.txt, sx(p.x), sy(p.y) - (1 - p.a) * 30); }
+    else { ctx.beginPath(); ctx.arc(sx(p.x), sy(p.y), p.r * SC, 0, Math.PI * 2); ctx.strokeStyle = p.c; ctx.lineWidth = 2; ctx.stroke(); }
+  }
+  ctx.globalAlpha = 1;
+  drawWater();
+  drawHUD();
+
+  if (state === 'play' && now < hintUntil) {
+    ctx.globalAlpha = Math.min(1, (hintUntil - now) / 600);
+    const s = fitText(T.hint, 16, W - 32, 700);
+    ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.fillRect(0, H - 64, W, 40);
+    ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(T.hint, W / 2, H - 44);
+    ctx.globalAlpha = 1;
+  }
+  if (state === 'over') drawOver(now);
+  requestAnimationFrame(frame);
+}
+
+function drawTitle(now) {
+  titleT = now / 1000;
+  // swinging demo monkey
+  const ax = W / 2, ay = H * 0.2;
+  const ang = Math.sin(titleT * 2.2) * 0.9, L = Math.min(W, H) * 0.3;
+  const mx = ax + Math.sin(ang) * L, my = ay + Math.cos(ang) * L;
+  ctx.strokeStyle = '#f5e6c8'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(mx, my); ctx.stroke();
+  ctx.beginPath(); ctx.arc(ax, ay, 10, 0, Math.PI * 2); ctx.fillStyle = '#8ad4ff'; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke();
+  const saveP = P; const sSC = SC, sCam = camY;
+  P = { x: mx / SC, y: my / SC + camY, px: mx / SC - Math.cos(ang) * 0.5, py: my / SC + camY, rot: 0 };
+  rope = { peg: { x: ax / SC, y: ay / SC + camY } };
+  drawPlayer();
+  rope = null; P = saveP;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff';
+  fitText(T.title, 44, W - 32, 900);
+  ctx.fillText(T.title, W / 2, H * 0.6);
+  ctx.fillStyle = 'rgba(255,255,255,0.88)';
+  const lines = [T.how1, T.how2, T.how3];
+  lines.forEach((l, i) => { fitText(l, 15, W - 32, 600); ctx.fillText(l, W / 2, H * 0.6 + 50 + i * 24); });
+  ctx.globalAlpha = 0.6 + 0.4 * Math.sin(now / 300);
+  fitText(T.start, 22, W - 32, 800); ctx.fillStyle = '#ffd34d';
+  ctx.fillText(T.start, W / 2, H * 0.88);
+  ctx.globalAlpha = 1;
+  if (best > 0) { ctx.fillStyle = 'rgba(255,255,255,0.7)'; fitText(`${T.best} ${best}`, 14, W - 32, 600); ctx.fillText(`${T.best} ${best}`, W / 2, H * 0.94); }
+}
+
+function drawOver(now) {
+  ctx.fillStyle = 'rgba(5,10,30,0.6)'; ctx.fillRect(0, 0, W, H);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#9fe3ff';
+  fitText(T.over, 26, W - 32, 800); ctx.fillText(T.over, W / 2, H * 0.3);
+  ctx.fillStyle = '#fff'; fitText(String(score), 72, W - 32, 900); ctx.fillText(String(score), W / 2, H * 0.42);
+  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  const sub = `${T.height} ${(maxH / 10).toFixed(0)}m · ${T.coins} ${coinCount}`;
+  fitText(sub, 16, W - 32, 600); ctx.fillText(sub, W / 2, H * 0.51);
+  if (newBest) { ctx.fillStyle = '#ffd34d'; fitText(T.newBest, 22, W - 32, 800); ctx.fillText(T.newBest, W / 2, H * 0.58); }
+  else { ctx.fillStyle = 'rgba(255,255,255,0.8)'; fitText(`${T.best} ${best}`, 18, W - 32, 700); ctx.fillText(`${T.best} ${best}`, W / 2, H * 0.58); }
+  if (now - overAt > 700) {
+    ctx.globalAlpha = 0.6 + 0.4 * Math.sin(now / 300);
+    ctx.fillStyle = '#fff'; fitText(T.again, 20, W - 32, 800); ctx.fillText(T.again, W / 2, H * 0.72);
+    ctx.globalAlpha = 1;
+  }
+}
+
+reset();
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
