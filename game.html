@@ -39,7 +39,7 @@
 
 <!-- 全画面プレイヤー -->
 <div class="player" id="player" hidden>
-  <div class="player-top"><button class="player-close" id="close" type="button"><span aria-hidden="true">✕</span> <span data-i18n="close"></span></button></div>
+  <div class="player-top"><button class="player-close" id="close" type="button"><span aria-hidden="true">✕</span> <span data-i18n="close"></span></button><button class="player-sound" id="sound" type="button" aria-pressed="true"></button></div>
   <div class="phone"><iframe id="frame" title="game" sandbox="allow-scripts allow-pointer-lock" allow="autoplay"></iframe></div>
 </div>
 
@@ -56,7 +56,7 @@
 <script src="assets/app.js?v=__V__"></script>
 <script>
 (async () => {
-  const { t, lang, EN, esc, fmtDate, genre, kTokens, loadIndex, loadMeta, Ratings, starBar, starIcons, aiStars, modeBanner } = AGF;
+  const { t, lang, EN, esc, fmtDate, genre, kTokens, loadIndex, loadMeta, Ratings, starBar, starIcons, aiStars, modeBanner, store } = AGF;
   const tr = I18N.tr;
   I18N.apply();
   modeBanner(document.getElementById('banner'));
@@ -172,9 +172,20 @@
   // ---------- 全画面プレイヤー ----------
   const player = $('player'), frame = $('frame');
   let openedAt = 0, pushed = false;
+  // 音のオン/オフ（このブラウザに記憶）。ゲームには {agf:'sound', on} で伝え、ゲームはそれに従う（仕様6）
+  let soundOn = store.get('agf_sound', true) !== false;
+  const sendSound = () => { try { frame.contentWindow?.postMessage({ agf: 'sound', on: soundOn }, '*'); } catch (e) {} };
+  function renderSound() {
+    $('sound').innerHTML = `<span aria-hidden="true">${soundOn ? '🔊' : '🔇'}</span> <span>${t(soundOn ? 'sound.on' : 'sound.off')}</span>`;
+    $('sound').setAttribute('aria-pressed', String(soundOn));
+  }
+  renderSound();
+  $('sound').hidden = (meta.specVersion || 0) < 6;   // 仕様5までの作品は合図に対応していないので出さない
+  $('sound').onclick = () => { soundOn = !soundOn; store.set('agf_sound', soundOn); renderSound(); sendSound(); };
+  frame.addEventListener('load', sendSound);
   addEventListener('message', (e) => {
     if (e.source !== frame.contentWindow || !e.data || !e.data.agf) return;
-    if (e.data.agf === 'start') session.plays++;
+    if (e.data.agf === 'start') { session.plays++; sendSound(); }
   });
   function openPlayer() {
     session = { plays: 0, seconds: 0 };

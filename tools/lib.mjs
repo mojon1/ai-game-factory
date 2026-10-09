@@ -79,6 +79,52 @@ export const SANDBOX_INIT = `(() => {
     try { Object.defineProperty(window, k, { get() { throw new DOMException('sandboxed iframe: ' + k + ' is not available', 'SecurityError'); } }); } catch (e) {}
   }
   window.alert = window.confirm = window.prompt = () => { throw new Error('alert/confirm/prompt は使用禁止です'); };
+  // 音の検査用: 音を鳴らし始めた時刻とループ再生（BGM）の数を記録する（鳴り方は変えない）
+  window.__agfAudio = { starts: [], loops: 0 };
+  const noteStart = (node) => { window.__agfAudio.starts.push(performance.now()); if (node.loop) window.__agfAudio.loops++; };
+  // 検査用の WebKit（iPhone 相当）は Web Audio を持たない。実機の iPhone にはあるので、音の出ない代わりの部品を置き、
+  // 「AudioContext が無い」という検査環境だけのエラーで不合格にならないようにする
+  if (!window.AudioContext && !window.webkitAudioContext) {
+    const PARAMS = /^(gain|frequency|detune|Q|pan|delayTime|playbackRate|offset|threshold|knee|ratio|attack|release|positionX|positionY|positionZ)$/;
+    const param = () => new Proxy({ value: 0 }, { get: (t, k) => (k in t ? t[k] : () => param()), set: (t, k, v) => ((t[k] = v), true) });
+    const node = () => {
+      const n = new Proxy({}, {
+        get(t, k) {
+          if (k in t) return t[k];
+          if (k === 'connect') return (d) => d || node();
+          if (k === 'start') return () => noteStart(n);
+          if (typeof k === 'string' && PARAMS.test(k)) return (t[k] = param());
+          if (k === 'then' || typeof k === 'symbol') return undefined;
+          return () => node();
+        },
+        set: (t, k, v) => ((t[k] = v), true),
+      });
+      return n;
+    };
+    class SilentAudioContext {
+      constructor() {
+        this.state = 'running'; this.sampleRate = 44100; this.destination = node(); this.listener = node(); this._t0 = performance.now();
+        return new Proxy(this, { get: (t, k) => (k in t ? (typeof t[k] === 'function' ? t[k].bind(t) : t[k]) : typeof k === 'string' && k.startsWith('create') ? () => node() : undefined) });
+      }
+      get currentTime() { return (performance.now() - this._t0) / 1000; }
+      resume() { return Promise.resolve(); } suspend() { return Promise.resolve(); } close() { return Promise.resolve(); }
+      createBuffer(ch, len, sr) { const d = Array.from({ length: ch }, () => new Float32Array(len)); return { numberOfChannels: ch, length: len, sampleRate: sr, duration: len / sr, getChannelData: (i) => d[i], copyToChannel() {} }; }
+      decodeAudioData() { return Promise.resolve(this.createBuffer(1, 1, 44100)); }
+    }
+    window.AudioContext = window.webkitAudioContext = SilentAudioContext;
+    for (const name of ['GainNode', 'OscillatorNode', 'AudioBufferSourceNode', 'StereoPannerNode', 'BiquadFilterNode', 'DelayNode', 'ConvolverNode', 'DynamicsCompressorNode', 'WaveShaperNode', 'ConstantSourceNode', 'PannerNode', 'AnalyserNode']) {
+      window[name] = function () { return node(); };
+    }
+  }
+  try {
+    // AudioBufferSourceNode は start を自分で持っているので、両方の prototype を包む
+    for (const C of [window.AudioScheduledSourceNode, window.AudioBufferSourceNode]) {
+      const P = C && C.prototype;
+      if (!P || !Object.prototype.hasOwnProperty.call(P, 'start')) continue;
+      const start = P.start;
+      P.start = function (...args) { noteStart(this); return start.apply(this, args); };
+    }
+  } catch (e) {}
   // 3D（WebGL）の画面も検査で読み取れるように、描画内容を保持させる（見た目は変わらない）
   const getContext = HTMLCanvasElement.prototype.getContext;
   HTMLCanvasElement.prototype.getContext = function (type, opts) {

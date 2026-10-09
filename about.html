@@ -69,6 +69,7 @@
     <li>2026-10-09: 人間の評価を「面白い / まあまあ / つまらない」の3段階から<b>星5段階</b>（★1 つまらない / ★2 いまいち / ★3 ふつう / ★4 面白い / ★5 とても面白い）に変更。それまでの評価は 面白い→★5、まあまあ→★3、つまらない→★1 に置き換えた。AIの自己判定も同じ星5段階にした（それまでの自己判定も同じ対応で星として表示する）。</li>
     <li>2026-10-09: 「評価20人以上で『面白い』が50%を超えたら観測された日とする」という判定ラインを取りやめた。数値の線を先に決めることは、この実験の問いの立て方と少しずれていると考えたため。</li>
     <li>2026-10-09: 仕様を変更（仕様5）。最初の12作のうち12作が「点数を伸ばす」、7作が「時間切れで終わる」作りに偏っていたため、2つの点を直した。(1) 仕様の画面ルールなどが点数・制限時間・ゲームオーバーのあるゲームを前提に書かれていたので、それらは必須ではなく、クリア型・ステージ型・点数のない遊びでもよいと明記した。(2) 作品ごとに「目指すもの・終わり方・中心の操作」を記録し、企画のときに見る過去作品の一覧に、その集計（偏り）を出すようにした。最初の12作の分類は、人間側（サイト改修のClaude）が後から付けた。企画の中身（お題）は指定していない。</li>
+    <li>2026-10-09: 仕様を変更（仕様6）。どの作品も音がなく地味だったため、<b>BGMと効果音を必須</b>にした（作り方は自由。音のファイルは使えないのでコードで作る）。あわせて、プレイ画面の上のバーに「音あり／音なし」の切り替えボタンを置き、ゲームはそれに従うことにした。自動テストで、音の仕組みと、操作しない間もBGMが続くことを確かめる。仕様5までの作品はそのまま。</li>
   </ul>
 </div>
 
@@ -103,6 +104,7 @@
     <li>2026-10-09: Changed human ratings from three options (fun / so-so / boring) to <b>1–5 stars</b> (★1 boring / ★2 meh / ★3 okay / ★4 fun / ★5 great fun). Earlier ratings were converted: fun → ★5, so-so → ★3, boring → ★1. The AI's self-judgment now uses the same 1–5 stars (earlier self-judgments are shown as stars with the same mapping).</li>
     <li>2026-10-09: Dropped the threshold "a game with N+ ratings and over P% 'fun' marks the day it was observed". Fixing a numeric line in advance felt slightly at odds with how the experiment's question is posed.</li>
     <li>2026-10-09: Changed the spec (version 5). All 12 of the first 12 games were "beat your score" games and 7 ended when time ran out, so two things were changed. (1) The spec's screen rules assumed a score, a time limit and a game over; it now states these are optional, and that goal-based, stage-based or score-free games are equally fine. (2) Each game now records its goal, how a round ends and its main controls, and the list of past games that the AI checks while planning shows a tally of these (the skew). The first 12 games were classified afterwards by the human side (the Claude working on the site). No topic or content is prescribed.</li>
+    <li>2026-10-09: Changed the spec (version 6). Every game so far was silent and felt flat, so <b>BGM and sound effects are now required</b> (made in code, since audio files are not allowed; how is up to the AI). A sound on/off button was added to the bar above the game, and games must follow it. The automated test checks that a game has sound, follows the switch, and keeps its BGM playing without input. Games made under earlier spec versions are unchanged.</li>
   </ul>
 </div>
 </main>

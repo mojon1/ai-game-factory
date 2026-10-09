@@ -24,18 +24,28 @@ export const CHECK_EN = {
   'iPhone: タッチで開始・操作でき、画面が変化する': 'iPhone: starts and responds to touch',
   'iPhone: 画面からはみ出さない': 'iPhone: no overflow',
   'プレイ開始の合図（start）を送っている': 'Sends the play "start" signal',
+  '音を鳴らす仕組みがある（BGM・効果音）': 'Has sound (BGM and sound effects)',
+  'サイトの音のオン/オフに対応している': "Follows the site's sound on/off",
+  'Android: BGMが鳴っている（操作していない間も音が続く）': 'Android: BGM plays (sound continues without input)',
   'JavaScript エラーが出ない': 'No JavaScript errors',
 };
 const drawn = (i) => (i.canvasVariety ?? 99) > 1 || i.text.length > 0;
 
 // 1端末分の検査: タップで開始 → ランダムなタップ・長押し・スワイプ → 画面の変化を確認
-async function deviceCheck(id, device, browser, add, label) {
+async function deviceCheck(id, device, browser, add, label, checkBgm = false) {
   const s = await openSession(id, { browser, frozen: false, device });
   try {
     const first = await s.inspect();
     add(`${label}: 描画されている`, drawn(first), `canvas色数=${first.canvasVariety ?? '-'}`);
     const before = await s.page.screenshot({ type: 'jpeg', quality: 60 });
     await s.act({ tap: [0.5, 0.5], hold: 80, wait: 300 });
+    if (checkBgm) {
+      // BGM: 開始してから何も操作しない間も、音が鳴り続けているか（ループ再生か、新しい音が鳴り始めている）
+      const t0 = await s.page.evaluate(() => performance.now());
+      await s.page.waitForTimeout(2500);
+      const au = await s.page.evaluate((t) => ({ idle: (window.__agfAudio?.starts || []).filter((x) => x > t).length, loops: window.__agfAudio?.loops || 0, all: (window.__agfAudio?.starts || []).length }), t0);
+      add(`${label}: BGMが鳴っている（操作していない間も音が続く）`, au.loops > 0 || au.idle >= 2, `操作なし2.5秒間に鳴り始めた音=${au.idle} / ループ再生=${au.loops} / 合計=${au.all}`);
+    }
     for (let i = 0; i < 8; i++) {
       const x = 0.15 + Math.random() * 0.7, y = 0.3 + Math.random() * 0.6;
       if (i % 3 === 2) await s.act({ swipe: [x, y, 1 - x, y], hold: 180, wait: 80 });
@@ -78,6 +88,12 @@ export async function validateGame(id) {
   const banned = html.match(/\b(alert|confirm|prompt)\s*\(|window\.open\s*\(/);
   add('alert/confirm/prompt/window.open を使っていない', !banned, banned ? banned[0] : '');
   add('Pointer Events でタッチ操作に対応している', /pointerdown/i.test(html));
+  // 仕様6以降: BGM と効果音が必須。サイトの「音のオン/オフ」の合図（agf: 'sound'）に従う
+  const v6 = (readMeta(id)?.specVersion || 0) >= 6;
+  if (v6) {
+    add('音を鳴らす仕組みがある（BGM・効果音）', /AudioContext|\bzzfx\b|ZZFX/.test(html));
+    add('サイトの音のオン/オフに対応している', /['"]sound['"]/.test(html) && /addEventListener\(\s*['"]message['"]|onmessage\s*=/.test(html));
+  }
   add('touch-action を指定している', /touch-action\s*:\s*none/i.test(html));
 
   const errors = [];
@@ -95,7 +111,7 @@ export async function validateGame(id) {
     add('日本語/英語で表示が切り替わる', !shots.ja.equals(shots.en));
 
     // Android
-    const a = await deviceCheck(id, 'android', chromium, add, 'Android');
+    const a = await deviceCheck(id, 'android', chromium, add, 'Android', v6);   // 音の確認は Chromium のみ（検査用の WebKit は音を出せない）
     if (!fs.existsSync(path.join(dir, 'thumb.jpg')) && !fs.existsSync(path.join(dir, 'thumb.webp')) || process.argv.includes('--thumb')) {
       await a.page.screenshot({ path: path.join(dir, 'thumb.jpg'), type: 'jpeg', quality: 80, scale: 'css' });
     }
