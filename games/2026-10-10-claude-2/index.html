@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>ちかすぎ図鑑 / Way Too Close</title>
+<style>
+html,body{margin:0;padding:0;height:100%;background:#fdf6ec;overflow:hidden;-webkit-user-select:none;user-select:none}
+canvas{display:block;width:100vw;height:100dvh;touch-action:none}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+'use strict';
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const JA = LANG === 'ja';
+const TX = {
+  ja: {
+    title: 'ちかすぎ図鑑',
+    how1: 'ものすごく近くから写した絵が、だんだん引いていく。',
+    how2: '何か分かったら、下の4つからタップ。',
+    how3: '近いうちに当てるほど高得点＆金メダル。',
+    start: 'タップでスタート',
+    again: 'タップでもう一度',
+    hint: '何が写ってる？ 分かったら下の4つからタップ',
+    zukan: '図鑑', best: 'ベスト', newBest: 'ベスト更新！', score: '点',
+    gold: '金', silver: '銀', bronze: '銅', miss: 'ざんねん', timeup: '時間切れ',
+    result: '10問 おわり', newEntry: '新しく登録', golds: '金メダル',
+  },
+  en: {
+    title: 'Way Too Close',
+    how1: 'A picture shot from way too close slowly zooms out.',
+    how2: 'Once you know what it is, tap one of the 4 below.',
+    how3: 'Guess while it is closer for more points & gold.',
+    start: 'Tap to start',
+    again: 'Tap to play again',
+    hint: 'What is it? Tap one of the 4 answers below',
+    zukan: 'Album', best: 'Best', newBest: 'New best!', score: 'pts',
+    gold: 'Gold', silver: 'Silver', bronze: 'Bronze', miss: 'Nope', timeup: 'Time up',
+    result: '10 questions done', newEntry: 'new entries', golds: 'golds',
+  }
+}[JA ? 'ja' : 'en'];
+
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+
+const UIF = 'system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif';
+const EF = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji","Segoe UI Symbol",sans-serif';
+
+const ITEMS = [
+  ['🍎','りんご','Apple'],['🍊','みかん','Tangerine'],['🍋','レモン','Lemon'],['🍌','バナナ','Banana'],
+  ['🍉','スイカ','Watermelon'],['🍇','ぶどう','Grapes'],['🍓','いちご','Strawberry'],['🍑','もも','Peach'],
+  ['🍒','さくらんぼ','Cherries'],['🍍','パイナップル','Pineapple'],['🥝','キウイ','Kiwi'],['🍅','トマト','Tomato'],
+  ['🍆','なす','Eggplant'],['🥕','にんじん','Carrot'],['🌽','とうもろこし','Corn'],['🥦','ブロッコリー','Broccoli'],
+  ['🍄','きのこ','Mushroom'],['🍞','食パン','Bread'],['🧀','チーズ','Cheese'],['🍔','ハンバーガー','Burger'],
+  ['🍕','ピザ','Pizza'],['🍣','おすし','Sushi'],['🍙','おにぎり','Rice ball'],['🍩','ドーナツ','Doughnut'],
+  ['🍰','ケーキ','Cake'],['🍦','ソフトクリーム','Soft serve'],['🐶','いぬ','Dog'],['🐱','ねこ','Cat'],
+  ['🐭','ねずみ','Mouse'],['🐰','うさぎ','Rabbit'],['🦊','きつね','Fox'],['🐻','くま','Bear'],
+  ['🐼','パンダ','Panda'],['🐨','コアラ','Koala'],['🐯','トラ','Tiger'],['🦁','ライオン','Lion'],
+  ['🐮','うし','Cow'],['🐷','ぶた','Pig'],['🐸','カエル','Frog'],['🐵','サル','Monkey'],
+  ['🐔','ニワトリ','Chicken'],['🐧','ペンギン','Penguin'],['🐙','タコ','Octopus'],['🐢','カメ','Turtle'],
+  ['🐝','ミツバチ','Honeybee'],['🦋','チョウ','Butterfly'],['🐞','テントウムシ','Ladybug'],['🐳','クジラ','Whale'],
+  ['🐠','熱帯魚','Tropical fish'],['🌻','ひまわり','Sunflower'],['🌹','バラ','Rose'],['🌵','サボテン','Cactus'],
+  ['🍁','もみじ','Maple leaf'],['🌈','にじ','Rainbow'],['⛄','雪だるま','Snowman'],['🔥','ほのお','Fire'],
+  ['🌙','三日月','Crescent moon'],['⭐','ほし','Star'],['🚗','くるま','Car'],['🚲','じてんしゃ','Bicycle'],
+  ['🚀','ロケット','Rocket'],['🚂','機関車','Locomotive'],['⚽','サッカーボール','Soccer ball'],['🏀','バスケットボール','Basketball'],
+  ['🎸','ギター','Guitar'],['🎈','ふうせん','Balloon'],['🎁','プレゼント','Gift'],['💡','電球','Light bulb'],
+  ['⏰','目覚まし時計','Alarm clock'],['🔑','かぎ','Key'],['🌂','かさ','Umbrella'],['👓','めがね','Glasses'],
+  ['👑','王冠','Crown'],['💎','宝石','Gem'],['🎃','かぼちゃ','Jack-o\'-lantern'],['🍀','四つ葉','Clover'],
+];
+const nameOf = (i) => ITEMS[i][JA ? 1 : 2];
+
+// ---------- emoji analysis ----------
+const SM = 40;
+const smc = document.createElement('canvas'); smc.width = smc.height = SM;
+const smx = smc.getContext('2d', { willReadFrequently: true });
+const avg = []; let pool = [];
+(function analyze() {
+  const ok = [], loose = [];
+  for (let i = 0; i < ITEMS.length; i++) {
+    smx.clearRect(0, 0, SM, SM);
+    smx.font = `32px ${EF}`; smx.textAlign = 'center'; smx.textBaseline = 'middle';
+    smx.fillText(ITEMS[i][0], SM / 2, SM / 2);
+    const d = smx.getImageData(0, 0, SM, SM).data;
+    let n = 0, col = 0, r = 0, g = 0, b = 0;
+    for (let p = 0; p < d.length; p += 4) {
+      const a = d[p + 3];
+      if (a > 128) {
+        n++; r += d[p]; g += d[p + 1]; b += d[p + 2];
+        if (Math.max(d[p], d[p + 1], d[p + 2]) - Math.min(d[p], d[p + 1], d[p + 2]) > 40) col++;
+      }
+    }
+    avg[i] = n ? [r / n, g / n, b / n] : [128, 128, 128];
+    if (n > 30) loose.push(i);
+    if (n > 30 && col > 6) ok.push(i);
+  }
+  pool = ok.length >= 12 ? ok : (loose.length >= 4 ? loose : ITEMS.map((_, i) => i));
+})();
+
+const S = 360;
+const big = document.createElement('canvas'); big.width = big.height = S;
+const bx = big.getContext('2d', { willReadFrequently: true });
+function renderBig(i) {
+  bx.clearRect(0, 0, S, S);
+  bx.font = `${Math.round(S * 0.78)}px ${EF}`; bx.textAlign = 'center'; bx.textBaseline = 'middle';
+  bx.fillText(ITEMS[i][0], S / 2, S / 2);
+  const d = bx.getImageData(0, 0, S, S).data;
+  let x0 = S, y0 = S, x1 = 0, y1 = 0;
+  for (let y = 0; y < S; y += 2) for (let x = 0; x < S; x += 2) {
+    if (d[(y * S + x) * 4 + 3] > 60) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  }
+  if (x1 <= x0) { x0 = S * 0.1; y0 = S * 0.1; x1 = S * 0.9; y1 = S * 0.9; }
+  const box = { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, w: Math.max(x1 - x0, y1 - y0) * 1.1 };
+  // focus: an interior point with lots of local detail
+  const px = (x, y) => (y * S + x) * 4;
+  const cand = [], R = 7;
+  for (let k = 0; k < 500; k++) {
+    const x = Math.floor(x0 + R + Math.random() * Math.max(1, x1 - x0 - 2 * R));
+    const y = Math.floor(y0 + R + Math.random() * Math.max(1, y1 - y0 - 2 * R));
+    const c = px(x, y); if (d[c + 3] < 240) continue;
+    let s = 0, bad = false;
+    for (const [dx, dy] of [[R, 0], [-R, 0], [0, R], [0, -R]]) {
+      const q = px(x + dx, y + dy); if (d[q + 3] < 240) { bad = true; break; }
+      s += Math.abs(d[c] - d[q]) + Math.abs(d[c + 1] - d[q + 1]) + Math.abs(d[c + 2] - d[q + 2]);
+    }
+    if (!bad) cand.push([s, x, y]);
+  }
+  cand.sort((a, b) => b[0] - a[0]);
+  let fx = box.cx, fy = box.cy;
+  if (cand.length) { const c = cand[Math.floor(Math.random() * Math.max(1, cand.length * 0.4))]; fx = c[1]; fy = c[2]; }
+  return { box, fx, fy };
+}
+
+// ---------- canvas ----------
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d');
+let W = 360, H = 640, DPR = 1;
+function resize() {
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = Math.max(1, cv.clientWidth || innerWidth || 360);
+  H = Math.max(1, cv.clientHeight || innerHeight || 640);
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+}
+addEventListener('resize', resize); resize();
+
+function layout() {
+  const hud = 52;
+  const btnMinH = 76;
+  let side = Math.min(W - 32, (H - hud - 30 - 34 - btnMinH * 2 - 10) * 1);
+  side = Math.max(120, Math.min(side, H * 0.5));
+  const vx = (W - side) / 2, vy = hud + 6;
+  const barY = vy + side + 10;
+  const by0 = barY + 24, by1 = H - 34;
+  const gap = 10;
+  const bw = (Math.min(W, 520) - 32 - gap) / 2;
+  const bh = Math.max(56, Math.min(120, (by1 - by0 - gap) / 2));
+  const bxs = (W - (bw * 2 + gap)) / 2;
+  const btns = [];
+  for (let k = 0; k < 4; k++) btns.push({ x: bxs + (k % 2) * (bw + gap), y: by0 + Math.floor(k / 2) * (bh + gap), w: bw, h: bh });
+  return { hud, side, vx, vy, barY, btns, hintY: Math.min(H - 16, by0 + bh * 2 + gap + 22) };
+}
+
+// ---------- audio ----------
+let AC = null, master = null;
+function ensureAudio() {
+  try {
+    if (!AC) { AC = new (window.AudioContext || window.webkitAudioContext)(); master = AC.createGain(); master.gain.value = 0.22; master.connect(AC.destination); }
+    if (AC.state === 'suspended') AC.resume();
+  } catch (e) { AC = null; }
+}
+function tone(freq, start, dur, type = 'sine', vol = 1) {
+  if (!AC) return;
+  try {
+    const t = AC.currentTime + start;
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.05);
+  } catch (e) {}
+}
+const sfx = {
+  correct(m) { const base = [0, 523, 587, 659][m]; const notes = [1, 1.25, 1.5, 2].slice(0, m + 1); notes.forEach((r, k) => tone(base * r, k * 0.07, 0.5, 'triangle', 0.7)); tone(base * 4, 0.07 * m, 0.6, 'sine', 0.25); },
+  wrong() { tone(196, 0, 0.18, 'square', 0.18); tone(155, 0.13, 0.3, 'square', 0.18); },
+  drop(m) { tone([0, 330, 392, 494][m], 0, 0.12, 'sine', 0.35); },
+  start() { tone(784, 0, 0.08, 'sine', 0.3); tone(1046, 0.06, 0.1, 'sine', 0.25); },
+  fanfare() { [523, 659, 784, 1046].forEach((f, k) => tone(f, k * 0.11, 0.45, 'triangle', 0.6)); },
+  tap() { tone(1200, 0, 0.04, 'sine', 0.2); },
+};
+
+// ---------- save ----------
+let zukan = {}; let best = 0;
+addEventListener('message', (e) => {
+  const m = e.data;
+  if (m && m.agf === 'loaded' && m.data && typeof m.data === 'object') {
+    if (m.data.z && typeof m.data.z === 'object') zukan = Object.assign({}, m.data.z, zukan);
+    if (typeof m.data.best === 'number') best = Math.max(best, m.data.best);
+  }
+});
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+function persist() { try { parent.postMessage({ agf: 'save', data: { best, z: zukan } }, '*'); } catch (e) {} }
+const medalOf = (i) => zukan[ITEMS[i][0]] || 0;
+const collected = () => ITEMS.reduce((s, it) => s + (zukan[it[0]] ? 1 : 0), 0);
+const goldCount = () => ITEMS.reduce((s, it) => s + (zukan[it[0]] === 3 ? 1 : 0), 0);
+
+// ---------- game ----------
+const NQ = 10, TZ = 7.0, HOLD = 1.6, GOLD_Z = 5, SILVER_Z = 2.2;
+let state = 'title', stateT = 0;
+let score = 0, qi = 0, q = null, phase = 'zoom', revealT = 0, roundRes = [], used = new Set(), newCount = 0, isNewBest = false, roundT = 0;
+let pops = [];
+
+const lerp = (a, b, t) => a + (b - a) * t;
+const shuffle = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const medalAt = (z) => z >= GOLD_Z ? 3 : z >= SILVER_Z ? 2 : 1;
+
+function pickAnswer() {
+  const c = pool.filter((i) => !used.has(i));
+  const list = c.length ? c : pool.slice();
+  const w = list.map((i) => [4, 3, 2, 1][medalOf(i)]);
+  let r = Math.random() * w.reduce((a, b) => a + b, 0);
+  for (let k = 0; k < list.length; k++) { r -= w[k]; if (r <= 0) return list[k]; }
+  return list[list.length - 1];
+}
+function pickChoices(ans, step) {
+  const a = avg[ans];
+  const others = pool.filter((i) => i !== ans).map((i) => [Math.hypot(avg[i][0] - a[0], avg[i][1] - a[1], avg[i][2] - a[2]), i]).sort((x, y) => x[0] - y[0]);
+  const k = Math.max(3, Math.round(lerp(14, 5, step)));
+  const near = shuffle(others.slice(0, Math.min(k, others.length)).map((x) => x[1])).slice(0, 3);
+  while (near.length < 3 && others.length > near.length) { const o = others[near.length][1]; if (!near.includes(o)) near.push(o); else break; }
+  return shuffle([ans, ...near]);
+}
+function newQuestion() {
+  const step = qi / (NQ - 1);
+  const idx = pickAnswer(); used.add(idx);
+  const info = renderBig(idx);
+  q = { idx, choices: pickChoices(idx, step), zMax: lerp(8, 13, step), t: 0, info, chosen: -2, z: 0, lastMedal: 3 };
+  phase = 'zoom'; revealT = 0;
+}
+function startRound() {
+  score = 0; qi = 0; roundRes = []; used = new Set(); newCount = 0; isNewBest = false; roundT = 0; pops = [];
+  state = 'play'; stateT = 0;
+  newQuestion();
+  signal('start'); sfx.start();
+}
+function curZ() { return Math.pow(q.zMax, Math.max(0, 1 - q.t / TZ)); }
+function answer(choice) {
+  if (phase !== 'zoom') return;
+  const z = curZ();
+  q.chosen = choice; q.z = z; phase = 'reveal'; revealT = 0;
+  const L = layout();
+  if (choice === q.idx) {
+    const m = medalAt(z); const pts = Math.round(z * 10);
+    score += pts; roundRes.push({ idx: q.idx, m });
+    const key = ITEMS[q.idx][0];
+    if (!zukan[key]) newCount++;
+    if (m > (zukan[key] || 0)) zukan[key] = m;
+    sfx.correct(m);
+    pops.push({ text: `+${pts}  ${[0, TX.bronze, TX.silver, TX.gold][m]}`, m, t: 0, x: W / 2, y: L.vy + L.side * 0.5 });
+  } else {
+    roundRes.push({ idx: q.idx, m: 0 });
+    sfx.wrong();
+    pops.push({ text: choice === -1 ? TX.timeup : TX.miss, m: 0, t: 0, x: W / 2, y: L.vy + L.side * 0.5 });
+  }
+}
+function endRound() {
+  state = 'result'; stateT = 0;
+  if (score > best) { best = score; isNewBest = score > 0; }
+  persist();
+  signal('end', { score });
+  sfx.fanfare();
+}
+
+function update(dt) {
+  stateT += dt;
+  if (state !== 'play') return;
+  roundT += dt;
+  if (phase === 'zoom') {
+    q.t += dt;
+    const m = medalAt(curZ());
+    if (m < q.lastMedal) { q.lastMedal = m; sfx.drop(m); }
+    if (q.t > TZ + HOLD) answer(-1);
+  } else {
+    revealT += dt;
+    if (revealT > 1.45) {
+      qi++;
+      if (qi >= NQ) endRound(); else newQuestion();
+    }
+  }
+  for (const p of pops) p.t += dt;
+  pops = pops.filter((p) => p.t < 1.2);
+}
+
+// ---------- drawing ----------
+function fitFont(text, size, maxW, weight = '700', fam = UIF) {
+  let s = size;
+  ctx.font = `${weight} ${s}px ${fam}`;
+  while (s > 12 && ctx.measureText(text).width > maxW) { s -= 1; ctx.font = `${weight} ${s}px ${fam}`; }
+  return s;
+}
+function rr(x, y, w, h, r) { ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x, y, w, h, r) : ctx.rect(x, y, w, h); }
+const MC = ['#d9534f', '#c98a4b', '#9aa3b0', '#e2b11e'];
+
+function drawView(L, z) {
+  const { vx, vy, side } = L;
+  ctx.save();
+  rr(vx, vy, side, side, 18); ctx.fillStyle = '#ffffff'; ctx.fill();
+  ctx.clip();
+  const info = q.info;
+  const sw = info.box.w / z;
+  const k = q.zMax > 1 ? (z - 1) / (q.zMax - 1) : 0;
+  const cx = lerp(info.box.cx, info.fx, k), cy = lerp(info.box.cy, info.fy, k);
+  let sx = cx - sw / 2, sy = cy - sw / 2;
+  // clip source rect to the canvas manually
+  const ix0 = Math.max(0, sx), iy0 = Math.max(0, sy), ix1 = Math.min(S, sx + sw), iy1 = Math.min(S, sy + sw);
+  if (ix1 > ix0 && iy1 > iy0) {
+    const sc = side / sw;
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(big, ix0, iy0, ix1 - ix0, iy1 - iy0, vx + (ix0 - sx) * sc, vy + (iy0 - sy) * sc, (ix1 - ix0) * sc, (iy1 - iy0) * sc);
+  }
+  ctx.restore();
+  ctx.lineWidth = 3; ctx.strokeStyle = '#3b3346'; rr(vx, vy, side, side, 18); ctx.stroke();
+  // zoom readout
+  const zt = `×${z.toFixed(1)}`;
+  ctx.font = `700 15px ${UIF}`; const tw = ctx.measureText(zt).width;
+  ctx.fillStyle = 'rgba(59,51,70,0.78)'; rr(vx + side - tw - 22, vy + side - 32, tw + 14, 24, 12); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(zt, vx + side - tw - 15, vy + side - 20);
+}
+function drawBar(L, z) {
+  const x = L.vx, w = L.side, y = L.barY, h = 12;
+  const lz = Math.log(q.zMax);
+  const pB = Math.log(SILVER_Z) / lz, pS = Math.log(GOLD_Z) / lz;
+  const seg = [[0, pB, 1], [pB, pS, 2], [pS, 1, 3]];
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = `700 12px ${UIF}`;
+  for (const [a, b, m] of seg) {
+    ctx.fillStyle = MC[m]; ctx.globalAlpha = 0.85; rr(x + a * w + 1, y, (b - a) * w - 2, h, 6); ctx.fill(); ctx.globalAlpha = 1;
+  }
+  const p = Math.log(Math.max(1, z)) / lz;
+  ctx.fillStyle = '#3b3346';
+  ctx.beginPath(); ctx.moveTo(x + p * w, y - 2); ctx.lineTo(x + p * w - 6, y - 10); ctx.lineTo(x + p * w + 6, y - 10); ctx.closePath(); ctx.fill();
+  ctx.fillRect(x + p * w - 1.5, y - 2, 3, h + 4);
+}
+function drawButtons(L) {
+  for (let k = 0; k < 4; k++) {
+    const b = L.btns[k], i = q.choices[k];
+    let bg = '#ffffff', stroke = '#3b3346';
+    if (phase === 'reveal') {
+      if (i === q.idx) { bg = '#c9f0c4'; stroke = '#2e8b3a'; }
+      else if (i === q.chosen) { bg = '#f7c9c6'; stroke = '#c0392b'; }
+      else { bg = '#f1ece4'; stroke = '#b8b0a6'; }
+    }
+    ctx.fillStyle = 'rgba(59,51,70,0.18)'; rr(b.x, b.y + 4, b.w, b.h, 16); ctx.fill();
+    ctx.fillStyle = bg; rr(b.x, b.y, b.w, b.h, 16); ctx.fill();
+    ctx.lineWidth = 2.5; ctx.strokeStyle = stroke; ctx.stroke();
+    const es = Math.min(b.h * 0.5, 46);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = `${es}px ${EF}`; ctx.fillStyle = '#000';
+    ctx.fillText(ITEMS[i][0], b.x + b.w / 2, b.y + b.h * 0.4);
+    ctx.fillStyle = '#3b3346';
+    fitFont(nameOf(i), 14, b.w - 12, '700');
+    ctx.fillText(nameOf(i), b.x + b.w / 2, b.y + b.h * 0.82);
+  }
+}
+function drawHud(L) {
+  ctx.fillStyle = '#3b3346'; ctx.textBaseline = 'middle';
+  ctx.textAlign = 'left'; ctx.font = `800 26px ${UIF}`; ctx.fillText(String(score), 16, 26);
+  const sw = ctx.measureText(String(score)).width;
+  ctx.font = `600 14px ${UIF}`; ctx.fillText(TX.score, 20 + sw, 30);
+  ctx.textAlign = 'right'; ctx.font = `700 18px ${UIF}`;
+  ctx.fillText(`${Math.min(qi + 1, NQ)} / ${NQ}`, W - 16, 22);
+  ctx.font = `600 14px ${UIF}`; ctx.fillStyle = '#7a7080';
+  ctx.fillText(`${TX.best} ${best}`, W - 16, 42);
+}
+function drawPlay() {
+  const L = layout();
+  let z = curZ();
+  if (phase === 'reveal') { const e = Math.min(1, revealT / 0.45); z = lerp(q.z, 1, 1 - Math.pow(1 - e, 3)); }
+  drawHud(L);
+  drawView(L, z);
+  drawBar(L, phase === 'reveal' ? q.z : z);
+  drawButtons(L);
+  for (const p of pops) {
+    const a = Math.min(1, (1.2 - p.t) / 0.4);
+    ctx.globalAlpha = a;
+    const y = p.y - p.t * 30;
+    const s = fitFont(p.text, 34, L.side - 20, '900');
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.lineWidth = 6; ctx.strokeStyle = '#ffffff'; ctx.strokeText(p.text, p.x, y);
+    ctx.fillStyle = p.m ? (p.m === 3 ? '#c48f00' : p.m === 2 ? '#5d6878' : '#9a5a1e') : '#c0392b';
+    ctx.fillText(p.text, p.x, y);
+    ctx.globalAlpha = 1;
+  }
+  if (roundT < 4.5 && qi === 0) {
+    ctx.globalAlpha = Math.min(1, (4.5 - roundT) / 0.6);
+    ctx.fillStyle = '#5a5060'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    fitFont(TX.hint, 14, W - 24, '600');
+    ctx.fillText(TX.hint, W / 2, L.hintY);
+    ctx.globalAlpha = 1;
+  }
+}
+function drawGrid(y, maxH) {
+  const cols = W < 420 ? 10 : 12;
+  const rows = Math.ceil(ITEMS.length / cols);
+  const cell = Math.min((Math.min(W, 520) - 32) / cols, maxH / rows);
+  const x0 = (W - cell * cols) / 2;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  for (let i = 0; i < ITEMS.length; i++) {
+    const cx = x0 + (i % cols + 0.5) * cell, cy = y + (Math.floor(i / cols) + 0.5) * cell;
+    const m = medalOf(i);
+    if (m) {
+      ctx.fillStyle = MC[m]; ctx.globalAlpha = 0.35; ctx.beginPath(); ctx.arc(cx, cy, cell * 0.46, 0, 7); ctx.fill(); ctx.globalAlpha = 1;
+      ctx.font = `${Math.floor(cell * 0.62)}px ${EF}`; ctx.fillStyle = '#000'; ctx.fillText(ITEMS[i][0], cx, cy + 1);
+    } else {
+      ctx.fillStyle = '#e8e0d4'; ctx.beginPath(); ctx.arc(cx, cy, cell * 0.4, 0, 7); ctx.fill();
+      ctx.fillStyle = '#b3a99c'; ctx.font = `700 ${Math.max(12, Math.floor(cell * 0.42))}px ${UIF}`; ctx.fillText('?', cx, cy + 1);
+    }
+  }
+  return rows * cell;
+}
+function drawTitle() {
+  const t = stateT;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  // a teaser lens that slowly zooms
+  const lensR = Math.min(W, H) * 0.13;
+  const ly = Math.max(70, H * 0.12);
+  ctx.save(); ctx.beginPath(); ctx.arc(W / 2, ly, lensR, 0, 7); ctx.fillStyle = '#fff'; ctx.fill(); ctx.clip();
+  const zz = 1 + 5 * (0.5 + 0.5 * Math.cos(t * 0.9));
+  ctx.font = `${Math.round(lensR * 1.3 * zz)}px ${EF}`; ctx.fillText(ITEMS[Math.floor(t / 7) % ITEMS.length][0], W / 2 + lensR * 0.15 * (zz - 1), ly + lensR * 0.1 * (zz - 1));
+  ctx.restore();
+  ctx.lineWidth = 5; ctx.strokeStyle = '#3b3346'; ctx.beginPath(); ctx.arc(W / 2, ly, lensR, 0, 7); ctx.stroke();
+  ctx.lineWidth = 9; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(W / 2 + lensR * 0.72, ly + lensR * 0.72); ctx.lineTo(W / 2 + lensR * 1.25, ly + lensR * 1.25); ctx.stroke();
+  let y = ly + lensR + 44;
+  ctx.fillStyle = '#3b3346'; fitFont(TX.title, 40, W - 32, '900'); ctx.fillText(TX.title, W / 2, y);
+  y += 38; ctx.fillStyle = '#5a5060';
+  for (const s of [TX.how1, TX.how2, TX.how3]) { fitFont(s, 15, W - 28, '600'); ctx.fillText(s, W / 2, y); y += 23; }
+  y += 8;
+  ctx.fillStyle = '#3b3346'; ctx.font = `700 15px ${UIF}`;
+  ctx.fillText(`${TX.zukan} ${collected()} / ${ITEMS.length}　${TX.golds} ${goldCount()}　${TX.best} ${best}`, W / 2, y);
+  y += 14;
+  const gh = drawGrid(y, Math.max(60, H - y - 60));
+  const a = 0.55 + 0.45 * Math.sin(t * 4);
+  ctx.globalAlpha = a; ctx.fillStyle = '#d9534f'; ctx.font = `800 22px ${UIF}`;
+  ctx.fillText(TX.start, W / 2, Math.min(H - 28, y + gh + 30)); ctx.globalAlpha = 1;
+}
+function drawResult() {
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  let y = Math.max(50, H * 0.08);
+  ctx.fillStyle = '#5a5060'; fitFont(TX.result, 20, W - 32, '700'); ctx.fillText(TX.result, W / 2, y);
+  y += 56; ctx.fillStyle = '#3b3346'; ctx.font = `900 60px ${UIF}`; ctx.fillText(String(score), W / 2, y);
+  y += 44;
+  if (isNewBest) { ctx.fillStyle = '#d9534f'; ctx.font = `800 20px ${UIF}`; ctx.fillText(TX.newBest, W / 2, y); }
+  else { ctx.fillStyle = '#7a7080'; ctx.font = `700 17px ${UIF}`; ctx.fillText(`${TX.best} ${best}`, W / 2, y); }
+  y += 36;
+  const cell = Math.min(60, (W - 32) / 5);
+  const x0 = (W - cell * 5) / 2;
+  roundRes.forEach((r, k) => {
+    const cx = x0 + (k % 5 + 0.5) * cell, cy = y + (Math.floor(k / 5) + 0.5) * cell;
+    ctx.fillStyle = MC[r.m]; ctx.globalAlpha = r.m ? 0.4 : 0.18; ctx.beginPath(); ctx.arc(cx, cy, cell * 0.45, 0, 7); ctx.fill(); ctx.globalAlpha = 1;
+    ctx.lineWidth = 3; ctx.strokeStyle = MC[r.m]; ctx.stroke();
+    ctx.font = `${Math.floor(cell * 0.55)}px ${EF}`; ctx.fillStyle = '#000'; ctx.fillText(ITEMS[r.idx][0], cx, cy + 1);
+    if (!r.m) { ctx.strokeStyle = '#c0392b'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(cx - cell * 0.3, cy - cell * 0.3); ctx.lineTo(cx + cell * 0.3, cy + cell * 0.3); ctx.stroke(); }
+  });
+  y += cell * 2 + 26;
+  ctx.fillStyle = '#3b3346'; fitFont(`${TX.zukan} ${collected()} / ${ITEMS.length}`, 18, W - 32, '800');
+  ctx.fillText(`${TX.zukan} ${collected()} / ${ITEMS.length}`, W / 2, y);
+  if (newCount) { y += 26; ctx.fillStyle = '#2e8b3a'; ctx.font = `700 16px ${UIF}`; ctx.fillText(JA ? `${TX.newEntry} +${newCount}` : `+${newCount} ${TX.newEntry}`, W / 2, y); }
+  y += 20;
+  const gh = drawGrid(y, Math.max(60, H - y - 60));
+  if (stateT > 0.7) {
+    const a = 0.55 + 0.45 * Math.sin(stateT * 4);
+    ctx.globalAlpha = a; ctx.fillStyle = '#d9534f'; ctx.font = `800 22px ${UIF}`;
+    ctx.fillText(TX.again, W / 2, Math.min(H - 26, y + gh + 28)); ctx.globalAlpha = 1;
+  }
+}
+
+function draw() {
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.fillStyle = '#fdf6ec'; ctx.fillRect(0, 0, W, H);
+  if (state === 'title') drawTitle();
+  else if (state === 'play') drawPlay();
+  else drawResult();
+}
+
+// ---------- input ----------
+cv.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  ensureAudio();
+  const r = cv.getBoundingClientRect();
+  const x = e.clientX - r.left, y = e.clientY - r.top;
+  if (state === 'title') { startRound(); return; }
+  if (state === 'result') { if (stateT > 0.7) startRound(); return; }
+  if (state === 'play' && phase === 'zoom') {
+    const L = layout();
+    for (let k = 0; k < 4; k++) {
+      const b = L.btns[k];
+      if (x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h) { answer(q.choices[k]); return; }
+    }
+  }
+});
+cv.addEventListener('contextmenu', (e) => e.preventDefault());
+
+let last = 0;
+function frame(ts) {
+  const dt = last ? Math.min(0.05, (ts - last) / 1000) : 0;
+  last = ts;
+  if (cv.clientWidth !== W || cv.clientHeight !== H) resize();
+  update(dt);
+  draw();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

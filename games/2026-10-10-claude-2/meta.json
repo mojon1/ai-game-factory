@@ -1,0 +1,773 @@
+{
+  "id": "2026-10-10-claude-2",
+  "status": "published",
+  "title": "ちかすぎ図鑑",
+  "genre": "クイズ",
+  "concept": "ものすごく近くから写した絵文字が、だんだん引いていく。「赤くてつぶつぶ…いちご？トマト？」と正体が見えた瞬間に答える、拡大写真当てクイズ。選択肢は答えと色が近いものから選ばれるので、早押しの勇気と見極めの勝負になる。当てた絵文字は図鑑に金銀銅で残る。",
+  "howToPlay": "近づきすぎた絵がゆっくり引いていくので、何か分かったら下の4択をタップ。近いうちに当てるほど高得点で、金メダルが図鑑に残る。",
+  "libraryDecision": "使わない。核は「拡大画像の正体に気づく瞬間」で、絵文字を大きく描いて切り出すだけで表現でき、3D・物理演算はその瞬間を強めない。音も数種類の短い音なので Web Audio で直接作った。",
+  "soundDecision": "BGMは付けず、クイズの集中を邪魔しない静けさにした。代わりに、ズームが金→銀→銅の境目を越えるたびに小さな音を鳴らして「もうメダルが下がる」焦りを耳で伝え、正解はメダルが良いほど音数の多いきらめき、不正解は短く低いブザーにした。",
+  "planning": {
+    "genreDraw": {
+      "ja": "クイズ",
+      "en": "Quiz",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "（くじ: クイズ）超拡大された絵文字が少しずつ引いていき、正体が分かった瞬間に4択から答える。早く当てるほど高得点で、当てたものが図鑑に集まる。",
+        "ideaEn": "(Draw: Quiz) An extreme close-up of an emoji slowly zooms out; answer from 4 choices the moment you recognize it. Faster guesses score more, and guessed items fill an album.",
+        "fromDraw": true
+      },
+      {
+        "idea": "指でこねて形を変える粘土を、お題のシルエットに近づける。形の一致率が上がるほど色が付いていく。",
+        "ideaEn": "Knead a lump of clay with your finger to match a target silhouette; it gains color as the match improves.",
+        "fromDraw": false
+      },
+      {
+        "idea": "夜空に散らばる星を、星座の線を思い出しながらつないでいく。正しい線ほど明るく光り、全部つなぐと星座の絵が浮かぶ。",
+        "ideaEn": "Connect scattered stars by recalling constellation lines; correct lines glow, and completing one reveals its picture.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "complete",
+    "ending": "limit",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Way Too Close",
+      "concept": "An emoji shot from way too close slowly zooms out. \"Red and seedy... strawberry? tomato?\" — you answer the moment it clicks. Wrong choices are picked from emoji with similar colors, so it is a test of nerve and judgment. Each emoji you guess is kept in an album with a gold, silver or bronze medal.",
+      "howToPlay": "A too-close picture slowly zooms out; tap the right one of 4 answers once you know it. Guess earlier for more points and a gold medal in your album.",
+      "libraryDecision": "None. The core is the moment you recognize a magnified image, which only needs a large emoji drawn and cropped; 3D or physics would not strengthen it. The few short sounds are made directly with Web Audio.",
+      "soundDecision": "No BGM, keeping the quiet focus of a quiz. Instead, a small tone plays each time the zoom crosses the gold/silver/bronze threshold so you hear your medal slipping; a correct answer sparkles with more notes for better medals, and a wrong one gives a short low buzz."
+    }
+  },
+  "createdAt": "2026-10-10T11:34:04+09:00",
+  "specVersion": 7,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "manual",
+    "startedAt": "2026-10-10T11:34:04+09:00",
+    "metricsFrom": "2026-10-10T02:33:08.795Z",
+    "transcript": "c0fcd9a9-3323-4a8e-bc38-3be47631d7eb.jsonl",
+    "validationRuns": 1,
+    "finishedAt": "2026-10-10T11:49:29+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-10T11:43:37+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "24.4KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=71",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=477",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=61",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=229",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 24969,
+    "lines": 514
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0.1,
+    "idleStarts": 1
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "近すぎて何か分からない色のかたまりが、引いていく途中で『目だ！パンダだ！』と急に分かる瞬間が気持ちいい。正解後に一気に全体へ引く答え合わせも楽しい。ただ序盤は4択の色がばらけていて色だけで当たりやすく、1/4の当てずっぽうでも金が取れてしまうので、外す緊張感は薄め。10問を1回遊んで10問正解、858点。図鑑が埋まっていくのはもう1回の理由になる。自己プレイはスクリーンショットを画像として見て行った。",
+    "similar": [
+      {
+        "title": "Close Up Pics: Zoom Out 3D Fun",
+        "url": "https://apps.apple.com/us/app/-/id632311326",
+        "similarity": "高",
+        "note": "拡大写真の正体を当てる点が同じ。あちらは文字入力で時間制限なし、こちらは4択で、引いていく途中の早押しとメダルが核",
+        "note_en": "Same idea of guessing a zoomed-in picture. It uses typed answers with no time limit; this one is 4-choice with early-buzz timing and medals during the zoom-out."
+      },
+      {
+        "title": "GuessPho - Zoom Photo Quiz Game",
+        "url": "https://apps.apple.com/us/app/-/id6502940136",
+        "similarity": "高",
+        "note": "拡大写真を4択で当てる形式が近い。こちらは選択肢を色が近いものから選び、引く速さで点とメダルが決まる",
+        "note_en": "Close format: zoomed photo with multiple choice. Here distractors are picked by similar color, and points/medals depend on how early you answer."
+      },
+      {
+        "title": "ヒントでピント（フジテレビのクイズ番組）",
+        "similarity": "中",
+        "note": "モザイクや拡大で隠された写真がだんだん分かっていくテレビのクイズ。早く答えるほど有利という構造がルーツ。ウェブ検索では確認できず、知識から挙げた",
+        "note_en": "Japanese TV quiz where hidden (mosaic/zoomed) photos gradually become clear; answering earlier pays more. A root of this idea. Listed from knowledge, not confirmed by search."
+      },
+      {
+        "title": "Guess the Emoji Quiz Game",
+        "url": "https://apps.apple.com/app/id6444368464",
+        "similarity": "低",
+        "note": "絵文字を当てるクイズ。拡大の仕組みは無く、絵文字の組み合わせから言葉を当てる",
+        "note_en": "An emoji quiz, but without zoom; you guess words from emoji combinations."
+      }
+    ],
+    "research": "WebSearchで『zoomed in picture guessing quiz close up』『emoji zoom quiz』『拡大写真 だんだん引いていく クイズ番組』の3回検索。拡大写真当てアプリは多数見つかったが、絵文字を拡大して引いていく形式は見つからなかった。ヒントでピントは検索では確認できず知識から挙げた。",
+    "i18n": {
+      "en": {
+        "comment": "A blob of color too close to read suddenly clicks mid-zoom — 'an eye! a panda!' — and that moment feels great, as does the fast zoom-out reveal after a correct answer. But early choices differ in color so color alone often gives it away, and a blind 1-in-4 guess can still win gold, so there's little tension of missing. I played one round of 10, got all 10 right for 858 points. Filling the album is a reason to play again. I viewed the screenshots as images during self-play.",
+        "research": "Three WebSearch queries: zoomed-in picture guessing quiz, emoji zoom quiz, and a Japanese query on TV zoom-out photo quizzes. Many close-up photo quiz apps exist; none zoom out from emoji. 'Hint de Pinto' is from my knowledge, not confirmed by search."
+      }
+    },
+    "method": "スマホ縦画面で 25 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 25 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.90) 120ms",
+        "note": "タイトル。虫めがねと「？」だらけの図鑑。どこかをタップして開始",
+        "noteEn": "Title: a magnifier and an album full of '?'. Tapping to start.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.27,0.87) 120ms",
+        "note": "青い面が斜めに切れている。カット面っぽいので宝石と読んで早押し",
+        "noteEn": "Blue planes cut diagonally, like facets. Guessing Gem early.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 1500ms",
+        "note": "正解すると一気に引いて全体が見え、+74 金と出る。答え合わせが気持ちいい",
+        "noteEn": "On a correct answer it zooms all the way out and shows +74 Gold. Satisfying reveal.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 2000ms",
+        "note": "緑のグラデーションだけ。カエルかブロッコリーか分からないので少し待つ",
+        "noteEn": "Just a green gradient. Frog or broccoli? Waiting a bit.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.27,0.87) 120ms",
+        "note": "もう銀ゾーン。暗い青緑のかたまりが重なって見えるのでブロッコリーに賭ける",
+        "noteEn": "Already in silver. Dark teal lumps overlapping — betting on Broccoli.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 1500ms",
+        "note": "当たった。引いた瞬間に『やっぱり！』となる",
+        "noteEn": "Correct. The zoom-out gives a 'knew it!' moment.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.27,0.68) 120ms",
+        "note": "茶色に鮮やかなピンク。サルの顔もありえるが、ピンクが濃いのでドーナツのアイシングと読んで金を狙う",
+        "noteEn": "Brown with vivid pink. Could be the monkey's face, but the pink is strong — guessing Doughnut icing for gold.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 1500ms",
+        "note": "ピンクはアイシングではなくスプリンクルだった。読みは半分外れでも当たりは当たり",
+        "noteEn": "The pink was a sprinkle, not icing. Half-wrong reasoning, still right.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.73,0.87) 120ms",
+        "note": "紫と白の境目がゆるくカーブ。にじの紫帯かペンギンのお腹か。白い面が広いのでペンギン",
+        "noteEn": "A soft curved border between purple and white. Rainbow's violet band or a penguin belly? The white area is large — Penguin.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 1500ms",
+        "note": "4問連続正解。序盤は選択肢の色がばらけていて、色だけでかなり絞れる",
+        "noteEn": "4 in a row. Early on the choices differ in color, so color alone narrows it a lot.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "wait 2500ms",
+        "note": "ほぼ一面うす紫。パンダもペンギンもサッカーボールも白い部分がある。ここは待つしかない",
+        "noteEn": "Almost all pale lavender. Panda, penguin and soccer ball all have white parts. Have to wait.",
+        "image": "ai-play/step-11.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.73,0.68) 120ms",
+        "note": "紫のしずく形の中に黒い目。パンダの目のまわりだ！銀で回答",
+        "noteEn": "A black eye inside a purple teardrop patch — the panda's eye! Answering in silver.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "wait 1500ms",
+        "note": "目が見えた瞬間に分かる『あ！』の気持ちよさが一番の魅力",
+        "noteEn": "The 'aha!' when an eye appears is the best part.",
+        "image": "ai-play/step-13.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "tap(0.27,0.87) 120ms",
+        "note": "うすピンクとオレンジの層が斜めに重なる。クリームとスポンジに見えるのでケーキ",
+        "noteEn": "Pale pink and orange layers on a diagonal — cream and sponge. Cake.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "wait 1500ms",
+        "note": "6問中6問正解。4択の色がばらけると簡単すぎる面もある",
+        "noteEn": "6 of 6. When the 4 choices differ in color it can feel too easy.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "tap(0.27,0.87) 120ms",
+        "note": "選択肢が全部オレンジ系になってきた。赤い帯と黄色の面がくっきり分かれているのでプレゼントのリボンとフタと判断",
+        "noteEn": "Now all choices are orange-ish. A crisp red band over yellow looks like a gift's ribbon and lid.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 17,
+        "action": "wait 1500ms",
+        "note": "当たり。次は見た瞬間に勘で押してみる",
+        "noteEn": "Correct. Next I'll try a gut guess the instant it appears.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 18,
+        "action": "tap(0.73,0.87) 120ms",
+        "note": "くすんだピンクと茶色。ドーナツとサルで迷う。茶色の境目がギザっとしているのでサルの毛と見て勘で押す",
+        "noteEn": "Dusty pink and brown: doughnut or monkey? The brown edge looks fuzzy, like fur — gut guess Monkey.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 19,
+        "action": "wait 1500ms",
+        "note": "勘が当たった。ただ、全体に正解しやすく、外す緊張感は薄め",
+        "noteEn": "The gut guess hit. Overall it's fairly easy to be right; little tension of missing.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 20,
+        "action": "tap(0.73,0.68) 120ms",
+        "note": "4つとも赤。画面も一面の赤で手がかりゼロ。金メダル欲しさに、りんごで賭ける",
+        "noteEn": "All four are red and the screen is solid red — no clue. Gambling on Apple for the gold.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 21,
+        "action": "wait 1500ms",
+        "note": "1/4の賭けが当たった。手がかりゼロでも早押しすれば点が取れてしまうのは弱点かもしれない",
+        "noteEn": "The 1-in-4 gamble paid off. Being able to score by blind early guessing may be a weakness.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 22,
+        "action": "tap(0.27,0.87) 120ms",
+        "note": "オレンジの中に丸い青。オレンジ系の4択で青を持つのは王冠の宝石だけ。即答",
+        "noteEn": "A round blue spot in orange. Among the orange choices, only the crown has a blue jewel. Instant answer.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 23,
+        "action": "wait 1800ms",
+        "note": "最終問題の答え合わせ後、結果画面へ",
+        "noteEn": "After the last reveal, to the result screen.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 858,
+              "z": {
+                "💎": 3,
+                "🥦": 2,
+                "🍩": 3,
+                "🐧": 3,
+                "🐼": 2,
+                "🍰": 3,
+                "🎁": 3,
+                "🐵": 3,
+                "🍎": 3,
+                "👑": 3
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 858
+          }
+        ]
+      },
+      {
+        "step": 24,
+        "action": "wait 1000ms",
+        "note": "結果画面。10問の金銀メダルと、図鑑に10個登録された様子。埋まっていく図鑑はもう1回の理由になる",
+        "noteEn": "Result screen: medals for the 10 questions and 10 album entries. Filling the album gives a reason for one more round.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 858,
+              "z": {
+                "💎": 3,
+                "🥦": 2,
+                "🍩": 3,
+                "🐧": 3,
+                "🐼": 2,
+                "🍰": 3,
+                "🎁": 3,
+                "🐵": 3,
+                "🍎": 3,
+                "👑": 3
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 858
+          }
+        ]
+      },
+      {
+        "step": 25,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "タップでもう一度。すぐ次の10問が始まる",
+        "noteEn": "Tap to play again; the next 10 start right away.",
+        "image": "ai-play/step-25.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 858,
+              "z": {
+                "💎": 3,
+                "🥦": 2,
+                "🍩": 3,
+                "🐧": 3,
+                "🐼": 2,
+                "🍰": 3,
+                "🎁": 3,
+                "🐵": 3,
+                "🍎": 3,
+                "👑": 3
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 858
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-10T11:49:29+09:00"
+  },
+  "publishedAt": "2026-10-10T11:49:29+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 10664,
+    "outputTokens": 25932,
+    "contextTokens": 5155320,
+    "turns": 41,
+    "toolCalls": 59,
+    "webSearches": 0,
+    "minutes": 16.3,
+    "from": "2026-10-10T02:33:08.795Z",
+    "to": "2026-10-10T02:49:29.373Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-10T11:49:29+09:00",
+    "validationRuns": 1,
+    "codeKB": 24.4
+  }
+}
