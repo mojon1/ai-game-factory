@@ -1,0 +1,536 @@
+{
+  "id": "2026-10-10-claude-3",
+  "status": "published",
+  "title": "スポン！畑",
+  "genre": "農業・栽培",
+  "concept": "葉っぱを引っぱる力が強いほど野菜は高く飛ぶが、強すぎると葉がブチッとちぎれる。左右にゆらして土をゆるめ、葉が黄ばみきしむ「ちぎれる寸前」まで引いてスポーンと抜く、力加減の手触りを核にした収穫ゲーム。",
+  "howToPlay": "葉っぱをつかんで上へ引っぱる。左右にゆらすと土がゆるみ、ちぎれる寸前で抜くほど高く飛ぶ。10本の飛んだ高さの合計を競う。",
+  "libraryDecision": "使わない。核は指の引き加減と葉の伸び・色・きしむ音の反応で、物理演算は抜けた後の飛び方にしか効かず、決まった放物線のほうが「どれだけ飛んだか」が読みやすい。3Dも不要と判断した。",
+  "soundDecision": "BGMは付けない。引っぱる強さに合わせて音程と大きさが上がる「きしみ音」を鳴らし、ちぎれそうな境目を耳でも感じ取れるようにした。土をゆらす音、スポンと抜ける音、ブチッとちぎれる音はすべてWeb Audioで作り、静かな畑で手応えだけが聞こえるようにした。",
+  "planning": {
+    "genreDraw": {
+      "ja": "農業・栽培",
+      "en": "Farming",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "畑の野菜を葉っぱで引っこ抜く。強く引くほど高く飛ぶが、強すぎると葉がちぎれる。左右にゆらして土をゆるめ、ちぎれる寸前を狙う力加減のゲーム。",
+        "ideaEn": "Pull vegetables out by their leaves. The harder you pull, the higher they fly — too hard and the leaves snap. Wiggle to loosen the soil and aim for the edge of tearing.",
+        "fromDraw": true
+      },
+      {
+        "idea": "折り紙を指でスワイプして折り、見本のシルエットと同じ形にするステージ制パズル。折る順番で重なり方が変わる。",
+        "ideaEn": "Swipe to fold a sheet of paper into the target silhouette, stage by stage. The fold order changes how layers overlap.",
+        "fromDraw": false
+      },
+      {
+        "idea": "眠れない夜、柵を跳び越える羊をリズムよくタップで数える。ときどき狼や二度跳びする羊が混ざり、数え間違えると目がさえてしまう。",
+        "ideaEn": "On a sleepless night, tap in rhythm to count sheep jumping a fence. Wolves and double-jumpers sneak in; miscount and you wake up.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "limit",
+    "input": [
+      "drag",
+      "hold"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "SPOON! Farm",
+      "concept": "The harder you pull the leaves, the higher the vegetable flies — but pull too hard and they snap. Wiggle to loosen the soil, then pull right up to the edge where the leaves pale and creak, and launch it. The core is the feel of pulling force.",
+      "howToPlay": "Grab the leaves and pull up. Wiggle sideways to loosen the soil; the closer to snapping, the higher it flies. Score is the total height of 10 vegetables.",
+      "libraryDecision": "No libraries. The core is finger pull force and the leaves stretching, changing color and creaking. Physics would only affect the flight after the pop, and a fixed arc makes \"how high did it fly\" easier to read. 3D is unnecessary.",
+      "soundDecision": "No BGM. A creaking tone rises in pitch and volume with the pull force so you can hear the snapping point approach. Soil crunches, the POP and the SNAP are all synthesized with Web Audio, so only the feel of the pull is heard in a quiet field."
+    }
+  },
+  "createdAt": "2026-10-10T11:51:47+09:00",
+  "specVersion": 7,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "manual",
+    "startedAt": "2026-10-10T11:51:47+09:00",
+    "metricsFrom": "2026-10-10T02:50:44.909Z",
+    "transcript": "cb6ca887-9d1a-4b9f-9c00-00367e8925b9.jsonl",
+    "validationRuns": 1,
+    "finishedAt": "2026-10-10T12:01:10+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-10T11:54:37+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "29.4KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=147",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=104",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=126",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=117",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 30078,
+    "lines": 646
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "葉をつかんで引くと土にひびが入り、野菜がじわっと顔を出して、スポンと土ぼこりごと飛ぶ瞬間は気持ちいい。かぶは固くて、ゆらさないと全く抜けないので、ゆらす→引く、の手順を自然に覚えた。ゆらさず思いきり引くとブチッとちぎれて0点になり、失敗も分かりやすい。ただ、土をよくゆるめたあとなら強く一気に引いても、葉がちぎれる前に抜けて最高の高さが出てしまう場面があり、『ちぎれる寸前を見きわめる』という狙いほど力加減の緊張が続かない。10本で1〜2分と短く、結果画面の棒グラフでどこで損をしたかが分かるので、もう1回はやりたくなる。自己プレイは画像を見ながら行ったが、リプレイ方式のため野菜ごとの強さの乱数が手ごとに変わり、途中の合計値や最後のおおきなかぶの結果がステップ間で食い違っている（ゲームの不具合ではない）。",
+    "similar": [
+      {
+        "title": "Super Mario Bros. 2（野菜を引っこ抜く）",
+        "url": "https://www.mariowiki.com/Super_Mario_Bros._2",
+        "similarity": "低",
+        "note": "地面の葉をつかんで野菜を引き抜く動作のルーツ。ただし抜くのは一瞬で、力加減の遊びではない。",
+        "note_en": "A root of grabbing leaves to pluck vegetables, but plucking is instant, not a force-control game."
+      },
+      {
+        "title": "Harvest Man（WarioWare: Move It!）",
+        "url": "https://www.mariowiki.com/Harvest_Man",
+        "similarity": "中",
+        "note": "地面から物を引き抜くプチゲーム。体を動かして引く点は近いが、ちぎれるリスクと飛ぶ高さの得点はない。",
+        "note_en": "A microgame about pulling things out of the ground. Similar pulling motion, but no snapping risk or height score."
+      },
+      {
+        "title": "カナヘイの大きなかぶ ~旅するお野菜引っこ抜きゲーム~",
+        "url": "https://apps.apple.com/jp/app/id1038007349",
+        "similarity": "中",
+        "note": "スマホで大きなかぶなどの野菜を引っこ抜く題材が同じ。こちらはゆらして土をゆるめ、ちぎれる寸前まで引く力加減が中心。",
+        "note_en": "Same theme of pulling vegetables like a giant turnip on phones. This game centers on loosening the soil and pulling right up to the snapping point."
+      },
+      {
+        "title": "Pull It Out",
+        "url": "https://sleepyr04.itch.io/pull-it-out",
+        "similarity": "低",
+        "note": "にんじんを引き抜くスマホゲームだが、出てきたものをタップする反射神経の遊び。",
+        "note_en": "A phone game about pulling carrots, but it is a reflex game of tapping what pops up."
+      }
+    ],
+    "research": "WebSearchで「引っこ抜き 大根 スマホゲーム」「vegetable pulling game pull too hard leaves snap」「Super Mario Bros 2 pluck vegetables / WarioWare Harvest Man」を3回検索した。野菜を引き抜く題材の作品は多いが、ちぎれる寸前まで引くほど高く飛ぶという力加減の仕組みの作品は見つからなかった。",
+    "i18n": {
+      "en": {
+        "comment": "Grabbing the leaves, watching the soil crack, the vegetable slowly emerging and then POPping out in a spray of dirt feels good. Turnips won't budge unless you wiggle, so the wiggle-then-pull routine is learned naturally. Yanking without loosening snaps the leaves for 0 points, a clear failure. However, once the soil is well loosened, a hard fast yank can pop the vegetable before the leaves tear and gives max height, so the tension of judging the snapping point does not last as much as intended. A run is 10 vegetables in 1–2 minutes and the bar chart shows where you lost, which makes me want another go. I played viewing screenshots; because the tool replays with fresh randomness, per-vegetable strengths changed between steps, so totals and the giant turnip's outcome differ across steps (not a game bug).",
+        "research": "Three WebSearch queries: Japanese vegetable-pulling phone games, 'vegetable pulling game pull too hard leaves snap', and Super Mario Bros. 2 plucking / WarioWare Harvest Man. Many games use vegetable pulling, but none found with the 'pull closer to snapping to launch higher' force mechanic."
+      }
+    },
+    "method": "スマホ縦画面で 15 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 15 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "タイトル画面。葉をつかんで引っぱる、左右でゆるむ、ちぎれる寸前が高く飛ぶ、と3行で分かる。タップで開始。",
+        "noteEn": "Title screen explains grab, wiggle, and pull to the edge in three lines. Tap to start.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "path(0.50,0.52→0.50,0.45→0.50,0.38→0.50,0.37→0.50,0.37→0.50,0.37→0.50,0.37→0.50,0.37) 1500ms",
+        "note": "まずゆらさずに、そっと上へ引いて様子を見る。",
+        "noteEn": "First, a gentle pull without wiggling to see what happens.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "path(0.50,0.52→0.50,0.45→0.30,0.44→0.70,0.44→0.30,0.44→0.70,0.44→0.30,0.44→0.70,0.44→0.50,0.40→0.50,0.36→0.50,0.35→0.50,0.35→0.50,0.35→0.50,0.35→0.50,0.35→0.50,0.35→0.50,0.35→0.50,0.35) 3000ms",
+        "note": "変化が見えないまま指を離すと沈んで戻った。今度は軽く引きながら左右に3往復ゆらし、そのあと強めに引き続ける。",
+        "noteEn": "Nothing visible, and it sank back on release. Now wiggle three times while lightly pulling, then pull harder and hold.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "path(0.50,0.52→0.40,0.48→0.60,0.48→0.40,0.47→0.60,0.47→0.50,0.40→0.50,0.34→0.50,0.33→0.50,0.33→0.50,0.33→0.50,0.33→0.50,0.33→0.50,0.33→0.50,0.33→0.50,0.33→0.50,0.33→0.50,0.33→0.50,0.33→0.50,0.33→0.50,0.33) 3500ms",
+        "note": "土にひびが入り、にんじんが半分顔を出した。もう少しゆらしてから、さっきより強く長く引く。",
+        "noteEn": "Cracks in the soil and the carrot is half out. Wiggle a bit more, then pull harder and longer.",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 1300ms → path(0.50,0.52→0.30,0.48→0.70,0.48→0.30,0.47→0.70,0.47→0.30,0.47→0.70,0.47→0.50,0.40→0.50,0.31→0.50,0.30→0.50,0.30→0.50,0.30→0.50,0.30→0.50,0.30→0.50,0.30→0.50,0.30→0.50,0.30) 3000ms",
+        "note": "スポン！と6.1m飛んだ。土の粉が舞って気持ちいい。2本目はもっと高さを狙って、さっきより強く引いてみる。",
+        "noteEn": "POP! 6.1m, with dirt spraying — satisfying. For the second carrot I pull harder to go higher.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "path(0.50,0.52→0.40,0.48→0.60,0.48→0.50,0.40→0.50,0.28→0.50,0.27→0.50,0.27→0.50,0.27→0.50,0.27→0.50,0.27→0.50,0.27→0.50,0.27→0.50,0.27) 2500ms",
+        "note": "（リプレイ方式で1本目は4.4mに変わった）2本目は土がひび割れたがまだ抜けない。思い切ってもっと強く引く。ちぎれるかもしれない。",
+        "noteEn": "(Replay changed the first to 4.4m.) The 2nd carrot's soil cracked but it is still in. Pull much harder now — it may snap.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 1300ms → path(0.50,0.52→0.50,0.30→0.50,0.27→0.50,0.27→0.50,0.27→0.50,0.27→0.50,0.27→0.50,0.27) 2500ms",
+        "note": "18.8mのスッポーン！強く一気に引いたら、ちぎれる前に抜けた。3本目はかぶ。同じ強引な引き方が通じるか、ゆらさずに試す。",
+        "noteEn": "18.8m SPOOOON! A hard, fast yank popped it before the leaves snapped. 3rd is a turnip — try the same yank without wiggling.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "path(0.50,0.52→0.50,0.47→0.15,0.46→0.85,0.46→0.15,0.46→0.85,0.46→0.15,0.46→0.85,0.46→0.15,0.46→0.85,0.46→0.50,0.40→0.50,0.33→0.50,0.32→0.50,0.32→0.50,0.32→0.50,0.32→0.50,0.32→0.50,0.32→0.50,0.32→0.50,0.32) 4000ms",
+        "note": "かぶはびくともしなかった。土が固いらしい。今度は大きく4往復ゆらしてから、ほどほどの強さで引き続ける。",
+        "noteEn": "The turnip didn't budge — the soil is hard. Now wiggle wide four times, then hold a moderate pull.",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "path(0.50,0.52→0.50,0.47→0.30,0.46→0.70,0.46→0.30,0.46→0.70,0.46→0.50,0.40→0.50,0.34→0.50,0.32→0.50,0.34→0.50,0.32→0.50,0.34→0.50,0.32→0.50,0.34→0.50,0.32→0.50,0.34→0.50,0.32→0.50,0.34→0.50,0.32→0.50,0.34→0.50,0.32→0.50,0.34→0.50,0.32→0.50,0.34→0.50,0.32→0.50,0.34→0.50,0.32) 4000ms",
+        "note": "土はひびだらけなのに抜けない。ゆらすのはもう十分と見て、今度はゆらしを短くして、引いている時間を長くする。",
+        "noteEn": "Soil is cracked all over but it won't come out. Enough wiggling — shorter wiggle, longer sustained pull.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 1300ms → path(0.50,0.52→0.50,0.47→0.20,0.46→0.80,0.46→0.20,0.46→0.80,0.46→0.20,0.46→0.80,0.46→0.50,0.40→0.50,0.27→0.50,0.25→0.50,0.27→0.50,0.25→0.50,0.27→0.50,0.25→0.50,0.27→0.50,0.25→0.50,0.27→0.50,0.25→0.50,0.27→0.50,0.25→0.50,0.27→0.50,0.25→0.50,0.27→0.50,0.25→0.50,0.27→0.50,0.25→0.50,0.27→0.50,0.25→0.50,0.27→0.50,0.25→0.50,0.27→0.50,0.25) 5000ms",
+        "note": "かぶが6.6m。コツがつかめてきた。4本目はだいこん。深くて長いので、3往復ゆらしてから強めに長く引く。",
+        "noteEn": "Turnip 6.6m — getting the knack. 4th is a daikon: deep and long, so wiggle three times then a strong, long pull.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "path(0.50,0.52→0.50,0.40→0.50,0.26→0.50,0.24→0.50,0.26→0.50,0.24→0.50,0.26→0.50,0.24→0.50,0.26→0.50,0.24→0.50,0.26→0.50,0.24→0.50,0.26→0.50,0.24→0.50,0.26→0.50,0.24→0.50,0.26→0.50,0.24→0.50,0.26→0.50,0.24→0.50,0.26→0.50,0.24→0.50,0.26→0.50,0.24→0.50,0.26→0.50,0.24→0.50,0.26→0.50,0.24→0.50,0.26→0.50,0.24→0.50,0.26→0.50,0.24) 5000ms",
+        "note": "だいこんが白い肩まで出てきたが、指を離すと少し沈む。今度はゆらさず、ちぎれないぎりぎりを長く保つ。",
+        "noteEn": "The daikon shows its white shoulder but sinks a bit on release. No wiggle this time — hold just under the snapping point for longer.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "wait 1000ms → path(0.50,0.52→0.50,0.16→0.50,0.16→0.50,0.14→0.50,0.16→0.50,0.14→0.50,0.16→0.50,0.14→0.50,0.16→0.50,0.14→0.50,0.16→0.50,0.14→0.50,0.16→0.50,0.14→0.50,0.16→0.50,0.14→0.50,0.16→0.50,0.14→0.50,0.16→0.50,0.14→0.50,0.16→0.50,0.14) 2500ms",
+        "note": "だいこんは抜けて合計34.5m。5本目のにんじんでは、ゆらさずに思いきり上まで引っぱって限界を試す。",
+        "noteEn": "Daikon popped, total 34.5m. For the 5th carrot I test the limit: no wiggle, yank all the way up.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "path(0.50,0.52→0.50,0.47→0.25,0.46→0.75,0.46→0.25,0.46→0.75,0.46→0.25,0.46→0.75,0.46→0.50,0.40→0.50,0.29→0.50,0.27→0.50,0.29→0.50,0.27→0.50,0.29→0.50,0.27→0.50,0.29→0.50,0.27→0.50,0.29→0.50,0.27→0.50,0.29→0.50,0.27→0.50,0.29→0.50,0.27→0.50,0.29→0.50,0.27→0.50,0.29→0.50,0.27→0.50,0.29→0.50,0.27→0.50,0.29→0.50,0.27→0.50,0.29→0.50,0.27→0.50,0.29→0.50,0.27) 4500ms",
+        "note": "ブチッとちぎれて0点、点が赤くなった。ゆらさずに強く引きすぎると負ける。6本目のじゃがいもは、しっかりゆらしてから強めに引く。",
+        "noteEn": "Snap — torn, 0 points, red dot. Yanking without loosening loses. 6th: potatoes — wiggle well, then a firm pull.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "wait 1300ms → path(0.50,0.52→0.50,0.47→0.20,0.46→0.80,0.46→0.20,0.46→0.80,0.46→0.20,0.46→0.80,0.46→0.50,0.40→0.50,0.32→0.50,0.30→0.50,0.32→0.50,0.30→0.50,0.32→0.50,0.30→0.50,0.32→0.50,0.30→0.50,0.32→0.50,0.30→0.50,0.32→0.50,0.30→0.50,0.32→0.50,0.30→0.50,0.32→0.50,0.30→0.50,0.32→0.50,0.30→0.50,0.32→0.50,0.30→0.50,0.32→0.50,0.30→0.50,0.32→0.50,0.30) 4500ms → wait 1300ms → path(0.50,0.52→0.50,0.47→0.20,0.46→0.80,0.46→0.20,0.46→0.80,0.46→0.20,0.46→0.80,0.46→0.50,0.40→0.50,0.28→0.50,0.26→0.50,0.28→0.50,0.26→0.50,0.28→0.50,0.26→0.50,0.28→0.50,0.26→0.50,0.28→0.50,0.26→0.50,0.28→0.50,0.26→0.50,0.28→0.50,0.26→0.50,0.28→0.50,0.26→0.50,0.28→0.50,0.26→0.50,0.28→0.50,0.26→0.50,0.28→0.50,0.26→0.50,0.28→0.50,0.26→0.50,0.28→0.50,0.26→0.50,0.28→0.50,0.26→0.50,0.28→0.50,0.26) 5500ms → wait 1300ms → path(0.50,0.52→0.50,0.47→0.20,0.46→0.80,0.46→0.20,0.46→0.80,0.46→0.20,0.46→0.80,0.46→0.50,0.40→0.50,0.29→0.50,0.27→0.50,0.29→0.50,0.27→0.50,0.29→0.50,0.27→0.50,0.29→0.50,0.27→0.50,0.29→0.50,0.27→0.50,0.29→0.50,0.27→0.50,0.29→0.50,0.27→0.50,0.29→0.50,0.27→0.50,0.29→0.50,0.27→0.50,0.29→0.50,0.27→0.50,0.29→0.50,0.27→0.50,0.29→0.50,0.27→0.50,0.29→0.50,0.27) 4500ms → wait 1300ms → path(0.50,0.52→0.50,0.47→0.20,0.46→0.80,0.46→0.20,0.46→0.80,0.46→0.20,0.46→0.80,0.46→0.20,0.46→0.80,0.46→0.20,0.46→0.80,0.46→0.50,0.40→0.50,0.24→0.50,0.22→0.50,0.24→0.50,0.22→0.50,0.24→0.50,0.22→0.50,0.24→0.50,0.22→0.50,0.24→0.50,0.22→0.50,0.24→0.50,0.22→0.50,0.24→0.50,0.22→0.50,0.24→0.50,0.22→0.50,0.24→0.50,0.22→0.50,0.24→0.50,0.22→0.50,0.24→0.50,0.22→0.50,0.24→0.50,0.22→0.50,0.24→0.50,0.22→0.50,0.24→0.50,0.22→0.50,0.24→0.50,0.22) 6000ms → wait 2500ms",
+        "note": "じゃがいもは4個まとめて飛んで9.2m。残りのかぶ・だいこん・じゃがいも・おおきなかぶを、ゆらしてからぎりぎりで引く同じやり方で続けて収穫する。おおきなかぶはゆらしを多めに。",
+        "noteEn": "Four potatoes flew together, 9.2m. Harvest the remaining turnip, daikon, potatoes and giant turnip the same way: loosen, then pull near the edge. Extra wiggling for the giant.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 97.5
+            }
+          },
+          {
+            "agf": "end",
+            "score": 97.5
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "結果は合計97.5m、ベスト更新。野菜ごとの飛んだ高さが棒で並ぶので、どこで損をしたか（ちぎれたにんじん）が一目で分かる。タップでもう一度。",
+        "noteEn": "Total 97.5m, new best. Bars per vegetable show where I lost (the torn carrot) at a glance. Tap to play again.",
+        "image": "ai-play/step-15.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-10T12:01:10+09:00"
+  },
+  "publishedAt": "2026-10-10T12:01:10+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 8758,
+    "outputTokens": 28572,
+    "contextTokens": 4466565,
+    "turns": 35,
+    "toolCalls": 45,
+    "webSearches": 0,
+    "minutes": 10.4,
+    "from": "2026-10-10T02:50:44.909Z",
+    "to": "2026-10-10T03:01:10.990Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-10T12:01:10+09:00",
+    "validationRuns": 1,
+    "codeKB": 29.4
+  }
+}
