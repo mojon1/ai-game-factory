@@ -1,0 +1,795 @@
+{
+  "id": "2026-10-10-claude-1",
+  "status": "published",
+  "title": "ともしび守り",
+  "genre": "アクション",
+  "concept": "自分の指が風よけになる。矢印の方から来る風の帯を、指を置いて受け流しロウソクの炎を守る。ただし近づけすぎると炎は息ができずに消える。ロウソクが増えるほど指が足りなくなり、何本の指をどこに置くかを瞬時に決める手触りが核。",
+  "howToPlay": "画面のふちに出る矢印の方から風が吹く。風と炎のあいだに指を置いてさえぎり、どの炎も消さずにできるだけ長く守る。",
+  "libraryDecision": "使わない。風の粒が指の円に当たって流れる処理は単純な円との当たり判定で十分で、物理演算を入れても「どこに指を置くか」という核は強まらない。2Dのキャンバスで粒を軽く大量に動かす方がなめらか。",
+  "soundDecision": "Web Audio で自作。風の強さに合わせて風音（ノイズ）が強まり、風が来る前には小さな予告音、炎が風を受けるとパチッと鳴る。目を離していても耳で危険が分かり、守り切ったあとの静けさが気持ちよくなる。ロウソクが増えるときは鈴の音、消えたときは下がる音。BGM は静けさと緊張の差を消すので入れない。",
+  "planning": {
+    "genreDraw": {
+      "ja": "ストラテジー",
+      "en": "Strategy",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "（ストラテジー）灯りの村を指でなぞって隣の村へ人を送り、敵の色の村と陣取りを争う。送るほど自分の村が手薄になる。",
+        "ideaEn": "(Strategy) Swipe from your lantern village to send people to neighbors and fight a rival color for territory; sending more leaves home weaker.",
+        "fromDraw": true
+      },
+      {
+        "idea": "風よけの指でロウソクを守る。風は矢印の方から来て、指に当たると流れる。近づけすぎると炎が消える。ロウソクは増えていく。",
+        "ideaEn": "Shield candles from gusts with your fingers. Wind comes from the arrows and flows around your fingers; too close and the flame suffocates. More candles appear over time.",
+        "fromDraw": false
+      },
+      {
+        "idea": "紙の折り線を指でなぞって紙飛行機を折り、折り方しだいで変わる飛び方で遠くを目指す。",
+        "ideaEn": "Fold a paper plane by tracing fold lines; how you fold changes how it flies, aiming for distance.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 1
+  },
+  "structure": {
+    "goal": "survive",
+    "ending": "fail",
+    "input": [
+      "multi",
+      "hold"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Keep the Flame",
+      "concept": "Your fingers are the windbreak. Gusts come from the arrows; place fingers to make the wind flow around and keep the candle flames alive. But too close and the flame suffocates. As candles multiply you run out of fingers: deciding instantly how many fingers go where is the core.",
+      "howToPlay": "Wind blows from the arrows at the screen edge. Put a finger between the wind and the flame to block it, and keep every flame alive as long as you can.",
+      "libraryDecision": "None. Wind particles flowing around a finger circle only need a simple circle collision; a physics engine would not strengthen the core of where to put your fingers. Plain 2D canvas keeps many light particles smooth.",
+      "soundDecision": "Hand-made Web Audio. Wind noise swells with the gust, a soft cue precedes each gust, and the flame crackles when the wind hits it, so you can hear danger even when looking elsewhere, and the silence after a save feels good. A chime when a candle is added, a falling tone when one goes out. No BGM, so the contrast of calm and tension stays."
+    }
+  },
+  "createdAt": "2026-10-10T09:06:35+09:00",
+  "specVersion": 7,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-10T09:06:35+09:00",
+    "metricsFrom": "2026-10-10T00:06:12.313Z",
+    "transcript": "a74d02f6-1ff0-4206-a301-45f448b1c29b.jsonl",
+    "validationRuns": 1,
+    "finishedAt": "2026-10-10T11:31:17+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-10T11:25:53+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "23.2KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=113",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=92",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=97",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=85",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 23799,
+    "lines": 596
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 1
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "矢印を見て風の来る方に指を置くと、風の筋が指の円で二つに分かれて炎の脇を流れていき、守れた手応えがはっきりある。炎に近すぎると青くしぼむので、ただ炎に指をかぶせる攻略はできず、置く位置に少し考えがいる。2本目のロウソクが出てからは、予告がどの炎に向かうのか分かりにくく、2本の指で壁を作って保険をかける遊び方になった。3秒手を離しただけで炎が危険になるので緊張は続く。一方、序盤15秒はロウソク1本で単調ぎみ、右上の予告矢印がベスト表示と重なって見にくい場面があった。自己プレイは指を離した後の画面しか撮れないので、指の円や「近すぎ！」表示は画像では確認できていない（炎が縮んだことで効果は確認）。",
+    "similar": [
+      {
+        "title": "Will you let the candle die?",
+        "url": "https://juankz.itch.io/will-you-let-the-candle-die",
+        "similarity": "高",
+        "note": "風からロウソクを手でかばって灯を守る、という題材とねらいがほぼ同じ。操作は端末を傾けて手を動かす方式で、指そのものが風よけになり複数の指を同時に使う点・近すぎると消える点が違う。",
+        "note_en": "Nearly the same theme: shield candles from wind with a hand. It moves a hand by tilting the phone; here the fingers themselves are windbreaks, several at once, and getting too close kills the flame."
+      },
+      {
+        "title": "Protect the Candle (Ludum Dare 50)",
+        "url": "https://rex64.itch.io/ld-50-protect-the-candle",
+        "similarity": "中",
+        "note": "ロウソクを守り続けるゲームジャム作品。守る対象と生き延びる構造が似ているが、指で風の流れを受け流す手触りは無い。",
+        "note_en": "A game-jam entry about protecting a candle; similar target and survival structure, without the finger-as-windbreak feel."
+      },
+      {
+        "title": "Fingle",
+        "url": "https://gamedeveloper.com/design/road-to-the-igf-game-oven-s-em-fingle-em-",
+        "similarity": "低",
+        "note": "複数の指を画面に置き続けることが遊びになっている先例。協力パズルで題材も目的も違う。",
+        "note_en": "A precedent for keeping several fingers on the screen as the play itself; a co-op puzzle with a different theme and goal."
+      },
+      {
+        "title": "my wind",
+        "url": "https://alexis77.itch.io/my-wind",
+        "similarity": "低",
+        "note": "指と風を組み合わせたスマホ作品。風を指で追いかける遊びで、風をさえぎる本作とは逆向き。",
+        "note_en": "A phone game pairing finger and wind, but you chase the wind instead of blocking it."
+      }
+    ],
+    "research": "ウェブ検索を3回（指で炎を風から守るスマホゲーム／風をさえぎって灯を保つゲーム／複数の指を使うゲーム Fingle）。",
+    "i18n": {
+      "en": {
+        "comment": "When I put a finger where the arrows point, the wind streaks split around the finger's circle and flow past the flame; blocking feels clear. Getting too close makes the flame shrink blue, so simply covering the flame doesn't work and placement takes some thought. Once a second candle appears it is hard to tell which flame a warning targets, so I ended up making a two-finger wall as insurance. Lifting my hands for just 3 s put a flame in danger, so tension stays up. On the other hand the first 15 s with one candle feel a bit monotonous, and a top-right warning arrow overlapped the best label once. Self-play only captures the screen after fingers lift, so I could not see the finger circle or the 'Too close!' label in images (I confirmed the effect through the shrinking flame).",
+        "research": "Three web searches (phone game shielding a flame from wind with fingers / blocking wind to keep a flame alive / multi-finger game Fingle)."
+      }
+    },
+    "method": "スマホ縦画面で 20 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 20 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "タイトル画面。ロウソク1本と3行の説明。タップで開始する。",
+        "noteEn": "Title: one candle and three lines of instructions. Tap to start.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "wait 2800ms",
+        "note": "開始。ヒントが下に出ている。最初の風の予告を待つ。",
+        "noteEn": "Started; a hint is at the bottom. Waiting for the first gust warning.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.27,0.55) 2200ms",
+        "note": "左のふちに矢印。風とロウソクの間（左側）に指を置いて2秒ほど押さえる。",
+        "noteEn": "Arrows on the left edge. I hold a finger between the wind and the candle for about 2 s.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.40,0.74) 2000ms",
+        "note": "左の風は指の円に当たって上下に分かれて流れ、炎は揺れなかった。次は左下から右上へ。炎の左下に指を置く。",
+        "noteEn": "The left gust split around my finger and the flame stayed calm. Next comes from bottom-left; I hold below-left of the flame.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.42,0.72) 2500ms",
+        "note": "指を離したとたん、下から風の筋が上がってきた。まだ吹いている。もう一度炎の下側に指を置く。",
+        "noteEn": "Right after I lifted, wind streaks rose from below. It is still blowing; I put a finger under the flame again.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.64,0.45) 2200ms",
+        "note": "今度は右上から斜めに風が向かってきて、もう炎の近くまで来ている。炎の右上に指を置く。",
+        "noteEn": "Now a diagonal gust from the upper right is already close to the flame. I put a finger up-right of it.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 4500ms",
+        "note": "何もせず待って、2本目のロウソクが出るか、放っておくと炎がどうなるかを見る。",
+        "noteEn": "Doing nothing to see whether a second candle appears and what happens to an unguarded flame.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 16.319999999999975
+            }
+          },
+          {
+            "agf": "end",
+            "score": 16.3
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.50,0.85) 120ms",
+        "note": "放っておいたら、右からの風を2回まともに受けて16.3秒で消えた。ちょうど2本目のロウソクが灯った直後。もう一度。",
+        "noteEn": "Left alone, the flame took two gusts from the right and died at 16.3 s, just after a second candle appeared. Again.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 16.319999999999975
+            }
+          },
+          {
+            "agf": "end",
+            "score": 16.3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 2600ms",
+        "note": "再開。最初の予告を見る。",
+        "noteEn": "Restarted; watching for the first warning.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 16.319999999999975
+            }
+          },
+          {
+            "agf": "end",
+            "score": 16.3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.48,0.61) 900ms",
+        "note": "下から風。試しに炎のすぐ下に指を置いてみる（近すぎるとどうなるか）。",
+        "noteEn": "Wind from below. As a test I place my finger right under the flame to see what 'too close' does.",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 16.319999999999975
+            }
+          },
+          {
+            "agf": "end",
+            "score": 16.3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.40,0.77) 2600ms",
+        "note": "近すぎた1秒で炎が半分ほどに縮み、部屋も暗くなった。指を炎から離して左下で風を受ける。",
+        "noteEn": "One second too close and the flame shrank to about half; the room darkened. I move the finger away to the lower left to catch the wind.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 16.319999999999975
+            }
+          },
+          {
+            "agf": "end",
+            "score": 16.3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.63,0.73) 2600ms",
+        "note": "炎は少しずつ戻ってきた。次は右下から。炎の右下で受ける。",
+        "noteEn": "The flame is slowly recovering. Next from the lower right; I block there.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 16.319999999999975
+            }
+          },
+          {
+            "agf": "end",
+            "score": 16.3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "tap(0.37,0.46) 2600ms",
+        "note": "炎は元の大きさに戻った。左上から斜めに風。炎の左上で受ける。",
+        "noteEn": "The flame is back to full. A diagonal gust from the upper left; I block up-left of the flame.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 16.319999999999975
+            }
+          },
+          {
+            "agf": "end",
+            "score": 16.3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "wait 1500ms",
+        "note": "2本目が出るころ。様子を見る。",
+        "noteEn": "Around when the second candle appears; watching.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 16.319999999999975
+            }
+          },
+          {
+            "agf": "end",
+            "score": 16.3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "multi(0.50,0.40 | 0.69,0.55) 2600ms",
+        "note": "上からの風が炎に当たっていて、右にも次の予告。2本の指で上と右を同時にふさぐ。",
+        "noteEn": "A gust from above is hitting the flame and another warning shows on the right. Two fingers block above and right at once.",
+        "image": "ai-play/step-15.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 16.319999999999975
+            }
+          },
+          {
+            "agf": "end",
+            "score": 16.3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "tap(0.28,0.75) 2600ms",
+        "note": "2本目のロウソクが左上に灯った。真ん中の炎は少し弱っている。左下から次の風。どちらに向かうか迷うが、真ん中の炎への道筋上に指を置く。",
+        "noteEn": "A second candle lit at the upper left; the middle flame is a bit weak. Next gust from the lower left. Unsure which flame it targets; I put a finger on the path to the middle one.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 16.319999999999975
+            }
+          },
+          {
+            "agf": "end",
+            "score": 16.3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 17,
+        "action": "multi(0.60,0.22 | 0.70,0.33) 2800ms",
+        "note": "左下の風は指で逸れた。今度は右上の角から予告（ベスト表示の上に重なっていて少し見にくい）。どちらの炎か分からないので、2本の指を並べて斜めの壁にする。",
+        "noteEn": "The lower-left gust was deflected. Now a warning in the top-right corner (overlapping the best label, a bit hard to see). Unsure of the target, I line up two fingers as a diagonal wall.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 16.319999999999975
+            }
+          },
+          {
+            "agf": "end",
+            "score": 16.3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 18,
+        "action": "multi(0.17,0.52 | 0.31,0.60) 2800ms",
+        "note": "上の風もしのいだ。左のふちから右上へ風が来て、もう吹き始めている。2本の指で左側をふさぐ。",
+        "noteEn": "Survived the top gust too. A gust from the left edge heading up-right is already blowing. Two fingers seal the left side.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 16.319999999999975
+            }
+          },
+          {
+            "agf": "end",
+            "score": 16.3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 19,
+        "action": "wait 3000ms",
+        "note": "手を離して様子を見る。",
+        "noteEn": "Hands off to see what happens.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 16.319999999999975
+            }
+          },
+          {
+            "agf": "end",
+            "score": 16.3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 20,
+        "action": "multi(0.50,0.32 | 0.33,0.73) 3000ms",
+        "note": "3秒手を離しただけで、右上からの風が左の炎に当たり、赤い輪（危険）が出た。右上の風の通り道と、左下からの次の風を2本の指でふさぐ。",
+        "noteEn": "Just 3 s hands-off and a gust from the upper right hit the left flame; a red danger ring appeared. Two fingers block that path and the next gust from the lower left.",
+        "image": "ai-play/step-20.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 16.319999999999975
+            }
+          },
+          {
+            "agf": "end",
+            "score": 16.3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-10T11:31:17+09:00"
+  },
+  "publishedAt": "2026-10-10T11:31:17+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 7244,
+    "outputTokens": 24349,
+    "contextTokens": 5127844,
+    "turns": 41,
+    "toolCalls": 45,
+    "webSearches": 0,
+    "minutes": 145.1,
+    "from": "2026-10-10T00:06:12.313Z",
+    "to": "2026-10-10T02:31:17.958Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-10T11:31:17+09:00",
+    "validationRuns": 1,
+    "codeKB": 23.2
+  }
+}

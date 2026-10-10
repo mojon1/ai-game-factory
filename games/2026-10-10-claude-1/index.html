@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>ともしび守り / Keep the Flame</title>
+<style>
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#0b0a12;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+canvas{display:block;width:100vw;height:100dvh;touch-action:none}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+(() => {
+'use strict';
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const T = {
+  ja: {
+    title: 'ともしび守り',
+    how1: '風が吹いてくる方へ指を置いて、炎を守ろう',
+    how2: '指は何本でも使える',
+    how3: '炎に近づけすぎると、息ができずに消える',
+    tap: 'タップでスタート',
+    hint: '矢印の方から風が来る。指でさえぎろう',
+    time: '秒',
+    best: 'ベスト',
+    out: '灯が消えた',
+    newBest: 'ベスト更新！',
+    again: 'タップでもう一度',
+    newCandle: '灯がふえた',
+    smother: '近すぎ！',
+  },
+  en: {
+    title: 'Keep the Flame',
+    how1: 'Put your fingers where the wind comes from',
+    how2: 'Use as many fingers as you like',
+    how3: 'Too close, and the flame suffocates',
+    tap: 'Tap to start',
+    hint: 'Wind comes from the arrows. Block it with a finger',
+    time: 's',
+    best: 'Best',
+    out: 'A flame went out',
+    newBest: 'New best!',
+    again: 'Tap to play again',
+    newCandle: 'Another flame',
+    smother: 'Too close!',
+  }
+}[LANG === 'ja' ? 'ja' : 'en'];
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+
+// ---------- save ----------
+let best = 0;
+addEventListener('message', (e) => {
+  if (e.data && e.data.agf === 'loaded' && e.data.data && typeof e.data.data.best === 'number') best = Math.max(best, e.data.data.best);
+});
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+const saveBest = () => { try { parent.postMessage({ agf: 'save', data: { best } }, '*'); } catch (e) {} };
+
+// ---------- canvas ----------
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d');
+let W = 360, H = 640, DPR = 1, S = 1;
+function resize() {
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = Math.max(1, window.innerWidth || cv.clientWidth || 360);
+  H = Math.max(1, window.innerHeight || cv.clientHeight || 640);
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+  S = Math.max(0.6, Math.min(W / 360, H / 640, 1.8));
+  for (const c of candles) placeCandle(c);
+}
+addEventListener('resize', resize);
+
+// ---------- audio ----------
+let ac = null, windGain = null, windFilter = null, master = null;
+function initAudio() {
+  if (ac) { if (ac.state === 'suspended') ac.resume(); return; }
+  try {
+    ac = new (window.AudioContext || window.webkitAudioContext)();
+    master = ac.createGain(); master.gain.value = 0.55; master.connect(ac.destination);
+    const len = ac.sampleRate * 2;
+    const buf = ac.createBuffer(1, len, ac.sampleRate);
+    const d = buf.getChannelData(0);
+    let last = 0;
+    for (let i = 0; i < len; i++) { const w = Math.random() * 2 - 1; last = (last + 0.02 * w) / 1.02; d[i] = last * 3.5; }
+    const src = ac.createBufferSource(); src.buffer = buf; src.loop = true;
+    windFilter = ac.createBiquadFilter(); windFilter.type = 'bandpass'; windFilter.frequency.value = 500; windFilter.Q.value = 0.8;
+    windGain = ac.createGain(); windGain.gain.value = 0;
+    src.connect(windFilter); windFilter.connect(windGain); windGain.connect(master);
+    src.start();
+    ac.resume();
+  } catch (e) { ac = null; }
+}
+function setWind(level) {
+  if (!ac || !windGain) return;
+  const t = ac.currentTime;
+  windGain.gain.setTargetAtTime(Math.min(0.5, level * 0.5), t, 0.12);
+  windFilter.frequency.setTargetAtTime(350 + level * 900, t, 0.15);
+}
+function tone(freq, dur, type = 'sine', vol = 0.15, slide = 0, delay = 0) {
+  if (!ac) return;
+  try {
+    const t = ac.currentTime + delay;
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(30, freq + slide), t + dur);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.05);
+  } catch (e) {}
+}
+let lastCrackle = 0;
+function crackle() {
+  if (!ac) return;
+  const now = performance.now();
+  if (now - lastCrackle < 70) return;
+  lastCrackle = now;
+  try {
+    const t = ac.currentTime;
+    const n = Math.floor(ac.sampleRate * 0.04);
+    const b = ac.createBuffer(1, n, ac.sampleRate);
+    const d = b.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3);
+    const s = ac.createBufferSource(); s.buffer = b;
+    const f = ac.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = 2200;
+    const g = ac.createGain(); g.gain.value = 0.18;
+    s.connect(f); f.connect(g); g.connect(master); s.start(t);
+  } catch (e) {}
+}
+const chime = () => { tone(880, 1.2, 'sine', 0.12); tone(1320, 1.4, 'sine', 0.07, 0, 0.08); tone(1760, 1.0, 'sine', 0.04, 0, 0.16); };
+const sigh = () => { tone(330, 1.4, 'triangle', 0.14, -180); tone(247, 1.8, 'sine', 0.1, -120, 0.15); };
+const warnSnd = () => tone(220, 0.5, 'sine', 0.035, 80);
+
+// ---------- game state ----------
+const SPOTS = [[0.5, 0.56], [0.29, 0.4], [0.71, 0.7], [0.72, 0.38], [0.28, 0.73]];
+const candles = [];
+let parts = [];
+let gusts = [];
+const fingers = new Map();
+let ignoreId = null;
+let state = 'title';
+let t = 0, nextGust = 0, overAt = 0, newBestFlag = false, lastTs = 0;
+let hintT = 0, banner = { text: '', t: 0 }, shake = 0, deadCandle = null;
+let titleCandle = { x: 0, y: 0, life: 1, lean: 0, flick: 0 };
+
+function placeCandle(c) { c.x = SPOTS[c.i][0] * W; c.y = SPOTS[c.i][1] * H; }
+function addCandle() {
+  const c = { i: candles.length, x: 0, y: 0, life: 1, lean: 0, calm: 0, hitT: 0, smother: 0, flick: Math.random() * 10, born: 0 };
+  placeCandle(c); candles.push(c);
+  return c;
+}
+function wantCandles(tt) { return tt < 15 ? 1 : tt < 40 ? 2 : tt < 75 ? 3 : 4; }
+
+const R = () => 42 * S;      // shield radius
+const RC = () => 15 * S;     // flame hit radius
+
+function startGame() {
+  candles.length = 0; parts = []; gusts = [];
+  addCandle();
+  t = 0; nextGust = 2.4; hintT = 4.5; banner.t = 0; shake = 0; deadCandle = null; newBestFlag = false;
+  state = 'play';
+  signal('start');
+}
+
+function endGame(c) {
+  state = 'over'; overAt = performance.now(); deadCandle = c;
+  if (t > best) { best = t; newBestFlag = true; saveBest(); }
+  sigh(); setWind(0);
+  if (navigator.vibrate) try { navigator.vibrate(120); } catch (e) {}
+  signal('end', { score: Math.floor(t * 10) / 10 });
+}
+
+function spawnGust() {
+  const live = candles.filter(c => c.born <= 0);
+  if (!live.length) return;
+  // prefer a candle that was not targeted lately
+  live.sort((a, b) => (a.lastTarget || 0) - (b.lastTarget || 0));
+  const tgt = Math.random() < 0.7 ? live[0] : live[Math.floor(Math.random() * live.length)];
+  tgt.lastTarget = t;
+  const ang = Math.random() * Math.PI * 2;
+  const dx = Math.cos(ang), dy = Math.sin(ang);
+  // find where the line enters the screen (going backward from target)
+  let te = 1e9;
+  if (dx > 1e-4) te = Math.min(te, tgt.x / dx); else if (dx < -1e-4) te = Math.min(te, (tgt.x - W) / dx);
+  if (dy > 1e-4) te = Math.min(te, tgt.y / dy); else if (dy < -1e-4) te = Math.min(te, (tgt.y - H) / dy);
+  const lead = Math.max(0.75, 1.25 - t * 0.004);
+  const curve = (t > 70 && Math.random() < 0.35) ? (Math.random() < 0.5 ? -1 : 1) * (0.35 + Math.random() * 0.35) : 0;
+  gusts.push({
+    tx: tgt.x, ty: tgt.y, dx, dy, te,
+    ex: tgt.x - dx * te, ey: tgt.y - dy * te,
+    width: (62 + Math.random() * 34) * S,
+    speed: (250 + Math.min(t, 120) * 1.4) * S * (0.9 + Math.random() * 0.25),
+    warn: lead, dur: 1.15 + Math.random() * 0.6, acc: 0, curve, age: 0,
+  });
+  warnSnd();
+}
+
+function update(dt) {
+  if (state === 'title') {
+    titleCandle.flick += dt;
+    return;
+  }
+  // flames always flicker, even after game over
+  for (const c of candles) { c.flick += dt; c.lean *= Math.pow(0.08, dt); if (c.born > 0) c.born -= dt; }
+  updateParticles(dt, state === 'play');
+  if (state !== 'play') return;
+
+  t += dt;
+  if (hintT > 0) hintT -= dt;
+  if (banner.t > 0) banner.t -= dt;
+  if (shake > 0) shake = Math.max(0, shake - dt * 3);
+
+  if (candles.length < wantCandles(t) && candles.length < SPOTS.length) {
+    const c = addCandle(); c.born = 1.2;
+    banner.text = T.newCandle; banner.t = 1.8; chime();
+  }
+
+  nextGust -= dt;
+  if (nextGust <= 0) {
+    spawnGust();
+    if (t > 55 && Math.random() < Math.min(0.45, (t - 55) / 120)) spawnGust();
+    nextGust = Math.max(0.95, 2.6 - t * 0.014) * (0.8 + Math.random() * 0.4);
+  }
+
+  for (const g of gusts) {
+    g.age += dt;
+    if (g.warn > 0) { g.warn -= dt; continue; }
+    g.dur -= dt;
+    g.acc += dt * 58;
+    while (g.acc >= 1 && g.dur > 0) {
+      g.acc -= 1;
+      const u = (Math.random() - 0.5) * g.width;
+      const px = -g.dy, py = g.dx;
+      const back = g.te + 20 * S + Math.random() * 30 * S;
+      const sp = g.speed * (0.85 + Math.random() * 0.3);
+      parts.push({ x: g.tx - g.dx * back + px * u, y: g.ty - g.dy * back + py * u, vx: g.dx * sp, vy: g.dy * sp, life: 0, curve: g.curve, defl: 0 });
+    }
+  }
+  gusts = gusts.filter(g => g.warn > 0 || g.dur > 0);
+
+  // candles: smother, regen, death
+  const r = R(), rc = RC();
+  for (const c of candles) {
+    if (c.born > 0) continue;
+    c.smother = 0;
+    for (const f of fingers.values()) {
+      if (Math.hypot(f.x - c.x, f.y - c.y) < r + rc * 0.6) { c.smother = 1; break; }
+    }
+    if (c.smother) { c.life -= dt * 0.55; c.calm = 0; }
+    c.calm += dt;
+    if (c.calm > 0.8 && !c.smother) c.life = Math.min(1, c.life + dt * 0.12);
+    if (c.hitT > 0) c.hitT -= dt;
+    if (c.life <= 0) { c.life = 0; endGame(c); return; }
+  }
+
+  // wind sound level
+  let active = 0;
+  for (const p of parts) if (!p.defl) active++;
+  let warnLv = 0;
+  for (const g of gusts) if (g.warn > 0) warnLv = Math.max(warnLv, 0.25 * (1 - g.warn / 1.3));
+  setWind(Math.min(1, active / 90 + warnLv));
+}
+
+function updateParticles(dt, live) {
+  const r = R(), rc = RC();
+  const fl = [...fingers.values()];
+  const keep = [];
+  for (const p of parts) {
+    p.life += dt;
+    if (p.curve) {
+      const a = p.curve * dt, ca = Math.cos(a), sa = Math.sin(a);
+      const vx = p.vx * ca - p.vy * sa; p.vy = p.vx * sa + p.vy * ca; p.vx = vx;
+    }
+    p.x += p.vx * dt; p.y += p.vy * dt;
+    if (live) {
+      for (const f of fl) {
+        const dx = p.x - f.x, dy = p.y - f.y, d = Math.hypot(dx, dy);
+        if (d < r && d > 0.001) {
+          const nx = dx / d, ny = dy / d;
+          p.x = f.x + nx * r; p.y = f.y + ny * r;
+          const vn = p.vx * nx + p.vy * ny;
+          if (vn < 0) { p.vx -= vn * nx * 1.15; p.vy -= vn * ny * 1.15; }
+          p.vx *= 0.82; p.vy *= 0.82;
+          p.defl = 1;
+        }
+      }
+      let consumed = false;
+      for (const c of candles) {
+        if (c.born > 0 || c.life <= 0) continue;
+        const d = Math.hypot(p.x - c.x, p.y - c.y);
+        if (d < rc) {
+          const sp = Math.hypot(p.vx, p.vy) / (300 * S);
+          const dmg = 0.03 * Math.min(1.2, Math.max(0.25, sp));
+          c.life -= dmg; c.calm = 0; c.hitT = 0.25;
+          c.lean = Math.max(-1.4, Math.min(1.4, c.lean + p.vx / (300 * S) * 0.35));
+          crackle(); consumed = true;
+          if (c.life < 0.35) shake = Math.min(1, shake + 0.15);
+          break;
+        }
+      }
+      if (consumed) continue;
+    }
+    const sp = Math.hypot(p.vx, p.vy);
+    if (p.life < 4.5 && sp > 25 * S && p.x > -400 * S && p.x < W + 400 * S && p.y > -400 * S && p.y < H + 400 * S) keep.push(p);
+  }
+  parts = keep;
+}
+
+// ---------- drawing ----------
+function fitText(txt, size, maxW, weight = '600') {
+  let s = size;
+  ctx.font = `${weight} ${s}px ${FONT}`;
+  while (s > 12 && ctx.measureText(txt).width > maxW) { s -= 1; ctx.font = `${weight} ${s}px ${FONT}`; }
+  return s;
+}
+
+function drawBackground(glow) {
+  const g = ctx.createRadialGradient(W / 2, H * 0.55, 10, W / 2, H * 0.55, Math.max(W, H) * 0.8);
+  const k = 0.35 + 0.65 * glow;
+  g.addColorStop(0, `rgb(${Math.round(42 * k + 14)},${Math.round(28 * k + 12)},${Math.round(30 * k + 22)})`);
+  g.addColorStop(1, '#07060c');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+  // table line
+  ctx.fillStyle = 'rgba(255,255,255,0.025)';
+  ctx.fillRect(0, H * 0.86, W, H * 0.14);
+}
+
+function drawCandle(c, alpha = 1) {
+  const s = S, x = c.x, y = c.y;
+  const life = Math.max(0, c.life);
+  const born = c.born > 0 ? 1 - c.born / 1.2 : 1;
+  // glow
+  if (life > 0) {
+    ctx.save(); ctx.globalCompositeOperation = 'lighter';
+    const gr = (50 + 90 * life) * s * born;
+    const gg = ctx.createRadialGradient(x, y, 2, x, y, gr);
+    gg.addColorStop(0, `rgba(255,170,80,${0.32 * life * born})`);
+    gg.addColorStop(1, 'rgba(255,120,40,0)');
+    ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(x, y, gr, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+  // body
+  const bw = 22 * s, top = y + 12 * s, bh = 58 * s;
+  const bg = ctx.createLinearGradient(x - bw / 2, 0, x + bw / 2, 0);
+  bg.addColorStop(0, '#d9cfb8'); bg.addColorStop(0.45, '#f6efe0'); bg.addColorStop(1, '#b9ad94');
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = bg;
+  ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x - bw / 2, top, bw, bh, 4 * s) : ctx.rect(x - bw / 2, top, bw, bh); ctx.fill();
+  ctx.fillStyle = '#6d5c4c';
+  ctx.beginPath(); ctx.ellipse(x, top + bh + 2 * s, bw * 0.95, 5 * s, 0, 0, Math.PI * 2); ctx.fill();
+  // wick
+  ctx.strokeStyle = '#2a201a'; ctx.lineWidth = 2 * s;
+  ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x + c.lean * 2 * s, top - 7 * s); ctx.stroke();
+  // flame
+  if (life > 0) {
+    const f = Math.sin(c.flick * 17) * 0.06 + Math.sin(c.flick * 29 + 1) * 0.04;
+    const sz = (0.35 + 0.65 * life) * (1 + f) * born;
+    const h = 36 * s * sz, w = 11 * s * sz;
+    const lean = c.lean * 12 * s + Math.sin(c.flick * 7) * 1.2 * s;
+    const by = top - 4 * s;
+    const fg = ctx.createRadialGradient(x, by - h * 0.3, 1, x, by - h * 0.4, h * 0.9);
+    const smo = c.smother ? 1 : 0;
+    fg.addColorStop(0, smo ? '#cfe2ff' : '#fffbe8');
+    fg.addColorStop(0.35, smo ? '#7fa6ff' : '#ffd36b');
+    fg.addColorStop(0.75, smo ? 'rgba(80,110,255,0.8)' : 'rgba(255,120,30,0.85)');
+    fg.addColorStop(1, 'rgba(255,60,0,0)');
+    ctx.fillStyle = fg;
+    ctx.beginPath();
+    ctx.moveTo(x - w, by - h * 0.15);
+    ctx.bezierCurveTo(x - w * 1.05, by - h * 0.6, x + lean * 0.5 - w * 0.3, by - h * 0.85, x + lean, by - h);
+    ctx.bezierCurveTo(x + lean * 0.5 + w * 0.3, by - h * 0.85, x + w * 1.05, by - h * 0.6, x + w, by - h * 0.15);
+    ctx.bezierCurveTo(x + w * 0.8, by + h * 0.05, x - w * 0.8, by + h * 0.05, x - w, by - h * 0.15);
+    ctx.fill();
+    // core
+    ctx.fillStyle = 'rgba(120,160,255,0.55)';
+    ctx.beginPath(); ctx.ellipse(x, by - h * 0.08, w * 0.35, h * 0.12, 0, 0, Math.PI * 2); ctx.fill();
+    // danger ring
+    if (life < 0.35 && state === 'play') {
+      const pu = 0.5 + 0.5 * Math.sin(performance.now() / 120);
+      ctx.strokeStyle = `rgba(255,90,70,${0.35 + 0.4 * pu})`; ctx.lineWidth = 2 * s;
+      ctx.beginPath(); ctx.arc(x, y - 4 * s, 26 * s + pu * 4 * s, 0, Math.PI * 2); ctx.stroke();
+    }
+  } else {
+    // smoke
+    const k = Math.min(1, (performance.now() - overAt) / 2500);
+    ctx.strokeStyle = `rgba(200,200,210,${0.35 * (1 - k)})`; ctx.lineWidth = 3 * s; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(x, top - 7 * s);
+    for (let i = 1; i <= 8; i++) ctx.lineTo(x + Math.sin(i * 0.9 + k * 6) * 6 * s, top - 7 * s - i * 9 * s * (0.5 + k));
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawWarnings() {
+  for (const g of gusts) {
+    const strength = g.warn > 0 ? 1 - g.warn / 1.3 : Math.max(0, g.dur) > 0 ? 0.6 : 0;
+    if (strength <= 0) continue;
+    const inset = 26 * S;
+    const ex = Math.min(W - inset, Math.max(inset, g.ex + g.dx * inset));
+    const ey = Math.min(H - inset, Math.max(inset, g.ey + g.dy * inset));
+    const ang = Math.atan2(g.dy, g.dx);
+    ctx.save(); ctx.translate(ex, ey); ctx.rotate(ang);
+    const pulse = 0.55 + 0.45 * Math.sin(g.age * 14);
+    ctx.strokeStyle = `rgba(190,225,255,${(0.35 + 0.55 * strength) * (g.warn > 0 ? pulse : 0.5)})`;
+    ctx.lineWidth = 3.2 * S; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    for (let k = 0; k < 3; k++) {
+      const ox = (k - 1) * 11 * S + (g.age * 30 * S) % (11 * S);
+      ctx.beginPath(); ctx.moveTo(ox - 6 * S, -10 * S); ctx.lineTo(ox + 4 * S, 0); ctx.lineTo(ox - 6 * S, 10 * S); ctx.stroke();
+    }
+    // band width tick
+    ctx.strokeStyle = `rgba(190,225,255,${0.18 * strength})`; ctx.lineWidth = 2 * S;
+    ctx.beginPath(); ctx.moveTo(-14 * S, -g.width / 2); ctx.lineTo(-14 * S, g.width / 2); ctx.stroke();
+    ctx.restore();
+  }
+}
+
+function drawParticles() {
+  ctx.lineCap = 'round';
+  for (const p of parts) {
+    const a = Math.min(1, p.life * 4) * (p.defl ? 0.3 : 0.75);
+    ctx.strokeStyle = p.defl ? `rgba(170,190,220,${a})` : `rgba(215,235,255,${a})`;
+    ctx.lineWidth = (p.defl ? 1.2 : 1.8) * S;
+    ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x - p.vx * 0.035, p.y - p.vy * 0.035); ctx.stroke();
+  }
+}
+
+function drawFingers() {
+  const r = R(), rc = RC();
+  for (const f of fingers.values()) {
+    let close = false;
+    for (const c of candles) if (c.born <= 0 && c.life > 0 && Math.hypot(f.x - c.x, f.y - c.y) < r + rc * 0.6) close = true;
+    const g = ctx.createRadialGradient(f.x, f.y, r * 0.2, f.x, f.y, r);
+    g.addColorStop(0, close ? 'rgba(255,110,110,0.18)' : 'rgba(255,225,190,0.14)');
+    g.addColorStop(1, close ? 'rgba(255,90,90,0.30)' : 'rgba(255,225,190,0.24)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(f.x, f.y, r, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = close ? 'rgba(255,120,120,0.85)' : 'rgba(255,230,200,0.6)';
+    ctx.lineWidth = 2 * S; ctx.stroke();
+    if (close) {
+      ctx.fillStyle = '#ffb0a8';
+      const sz = fitText(T.smother, 15, r * 2.4, '700');
+      ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+      ctx.fillText(T.smother, f.x, f.y - r - 6 * S);
+    }
+  }
+}
+
+function drawHUD() {
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = '#f3e7d3';
+  ctx.textAlign = 'left';
+  ctx.font = `700 ${Math.round(24 * Math.min(S, 1.3))}px ${FONT}`;
+  ctx.fillText(t.toFixed(1) + T.time, 14, 12);
+  ctx.textAlign = 'right';
+  ctx.fillStyle = 'rgba(243,231,211,0.75)';
+  ctx.font = `600 ${Math.round(15 * Math.min(S, 1.3))}px ${FONT}`;
+  ctx.fillText(`${T.best} ${best.toFixed(1)}${T.time}`, W - 14, 16);
+  // lit candles indicator
+  const n = candles.length;
+  for (let i = 0; i < n; i++) {
+    const c = candles[i];
+    const cx = W - 14 - (n - 1 - i) * 16 * Math.min(S, 1.3) - 6, cy = 44 * Math.min(S, 1.3);
+    ctx.fillStyle = c.life < 0.35 ? '#ff7a66' : '#ffc867';
+    ctx.globalAlpha = 0.4 + 0.6 * Math.max(0, c.life);
+    ctx.beginPath(); ctx.arc(cx, cy, 5 * Math.min(S, 1.3), 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  if (hintT > 0) {
+    ctx.globalAlpha = Math.min(1, hintT);
+    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+    ctx.fillRect(0, H - 64, W, 48);
+    ctx.fillStyle = '#f3e7d3';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    fitText(T.hint, 16, W - 24);
+    ctx.fillText(T.hint, W / 2, H - 40);
+    ctx.globalAlpha = 1;
+  }
+  if (banner.t > 0) {
+    ctx.globalAlpha = Math.min(1, banner.t);
+    ctx.fillStyle = '#ffe2a8';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    fitText(banner.text, 22, W - 24, '700');
+    ctx.fillText(banner.text, W / 2, H * 0.17);
+    ctx.globalAlpha = 1;
+  }
+}
+
+function drawTitle() {
+  drawBackground(0.8);
+  titleCandle.x = W / 2; titleCandle.y = H * 0.6;
+  titleCandle.lean = Math.sin(titleCandle.flick * 1.3) * 0.25;
+  drawCandle(titleCandle);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#ffe9c4';
+  fitText(T.title, 44 * Math.min(S, 1.3), W - 32, '800');
+  ctx.fillText(T.title, W / 2, H * 0.17);
+  ctx.fillStyle = 'rgba(243,231,211,0.9)';
+  const lines = [T.how1, T.how2, T.how3];
+  lines.forEach((l, i) => { fitText(l, 16 * Math.min(S, 1.2), W - 32, '500'); ctx.fillText(l, W / 2, H * 0.27 + i * 26 * Math.min(S, 1.2)); });
+  if (best > 0) {
+    ctx.fillStyle = 'rgba(243,231,211,0.7)';
+    fitText(`${T.best} ${best.toFixed(1)}${T.time}`, 15, W - 32, '600');
+    ctx.fillText(`${T.best} ${best.toFixed(1)}${T.time}`, W / 2, H * 0.8);
+  }
+  ctx.globalAlpha = 0.6 + 0.4 * Math.sin(performance.now() / 400);
+  ctx.fillStyle = '#ffffff';
+  fitText(T.tap, 20 * Math.min(S, 1.3), W - 32, '700');
+  ctx.fillText(T.tap, W / 2, H * 0.88);
+  ctx.globalAlpha = 1;
+}
+
+function drawOver() {
+  ctx.fillStyle = 'rgba(5,4,10,0.6)';
+  ctx.fillRect(0, 0, W, H);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#d9d2e6';
+  fitText(T.out, 22, W - 32, '600');
+  ctx.fillText(T.out, W / 2, H * 0.3);
+  ctx.fillStyle = '#ffe9c4';
+  const sc = t.toFixed(1) + T.time;
+  fitText(sc, 60 * Math.min(S, 1.3), W - 32, '800');
+  ctx.fillText(sc, W / 2, H * 0.4);
+  ctx.fillStyle = newBestFlag ? '#ffd36b' : 'rgba(243,231,211,0.8)';
+  const bl = newBestFlag ? T.newBest : `${T.best} ${best.toFixed(1)}${T.time}`;
+  fitText(bl, 18, W - 32, '700');
+  ctx.fillText(bl, W / 2, H * 0.49);
+  if (performance.now() - overAt > 700) {
+    ctx.globalAlpha = 0.6 + 0.4 * Math.sin(performance.now() / 400);
+    ctx.fillStyle = '#ffffff';
+    fitText(T.again, 20, W - 32, '700');
+    ctx.fillText(T.again, W / 2, H * 0.82);
+    ctx.globalAlpha = 1;
+  }
+}
+
+function draw() {
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  if (state === 'title') { drawTitle(); return; }
+  let glow = 0;
+  for (const c of candles) glow += Math.max(0, c.life);
+  glow = candles.length ? glow / candles.length : 0;
+  ctx.save();
+  if (shake > 0 && state === 'play') ctx.translate((Math.random() - 0.5) * 3 * shake, (Math.random() - 0.5) * 3 * shake);
+  drawBackground(glow);
+  for (const c of candles) drawCandle(c);
+  drawParticles();
+  drawWarnings();
+  if (state === 'play') drawFingers();
+  ctx.restore();
+  drawHUD();
+  if (state === 'over') drawOver();
+}
+
+function loop(ts) {
+  const dt = Math.min(0.05, Math.max(0, (ts - (lastTs || ts)) / 1000));
+  lastTs = ts;
+  update(dt);
+  draw();
+  requestAnimationFrame(loop);
+}
+
+// ---------- input ----------
+const pos = (e) => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+cv.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  initAudio();
+  if (state === 'title') { ignoreId = e.pointerId; startGame(); return; }
+  if (state === 'over') {
+    if (performance.now() - overAt > 700) { ignoreId = e.pointerId; fingers.clear(); startGame(); }
+    return;
+  }
+  const p = pos(e);
+  fingers.set(e.pointerId, p);
+  try { cv.setPointerCapture(e.pointerId); } catch (err) {}
+});
+cv.addEventListener('pointermove', (e) => {
+  if (!fingers.has(e.pointerId)) return;
+  e.preventDefault();
+  fingers.set(e.pointerId, pos(e));
+});
+const up = (e) => { fingers.delete(e.pointerId); if (e.pointerId === ignoreId) ignoreId = null; };
+cv.addEventListener('pointerup', up);
+cv.addEventListener('pointercancel', up);
+cv.addEventListener('lostpointercapture', up);
+cv.addEventListener('contextmenu', (e) => e.preventDefault());
+
+resize();
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
