@@ -1,0 +1,374 @@
+{
+  "id": "2026-10-10-gpt-2",
+  "status": "published",
+  "title": "鍵が鳴る廊下",
+  "genre": "ホラー",
+  "concept": "ボタンを押す間だけ暗い廊下で鍵を探せる。近づく影の予告を見たら指を離し、隠れて通り過ぎるのを待つ。あと少しで鍵になる進み具合を前に、欲張って押すか一度やめるか迷う緊張感。3つの廊下を抜ける。",
+  "howToPlay": "下のボタンを押し続けて鍵を探します。影の気配が赤くなったら離して隠れましょう。各廊下で鍵を3つ集めて出口へ。",
+  "libraryDecision": "共有棚は使わない。明かりを消すタイミングと予告の読みが核で、Canvasの廊下・影・進行表示とWeb Audioの低音で集中できる。物理や3Dを増やさず気配の変化を明確にする。",
+  "soundDecision": "探す間は控えめな低音、影の予告では低い拍、鍵発見時は短い金属音をWeb Audioで生成する。驚かせる大音量は使わず、視覚だけでもタイミングが分かるようにする。",
+  "planning": {
+    "genreDraw": {
+      "ja": "ホラー",
+      "en": "Horror",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "鍵が鳴る廊下。長押しで鍵を探し、近づく影の予告を見て手を離し隠れる。",
+        "ideaEn": "Keys in the Hall: hold to search for keys and release to hide when a shadow approaches.",
+        "fromDraw": true
+      },
+      {
+        "idea": "双子の足あと。左右対称に動く2人を別々の出口へ導く、鏡操作の迷路。",
+        "ideaEn": "Twin Footprints: guide two mirrored movers to separate exits.",
+        "fromDraw": false
+      },
+      {
+        "idea": "雲の編み目。空いた升へ雲を織り込んで飛び石をつなぐ建築パズル。",
+        "ideaEn": "Cloud Weave: interleave clouds into empty cells to connect stepping stones.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "fail",
+    "input": [
+      "hold"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Keys in the Hall",
+      "concept": "Hold the button to search a dark hallway for keys. Release and hide when the approaching shadow is announced. Near a completed key, decide whether to keep searching or stop safely. Escape through three hallways with mounting tension.",
+      "howToPlay": "Hold the bottom button to search for keys. Release to hide when the shadow warning turns red. Find three keys in each hallway to reach the exit.",
+      "libraryDecision": "Use no shelf libraries. Timing the light and reading telegraphs are the core. Canvas hallway, shadow and progress visuals plus Web Audio bass keep focus on approaching danger rather than added physics or 3D.",
+      "soundDecision": "Web Audio generates quiet bass while searching, low warning pulses and short metallic key notes. No loud jump scares; visual cues also explain timing."
+    }
+  },
+  "createdAt": "2026-10-10T14:29:02+09:00",
+  "specVersion": 7,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-10T14:29:02+09:00",
+    "metricsFrom": "2026-10-10T05:27:54.029Z",
+    "transcript": null,
+    "validationRuns": 1,
+    "finishedAt": "2026-10-10T14:35:35+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-10T14:30:30+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "6.8KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=58",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=60",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=50",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=57",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 6945,
+    "lines": 9
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 1
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "画像を見ながら9手プレイ。1つ目の廊下を抜け、2つ目で影を無視すると失敗し、同じ廊下へ再開できた。あと少しの鍵を前に離す判断には緊張がある。一方、周期が固定で待つ時間も長く、廊下の見た目が同じなので慣れると単調。全3廊下の踏破はしていない。",
+    "similar": [
+      {
+        "title": "Five Nights at Freddy's 4",
+        "url": "https://store.steampowered.com/app/388090/",
+        "similarity": "中",
+        "note": "廊下の気配を読み、光を使うタイミングを選ぶホラー。こちらは単一の長押し／離す操作と一定周期の予告で鍵を集め、複数の場所を監視しない。",
+        "note_en": "Both use hallway threats and timing the light. This game collects keys with one hold/release control and fixed warning cycles rather than monitoring multiple locations."
+      },
+      {
+        "title": "Sleepless Shadows",
+        "url": "https://leafylines.itch.io/sleepless-shadows",
+        "similarity": "中",
+        "note": "検索結果の作者説明では、明暗の指標に合わせて押す／離す呼吸操作を使うホラー。こちらは鍵の収集と廊下の影を避ける目的で、呼吸練習ではない。本文取得は失敗。",
+        "note_en": "The developer search excerpt describes hold/release breathing guided by light and dark indicators. Here the goal is collecting keys and avoiding hallway shadows, not breathing practice. Full-page fetch failed."
+      }
+    ],
+    "research": "ウェブ検索2回。Steam公式のFNAF4の廊下・懐中電灯の説明と、itch.io作者の長押し／隠れるホラーを調査。FNAF4は本文を確認。Sleepless Shadowsは検索結果の作者説明を参照し、本文取得失敗を明記。",
+    "i18n": {
+      "en": {
+        "comment": "Played nine image-guided moves. Cleared the first hall, failed by ignoring the shadow in the second, and retried the same hall. Releasing near a completed key creates tension, but fixed cycles, waiting and identical hall visuals become repetitive. I did not complete all three halls.",
+        "research": "Two web searches investigated official Steam hallway/flashlight horror and developer itch.io hold/release hiding games. Read the FNAF4 page; Sleepless Shadows is based on the developer search excerpt because the page fetch failed."
+      }
+    },
+    "method": "スマホ縦画面で 9 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 9 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.78) 120ms",
+        "note": "押している間に探し、赤い気配が来たら離すルール。3つの廊下を抜けるため開始する。",
+        "noteEn": "Hold to search and release when red shadows approach. I begin the escape through three hallways.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.50,0.86) 2500ms",
+        "note": "静かな廊下で鍵を探す。周期の表示が右へ進むので、予告に近づく前に離すつもりで長押しする。",
+        "noteEn": "I search the quiet hallway while watching the cycle indicator approach the warning zone.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 1800ms",
+        "note": "鍵は1つ、2つ目もかなり進んだが足音の予告が見える。ここで離し、影が通り過ぎるまで待つ。",
+        "noteEn": "One key is found and the second is nearly ready, but footsteps are announced. I stay hidden until the shadow passes.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.50,0.86) 1700ms",
+        "note": "目が消えて静かになった。探した進み具合は残っているので、残り2つを取りに戻る。",
+        "noteEn": "The eyes disappear and the hall is quiet. Search progress remains, so I resume for the remaining keys.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.50,0.86) 300ms",
+        "note": "鍵は2つで最後の手がかりがほぼ満ちている。静かな間に少しだけ押して出口を開ける。",
+        "noteEn": "Two keys are found and the last progress bar is almost full. I search a little longer while it is quiet.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.50,0.64) 120ms",
+        "note": "3本の鍵で最初の廊下を抜けた。次の廊下へ進み、予告の変化を見たい。",
+        "noteEn": "Three keys open the first hallway. I move on to inspect the next hallway.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 900ms → tap(0.50,0.64) 120ms",
+        "note": "前のタップでは結果画面が残った。表示を確認し、間を置いて改めて次へ進む。",
+        "noteEn": "The result stayed after my previous tap. I wait briefly and tap again to continue.",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.50,0.86) 3800ms",
+        "note": "2つ目の廊下に入れた。今度は欲張って押し続け、影が来ても離さないとどうなるか確かめる。",
+        "noteEn": "The second hallway starts correctly. I deliberately keep searching through the approaching shadow to test the consequence.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 900ms → tap(0.50,0.64) 120ms",
+        "note": "影を無視すると気づかれて失敗した。もう一度で同じ廊下を再開できるか確認する。",
+        "noteEn": "Ignoring the shadow caused failure. I retry to check that the same hallway restarts.",
+        "image": "ai-play/step-09.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-10T14:35:35+09:00"
+  },
+  "publishedAt": "2026-10-10T14:35:35+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 1845,
+    "outputTokens": 11779,
+    "contextTokens": 2065485,
+    "turns": 25,
+    "toolCalls": 24,
+    "webSearches": null,
+    "minutes": 7.7,
+    "from": "2026-10-10T05:27:54.029Z",
+    "to": "2026-10-10T05:35:38.764Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力から思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated Codex token_usage_record entries by unique response_id from planning through review. Input includes cached tokens; output excludes reasoning. Tools count top-level calls only.",
+    "recordedAt": "2026-10-10T14:35:38+09:00",
+    "validationRuns": 1,
+    "codeKB": 6.8,
+    "evidence": "metrics-evidence.json"
+  }
+}

@@ -1,0 +1,339 @@
+{
+  "id": "2026-10-10-gpt-1",
+  "status": "published",
+  "title": "砂浜のひみつ標本",
+  "genre": "収集",
+  "concept": "指で砂を払うと、埋もれた形が少しずつ姿を現す。貝の筋や星の腕から正体を想像し、最後の砂が落ちて標本になる瞬間を楽しむ。急かされず6つの海辺の宝物を集める、小さな発掘の遊び。",
+  "howToPlay": "砂の盛り上がりを指でなぞって払います。半分ほど見つけると残りの砂もほどけて標本に。6種類を集めましょう。",
+  "libraryDecision": "共有棚は使わない。砂の下に形が現れる手触りが核なので、Canvasの消去マスクと粒の描画で指の軌跡を直接反映する。物理や3Dを追加するより、遮蔽の変化を読み取りやすくする。",
+  "soundDecision": "指を動かす間に短い砂の音、発見時に柔らかい上昇音をWeb Audioで生成する。別のBGMは付けず、砂を払う操作と発見の区切りを音で分ける。",
+  "planning": {
+    "genreDraw": {
+      "ja": "収集",
+      "en": "Collecting",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "砂浜のひみつ標本。砂をこすって埋まった形を露出させ、海辺の宝物を6種類集める。",
+        "ideaEn": "Beach Secrets: brush away sand to reveal buried shapes and collect six seaside treasures.",
+        "fromDraw": true
+      },
+      {
+        "idea": "風見の糸。指で風を曲げて漂う凧を輪へ導く、間接操作の探索。",
+        "ideaEn": "Wind Thread: bend wind with a finger to guide a kite through rings.",
+        "fromDraw": false
+      },
+      {
+        "idea": "影の食卓。皿の影だけを動かして果物の居場所を推理する。",
+        "ideaEn": "Shadow Table: move plate shadows to deduce the positions of fruit.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "complete",
+    "ending": "goal",
+    "input": [
+      "draw"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Beach Secret Specimens",
+      "concept": "Brush away sand to reveal buried shapes little by little. Imagine the object from a shell ridge or star arm, then enjoy the moment the last grains loosen into a specimen. Collect six seaside treasures without a timer.",
+      "howToPlay": "Draw over the sand patches to brush them away. Reveal about half a treasure to uncover the rest. Collect all six kinds.",
+      "libraryDecision": "Use no shelf libraries. Revealing shapes beneath sand is the core; Canvas masks and grains directly reflect finger movement. Clear occlusion changes matter more than added physics or 3D.",
+      "soundDecision": "Web Audio generates brief sandy noise while brushing and a soft rising discovery tone. No separate BGM keeps brushing and discovery distinct."
+    }
+  },
+  "createdAt": "2026-10-10T12:01:13+09:00",
+  "specVersion": 7,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-10T12:01:13+09:00",
+    "metricsFrom": "2026-10-10T03:00:09.219Z",
+    "transcript": null,
+    "validationRuns": 2,
+    "finishedAt": "2026-10-10T14:27:46+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-10T12:03:45+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "7.6KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=56",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=64",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=45",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=58",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 7794,
+    "lines": 12
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "8手の画像付きプレイで6標本を収集し完成・再開を確認。砂が指の軌跡で消え、形が出る手触りは分かりやすい。標本ごとの見た目は違うが、操作と配置は固定で選択の深さや再挑戦の驚きは少ない。巻き貝の輪郭は背景に近い。星3、致命的な不具合なし。",
+    "similar": [
+      {
+        "title": "Hidden Folks",
+        "url": "https://hiddenfolks.com/press/hidden-folks-1",
+        "similarity": "中",
+        "note": "隠れたものを触って発見し、時間制限なしで集める点が共通。相手は多数の仕掛けと人探し、こちらは砂を払う1種類の操作で固定6標本を出す。",
+        "note_en": "Both use interaction to uncover hidden objects without a timer. The other has many interactions and targets; this brushes sand to reveal six fixed specimens."
+      },
+      {
+        "title": "Fossil Corner",
+        "url": "https://store.steampowered.com/app/1587710/Fossil_Corner/",
+        "similarity": "低",
+        "note": "小さな自然の標本を集める落ち着いた雰囲気が近い。相手は化石の進化パズル、こちらは砂の遮蔽を指で除いて海辺の形を見つける。",
+        "note_en": "Both calmly collect natural specimens. The other features fossil evolution puzzles; this removes sand occlusion to reveal seaside shapes."
+      }
+    ],
+    "research": "2検索で発掘・収集と隠し物探しを調査。Hidden Folks公式プレスの操作説明を読み、Fossil Corner公式ストア検索結果の説明と実在URLを確認して比較。",
+    "i18n": {
+      "en": {
+        "comment": "Eight image-guided moves collected six specimens, completed the album and restarted. Sand follows the finger and shapes emerge clearly. Specimens look different, but fixed placement and identical brushing offer little decision depth or replay surprise. The conch outline blends into the sand. Three stars; no fatal defects.",
+        "research": "Two queries explored excavation, collecting and hidden objects. Read the Hidden Folks official press description and checked the Fossil Corner official store search excerpt and URL."
+      }
+    },
+    "method": "スマホ縦画面で 8 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 8 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.80) 120ms",
+        "note": "砂を払い半分ほど見つけると標本になる、6種類の収集と読める。開始して砂の盛り上がりを探す。",
+        "noteEn": "The title explains brushing sand to reveal half a specimen and collecting six kinds. I start to find the sand patches.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "path(0.19,0.25→0.36,0.25→0.36,0.31→0.19,0.31→0.19,0.36→0.36,0.36) 1300ms",
+        "note": "6つの同じ砂の山が並ぶ。左上を往復して、下にどんな形が隠れているか見たい。",
+        "noteEn": "Six matching sand patches are visible. I sweep back and forth over the upper left to discover the shape beneath.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "path(0.64,0.25→0.80,0.25→0.80,0.31→0.64,0.31→0.64,0.36→0.80,0.36) 1200ms",
+        "note": "ほたて貝の筋が現れて発見1/6。指の軌跡で砂が取れる感触が分かる。右上にも同じように払って形を比べる。",
+        "noteEn": "A scallop with ridges appeared and the count is one of six. The sand follows my finger. I brush the upper right to compare its shape.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "path(0.19,0.46→0.36,0.46→0.36,0.51→0.19,0.51→0.19,0.57→0.36,0.57) 1250ms",
+        "note": "巻き貝は輪郭が背景に近く、筋が目立つ。中央左の砂を払って次の標本を見る。",
+        "noteEn": "The conch outline blends into the sand while its ridges stand out. I brush the middle-left patch for the next specimen.",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "path(0.64,0.46→0.80,0.46→0.80,0.51→0.64,0.51→0.64,0.57→0.80,0.57) 1200ms",
+        "note": "ひとでの5本の腕が見つかって3/6。選ぶ場所で違う形は出るが、払い方の工夫は必要ない。中央右へ進む。",
+        "noteEn": "The five-armed sea star makes three of six. Each patch has a different shape, but the brushing technique needs little variation. I explore the middle right.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "path(0.19,0.67→0.36,0.67→0.36,0.72→0.19,0.72→0.19,0.77→0.36,0.77) 1250ms",
+        "note": "たこまくらは白い円に花のような模様。4つ並ぶと標本帳らしくなってきた。左下の砂を払う。",
+        "noteEn": "The sand dollar has a flower-like pattern on a white disk. Four discoveries look like a specimen album. I brush the lower left.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "path(0.64,0.67→0.80,0.67→0.80,0.72→0.64,0.72→0.64,0.77→0.80,0.77) 1300ms",
+        "note": "海のガラスは淡い青緑で、貝との違いが分かる。最後の右下を払って6種類の完成を目指す。",
+        "noteEn": "Sea glass is pale turquoise and distinct from the shells. I brush the final lower-right patch to complete all six kinds.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 900ms → tap(0.50,0.80) 120ms",
+        "note": "6種類が一枚の標本帳に並んだ。収集の区切りは気持ちよいが、配置が固定で再挑戦の驚きは少ない。もう一度で砂が戻るか確認。",
+        "noteEn": "All six appear in a specimen album. Completing it feels pleasant, though fixed positions limit replay surprises. I restart to check that the sand returns.",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-10T14:27:46+09:00"
+  },
+  "publishedAt": "2026-10-10T14:27:46+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 1525,
+    "outputTokens": 7768,
+    "contextTokens": 4516802,
+    "turns": 21,
+    "toolCalls": 21,
+    "webSearches": null,
+    "minutes": 147.7,
+    "from": "2026-10-10T03:00:09.219Z",
+    "to": "2026-10-10T05:27:53.908Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力から思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated Codex token_usage_record entries by unique response_id from planning through review. Input includes cached tokens; output excludes reasoning. Tools count top-level calls only.",
+    "recordedAt": "2026-10-10T14:27:53+09:00",
+    "validationRuns": 2,
+    "codeKB": 7.6,
+    "evidence": "metrics-evidence.json"
+  }
+}
