@@ -225,7 +225,7 @@
     $('phone').replaceChildren(); frame = null;
     document.body.classList.remove('locked');
     Ratings.logPlay(id, session.plays, session.seconds);
-    if (!Ratings.mine(id) && session.seconds > 3) openSheet();
+    if (session.seconds > 3) openSheet();   // 遊ぶたびに評価できる（記録はすべて残り、平均には1人の最新の評価だけを使う）
   }
   function openSheet() { $('sheet').hidden = false; document.body.classList.add('locked'); }
   function closeSheet() { $('sheet').hidden = true; document.body.classList.remove('locked'); }
