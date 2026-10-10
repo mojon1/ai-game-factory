@@ -1,0 +1,224 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-10T05:30:30.056Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.78
+        ]
+      },
+      "desc": "tap(0.50,0.78) 120ms",
+      "note": "押している間に探し、赤い気配が来たら離すルール。3つの廊下を抜けるため開始する。",
+      "noteEn": "Hold to search and release when red shadows approach. I begin the escape through three hallways.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": {
+        "tap": [
+          0.5,
+          0.865
+        ],
+        "hold": 2500
+      },
+      "desc": "tap(0.50,0.86) 2500ms",
+      "note": "静かな廊下で鍵を探す。周期の表示が右へ進むので、予告に近づく前に離すつもりで長押しする。",
+      "noteEn": "I search the quiet hallway while watching the cycle indicator approach the warning zone.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": {
+        "wait": 1800
+      },
+      "desc": "wait 1800ms",
+      "note": "鍵は1つ、2つ目もかなり進んだが足音の予告が見える。ここで離し、影が通り過ぎるまで待つ。",
+      "noteEn": "One key is found and the second is nearly ready, but footsteps are announced. I stay hidden until the shadow passes.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": {
+        "tap": [
+          0.5,
+          0.865
+        ],
+        "hold": 1700
+      },
+      "desc": "tap(0.50,0.86) 1700ms",
+      "note": "目が消えて静かになった。探した進み具合は残っているので、残り2つを取りに戻る。",
+      "noteEn": "The eyes disappear and the hall is quiet. Search progress remains, so I resume for the remaining keys.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": {
+        "tap": [
+          0.5,
+          0.865
+        ],
+        "hold": 300
+      },
+      "desc": "tap(0.50,0.86) 300ms",
+      "note": "鍵は2つで最後の手がかりがほぼ満ちている。静かな間に少しだけ押して出口を開ける。",
+      "noteEn": "Two keys are found and the last progress bar is almost full. I search a little longer while it is quiet.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": {
+        "wait": 900,
+        "tap": [
+          0.5,
+          0.64
+        ]
+      },
+      "desc": "tap(0.50,0.64) 120ms",
+      "note": "3本の鍵で最初の廊下を抜けた。次の廊下へ進み、予告の変化を見たい。",
+      "noteEn": "Three keys open the first hallway. I move on to inspect the next hallway.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.64
+          ]
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.64) 120ms",
+      "note": "前のタップでは結果画面が残った。表示を確認し、間を置いて改めて次へ進む。",
+      "noteEn": "The result stayed after my previous tap. I wait briefly and tap again to continue.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": {
+        "tap": [
+          0.5,
+          0.865
+        ],
+        "hold": 3800
+      },
+      "desc": "tap(0.50,0.86) 3800ms",
+      "note": "2つ目の廊下に入れた。今度は欲張って押し続け、影が来ても離さないとどうなるか確かめる。",
+      "noteEn": "The second hallway starts correctly. I deliberately keep searching through the approaching shadow to test the consequence.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.64
+          ]
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.64) 120ms",
+      "note": "影を無視すると気づかれて失敗した。もう一度で同じ廊下を再開できるか確認する。",
+      "noteEn": "Ignoring the shadow caused failure. I retry to check that the same hallway restarts.",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}
