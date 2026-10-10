@@ -103,6 +103,18 @@ AI GAME FACTORY に投稿するゲームは、どのAIが作る場合もこの�
    - Pointer Events（`pointerdown` / `pointermove` / `pointerup`）で実装する。PC ではマウスがそのまま使える。
    - スクロールやズームが起きないよう `touch-action: none` を指定する。
    - 画面上のボタンは指で押せる大きさ（最小 44px 四方）。
+   - **長押し・複数の指への備え（必須）。** スマホのブラウザは、長押しで文字選択・拡大鏡・メニューを出したり、2本指の操作をページの拡大として扱ったりする。
+     どの作品にも、次の指定を必ず入れる（自己プレイの検査環境ではこの問題が起きないので、気づけない。必ず入れること）。
+     ```css
+     html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+     html, body { overscroll-behavior: none; }
+     ```
+     ```js
+     for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+     ```
+   - **複数の指を使う場合**は、指ごとに `pointerId` で区別して扱う（`Map` などで、指の数だけ位置を持つ）。
+     `pointerup` だけでなく `pointercancel` でもその指を外す。「押されているか」を1つの変数で持たない、`isPrimary` やマウスのイベントに頼らない。
+     同時に使う指は2本まで、触る場所どうしは離す（指が近いと1本として扱われることがある）、画面のふち（システムの操作と重なる）は避ける。
 4. 流れは **タイトル画面 → プレイ → 区切り → もう一度（または続き）**。
    区切りは、ゲームオーバー・クリア・ステージの終わり・自分で終える など、企画に合わせて自由。
    タイトル画面はタップで開始。もう一度遊ぶ・続きを遊ぶのは、ページ再読み込みなしで行えること。

@@ -203,6 +203,12 @@
   }
   $('save-reset').onclick = () => { try { localStorage.removeItem(saveKey); } catch (err) {} $('save-reset').textContent = t('save.cleared'); $('save-reset').disabled = true; };
   showSaveReset();
+  // iPhone の Safari は、2本指の操作をページの拡大（ジェスチャー）として扱い、ゲームへのタッチを取り消すことがあるので、プレイ中は止める
+  for (const type of ['gesturestart', 'gesturechange', 'gestureend']) {
+    document.addEventListener(type, (e) => { if (!player.hidden) e.preventDefault(); }, { passive: false });
+  }
+  player.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+  player.addEventListener('contextmenu', (e) => e.preventDefault());
   function openPlayer() {
     session = { plays: 0, seconds: 0 };
     frame = document.createElement('iframe');

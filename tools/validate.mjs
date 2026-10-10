@@ -24,6 +24,8 @@ export const CHECK_EN = {
   'iPhone: タッチで開始・操作でき、画面が変化する': 'iPhone: starts and responds to touch',
   'iPhone: 画面からはみ出さない': 'iPhone: no overflow',
   'プレイ開始の合図（start）を送っている': 'Sends the play "start" signal',
+  '長押しで文字選択・メニューが出ない指定がある': 'Blocks text selection and menus on long press',
+  '複数の指を指ごとに扱っている（pointerId）': 'Tracks each finger separately (pointerId)',
   'JavaScript エラーが出ない': 'No JavaScript errors',
 };
 const drawn = (i) => (i.canvasVariety ?? 99) > 1 || i.text.length > 0;
@@ -86,6 +88,12 @@ export async function validateGame(id) {
   const banned = html.match(/\b(alert|confirm|prompt)\s*\(|window\.open\s*\(/);
   add('alert/confirm/prompt/window.open を使っていない', !banned, banned ? banned[0] : '');
   add('Pointer Events でタッチ操作に対応している', /pointerdown/i.test(html));
+  // 仕様8以降: 長押し・複数の指への備え（実機でしか起きない問題なので、指定が入っているかを確かめる）
+  const meta0 = readMeta(id) || {};
+  if ((meta0.specVersion || 0) >= 8) {
+    add('長押しで文字選択・メニューが出ない指定がある', /user-select\s*:\s*none/.test(html) && /-webkit-user-select\s*:\s*none/.test(html) && /-webkit-touch-callout\s*:\s*none/.test(html) && /contextmenu/.test(html));
+    if ((meta0.structure?.input || []).includes('multi')) add('複数の指を指ごとに扱っている（pointerId）', /pointerId/.test(html) && /pointercancel/.test(html));
+  }
   // 音を鳴らすかどうかはAIの判断（仕様6「音の判断」）。音を使っているかと、その様子は記録だけ残す（合否には使わない）
   const usesSound = /AudioContext|\bzzfx\b|ZZFX/.test(html);
   add('touch-action を指定している', /touch-action\s*:\s*none/i.test(html));

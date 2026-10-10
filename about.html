@@ -76,6 +76,7 @@
     <li>2026-10-09: 作れるゲームの幅を狭めていた3つの点を直した。(1) AIの自己プレイの手順に「6〜12手でゲームオーバーやクリアまで体験する」とあり、すぐ終わるゲームへ誘導していたため、「どんなゲームかが分かるところまで遊べばよい」に改め、手数の目安も広げた。(2) 自己プレイでできる操作が、タップ・長押し・まっすぐのスワイプだけだったため、道筋をなぞる操作と、複数の指の操作を加えた。(3) 遊んだ記録を残せなかったため、サイトが作品ごとに小さな保存場所（遊ぶ人のブラウザ内、16KBまで）を貸す仕組みを加えた（使うかどうかはAIの自由）。作品ページには「このゲームの保存データを消す」を置いた。</li>
     <li>2026-10-09: 仕様を変更（仕様7）。作品の幅を広げるため、企画の「候補を3つ出す」の<b>うち1つは、くじで引いたジャンルで考える</b>ことにした。くじは、人間側が用意した57ジャンル（「その他」を含む）の一覧から等しい確率で1つ引く。3つの中から何を作るかはAIが選び、くじの候補を選ばなくてもよい。3つの候補と選んだものは作品ページに公開する。作品のジャンルも、この細かい一覧から付ける。</li>
     <li>2026-10-10: 最初期の評価の影響が大きかったため、それまでの評価（31件）を集計から外した（消さずに保管）。プレイ回数・プレイ時間の記録はそのまま。あわせて、遊ぶたびに評価できるようにした。付けた評価はすべて記録し、星の平均とランキングには1人につき最新の評価だけを使う。</li>
+    <li>2026-10-10: 実機で見つかった操作の問題に対応した（仕様8）。長押しで文字選択やメニューが出てプレイできない作品と、複数の指の操作がうまく効かない作品があったため、長押し・複数の指への備え（文字選択・長押しメニュー・ページの拡大を止める指定、指ごとの扱い方）を必須にし、自動テストで確かめるようにした。あわせて、サイトのプレイ画面でも、ページの拡大や文字選択がゲームの操作を横取りしないようにした。作品そのものは変更していない。</li>
   </ul>
 </div>
 
@@ -114,6 +115,7 @@
     <li>2026-10-09: Fixed three things that narrowed the range of games. (1) The self-play step said "reach game over or clear within 6–12 moves", nudging towards games that end quickly; it now says "play until you understand what kind of game it is", with a wider move range. (2) Self-play only allowed taps, long presses and straight swipes; drawing along a path and multi-finger input were added. (3) Games could not keep any record; the site now lends each game a small save slot in the player's browser (up to 16KB), which the AI may use or not. Game pages have a "Delete saved data for this game" link.</li>
     <li>2026-10-09: Changed the spec (version 7). To widen the range of games, <b>one of the three ideas the AI considers is now based on a genre drawn by lot</b> from a list of 57 genres (including "Other") prepared by the human side, each equally likely. The AI still chooses which of the three to make and may skip the drawn one. The three ideas and the choice are shown on the game page. Games are now labelled with a genre from this finer list.</li>
     <li>2026-10-10: The earliest ratings had too much weight, so the 31 ratings so far were removed from the totals (kept in storage, not deleted). Play counts and play time were kept. Players can now rate a game every time they play it; every rating is recorded, and the average and rankings use only each player's latest rating.</li>
+    <li>2026-10-10: Fixed touch problems found on real phones (spec version 8). In some games a long press selected text or opened a menu, and in another multi-finger input did not work well. Games must now include settings that block text selection, long-press menus and page zoom, and must track each finger separately; the automated test checks for these. The site's play screen also stops page zoom and text selection from taking over game input. The games themselves were not changed.</li>
   </ul>
 </div>
 </main>

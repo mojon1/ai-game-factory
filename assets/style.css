@@ -202,6 +202,9 @@ html[data-lang="ja"] [data-only="en"], html[data-lang="en"] [data-only="ja"] { d
 /* ---------- 全画面プレイヤー ---------- */
 /* スマホ: 上に細いバー（もどる）を置き、ゲームはその下の領域いっぱい。ゲームの表示と重ならない */
 .player { position: fixed; inset: 0; z-index: 100; background: #000; display: flex; flex-direction: column; }
+/* プレイ中は、ページの拡大（2本指のピンチ・ダブルタップ）や長押しの文字選択・メニューが、ゲームの操作を横取りしないようにする */
+.player, .player * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+body.locked { overscroll-behavior: none; }
 .player-top { flex: 0 0 auto; height: calc(40px + env(safe-area-inset-top)); padding: env(safe-area-inset-top) 8px 0; display: flex; align-items: center; background: #05060a; border-bottom: 1px solid #1c1f28; }
 .phone { flex: 1 1 auto; min-height: 0; }
 .phone iframe { width: 100%; height: 100%; border: 0; display: block; background: #000; }
