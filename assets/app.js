@@ -73,6 +73,7 @@
     mine(gameId) {
       const v = store.get('agf_votes', {})[gameId];
       if (!v) return null;
+      if (CFG.ratingsResetAt && (!v.at || v.at < CFG.ratingsResetAt)) return null;   // リセット前の評価は数えない
       return { ...v, stars: v.stars ?? ({ 2: 5, 1: 3, 0: 1 })[v.verdict] ?? null };
     },
     // 全作品の集計 { [id]: { votes, avg, dist[1..5], broken, sessions, avgSeconds, totalSeconds, replayRate } }
