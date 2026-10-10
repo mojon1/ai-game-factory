@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>ねふだ屋台</title>
+<style>
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#140f2a;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+canvas{display:block;width:100vw;height:100dvh;touch-action:none}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script src="../../lib/zzfx-1.4.0.min.js"></script>
+<script>
+'use strict';
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const T = {
+  ja: {
+    title: 'ねふだ屋台', sub: '夏祭りのかき氷屋',
+    how1: '画面を上下にドラッグして値札を変える。',
+    how2: '通る客を見て、高く売るか、安くして喜ばせるか。',
+    how3: '5日間でいくら稼げる？',
+    tap: 'タップでスタート', again: 'タップでもう一度', next: 'タップで次へ',
+    day: (d) => `${d}日目`, morning: (d) => `${d}日目の朝`,
+    forecast: '予報', order: '仕入れ', cups: '杯', perCup: '1杯 ¥40',
+    open: '開店する', money: '所持金', rep: '評判',
+    hot: '暑い！高くても買ってくれそう', warm: 'ふつうの夏の夜', cool: '涼しい…あまり売れないかも',
+    fire: '今夜は花火大会！終わりぎわに人が押し寄せる',
+    memo: '客メモ（買った最高 / 断られた最低）',
+    yesterday: (n) => `きのうは ${n}杯 売れた`,
+    hint: '↕ 上下にドラッグで値札を変える',
+    high: '高っ！', ok: 'まいど！', cheap: '安い！', crowd: '混んでる…', soldout: '売り切れ…', ripoff: 'ぼったくり！',
+    upto: (p) => `¥${p}なら…`,
+    left: '残り', soldOutSign: '売り切れ',
+    dayEnd: (d) => `${d}日目 おしまい`,
+    sold: '売れた', revenue: '売上', hearts: '喜んだ客', lost: '逃した客', melted: '溶けた氷', profit: '今日の利益',
+    final: '5日間の結果', total: '最終の所持金', gain: '稼いだ額', best: 'ベスト', newBest: 'ベスト更新！',
+    rank: ['見習い', 'ふつうの屋台', '人気屋台', '名物屋台', '伝説の屋台'],
+    notEnough: 'お金が足りない'
+  },
+  en: {
+    title: 'Price Tag Stall', sub: 'Shaved ice at the summer festival',
+    how1: 'Drag up / down anywhere to change the price.',
+    how2: 'Read each passer-by: charge high, or go cheap and make them happy.',
+    how3: 'How much can you earn in 5 nights?',
+    tap: 'Tap to start', again: 'Tap to play again', next: 'Tap to continue',
+    day: (d) => `Night ${d}`, morning: (d) => `Night ${d} — prep`,
+    forecast: 'Forecast', order: 'Stock', cups: 'cups', perCup: '¥40 / cup',
+    open: 'Open stall', money: 'Money', rep: 'Rep',
+    hot: 'Hot! People will pay more', warm: 'A normal summer night', cool: 'Cool night… sales may be slow',
+    fire: 'Fireworks tonight! A rush near closing',
+    memo: 'Notes (highest paid / lowest refused)',
+    yesterday: (n) => `Sold ${n} cups last night`,
+    hint: '↕ Drag up / down to change the price',
+    high: 'Too much!', ok: 'Thanks!', cheap: 'Cheap!', crowd: 'Too crowded…', soldout: 'Sold out…', ripoff: 'Rip-off!',
+    upto: (p) => `¥${p} maybe…`,
+    left: 'Left', soldOutSign: 'SOLD OUT',
+    dayEnd: (d) => `Night ${d} closed`,
+    sold: 'Sold', revenue: 'Revenue', hearts: 'Delighted', lost: 'Missed', melted: 'Melted', profit: 'Profit',
+    final: '5-night result', total: 'Final money', gain: 'Earned', best: 'Best', newBest: 'New best!',
+    rank: ['Apprentice', 'Ordinary stall', 'Popular stall', 'Famous stall', 'Legendary stall'],
+    notEnough: 'Not enough money'
+  }
+}[LANG === 'ja' ? 'ja' : 'en'];
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+
+// ---------- save ----------
+let best = 0;
+addEventListener('message', (e) => { if (e.data && e.data.agf === 'loaded' && e.data.data) { best = e.data.data.best || 0; } });
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+const saveBest = () => { try { parent.postMessage({ agf: 'save', data: { best } }, '*'); } catch (e) {} };
+
+// ---------- sound ----------
+let audioOn = false;
+const S = {};
+function initAudio() {
+  if (audioOn || typeof ZZFX === 'undefined') return;
+  try {
+    ZZFX.audioContext?.resume();
+    ZZFX.volume = 0.25;
+    S.coin = new ZZFXSound([.7,0,1675,,.04,.22,1,1.8,,,837,.05]);
+    S.heart = new ZZFXSound([.6,0,880,.01,.08,.25,0,1,,,440,.07]);
+    S.tick = new ZZFXSound([.12,0,1100,0,.004,.015,0]);
+    S.boo = new ZZFXSound([.45,0,190,.01,.05,.16,2,1,-4]);
+    S.don = new ZZFXSound([.5,0,68,.004,.04,.28,0,1,-1.5,,,,,.1]);
+    S.kara = new ZZFXSound([.12,0,1000,0,.01,.04,4,1,,,,,,2]);
+    S.boom = new ZZFXSound([.8,.1,55,.01,.25,.9,4,1,-.5,,,,,1]);
+    S.bell = new ZZFXSound([.5,0,1400,.01,.1,.7,0,1,,,700,.06]);
+    audioOn = true;
+  } catch (e) {}
+}
+const play = (k) => { if (audioOn && S[k]) try { S[k].play(); } catch (e) {} };
+
+// ---------- canvas ----------
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d');
+let W = 360, H = 640, DPR = 1;
+function resize() {
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = Math.max(1, innerWidth || 360); H = Math.max(1, innerHeight || 640);
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+}
+addEventListener('resize', resize); resize();
+
+// ---------- game data ----------
+const TYPES = [
+  { e: '👦', base: 120, w: 22, n: 1 },
+  { e: '🧑', base: 180, w: 22, n: 1 },
+  { e: '👩', base: 235, w: 18, n: 1 },
+  { e: '👴', base: 290, w: 14, n: 1 },
+  { e: '🤵', base: 430, w: 10, n: 1 },
+  { e: '💑', base: 220, w: 14, n: 2 },
+];
+const TW = TYPES.reduce((a, t) => a + t.w, 0);
+const COST = 40, DAY_LEN = 45, START_MONEY = 2000, DAYS = 5;
+const rnd = (a, b) => a + Math.random() * (b - a);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+let state = 'title', stateT = 0;
+let run;
+function newRun() {
+  const temps = [rnd(29, 31), rnd(32, 34.5), rnd(24.5, 27), rnd(31, 35), rnd(30, 32)].map(Math.round);
+  run = { day: 1, money: START_MONEY, rep: 50, temps, memo: TYPES.map(() => ({ paid: 0, refused: 0 })), lastSold: null, order: 30, price: 200 };
+}
+let day; // per-day state
+function startDay() {
+  const temp = run.temps[run.day - 1];
+  run.money -= run.order * COST;
+  day = {
+    t: 0, temp, stock: run.order, bought: run.order, sold: 0, revenue: 0, hearts: 0, lost: 0,
+    people: [], queue: [], serveT: 0, spawnAcc: 0, pops: [], fireworks: [], beat: 0, beatI: 0,
+    mul: 1 + (temp - 30) * 0.06,
+    fire: run.day === DAYS,
+  };
+  state = 'day'; stateT = 0;
+  play('bell');
+}
+function spawn() {
+  let r = Math.random() * TW, ti = 0;
+  for (; ti < TYPES.length - 1; ti++) { r -= TYPES[ti].w; if (r < 0) break; }
+  const ty = TYPES[ti];
+  const dir = Math.random() < 0.5 ? 1 : -1;
+  const max = Math.round(ty.base * day.mul * rnd(0.82, 1.18) / 10) * 10;
+  day.people.push({ ti, dir, x: dir > 0 ? -30 : W + 30, lane: dir > 0 ? 0 : 1, spd: rnd(42, 62), max, st: 'walk', bob: Math.random() * 6, cone: false, decided: false });
+}
+function pop(x, y, text, color, big) { day.pops.push({ x, y, text, color, t: 0, big }); }
+
+function decide(p) {
+  p.decided = true;
+  const ty = TYPES[p.ti], m = run.memo[p.ti];
+  const y = laneY(p.lane) - 46;
+  if (day.stock <= 0) { pop(p.x, y, T.soldout, '#ccc'); day.lost++; run.rep = clamp(run.rep - 1, 0, 100); return; }
+  const price = run.price;
+  if (price <= p.max) {
+    if (day.queue.length >= 4) { pop(p.x, y, T.crowd, '#ccc'); day.lost++; run.rep = clamp(run.rep - 1, 0, 100); return; }
+    const n = Math.min(ty.n, day.stock);
+    day.stock -= n; day.sold += n; day.revenue += price * n; run.money += price * n;
+    m.paid = Math.max(m.paid, price);
+    p.st = 'queue'; day.queue.push(p);
+    if (price <= p.max * 0.65) { day.hearts++; run.rep = clamp(run.rep + 2, 0, 100); pop(p.x, y, '♥ ' + T.cheap, '#ff8fb8'); play('heart'); }
+    else { pop(p.x, y, `+¥${price * n}`, '#ffe066'); play('coin'); }
+  } else {
+    m.refused = m.refused ? Math.min(m.refused, price) : price;
+    day.lost++;
+    if (price > p.max * 1.6) { run.rep = clamp(run.rep - 3, 0, 100); pop(p.x, y, T.ripoff + ' ' + T.upto(p.max), '#ff7a6b'); }
+    else pop(p.x, y, T.high + ' ' + T.upto(p.max), '#9fd3ff');
+    play('boo');
+  }
+}
+const laneY = (l) => H * (l === 0 ? 0.70 : 0.79);
+const stallX = () => W / 2;
+
+function updateDay(dt) {
+  day.t += dt; stateT += dt;
+  const remain = DAY_LEN - day.t;
+  // festival beat
+  day.beat += dt;
+  if (day.beat > 0.36) { day.beat -= 0.36; const pat = [1, 0, 2, 0, 1, 1, 2, 0]; const b = pat[day.beatI++ % 8]; if (b === 1) play('don'); else if (b === 2) play('kara'); }
+  // spawn
+  if (remain > 1.5) {
+    let rate = (0.72 + (day.temp - 30) * 0.05) * (0.5 + run.rep / 100);
+    if (day.fire && remain < 16) rate *= 2.3;
+    day.spawnAcc += dt * rate;
+    while (day.spawnAcc > 1) { day.spawnAcc -= 1 + rnd(-0.35, 0.35); spawn(); }
+  }
+  // serve queue
+  if (day.queue.length) {
+    day.serveT += dt;
+    if (day.serveT > 0.55) { day.serveT = 0; const p = day.queue.shift(); p.st = 'walk'; p.cone = true; }
+  }
+  const cx = stallX();
+  for (const p of day.people) {
+    p.bob += dt * 9;
+    if (p.st === 'walk') {
+      p.x += p.dir * p.spd * dt;
+      if (!p.decided && ((p.dir > 0 && p.x >= cx - 22) || (p.dir < 0 && p.x <= cx + 22))) decide(p);
+    } else if (p.st === 'queue') {
+      const idx = day.queue.indexOf(p);
+      const tx = cx - p.dir * (22 + idx * 26);
+      p.x += (tx - p.x) * Math.min(1, dt * 6);
+    }
+  }
+  day.people = day.people.filter((p) => p.x > -60 && p.x < W + 60);
+  for (const q of day.pops) q.t += dt;
+  day.pops = day.pops.filter((q) => q.t < 1.8);
+  // fireworks
+  if (day.fire && remain < 16 && Math.random() < dt * 1.4) {
+    day.fireworks.push({ x: rnd(W * 0.1, W * 0.9), y: rnd(H * 0.08, H * 0.24), t: 0, hue: Math.floor(rnd(0, 360)) }); play('boom');
+  }
+  for (const f of day.fireworks) f.t += dt;
+  day.fireworks = day.fireworks.filter((f) => f.t < 1.6);
+  if (remain <= 0) endDay();
+}
+let dayRes;
+function endDay() {
+  const melted = day.stock;
+  dayRes = { sold: day.sold, revenue: day.revenue, hearts: day.hearts, lost: day.lost, melted, profit: day.revenue - day.bought * COST };
+  run.lastSold = day.sold;
+  state = 'dayend'; stateT = 0;
+  play('bell');
+}
+
+// ---------- input ----------
+let drag = null, buttons = [];
+cv.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  initAudio();
+  try { cv.setPointerCapture(e.pointerId); } catch (er) {}
+  const x = e.clientX, y = e.clientY;
+  if (state === 'title') { newRun(); state = 'order'; stateT = 0; signal('start'); return; }
+  if (state === 'order') {
+    for (const b of buttons) if (x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h) { b.fn(); return; }
+    return;
+  }
+  if (state === 'day') { drag = { id: e.pointerId, y, p: run.price, last: run.price }; return; }
+  if (state === 'dayend' && stateT > 0.7) {
+    if (run.day >= DAYS) { finish(); }
+    else { run.day++; run.order = clamp(run.order, 0, Math.floor(run.money / COST)); state = 'order'; stateT = 0; }
+    return;
+  }
+  if (state === 'final' && stateT > 0.7) { newRun(); state = 'order'; stateT = 0; signal('start'); }
+});
+cv.addEventListener('pointermove', (e) => {
+  if (!drag || state !== 'day' || e.pointerId !== drag.id) return;
+  const np = clamp(Math.round((drag.p + (drag.y - e.clientY) / 9 * 10) / 10) * 10, 50, 600);
+  if (np !== run.price) { run.price = np; play('tick'); }
+});
+const endDrag = (e) => { if (drag && e.pointerId === drag.id) drag = null; };
+cv.addEventListener('pointerup', endDrag); cv.addEventListener('pointercancel', endDrag);
+
+let final;
+function finish() {
+  const gain = run.money - START_MONEY;
+  const isBest = run.money > best;
+  if (isBest) { best = run.money; saveBest(); }
+  const rank = gain < 4000 ? 0 : gain < 9000 ? 1 : gain < 14000 ? 2 : gain < 19000 ? 3 : 4;
+  final = { money: run.money, gain, isBest, rank };
+  state = 'final'; stateT = 0;
+  signal('end', { score: run.money });
+}
+
+// ---------- drawing helpers ----------
+function txt(s, x, y, size, color, align = 'center', weight = 700, maxW) {
+  ctx.font = `${weight} ${size}px ${FONT}`;
+  ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = 'middle';
+  if (maxW) { const w = ctx.measureText(s).width; if (w > maxW) { ctx.font = `${weight} ${Math.max(12, size * maxW / w)}px ${FONT}`; } }
+  ctx.fillText(s, x, y);
+}
+function rrect(x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
+function emo(s, x, y, size) { ctx.font = `${size}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff'; ctx.fillText(s, x, y); }
+const yen = (v) => (v < 0 ? '-¥' : '¥') + Math.abs(Math.round(v)).toLocaleString('en-US');
+
+let tGlobal = 0;
+function drawBackground() {
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, '#1b1440'); g.addColorStop(0.55, '#3a2457'); g.addColorStop(0.62, '#2a1d3a'); g.addColorStop(1, '#1a1424');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  // stars
+  for (let i = 0; i < 30; i++) { const sx = (i * 97.3) % W, sy = (i * 53.7) % (H * 0.3) + 50; ctx.fillStyle = `rgba(255,255,255,${0.25 + 0.25 * Math.sin(tGlobal * 2 + i)})`; ctx.fillRect(sx, sy, 2, 2); }
+  // ground
+  ctx.fillStyle = '#2b2236'; ctx.fillRect(0, H * 0.635, W, H * 0.365);
+  ctx.fillStyle = 'rgba(255,255,255,0.05)'; ctx.fillRect(0, H * 0.745, W, 2);
+  // lantern string
+  const ly = H * 0.115;
+  ctx.strokeStyle = 'rgba(0,0,0,.5)'; ctx.lineWidth = 1.5; ctx.beginPath();
+  for (let x = 0; x <= W; x += 6) { const y = ly + Math.sin(x / W * Math.PI * 3) * 8; x ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+  ctx.stroke();
+  for (let i = 0; i < 8; i++) {
+    const x = (i + 0.5) * W / 8, y = ly + Math.sin(x / W * Math.PI * 3) * 8 + 12;
+    const gl = ctx.createRadialGradient(x, y, 2, x, y, 26); gl.addColorStop(0, 'rgba(255,150,80,.35)'); gl.addColorStop(1, 'rgba(255,150,80,0)');
+    ctx.fillStyle = gl; ctx.fillRect(x - 26, y - 26, 52, 52);
+    ctx.fillStyle = i % 2 ? '#ff5a4f' : '#ffb347'; ctx.beginPath(); ctx.ellipse(x, y, 8, 11, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#222'; ctx.fillRect(x - 5, y - 12, 10, 3); ctx.fillRect(x - 5, y + 9, 10, 3);
+  }
+}
+function drawStall() {
+  const cx = stallX(), sw = Math.min(W * 0.62, 260), top = H * 0.39, counter = H * 0.56, bottom = H * 0.64;
+  // back posts
+  ctx.fillStyle = '#5b3a24'; ctx.fillRect(cx - sw / 2 + 6, top, 8, bottom - top); ctx.fillRect(cx + sw / 2 - 14, top, 8, bottom - top);
+  // inside glow
+  ctx.fillStyle = '#ffdca8'; ctx.globalAlpha = 0.18; ctx.fillRect(cx - sw / 2 + 14, top + 16, sw - 28, counter - top - 16); ctx.globalAlpha = 1;
+  // shopkeeper + ice machine
+  emo('🍧', cx - sw * 0.22, counter - 20, 30);
+  emo('🧊', cx + sw * 0.24, counter - 18, 24);
+  // roof (striped awning)
+  const n = 8, rw = sw + 24;
+  for (let i = 0; i < n; i++) {
+    ctx.fillStyle = i % 2 ? '#fff' : '#e8484a';
+    ctx.beginPath(); const x0 = cx - rw / 2 + i * rw / n;
+    ctx.moveTo(x0, top - 18); ctx.lineTo(x0 + rw / n, top - 18); ctx.lineTo(x0 + rw / n, top + 6);
+    ctx.quadraticCurveTo(x0 + rw / n / 2, top + 18, x0, top + 6); ctx.closePath(); ctx.fill();
+  }
+  // 氷 flag
+  ctx.fillStyle = '#fff'; ctx.fillRect(cx - sw / 2 - 2, top - 2, 26, 34);
+  txt(LANG === 'ja' ? '氷' : 'ICE', cx - sw / 2 + 11, top + 15, LANG === 'ja' ? 20 : 11, '#d22', 'center', 900);
+  // counter
+  ctx.fillStyle = '#8a5a35'; ctx.fillRect(cx - sw / 2, counter, sw, bottom - counter);
+  ctx.fillStyle = '#a7724a'; ctx.fillRect(cx - sw / 2, counter, sw, 6);
+  // stock count on counter
+  if (day) {
+    const low = day.stock <= 5;
+    txt(day.stock > 0 ? `${T.left} ${day.stock}${LANG === 'ja' ? '杯' : ''}` : T.soldOutSign, cx, (counter + bottom) / 2 + 3, 15, day.stock > 0 ? (low ? '#ffb0a0' : '#fff3dc') : '#ff8a7a', 'center', 800, sw - 20);
+  }
+}
+function drawSign() {
+  const cx = stallX(), y = H * 0.25, w = Math.min(W * 0.56, 220), h = 64;
+  // hanging strings
+  ctx.strokeStyle = '#ccb'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(cx - w * 0.3, y - h / 2); ctx.lineTo(cx - w * 0.3, H * 0.39 - 18); ctx.moveTo(cx + w * 0.3, y - h / 2); ctx.lineTo(cx + w * 0.3, H * 0.39 - 18); ctx.stroke();
+  const sold = day && day.stock <= 0;
+  const k = drag ? 1.06 : 1;
+  ctx.save(); ctx.translate(cx, y); ctx.scale(k, k);
+  rrect(-w / 2, -h / 2, w, h, 10); ctx.fillStyle = '#fff8e6'; ctx.fill(); ctx.lineWidth = 4; ctx.strokeStyle = '#5b3a24'; ctx.stroke();
+  if (sold) txt(T.soldOutSign, 0, 2, 30, '#c33', 'center', 900, w - 16);
+  else { txt('¥' + run.price, 0, 3, 40, '#c22', 'center', 900, w - 20); }
+  ctx.restore();
+}
+function drawGauge() {
+  // vertical price gauge on the right edge
+  const x = W - 22, y0 = H * 0.17, y1 = H * 0.6;
+  ctx.fillStyle = 'rgba(255,255,255,.12)'; rrect(x - 5, y0, 10, y1 - y0, 5); ctx.fill();
+  const f = (run.price - 50) / 550, y = y1 - f * (y1 - y0);
+  const g = ctx.createLinearGradient(0, y1, 0, y0); g.addColorStop(0, '#6fd3ff'); g.addColorStop(1, '#ff6b6b');
+  ctx.fillStyle = g; rrect(x - 5, y, 10, y1 - y, 5); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x, y, drag ? 10 : 8, 0, Math.PI * 2); ctx.fill();
+  txt('▲', x, y0 - 12, 12, 'rgba(255,255,255,.6)'); txt('▼', x, y1 + 12, 12, 'rgba(255,255,255,.6)');
+}
+function drawPeople() {
+  const cx = stallX();
+  const sorted = day.people.slice().sort((a, b) => a.lane - b.lane);
+  for (const p of sorted) {
+    const y = laneY(p.lane) + (p.st === 'walk' ? -Math.abs(Math.sin(p.bob)) * 4 : 0);
+    ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.beginPath(); ctx.ellipse(p.x, laneY(p.lane) + 18, 14, 4, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.save(); ctx.translate(p.x, y); if (p.dir < 0) ctx.scale(-1, 1); emo(TYPES[p.ti].e, 0, 0, 34); ctx.restore();
+    if (p.cone) emo('🍧', p.x + p.dir * 16, y - 6, 18);
+    // thinking bubble while approaching
+    if (!p.decided && Math.abs(p.x - cx) < 110) {
+      const a = 1 - Math.abs(p.x - cx) / 110;
+      ctx.globalAlpha = Math.min(1, a * 2);
+      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(p.x, y - 34, 11, 0, Math.PI * 2); ctx.fill();
+      txt('?', p.x, y - 34, 15, '#333', 'center', 900);
+      ctx.globalAlpha = 1;
+    }
+  }
+}
+function drawPops() {
+  for (const q of day.pops) {
+    const a = q.t < 1.3 ? 1 : 1 - (q.t - 1.3) / 0.5;
+    ctx.globalAlpha = Math.max(0, a);
+    const y = q.y - q.t * 18;
+    ctx.font = `800 14px ${FONT}`; const w = ctx.measureText(q.text).width + 14;
+    const x = clamp(q.x, w / 2 + 4, W - w / 2 - 4);
+    rrect(x - w / 2, y - 13, w, 26, 13); ctx.fillStyle = 'rgba(20,14,36,.85)'; ctx.fill();
+    txt(q.text, x, y, 14, q.color, 'center', 800);
+    ctx.globalAlpha = 1;
+  }
+}
+function drawFireworks() {
+  for (const f of day.fireworks) {
+    const r = 10 + f.t * 55, a = Math.max(0, 1 - f.t / 1.6);
+    for (let i = 0; i < 16; i++) {
+      const an = i / 16 * Math.PI * 2;
+      ctx.fillStyle = `hsla(${f.hue + i * 4},90%,65%,${a})`;
+      ctx.beginPath(); ctx.arc(f.x + Math.cos(an) * r, f.y + Math.sin(an) * r + f.t * f.t * 10, 2.5, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+}
+function drawHUD() {
+  ctx.fillStyle = 'rgba(10,6,24,.55)'; ctx.fillRect(0, 0, W, 48);
+  txt(yen(run.money), 12, 24, 22, '#ffe066', 'left', 900, W * 0.4);
+  const remain = Math.max(0, DAY_LEN - day.t);
+  txt(`${T.day(run.day)}/${DAYS}`, W - 12, 15, 14, '#fff', 'right', 800);
+  txt(`${day.temp}℃  ♥${Math.round(run.rep)}`, W - 12, 34, 14, '#ffb3cf', 'right', 800);
+  // time bar
+  ctx.fillStyle = 'rgba(255,255,255,.15)'; ctx.fillRect(0, 48, W, 5);
+  ctx.fillStyle = remain < 10 ? '#ff7a6b' : '#7ee0a0'; ctx.fillRect(0, 48, W * remain / DAY_LEN, 5);
+}
+function panel(x, y, w, h) { rrect(x, y, w, h, 16); ctx.fillStyle = 'rgba(18,12,36,.92)'; ctx.fill(); ctx.strokeStyle = 'rgba(255,200,150,.35)'; ctx.lineWidth = 2; ctx.stroke(); }
+function button(x, y, w, h, label, fn, color = '#e8484a', enabled = true) {
+  rrect(x, y, w, h, 12); ctx.fillStyle = enabled ? color : '#555'; ctx.fill();
+  txt(label, x + w / 2, y + h / 2 + 1, Math.min(22, h * 0.45), '#fff', 'center', 900, w - 8);
+  if (enabled) buttons.push({ x, y, w, h, fn });
+}
+
+function drawTitle() {
+  drawBackground(); run = run || { price: 200 }; drawStall(); drawSign();
+  ctx.fillStyle = 'rgba(10,6,24,.55)'; ctx.fillRect(0, H * 0.645, W, H * 0.355);
+  txt(T.title, W / 2, H * 0.06 + 20, 40, '#fff', 'center', 900, W - 30);
+  txt(T.sub, W / 2, H * 0.06 + 56, 15, '#ffcf9e', 'center', 700, W - 30);
+  txt(T.how1, W / 2, H * 0.71, 15, '#fff', 'center', 700, W - 28);
+  txt(T.how2, W / 2, H * 0.71 + 26, 14, '#ddd', 'center', 600, W - 28);
+  txt(T.how3, W / 2, H * 0.71 + 50, 14, '#ddd', 'center', 600, W - 28);
+  ctx.globalAlpha = 0.6 + 0.4 * Math.sin(tGlobal * 4);
+  txt(T.tap, W / 2, H * 0.90, 20, '#ffe066', 'center', 900);
+  ctx.globalAlpha = 1;
+  if (best) txt(`${T.best} ${yen(best)}`, W / 2, H * 0.955, 14, '#bbb', 'center', 700);
+  // demo price wiggle
+  run.price = 200 + Math.round(Math.sin(tGlobal * 1.3) * 8) * 10;
+}
+function drawOrder() {
+  buttons = [];
+  drawBackground();
+  const pw = Math.min(W - 24, 380), px = (W - pw) / 2, py = 58, ph = H - 70;
+  panel(px, py, pw, ph);
+  let y = py + 28;
+  txt(T.morning(run.day), W / 2, y, 22, '#fff', 'center', 900, pw - 20); y += 34;
+  const temp = run.temps[run.day - 1];
+  const icon = temp >= 32 ? '☀' : temp <= 27 ? '⛅' : '🌙';
+  txt(`${T.forecast}  ${icon} ${temp}℃`, W / 2, y, 20, temp >= 32 ? '#ffb070' : temp <= 27 ? '#9fd3ff' : '#fff', 'center', 800, pw - 20); y += 24;
+  txt(temp >= 32 ? T.hot : temp <= 27 ? T.cool : T.warm, W / 2, y, 13, '#ccc', 'center', 600, pw - 20); y += 20;
+  if (run.day === DAYS) { txt('🎆 ' + T.fire, W / 2, y, 13, '#ffd27a', 'center', 700, pw - 20); y += 20; }
+  y += 6;
+  txt(`${T.money} ${yen(run.money)}   ♥ ${T.rep} ${Math.round(run.rep)}`, W / 2, y, 15, '#ffe066', 'center', 800, pw - 20); y += 28;
+  // order stepper
+  txt(`${T.order}  (${T.perCup})`, W / 2, y, 14, '#ddd', 'center', 700, pw - 20); y += 30;
+  const maxOrder = Math.floor(run.money / COST);
+  run.order = clamp(run.order, 0, maxOrder);
+  const bw = 52, bh = 48;
+  button(px + 14, y - bh / 2, bw, bh, '−5', () => { run.order = Math.max(0, run.order - 5); play('tick'); }, '#4a6fa5');
+  button(px + pw - 14 - bw, y - bh / 2, bw, bh, '+5', () => { run.order = Math.min(maxOrder, run.order + 5); play('tick'); }, '#4a6fa5', run.order < maxOrder);
+  txt(`${run.order} ${T.cups}`, W / 2, y - 6, 26, '#fff', 'center', 900, pw - 2 * bw - 40);
+  txt(`-${yen(run.order * COST)}`, W / 2, y + 16, 13, '#ff9f8f', 'center', 700);
+  y += 36;
+  if (run.lastSold !== null) { txt(T.yesterday(run.lastSold), W / 2, y, 13, '#aaa', 'center', 600, pw - 20); }
+  y += 26;
+  // memo
+  txt(T.memo, W / 2, y, 13, '#ffcf9e', 'center', 700, pw - 20); y += 8;
+  const rowH = Math.max(22, Math.min(28, (py + ph - 84 - y) / TYPES.length));
+  for (let i = 0; i < TYPES.length; i++) {
+    const m = run.memo[i], ry = y + rowH * (i + 0.5) + 4;
+    emo(TYPES[i].e, px + pw * 0.2, ry, 20);
+    txt(m.paid ? yen(m.paid) : '—', px + pw * 0.48, ry, 15, '#9fe7b0', 'center', 800);
+    txt('/', px + pw * 0.6, ry, 14, '#777');
+    txt(m.refused ? yen(m.refused) : '—', px + pw * 0.74, ry, 15, '#ff9f8f', 'center', 800);
+  }
+  button(px + 24, py + ph - 70, pw - 48, 54, T.open, () => { if (run.order <= 0 && run.money < COST) { finishEarly(); return; } startDay(); }, '#e8484a');
+}
+function finishEarly() { finish(); }
+function drawDay() {
+  drawBackground();
+  drawFireworks();
+  drawSign();
+  drawStall();
+  drawGauge();
+  drawPeople();
+  drawPops();
+  drawHUD();
+  if (run.day === 1 && day.t < 5) {
+    ctx.globalAlpha = Math.min(1, (5 - day.t) / 1);
+    txt(T.hint, W / 2, H * 0.93, 15, '#fff', 'center', 800, W - 24);
+    ctx.globalAlpha = 1;
+  }
+  if (day.fire && DAY_LEN - day.t < 16 && DAY_LEN - day.t > 14) txt('🎆', W / 2, H * 0.92, 28, '#fff');
+}
+function drawDayEnd() {
+  drawDay();
+  const pw = Math.min(W - 40, 340), ph = 330, px = (W - pw) / 2, py = (H - ph) / 2;
+  panel(px, py, pw, ph);
+  let y = py + 32;
+  txt(T.dayEnd(run.day), W / 2, y, 22, '#fff', 'center', 900, pw - 20); y += 42;
+  const rows = [
+    [T.sold, `${dayRes.sold} ${T.cups}`, '#fff'],
+    [T.revenue, yen(dayRes.revenue), '#ffe066'],
+    [T.hearts, `♥ ${dayRes.hearts}`, '#ff8fb8'],
+    [T.lost, `${dayRes.lost}`, '#9fd3ff'],
+    [T.melted, `${dayRes.melted} ${T.cups}`, '#aaa'],
+  ];
+  for (const r of rows) { txt(r[0], px + 24, y, 15, '#ccc', 'left', 700); txt(r[1], px + pw - 24, y, 16, r[2], 'right', 800); y += 30; }
+  y += 8;
+  txt(T.profit, px + 24, y, 17, '#fff', 'left', 800);
+  txt(yen(dayRes.profit), px + pw - 24, y, 24, dayRes.profit >= 0 ? '#7ee0a0' : '#ff7a6b', 'right', 900);
+  y += 44;
+  if (stateT > 0.7) { ctx.globalAlpha = 0.6 + 0.4 * Math.sin(tGlobal * 4); txt(run.day >= DAYS ? T.next : T.next, W / 2, py + ph - 26, 17, '#ffe066'); ctx.globalAlpha = 1; }
+}
+function drawFinal() {
+  drawBackground();
+  const pw = Math.min(W - 40, 340), ph = 360, px = (W - pw) / 2, py = (H - ph) / 2;
+  panel(px, py, pw, ph);
+  txt(T.final, W / 2, py + 34, 20, '#ffcf9e', 'center', 800);
+  txt(T.rank[final.rank], W / 2, py + 72, 24, '#fff', 'center', 900, pw - 20);
+  txt(T.total, W / 2, py + 112, 14, '#ccc');
+  txt(yen(final.money), W / 2, py + 148, 42, '#ffe066', 'center', 900, pw - 20);
+  txt(`${T.gain} ${final.gain >= 0 ? '+' : ''}${yen(final.gain)}`, W / 2, py + 188, 16, final.gain >= 0 ? '#7ee0a0' : '#ff7a6b', 'center', 800);
+  if (final.isBest) txt(T.newBest, W / 2, py + 226, 20, '#ff8fb8', 'center', 900);
+  else txt(`${T.best} ${yen(best)}`, W / 2, py + 226, 16, '#bbb', 'center', 700);
+  txt('🍧', W / 2, py + 270, 36, '#fff');
+  if (stateT > 0.7) { ctx.globalAlpha = 0.6 + 0.4 * Math.sin(tGlobal * 4); txt(T.again, W / 2, py + ph - 26, 18, '#ffe066'); ctx.globalAlpha = 1; }
+}
+
+// ---------- loop ----------
+let lastTs = 0;
+function frame(ts) {
+  const dt = Math.min(0.05, lastTs ? (ts - lastTs) / 1000 : 0.016); lastTs = ts;
+  tGlobal += dt;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  if (state === 'day') updateDay(dt); else stateT += dt;
+  if (state === 'title') drawTitle();
+  else if (state === 'order') drawOrder();
+  else if (state === 'day') drawDay();
+  else if (state === 'dayend') drawDayEnd();
+  else if (state === 'final') drawFinal();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

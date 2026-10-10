@@ -1,0 +1,633 @@
+{
+  "id": "2026-10-10-claude-4",
+  "status": "published",
+  "title": "ねふだ屋台",
+  "genre": "経営",
+  "concept": "夏祭りのかき氷屋台で、通りがかる客を見ながら値札を指で上げ下げする。子どもには安く、紳士には強気に。断られると「¥180なら…」と本音が聞けて、客メモが育つ。高く売るか、安くして喜ばせ評判を上げるかの駆け引きが核。",
+  "howToPlay": "朝に氷を仕入れ、夜は画面を上下にドラッグして値札を変える。客が屋台の前に来た瞬間の値段で買うかどうかが決まる。5日間で所持金を増やそう。",
+  "libraryDecision": "ZzFX（効果音）を使う。会計の「チャリン」、喜んだ客のチャイム、断られた「ぶっ」という音が値付けの手応えそのものなので、一瞬で結果が耳に入るようにした。画面は2Dの屋台と通りで十分なので3D・物理演算は使わない。",
+  "soundDecision": "夜店の雰囲気づくりに、小さな音量でドン・カラッと太鼓のリズムを刻み、売れた・喜ばれた・断られたを3種類の短い効果音で鳴らし分ける。値札を動かすとカチカチ鳴るので、目を客に向けたまま値段の変化が分かる。メロディのBGMは客の反応音を埋もれさせるので入れない。",
+  "planning": {
+    "genreDraw": {
+      "ja": "経営",
+      "en": "Management / tycoon",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "夏祭りのかき氷屋台。通りがかる客を見ながら値札をドラッグで上げ下げし、高く売るか安くして評判を上げるかを駆け引きする5日間の経営。",
+        "ideaEn": "A shaved-ice stall at a summer festival: drag the price tag up and down as each passer-by approaches, balancing profit against delighting customers over 5 nights.",
+        "fromDraw": true
+      },
+      {
+        "idea": "暗い洞窟で、タップすると音の波紋が広がって壁が一瞬だけ見える。記憶をたよりにモグラを出口まで導くエコーロケーション迷路。",
+        "ideaEn": "An echolocation maze: tap to send a sound ripple that briefly reveals cave walls, then guide a mole to the exit from memory.",
+        "fromDraw": false
+      },
+      {
+        "idea": "風鈴の短冊を指ではじいて風を起こし、吊るされた風鈴を順番に鳴らしてメロディを完成させる物理おもちゃ。",
+        "ideaEn": "Flick paper strips to make wind and ring hanging wind chimes in order to complete a melody.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "limit",
+    "input": [
+      "drag",
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Price Tag Stall",
+      "concept": "At a summer-festival shaved-ice stall you slide the price tag up and down while watching who walks by: cheap for kids, bold for gentlemen. Refusals reveal what they would have paid, filling your notes. The core is the tug-of-war between squeezing profit and delighting customers to build reputation.",
+      "howToPlay": "Buy ice each morning, then drag up/down at night to change the price. The price at the moment a customer reaches the stall decides whether they buy. Grow your money over 5 nights.",
+      "libraryDecision": "Uses ZzFX for sound effects: the coin jingle, the delighted chime and the refusal boop are the feedback of pricing itself, so results reach your ears instantly. A 2D stall and street are enough, so no 3D or physics.",
+      "soundDecision": "A quiet taiko rhythm (don, kara) sets the night-festival mood, and three short sounds separate a sale, a delighted customer and a refusal. Moving the tag clicks, so you can watch customers while hearing the price change. No melodic BGM, since it would bury the customer reactions."
+    }
+  },
+  "createdAt": "2026-10-10T12:02:48+09:00",
+  "specVersion": 7,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "manual",
+    "startedAt": "2026-10-10T12:02:48+09:00",
+    "metricsFrom": "2026-10-10T03:02:05.767Z",
+    "transcript": "55e403b1-41ac-4cb2-84b1-8e7bfd3b5bb7.jsonl",
+    "validationRuns": 1,
+    "finishedAt": "2026-10-10T14:40:46+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-10T14:29:32+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "26.0KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=259",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=308",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=194",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=191",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 26595,
+    "lines": 529
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "ZzFX",
+      "version": "1.4.0",
+      "file": "zzfx-1.4.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "客が屋台の前に来る直前に値札をグイッと上げて紳士に¥380で売れた瞬間や、「高っ！¥170なら…」と本音が出るのは楽しく、客メモが埋まって値付けの勘が育つ手応えもある。暑い日は客が次々来て忙しく面白い。一方、涼しい3日目は客がまばらで待ち時間が長く退屈ぎみ。子ども👦と若者🧑の絵文字が見分けにくく、客メモは気温の違う日の値段が混ざるので参考にしにくい。吹き出しが人や在庫表示と重なることもあった。致命的な不具合はない。",
+    "similar": [
+      {
+        "title": "Lemonade Stand (1973, MECC)",
+        "url": "https://en.wikipedia.org/wiki/Lemonade_Stand",
+        "similarity": "高",
+        "note": "天気を見て仕入れと値段を決め、売れ残りは無駄になる日ごとの経営という骨組みが同じ。本作は値段を1日の中で客ごとにリアルタイムで動かす点が違う。",
+        "note_en": "Same skeleton: read the weather, decide stock and price each day, leftovers are wasted. This game differs by changing the price live per customer during the day."
+      },
+      {
+        "title": "Moonlighter",
+        "url": "https://siliconera.com/?p=709874",
+        "similarity": "中",
+        "note": "値札に対する客の反応（安い・ちょうど・高い）から適正価格を学び、記録が残る点が近い。本作は商品が1種類で、通る客の種類に合わせて値札をその場で動かす。",
+        "note_en": "Close in learning fair prices from customer reactions (cheap / fine / too high) with a log. Here there is one product and you move the tag on the fly for each passer-by."
+      },
+      {
+        "title": "Recettear: An Item Shop's Tale",
+        "url": "https://steamcommunity.com/app/70400/discussions/0/458605613387361162",
+        "similarity": "低",
+        "note": "客ごとに払える上限を読んで値段を決めるショップ経営。本作は交渉ではなく、歩いてくる客を見ながら値札を指で上げ下げするアクション寄りの手触り。",
+        "note_en": "Shop management where you read each customer's budget. Here there is no haggling; you slide the tag while customers walk up, which is more action-like."
+      }
+    ],
+    "research": "WebSearchで「Lemonade Stand」の仕組みと出典（Wikipedia）、客ごとの値付け・客の反応で価格を学ぶ作品（Moonlighter, Recettear）を3回検索して比較した。",
+    "i18n": {
+      "en": {
+        "comment": "Yanking the tag up just before a gentleman reaches the stall and selling at ¥380 feels great, and refusals like 'Too much! ¥170 maybe…' reveal true budgets, so the notes grow your pricing instinct. Hot nights are busy and fun. But the cool night 3 had sparse customers and long idle gaps. The kid and young-adult emoji are hard to tell apart, and the notes mix prices from nights with different temperatures, which makes them less useful. Speech bubbles sometimes overlap people and the stock label. No fatal bugs.",
+        "research": "Ran 3 web searches: Lemonade Stand mechanics and its Wikipedia page, and games where you price per customer or learn from reactions (Moonlighter, Recettear)."
+      }
+    },
+    "method": "スマホ縦画面で 21 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 21 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.60) 120ms",
+        "note": "タイトル。夏祭りの屋台と値札。タップで開始",
+        "noteEn": "Title: a festival stall with a price tag. Tap to start.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.86,0.35) 120ms → tap(0.50,0.91) 120ms → wait 5000ms",
+        "note": "仕入れを35杯に増やして開店。5秒ようすを見る",
+        "noteEn": "Raised stock to 35 cups, opened, watched for 5 seconds.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "swipe(0.50,0.60→0.50,0.39) 300ms → wait 2500ms",
+        "note": "子どもに¥200は高すぎて¥170までと分かった。紳士🤵が来るので値札を¥350に上げてみる",
+        "noteEn": "A kid refused ¥200 (would pay ¥170). A gentleman is coming, so I raised the tag to about ¥350.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "swipe(0.50,0.40→0.50,0.54) 250ms → wait 2000ms",
+        "note": "紳士は¥350でも買った！次はおじいさん👴。少し下げて¥250で",
+        "noteEn": "The gentleman paid ¥350! Next is a grandpa, so I lowered it to about ¥250.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "swipe(0.50,0.40→0.50,0.47) 200ms → wait 3000ms",
+        "note": "おじいさんは¥250で購入。子ども2人が続けて来るので¥170まで下げる",
+        "noteEn": "Grandpa bought at ¥250. Two kids are next, so I dropped it to ¥170.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "swipe(0.50,0.40→0.50,0.47) 200ms → wait 4000ms",
+        "note": "強気に出すぎて評判が44に下がった。人が増えてきたので¥150に下げて数で稼ぐ",
+        "noteEn": "Overcharging dropped my rep to 44. The crowd grew, so I went down to ¥150 to sell volume.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 700ms → swipe(0.50,0.70→0.50,0.38) 300ms → wait 3500ms",
+        "note": "おじいさんに¥150で♥安い！評判が戻る。紳士が2人来るので¥380まで上げて待つ",
+        "noteEn": "Grandpa got it at ¥150 – ♥ Cheap! Rep recovers. Two gentlemen coming, so I raise to ~¥380.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "swipe(0.50,0.40→0.50,0.62) 300ms → wait 9000ms",
+        "note": "紳士は買ってくれたが、後ろの客に「ぼったくり！」。中間の¥220くらいに戻して様子見",
+        "noteEn": "The gentleman bought, but the next person shouted 'Rip-off!'. Back to a middle ~¥220 and watch.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "swipe(0.50,0.50→0.50,0.55) 200ms → wait 13000ms",
+        "note": "思ったより客足が少なく、氷が余りそう。¥180に下げて閉店まで待つ",
+        "noteEn": "Fewer customers than expected; ice will be left over. Lowered to ¥180 and waited until closing.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 2500ms",
+        "note": "閉店まぎわ。カップルが2杯買ってくれた。結果を見る",
+        "noteEn": "Near closing; a couple bought 2 cups. Checking the results.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "wait 900ms → tap(0.50,0.80) 120ms",
+        "note": "1日目は16杯売って利益¥1,910。19杯溶けた。次の朝へ",
+        "noteEn": "Night 1: 16 cups sold, ¥1,910 profit, 19 melted. On to the next morning.",
+        "image": "ai-play/step-11.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.14,0.35) 120ms → tap(0.14,0.35) 120ms → tap(0.50,0.91) 120ms → swipe(0.50,0.60→0.50,0.50) 250ms → wait 6000ms",
+        "note": "客メモが埋まってきた。34℃で暑いので仕入れは25杯に絞り、値札を¥250台に上げて開店",
+        "noteEn": "The notes are filling in. It's 34°C, so I cut stock to 25 cups and opened at around ¥250.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "wait 12000ms → swipe(0.50,0.50→0.50,0.45) 200ms → wait 12000ms",
+        "note": "暑い日は¥250でもおじいさん・お母さんが次々買う。子どもには「ぼったくり」と言われ評判が削れる。少し上げて閉店まで",
+        "noteEn": "On a hot night grandpas and moms buy at ¥250, but kids call it a rip-off and my rep erodes. Nudged it up and rode to closing.",
+        "image": "ai-play/step-13.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "wait 14000ms → wait 900ms → tap(0.50,0.80) 120ms",
+        "note": "残り10杯を¥290のまま売り切れまで。結果を見て3日目の朝へ",
+        "noteEn": "Kept ¥290 for the last 10 cups, then on to the night-3 morning.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "wait 5000ms",
+        "note": "カップルが続々。残り5杯、閉店まであと少し",
+        "noteEn": "Couples keep coming. 5 cups left, almost closing.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "wait 3000ms",
+        "note": "閉店",
+        "noteEn": "Closing.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 17,
+        "action": "tap(0.50,0.80) 120ms → wait 300ms",
+        "note": "2日目は利益¥4,980。暑い日は強気が通る。3日目の朝",
+        "noteEn": "Night 2 profit ¥4,980; bold prices work on hot nights. Morning of night 3.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 18,
+        "action": "tap(0.14,0.35) 120ms → tap(0.50,0.91) 120ms → swipe(0.50,0.50→0.50,0.62) 250ms → wait 15000ms",
+        "note": "25℃で涼しい。仕入れ20杯、値札は¥160前後に下げて開店",
+        "noteEn": "Cool 25°C night. 20 cups, price lowered to ~¥160.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 19,
+        "action": "swipe(0.50,0.50→0.50,0.56) 200ms → wait 30000ms",
+        "note": "涼しい夜は人通りが少ない。¥160に下げ、喜んでもらって評判を戻す作戦",
+        "noteEn": "Cool night, thin crowd. Dropped to ~¥160 to delight people and rebuild rep.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 20,
+        "action": "wait 30000ms → wait 30000ms",
+        "note": "客がまばら。安くしても売れる数は少なく、評判は♥40まで下がった。閉店まで待つ",
+        "noteEn": "Sparse customers; even cheap prices sell few, rep down to 40. Waiting for closing.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 21,
+        "action": "wait 6000ms",
+        "note": "涼しい日は待ち時間が長く、やることが少なくて退屈ぎみ。3日目の結果",
+        "noteEn": "The cool night has long gaps with little to do – a bit dull. Night 3 result.",
+        "image": "ai-play/step-21.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-10T14:40:46+09:00"
+  },
+  "publishedAt": "2026-10-10T14:40:46+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 8285,
+    "outputTokens": 26448,
+    "contextTokens": 5203268,
+    "turns": 42,
+    "toolCalls": 54,
+    "webSearches": 0,
+    "minutes": 158.7,
+    "from": "2026-10-10T03:02:05.767Z",
+    "to": "2026-10-10T05:40:46.176Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-10T14:40:46+09:00",
+    "validationRuns": 1,
+    "codeKB": 26
+  }
+}
