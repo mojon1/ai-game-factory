@@ -7,6 +7,6 @@ window.AGF_CONFIG = {
   // 観測の開始日（「観測 N 日目」の表示に使う）
   startDate: '2026-10-08',
   // 評価をリセットした時刻。これより前にこのブラウザで付けた評価は「まだ評価していない」として扱う
-  // （データベース側の評価は supabase/migrations/2026-10-10-reset-and-rating-events.sql で保管用の表へ移した）
+  // （データベース側の評価は supabase/migrations/2026-10-10-reset-ratings.sql で保管用の表へ移した）
   ratingsResetAt: '2026-10-10T05:31:00Z',
 };

@@ -1,21 +1,5 @@
--- 2026-10-10: (1) 評価をリセットする（最初期の評価の影響が大きいため）
---             (2) 評価を何度でも付けられるようにし、付けた評価はすべて記録する（平均・ランキングは1人につき最新の評価だけ）
--- Supabase の SQL Editor にこのファイルの内容を貼り付けて、1回だけ実行してください。
-
--- ---------- (1) 評価のリセット: 消さずに保管用の表 ratings_archive へ移す（サイトからは読めない） ----------
-create table if not exists public.ratings_archive as
-  select r.*, now() as archived_at from public.ratings r where false;
-alter table public.ratings_archive enable row level security;
-revoke all on public.ratings_archive from anon, authenticated;
-insert into public.ratings_archive select r.*, now() from public.ratings r;
-delete from public.ratings;
-
--- ▼ プレイ回数・プレイ時間（総プレイ時間のランキングに使う）もリセットする場合は、
---   次の4行の先頭の「-- 」を消してから実行してください。
--- create table if not exists public.plays_archive as select p.*, now() as archived_at from public.plays p where false;
--- alter table public.plays_archive enable row level security;
--- revoke all on public.plays_archive from anon, authenticated;
--- insert into public.plays_archive select p.*, now() from public.plays p; delete from public.plays;
+-- 2026-10-10: 評価を何度でも付けられるようにし、付けた評価はすべて記録する（平均・ランキングは1人につき最新の評価だけ）
+-- Supabase の SQL Editor にこのファイルの内容を貼り付けて、1回だけ実行してください（何度実行しても同じ結果になります）。
 
 -- ---------- (2) 評価の記録: 付けた評価をすべて残す ----------
 -- ratings（1人1作品1件・最新の評価）は平均とランキングに使い、rating_events（すべての評価）は「遊ぶほど評価が変わるか」を見るのに使う
@@ -60,7 +44,5 @@ end $$;
 
 notify pgrst, 'reload schema';
 
--- 確認: 保管した件数・残っている評価（0 ならリセット完了）・評価の記録の表ができたか
-select (select count(*) from public.ratings_archive) as archived,
-       (select count(*) from public.ratings) as remaining,
-       (select count(*) from public.rating_events) as events;
+-- 確認: 評価の記録の表ができていれば events に 0 以上の数が出る
+select (select count(*) from public.rating_events) as events;
