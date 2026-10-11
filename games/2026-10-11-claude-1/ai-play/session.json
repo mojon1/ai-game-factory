@@ -1,0 +1,801 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-11T01:15:41.476Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.6
+        ]
+      },
+      "desc": "tap(0.50,0.60) 120ms",
+      "note": "タイトル画面。遊び方3行を読んでタップで開始",
+      "noteEn": "Title screen; read the 3 lines and tapped to start",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": [
+        {
+          "wait": 800
+        },
+        {
+          "swipe": [
+            0.5,
+            0.5,
+            0.5,
+            0.64
+          ],
+          "hold": 500
+        }
+      ],
+      "desc": "wait 800ms → swipe(0.50,0.50→0.50,0.64) 500ms",
+      "note": "下に引いて離す。つよさ55%くらいで投げてみる",
+      "noteEn": "Pulled down and released at about 55% power",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": {
+        "wait": 2500
+      },
+      "desc": "wait 2500ms",
+      "note": "石がまっすぐ進んでいく。まずは掃かずにどこまで届くか見る",
+      "noteEn": "The stone slides straight; watching how far it goes without sweeping first",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": {
+        "path": [
+          [
+            0.35,
+            0.38
+          ],
+          [
+            0.65,
+            0.36
+          ],
+          [
+            0.35,
+            0.38
+          ],
+          [
+            0.65,
+            0.36
+          ],
+          [
+            0.35,
+            0.38
+          ],
+          [
+            0.65,
+            0.36
+          ],
+          [
+            0.35,
+            0.38
+          ],
+          [
+            0.65,
+            0.36
+          ],
+          [
+            0.35,
+            0.38
+          ],
+          [
+            0.65,
+            0.36
+          ],
+          [
+            0.35,
+            0.38
+          ],
+          [
+            0.65,
+            0.36
+          ]
+        ],
+        "hold": 1200
+      },
+      "desc": "path(0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36) 1200ms",
+      "note": "石の前を左右にこすって掃く",
+      "noteEn": "Rubbing left and right in front of the stone to sweep",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": {
+        "wait": 2500
+      },
+      "desc": "wait 2500ms",
+      "note": "掃いた跡が白く光り、石がハウスの中まで届いた。止まるのを待つ",
+      "noteEn": "The swept ice shines white and the stone reached the house; waiting for it to stop",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "wait": 1000
+        },
+        {
+          "tap": [
+            0.13,
+            0.9
+          ]
+        },
+        {
+          "swipe": [
+            0.5,
+            0.5,
+            0.5,
+            0.62
+          ],
+          "hold": 500
+        },
+        {
+          "wait": 3000
+        }
+      ],
+      "desc": "wait 1000ms → tap(0.13,0.90) 120ms → swipe(0.50,0.50→0.50,0.62) 500ms → wait 3000ms",
+      "note": "1投目は中心の少し右奥で止まった。曲がる向きを左に変え、少し弱めに投げる",
+      "noteEn": "Stone 1 stopped just right of and beyond center. Switched curl to left and threw a bit lighter",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "path": [
+            [
+              0.35,
+              0.4
+            ],
+            [
+              0.6,
+              0.38
+            ],
+            [
+              0.35,
+              0.4
+            ],
+            [
+              0.6,
+              0.38
+            ],
+            [
+              0.35,
+              0.4
+            ],
+            [
+              0.6,
+              0.38
+            ],
+            [
+              0.35,
+              0.4
+            ],
+            [
+              0.6,
+              0.38
+            ]
+          ],
+          "hold": 900
+        },
+        {
+          "wait": 3500
+        }
+      ],
+      "desc": "path(0.35,0.40→0.60,0.38→0.35,0.40→0.60,0.38→0.35,0.40→0.60,0.38→0.35,0.40→0.60,0.38) 900ms → wait 3500ms",
+      "note": "左に曲がりながら進む。少しだけ掃いて曲がりを抑えた",
+      "noteEn": "It curls left; swept a little to hold the line",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": [
+        {
+          "swipe": [
+            0.5,
+            0.5,
+            0.47,
+            0.64
+          ],
+          "hold": 500
+        },
+        {
+          "wait": 2600
+        },
+        {
+          "path": [
+            [
+              0.35,
+              0.38
+            ],
+            [
+              0.65,
+              0.36
+            ],
+            [
+              0.35,
+              0.38
+            ],
+            [
+              0.65,
+              0.36
+            ],
+            [
+              0.35,
+              0.38
+            ],
+            [
+              0.65,
+              0.36
+            ],
+            [
+              0.35,
+              0.38
+            ],
+            [
+              0.65,
+              0.36
+            ],
+            [
+              0.35,
+              0.38
+            ],
+            [
+              0.65,
+              0.36
+            ]
+          ],
+          "hold": 1000
+        },
+        {
+          "wait": 3500
+        }
+      ],
+      "desc": "swipe(0.50,0.50→0.47,0.64) 500ms → wait 2600ms → path(0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36) 1000ms → wait 3500ms",
+      "note": "2投目は手前左の青。3投目は少し右に狙い、左カーブで中心に寄せ、途中で掃く",
+      "noteEn": "Stone 2 stopped short-left in the blue. Stone 3: aimed slightly right with left curl, swept on the way",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.8
+          ]
+        },
+        {
+          "wait": 1200
+        }
+      ],
+      "desc": "tap(0.50,0.80) 120ms → wait 1200ms",
+      "note": "エンド1は+6点。赤い石がないので、ハウスに入れた分だけ点になった。次のエンドへ",
+      "noteEn": "End 1: +6. With no red stones, everything in the house scored. On to end 2",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "action": [
+        {
+          "swipe": [
+            0.5,
+            0.45,
+            0.48,
+            0.65
+          ],
+          "hold": 500
+        },
+        {
+          "wait": 4500
+        }
+      ],
+      "desc": "swipe(0.50,0.45→0.48,0.65) 500ms → wait 4500ms",
+      "note": "赤い石が中心の右にある。強めに投げてはじき出しを狙う",
+      "noteEn": "A red stone sits right of the button; throwing hard to knock it out",
+      "image": "ai-play/step-10.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "action": [
+        {
+          "wait": 1500
+        },
+        {
+          "swipe": [
+            0.5,
+            0.5,
+            0.5,
+            0.63
+          ],
+          "hold": 500
+        },
+        {
+          "wait": 2700
+        },
+        {
+          "path": [
+            [
+              0.35,
+              0.38
+            ],
+            [
+              0.65,
+              0.36
+            ],
+            [
+              0.35,
+              0.38
+            ],
+            [
+              0.65,
+              0.36
+            ],
+            [
+              0.35,
+              0.38
+            ],
+            [
+              0.65,
+              0.36
+            ],
+            [
+              0.35,
+              0.38
+            ],
+            [
+              0.65,
+              0.36
+            ]
+          ],
+          "hold": 800
+        },
+        {
+          "wait": 3500
+        }
+      ],
+      "desc": "wait 1500ms → swipe(0.50,0.50→0.50,0.63) 500ms → wait 2700ms → path(0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36) 800ms → wait 3500ms",
+      "note": "赤にかすって赤は右へずれ、黄色は奥へ抜けて消えた。今度はやわらかく中心へ",
+      "noteEn": "It clipped the red, pushing it right, and my stone flew out the back. Now a soft draw to the center",
+      "image": "ai-play/step-11.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 12,
+      "action": [
+        {
+          "tap": [
+            0.13,
+            0.9
+          ]
+        },
+        {
+          "swipe": [
+            0.5,
+            0.5,
+            0.505,
+            0.63
+          ],
+          "hold": 500
+        },
+        {
+          "wait": 2700
+        },
+        {
+          "path": [
+            [
+              0.35,
+              0.38
+            ],
+            [
+              0.65,
+              0.36
+            ],
+            [
+              0.35,
+              0.38
+            ],
+            [
+              0.65,
+              0.36
+            ],
+            [
+              0.35,
+              0.38
+            ],
+            [
+              0.65,
+              0.36
+            ]
+          ],
+          "hold": 600
+        },
+        {
+          "wait": 4000
+        }
+      ],
+      "desc": "tap(0.13,0.90) 120ms → swipe(0.50,0.50→0.51,0.63) 500ms → wait 2700ms → path(0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36) 600ms → wait 4000ms",
+      "note": "黄色が赤より中心に近い。最後は右回転に変えて、もう1個中心近くへ",
+      "noteEn": "My stone is closer than the red. Last one with right curl, aiming near the center again",
+      "image": "ai-play/step-12.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 13,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.8
+          ]
+        },
+        {
+          "wait": 1500
+        }
+      ],
+      "desc": "tap(0.50,0.80) 120ms → wait 1500ms",
+      "note": "赤い円の内側の2個が+2ずつ。赤より中心に近いと点になると目で分かる",
+      "noteEn": "Two stones inside the red dashed circle score +2 each; easy to see which beat the red",
+      "image": "ai-play/step-13.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 14,
+      "action": [
+        {
+          "swipe": [
+            0.5,
+            0.5,
+            0.53,
+            0.63
+          ],
+          "hold": 500
+        },
+        {
+          "wait": 3000
+        }
+      ],
+      "desc": "swipe(0.50,0.50→0.53,0.63) 500ms → wait 3000ms",
+      "note": "赤が中心の右上。少し左へ投げ、右カーブで回り込ませる",
+      "noteEn": "Red is upper-right of the button. Throwing slightly left with right curl to bend in",
+      "image": "ai-play/step-14.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 15,
+      "action": [
+        {
+          "path": [
+            [
+              0.3,
+              0.4
+            ],
+            [
+              0.55,
+              0.38
+            ],
+            [
+              0.3,
+              0.4
+            ],
+            [
+              0.55,
+              0.38
+            ],
+            [
+              0.3,
+              0.4
+            ],
+            [
+              0.55,
+              0.38
+            ],
+            [
+              0.3,
+              0.4
+            ],
+            [
+              0.55,
+              0.38
+            ],
+            [
+              0.3,
+              0.4
+            ],
+            [
+              0.55,
+              0.38
+            ]
+          ],
+          "hold": 1000
+        },
+        {
+          "wait": 3500
+        }
+      ],
+      "desc": "path(0.30,0.40→0.55,0.38→0.30,0.40→0.55,0.38→0.30,0.40→0.55,0.38→0.30,0.40→0.55,0.38→0.30,0.40→0.55,0.38) 1000ms → wait 3500ms",
+      "note": "手前に赤いガード石。左を抜けるよう掃いて曲がりを抑える。上の小さな全体図が本物のハウスに重なって見づらい",
+      "noteEn": "A red guard ahead; sweeping to keep left of it. The small overview overlaps the real house at the top, which is hard to read",
+      "image": "ai-play/step-15.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 16,
+      "action": [
+        {
+          "swipe": [
+            0.5,
+            0.5,
+            0.52,
+            0.63
+          ],
+          "hold": 500
+        },
+        {
+          "wait": 2800
+        },
+        {
+          "path": [
+            [
+              0.3,
+              0.4
+            ],
+            [
+              0.55,
+              0.38
+            ],
+            [
+              0.3,
+              0.4
+            ],
+            [
+              0.55,
+              0.38
+            ],
+            [
+              0.3,
+              0.4
+            ],
+            [
+              0.55,
+              0.38
+            ]
+          ],
+          "hold": 600
+        },
+        {
+          "wait": 4000
+        },
+        {
+          "swipe": [
+            0.5,
+            0.5,
+            0.5,
+            0.6
+          ],
+          "hold": 500
+        },
+        {
+          "wait": 7000
+        }
+      ],
+      "desc": "swipe(0.50,0.50→0.52,0.63) 500ms → wait 2800ms → path(0.30,0.40→0.55,0.38→0.30,0.40→0.55,0.38→0.30,0.40→0.55,0.38) 600ms → wait 4000ms → swipe(0.50,0.50→0.50,0.60) 500ms → wait 7000ms",
+      "note": "ガードの横を抜けて中心近くに入った。残り2投を続けて投げ、エンドの結果を見る",
+      "noteEn": "Slipped past the guard into the rings. Threw the remaining two to see the end result",
+      "image": "ai-play/step-16.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}

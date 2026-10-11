@@ -1,0 +1,550 @@
+{
+  "id": "2026-10-11-claude-1",
+  "status": "published",
+  "title": "こすれ！カーリング",
+  "genre": "スポーツ",
+  "concept": "投げたあとが本番のカーリング。すべっていく石の前を指でシャカシャカこすると、氷が磨かれて石がのび、曲がりも弱まる。弱めに投げて掃いて届かせる、こすりすぎて通り過ぎる——自分の指がほうきになる手触りと、赤い石との位置取りを核にした。",
+  "howToPlay": "石を下に引いてはなすと投げる。すべっている間に石の前をこすると、遠くまでのびて曲がりにくくなる。5エンドで、赤い石より中心に近い黄色い石が得点。",
+  "libraryDecision": "使わない。石は同じ大きさの円どうしの衝突だけで、氷の摩擦・曲がり・掃いたときの効き方を細かく自分で決めたいので、物理演算は自作した。真上から見た2Dのシートで位置関係が一番読みやすいので3Dも使わない。音は掃く強さに合わせて連続的に変える必要があり、Web Audio で直接作る。",
+  "soundDecision": "BGMは付けない。こする速さに合わせて音量と高さが変わる「シャッシャッ」という掃く音、石がすべるゴーッという低い音、石どうしのカツン、得点のチャイムだけを鳴らす。掃く手応えが耳から返ってくることが一番の気持ちよさなので、それを邪魔する曲は入れない。",
+  "planning": {
+    "genreDraw": {
+      "ja": "クイズ",
+      "en": "Quiz",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "一瞬だけ表示された点の数を、つまみを動かして答える「目分量クイズ」。ぴったりだけでなく近さで得点が入り、表示時間がだんだん短くなる。",
+        "ideaEn": "An estimation quiz: dots flash for a moment and you slide a dial to guess how many. Closeness scores points, and the flash gets shorter.",
+        "fromDraw": true
+      },
+      {
+        "idea": "すべる石の前を指でこすって掃くカーリング。弱めに投げて掃いて届かせる、自分の指がほうきになる手触りが核。",
+        "ideaEn": "Curling where you rub the ice in front of the sliding stone to sweep it: throw a bit light and sweep it home, with your finger as the broom.",
+        "fromDraw": false
+      },
+      {
+        "idea": "折り紙の端をドラッグして折り、見本のシルエットと同じ形にする折りたたみパズル。",
+        "ideaEn": "An origami puzzle: drag the paper edges to fold it into the shown silhouette.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 1
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "limit",
+    "input": [
+      "drag",
+      "swipe"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Sweep! Curling",
+      "concept": "Curling where the real game starts after the throw. Rub fast in front of the sliding stone and the polished ice makes it travel farther and curl less. Throw light and sweep it home, or over-sweep and slide past: the core is your finger becoming the broom, plus jockeying for position against the red stones.",
+      "howToPlay": "Pull the stone down and let go to throw. While it slides, rub in front of it to make it go farther and curl less. Over 5 ends, yellow stones closer to the center than any red stone score.",
+      "libraryDecision": "No libraries. Stones are only equal circles colliding, and I wanted to tune ice friction, curl and the effect of sweeping by hand, so the physics is custom. A top-down 2D sheet shows positions most clearly, so no 3D. Sound must follow sweep strength continuously, so it is made directly with Web Audio.",
+      "soundDecision": "No BGM. Only a swish whose volume and pitch follow how fast you rub, the low rumble of a sliding stone, the clack of stones colliding and scoring chimes. Hearing the sweep respond to your finger is the main pleasure, so no music competes with it."
+    }
+  },
+  "createdAt": "2026-10-11T10:10:33+09:00",
+  "specVersion": 8,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-11T10:10:33+09:00",
+    "metricsFrom": "2026-10-11T01:09:26.839Z",
+    "transcript": "87822a71-ffdd-42fd-8baa-1fa0a6cf8327.jsonl",
+    "validationRuns": 1,
+    "finishedAt": "2026-10-11T10:21:21+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-11T10:15:37+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "28.4KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=110",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=116",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=85",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=110",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 29079,
+    "lines": 681
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "引いて投げ、すべる石の前をこすると白い掃き跡が残って石がぐっとのびる手応えがあり、弱めに投げて掃いて届かせる遊び方がすぐ分かった。赤い石の距離が点線の円で出るので得点の理由も分かりやすい。一方、投げる強さは数値どおりに再現されるので慣れると狙いやすく、驚きは少なめ。石が近づくと上の小さな全体図が本物のハウスに重なって見づらく、手前のガード石は全体図に映らない。終盤の得点パネルが手前の石に重なる場面もあった。",
+    "similar": [
+      {
+        "title": "Curling (William Alexander, browser)",
+        "url": "https://williamalexander.co/curling/",
+        "similarity": "高",
+        "note": "投げたあと石の前を往復してこすると、遠く・まっすぐになるブラウザのカーリング。掃き方の発想はほぼ同じ。こちらは1人で5エンド、赤い石が先に置かれた状況に挑む形。",
+        "note_en": "A browser curling game where scrubbing back and forth in front of the stone makes it go farther and straighter; nearly the same sweeping idea. Mine is solo over 5 ends against pre-placed red stones."
+      },
+      {
+        "title": "Curling Chaos (iOS)",
+        "url": "https://apps.apple.com/us/app/-/id6758259377",
+        "similarity": "高",
+        "note": "引いて狙い、離して投げ、画面をこすって石を操る。こすり方の向きで加速・減速・左右まで変わる点が違う。こちらはこすると「のびて曲がりにくい」だけの単純な効き方。",
+        "note_en": "Drag back to aim, release, then scrub the screen. Its scrub direction can speed up, slow down or nudge sideways; mine only makes the stone go farther and curl less."
+      },
+      {
+        "title": "Mario & Sonic at the Olympic Winter Games (DS) カーリング",
+        "url": "https://www.mariowiki.com/Curling_(Mario_&_Sonic_at_the_Olympic_Winter_Games_for_DS)",
+        "similarity": "中",
+        "note": "タッチ画面で石の前をこすって掃く操作の先駆け。キャラクターと対戦がある点が違う。",
+        "note_en": "An early touchscreen take where you rub in front of the stone to sweep; it has characters and opponents."
+      },
+      {
+        "title": "Deca Sports (Wii) カーリング",
+        "url": "https://www.siliconera.com/2008/02/26/curling-without-being-cold-deca-sportas-winter-games/",
+        "similarity": "低",
+        "note": "リモコンを振る激しさで掃く強さが決まる。体の動きで掃く点は同じ発想だが、操作はタッチではない。",
+        "note_en": "Shake the remote harder to sweep harder; same idea of physical sweeping, but not touch."
+      }
+    ],
+    "research": "WebSearchで「curling mobile game swipe to sweep rub screen」「Nintendo curling sweeping by shaking controller」の2回調べた。こすって掃く操作はスマホ・ブラウザ・DSに既に複数あり、発想自体は新しくないと分かった。",
+    "i18n": {
+      "en": {
+        "comment": "Pull, throw, then rub in front of the sliding stone: white sweep marks appear and the stone visibly carries farther, so 'throw light and sweep it home' clicks right away. The red stone's distance is shown as a dashed circle, making scoring clear. On the other hand, throw power is perfectly repeatable, so it gets predictable once learned. When the stone nears the house the small overview overlaps the real house, guard stones do not appear in the overview, and the end-score panel can cover a short stone.",
+        "research": "Two WebSearch queries (mobile curling with rub-to-sweep; Nintendo curling sweeping by shaking). Rub-to-sweep already exists on phones, browsers and the DS, so the idea itself is not new."
+      }
+    },
+    "method": "スマホ縦画面で 16 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 16 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.60) 120ms",
+        "note": "タイトル画面。遊び方3行を読んでタップで開始",
+        "noteEn": "Title screen; read the 3 lines and tapped to start",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "wait 800ms → swipe(0.50,0.50→0.50,0.64) 500ms",
+        "note": "下に引いて離す。つよさ55%くらいで投げてみる",
+        "noteEn": "Pulled down and released at about 55% power",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 2500ms",
+        "note": "石がまっすぐ進んでいく。まずは掃かずにどこまで届くか見る",
+        "noteEn": "The stone slides straight; watching how far it goes without sweeping first",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "path(0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36) 1200ms",
+        "note": "石の前を左右にこすって掃く",
+        "noteEn": "Rubbing left and right in front of the stone to sweep",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 2500ms",
+        "note": "掃いた跡が白く光り、石がハウスの中まで届いた。止まるのを待つ",
+        "noteEn": "The swept ice shines white and the stone reached the house; waiting for it to stop",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 1000ms → tap(0.13,0.90) 120ms → swipe(0.50,0.50→0.50,0.62) 500ms → wait 3000ms",
+        "note": "1投目は中心の少し右奥で止まった。曲がる向きを左に変え、少し弱めに投げる",
+        "noteEn": "Stone 1 stopped just right of and beyond center. Switched curl to left and threw a bit lighter",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "path(0.35,0.40→0.60,0.38→0.35,0.40→0.60,0.38→0.35,0.40→0.60,0.38→0.35,0.40→0.60,0.38) 900ms → wait 3500ms",
+        "note": "左に曲がりながら進む。少しだけ掃いて曲がりを抑えた",
+        "noteEn": "It curls left; swept a little to hold the line",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "swipe(0.50,0.50→0.47,0.64) 500ms → wait 2600ms → path(0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36) 1000ms → wait 3500ms",
+        "note": "2投目は手前左の青。3投目は少し右に狙い、左カーブで中心に寄せ、途中で掃く",
+        "noteEn": "Stone 2 stopped short-left in the blue. Stone 3: aimed slightly right with left curl, swept on the way",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.50,0.80) 120ms → wait 1200ms",
+        "note": "エンド1は+6点。赤い石がないので、ハウスに入れた分だけ点になった。次のエンドへ",
+        "noteEn": "End 1: +6. With no red stones, everything in the house scored. On to end 2",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "swipe(0.50,0.45→0.48,0.65) 500ms → wait 4500ms",
+        "note": "赤い石が中心の右にある。強めに投げてはじき出しを狙う",
+        "noteEn": "A red stone sits right of the button; throwing hard to knock it out",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "wait 1500ms → swipe(0.50,0.50→0.50,0.63) 500ms → wait 2700ms → path(0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36) 800ms → wait 3500ms",
+        "note": "赤にかすって赤は右へずれ、黄色は奥へ抜けて消えた。今度はやわらかく中心へ",
+        "noteEn": "It clipped the red, pushing it right, and my stone flew out the back. Now a soft draw to the center",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.13,0.90) 120ms → swipe(0.50,0.50→0.51,0.63) 500ms → wait 2700ms → path(0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36→0.35,0.38→0.65,0.36) 600ms → wait 4000ms",
+        "note": "黄色が赤より中心に近い。最後は右回転に変えて、もう1個中心近くへ",
+        "noteEn": "My stone is closer than the red. Last one with right curl, aiming near the center again",
+        "image": "ai-play/step-12.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "tap(0.50,0.80) 120ms → wait 1500ms",
+        "note": "赤い円の内側の2個が+2ずつ。赤より中心に近いと点になると目で分かる",
+        "noteEn": "Two stones inside the red dashed circle score +2 each; easy to see which beat the red",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "swipe(0.50,0.50→0.53,0.63) 500ms → wait 3000ms",
+        "note": "赤が中心の右上。少し左へ投げ、右カーブで回り込ませる",
+        "noteEn": "Red is upper-right of the button. Throwing slightly left with right curl to bend in",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "path(0.30,0.40→0.55,0.38→0.30,0.40→0.55,0.38→0.30,0.40→0.55,0.38→0.30,0.40→0.55,0.38→0.30,0.40→0.55,0.38) 1000ms → wait 3500ms",
+        "note": "手前に赤いガード石。左を抜けるよう掃いて曲がりを抑える。上の小さな全体図が本物のハウスに重なって見づらい",
+        "noteEn": "A red guard ahead; sweeping to keep left of it. The small overview overlaps the real house at the top, which is hard to read",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "swipe(0.50,0.50→0.52,0.63) 500ms → wait 2800ms → path(0.30,0.40→0.55,0.38→0.30,0.40→0.55,0.38→0.30,0.40→0.55,0.38) 600ms → wait 4000ms → swipe(0.50,0.50→0.50,0.60) 500ms → wait 7000ms",
+        "note": "ガードの横を抜けて中心近くに入った。残り2投を続けて投げ、エンドの結果を見る",
+        "noteEn": "Slipped past the guard into the rings. Threw the remaining two to see the end result",
+        "image": "ai-play/step-16.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-11T10:21:21+09:00"
+  },
+  "publishedAt": "2026-10-11T10:21:21+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 20248,
+    "outputTokens": 26014,
+    "contextTokens": 5438967,
+    "turns": 38,
+    "toolCalls": 44,
+    "webSearches": 0,
+    "minutes": 12,
+    "from": "2026-10-11T01:09:26.839Z",
+    "to": "2026-10-11T01:21:25.813Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-11T10:21:25+09:00",
+    "validationRuns": 1,
+    "codeKB": 28.4
+  }
+}

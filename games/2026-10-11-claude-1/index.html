@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>こすれ！カーリング</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; }
+html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #13233a; }
+canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const TEXT = {
+  ja: {
+    title: 'こすれ！カーリング',
+    how: ['石を下に引いて、はなして投げる', 'すべる石の前をこすると、のびて曲がりにくい', '黄色い石を、赤い石より中心の近くへ'],
+    start: 'タップでスタート',
+    score: '得点', end: 'エンド',
+    hintAim: '下に引いて、はなすと投げる',
+    hintRun: '石の前をシャカシャカこすって掃こう！',
+    power: 'つよさ', curl: '曲がる向き', sweep: 'スイープ！',
+    endRes: 'エンド {n}', pts: '+{p}点', nopts: '得点なし',
+    next: 'タップで次へ', again: 'タップでもう一度',
+    total: '合計', best: 'ベスト', newBest: 'ベスト更新！', unit: '点',
+    ranks: ['見習い', 'リード', 'セカンド', 'サード', 'スキップ', '名スキップ'],
+    rankLabel: '称号',
+  },
+  en: {
+    title: 'Sweep! Curling',
+    how: ['Pull the stone down and let go to throw', 'Rub in front of the sliding stone: it goes farther and curls less', 'Get yellow stones closer to the center than red ones'],
+    start: 'Tap to start',
+    score: 'Score', end: 'End',
+    hintAim: 'Pull down, let go to throw',
+    hintRun: 'Rub fast in front of the stone to sweep!',
+    power: 'Power', curl: 'Curl', sweep: 'SWEEP!',
+    endRes: 'End {n}', pts: '+{p} pts', nopts: 'No points',
+    next: 'Tap to continue', again: 'Tap to play again',
+    total: 'Total', best: 'Best', newBest: 'New best!', unit: ' pts',
+    ranks: ['Rookie', 'Lead', 'Second', 'Third', 'Skip', 'Master Skip'],
+    rankLabel: 'Rank',
+  },
+};
+const L = TEXT[LANG] || TEXT.en;
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+
+let best = 0;
+addEventListener('message', (e) => {
+  if (e.data && e.data.agf === 'loaded' && e.data.data && typeof e.data.data.best === 'number') best = Math.max(best, e.data.data.best);
+});
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+
+const cv = document.getElementById('c');
+const cx = cv.getContext('2d');
+let W = 360, H = 640, DPR = 1;
+function resize() {
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = Math.max(1, window.innerWidth || 1);
+  H = Math.max(1, window.innerHeight || 1);
+  cv.width = Math.max(1, Math.round(W * DPR));
+  cv.height = Math.max(1, Math.round(H * DPR));
+}
+addEventListener('resize', resize);
+resize();
+
+// ---------- world ----------
+const HY = 6.0, R = 0.4, R2 = 0.27, R3 = 0.13, BTN = 0.05;
+const BACK = HY + R + 0.12, HOG = HY - 1.3, SR = 0.045, Y0 = 0.35;
+const A0 = 0.46, SWEEP_A = 0.3, CURL = 0.03, E = 0.88;
+const ENDS = [[0, 0], [1, 0], [1, 1], [2, 1], [3, 1]];
+const PER_END = 3;
+
+const PX = () => Math.max(1, Math.min(W * 0.9, H * 0.55));
+let cam = 0;
+const sy = (wy) => H * 0.55 - (wy - cam) * PX();
+const sx = (wx) => W / 2 + wx * PX();
+const aimCam = () => Y0 + 0.17 * H / PX();
+const houseCam = () => HY - 0.15 * H / PX();
+const followCam = (y) => y + 0.07 * H / PX();
+
+// ---------- state ----------
+let phase = 'title', phaseT = 0, time = 0;
+let endIdx = 0, thrown = 0, total = 0, endPts = 0, newBest = false;
+let stones = [], active = null, spin = 1, pull = null;
+let sweepS = 0, sweepFast = 0, rub = 0;
+let trail = [], parts = [], labels = [], dRedShow = Infinity;
+let hint = '', hintT = 0, shownAimHint = false, shownRunHint = false, sweepTextT = 0, shake = 0;
+const pointers = new Map();
+
+function mk(x, y, team) { return { x, y, vx: 0, vy: 0, team, spin: 0, rot: Math.random() * 6, out: false, alpha: 1 }; }
+function placeReds(nh, ng) {
+  const out = [];
+  const ok = (x, y) => out.every((s) => Math.hypot(s.x - x, s.y - y) > SR * 2.6);
+  for (let i = 0; i < nh; i++) {
+    for (let k = 0; k < 60; k++) {
+      const a = Math.random() * Math.PI * 2, d = 0.03 + Math.random() * 0.3;
+      const x = Math.cos(a) * d, y = HY + Math.sin(a) * d;
+      if (ok(x, y)) { out.push(mk(x, y, 'r')); break; }
+    }
+  }
+  for (let i = 0; i < ng; i++) {
+    for (let k = 0; k < 60; k++) {
+      const x = (Math.random() - 0.5) * 0.34, y = HY - 0.62 - Math.random() * 0.45;
+      if (ok(x, y)) { out.push(mk(x, y, 'r')); break; }
+    }
+  }
+  return out;
+}
+
+function setPhase(p) { phase = p; phaseT = 0; }
+function startGame() {
+  total = 0; endIdx = 0; newBest = false;
+  startEnd();
+  signal('start');
+}
+function startEnd() {
+  const [nh, ng] = ENDS[endIdx];
+  stones = placeReds(nh, ng);
+  thrown = 0; active = null; trail = []; labels = []; dRedShow = Infinity;
+  setPhase('aim');
+  if (!shownAimHint) { showHint(L.hintAim); shownAimHint = true; }
+}
+function showHint(t) { hint = t; hintT = 4; }
+
+function pullInfo() {
+  if (!pull) return null;
+  const dx = pull.sx - pull.x, dy = pull.y - pull.sy; // throw direction on screen (up = +dy)
+  const len = Math.hypot(dx, dy);
+  const power = dy > 4 ? Math.min(1, len / (0.25 * H)) : 0;
+  const ang = Math.max(-0.6, Math.min(0.6, Math.atan2(dx, Math.max(1, dy)))) * 0.2;
+  return { power, ang };
+}
+function throwStone() {
+  const p = pullInfo();
+  pull = null;
+  if (!p || p.power < 0.06) return;
+  const v0 = 1.6 + p.power * 1.2;
+  const s = mk(0, Y0, 'y');
+  s.vx = v0 * Math.sin(p.ang); s.vy = v0 * Math.cos(p.ang); s.spin = spin;
+  stones.push(s); active = s; thrown++;
+  sweepS = 0; sweepFast = 0; rub = 0;
+  setPhase('run');
+  sndThrow();
+  if (!shownRunHint) { showHint(L.hintRun); shownRunHint = true; }
+}
+
+function scoreEnd() {
+  const inPlay = stones.filter((s) => !s.out);
+  const dist = (s) => Math.hypot(s.x, s.y - HY);
+  let dRed = Infinity;
+  for (const s of inPlay) if (s.team === 'r') dRed = Math.min(dRed, dist(s));
+  dRedShow = dRed;
+  labels = []; endPts = 0;
+  for (const s of inPlay) {
+    if (s.team !== 'y') continue;
+    const d = dist(s);
+    if (d < R + SR && d < dRed) {
+      const p = d < R3 + SR ? 3 : d < R2 + SR ? 2 : 1;
+      endPts += p;
+      labels.push({ x: s.x, y: s.y, p });
+    }
+  }
+  labels.sort((a, b) => b.p - a.p);
+  total += endPts;
+  setPhase('endScore');
+  labels.forEach((l, i) => sndTone(660 + l.p * 220, 0.25 + i * 0.18, 0.25, 0.12));
+  if (!labels.length) sndTone(220, 0.2, 0.3, 0.08, 'triangle');
+}
+function nextEnd() {
+  endIdx++;
+  if (endIdx >= ENDS.length) {
+    newBest = total > best;
+    if (newBest) best = total;
+    try { parent.postMessage({ agf: 'save', data: { best } }, '*'); } catch (e) {}
+    signal('end', { score: total });
+    setPhase('over');
+    [523, 659, 784].forEach((f, i) => sndTone(f, i * 0.12, 0.6, 0.09));
+  } else startEnd();
+}
+
+// ---------- input ----------
+const spinBtn = () => ({ x: 18 + 30, y: H - 34 - 30, r: 30 });
+function inSpin(x, y) { const b = spinBtn(); return Math.hypot(x - b.x, y - b.y) < b.r + 10; }
+addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  audioInit();
+  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (phase === 'title') { startGame(); return; }
+  if (phase === 'aim') {
+    if (inSpin(e.clientX, e.clientY)) { spin = -spin; sndTone(880, 0, 0.06, 0.08, 'square'); return; }
+    if (!pull) pull = { id: e.pointerId, sx: e.clientX, sy: e.clientY, x: e.clientX, y: e.clientY };
+    return;
+  }
+  if (phase === 'endScore' && phaseT > 0.9) { nextEnd(); return; }
+  if (phase === 'over' && phaseT > 0.7) { startGame(); return; }
+}, { passive: false });
+addEventListener('pointermove', (e) => {
+  const p = pointers.get(e.pointerId);
+  if (!p) return;
+  const dx = e.clientX - p.x, dy = e.clientY - p.y;
+  p.x = e.clientX; p.y = e.clientY;
+  if (pull && pull.id === e.pointerId) { pull.x = e.clientX; pull.y = e.clientY; }
+  if (phase === 'run' && active && !active.out) {
+    const ay = sy(active.y);
+    if (e.clientY < ay + 40) rub += Math.hypot(dx, dy);
+  }
+}, { passive: false });
+function up(e, cancel) {
+  pointers.delete(e.pointerId);
+  if (pull && pull.id === e.pointerId) {
+    if (cancel) pull = null;
+    else throwStone();
+  }
+}
+addEventListener('pointerup', (e) => up(e, false));
+addEventListener('pointercancel', (e) => up(e, true));
+
+// ---------- audio ----------
+let AC = null, master = null, noiseBuf = null, sweepG = null, sweepF = null, rumbleG = null;
+function audioInit() {
+  if (AC) { if (AC.state === 'suspended') AC.resume(); return; }
+  try {
+    AC = new (window.AudioContext || window.webkitAudioContext)();
+    master = AC.createGain(); master.gain.value = 0.8; master.connect(AC.destination);
+    noiseBuf = AC.createBuffer(1, AC.sampleRate * 2, AC.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    const loop = (type, freq, q) => {
+      const src = AC.createBufferSource(); src.buffer = noiseBuf; src.loop = true;
+      const f = AC.createBiquadFilter(); f.type = type; f.frequency.value = freq; f.Q.value = q;
+      const g = AC.createGain(); g.gain.value = 0;
+      src.connect(f); f.connect(g); g.connect(master); src.start();
+      return { g, f };
+    };
+    const a = loop('bandpass', 3000, 0.8); sweepG = a.g; sweepF = a.f;
+    const b = loop('lowpass', 170, 0.7); rumbleG = b.g;
+    AC.resume();
+  } catch (e) { AC = null; }
+}
+function sndTone(freq, delay, dur, vol, type = 'sine') {
+  if (!AC) return;
+  try {
+    const t = AC.currentTime + delay;
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.05);
+  } catch (e) {}
+}
+function sndClack(v) {
+  if (!AC) return;
+  try {
+    const t = AC.currentTime, vol = Math.min(0.5, 0.12 + v * 0.25);
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = 'triangle'; o.frequency.setValueAtTime(1300, t); o.frequency.exponentialRampToValueAtTime(600, t + 0.07);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.14);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + 0.2);
+    const n = AC.createBufferSource(); n.buffer = noiseBuf;
+    const f = AC.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = 2500;
+    const g2 = AC.createGain(); g2.gain.setValueAtTime(vol * 0.8, t); g2.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
+    n.connect(f); f.connect(g2); g2.connect(master); n.start(t, Math.random()); n.stop(t + 0.08);
+  } catch (e) {}
+}
+function sndThrow() {
+  if (!AC) return;
+  try {
+    const t = AC.currentTime;
+    const n = AC.createBufferSource(); n.buffer = noiseBuf;
+    const f = AC.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 1.2;
+    f.frequency.setValueAtTime(400, t); f.frequency.exponentialRampToValueAtTime(1400, t + 0.25);
+    const g = AC.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.12, t + 0.08); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+    n.connect(f); f.connect(g); g.connect(master); n.start(t, Math.random()); n.stop(t + 0.4);
+  } catch (e) {}
+}
+function audioFrame() {
+  if (!AC || !sweepG) return;
+  const t = AC.currentTime;
+  let maxV = 0;
+  for (const s of stones) if (!s.out) maxV = Math.max(maxV, Math.hypot(s.vx, s.vy));
+  sweepG.gain.setTargetAtTime(phase === 'run' ? sweepFast * 0.32 : 0, t, 0.025);
+  sweepF.frequency.setTargetAtTime(2200 + sweepFast * 2200, t, 0.03);
+  rumbleG.gain.setTargetAtTime(Math.min(0.5, maxV * 0.2), t, 0.08);
+}
+
+// ---------- physics ----------
+function physics(dt) {
+  const n = 4, h = dt / n;
+  for (let k = 0; k < n; k++) {
+    for (const s of stones) {
+      if (s.out) continue;
+      const v = Math.hypot(s.vx, s.vy);
+      if (v <= 0) continue;
+      const sw = s === active ? sweepS : 0;
+      const nv = Math.max(0, v - A0 * (1 - SWEEP_A * sw) * h);
+      if (nv < 0.012) { s.vx = 0; s.vy = 0; continue; }
+      const ux = s.vx / v, uy = s.vy / v;
+      const c = s.spin ? s.spin * CURL * (1 - 0.55 * sw) / (v + 0.5) : 0;
+      let vx = s.vx + uy * c * h, vy = s.vy - ux * c * h;
+      const m = Math.hypot(vx, vy) || 1;
+      s.vx = vx / m * nv; s.vy = vy / m * nv;
+      s.x += s.vx * h; s.y += s.vy * h;
+      s.rot += (s.spin || 0.4) * v * h * 1.6;
+      if (Math.abs(s.x) > 0.5 || s.y > BACK + SR) { s.out = true; s.vx = 0; s.vy = 0; }
+    }
+    for (let i = 0; i < stones.length; i++) {
+      const a = stones[i];
+      if (a.out) continue;
+      for (let j = i + 1; j < stones.length; j++) {
+        const b = stones[j];
+        if (b.out) continue;
+        const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy);
+        if (d >= SR * 2 || d <= 0) continue;
+        const nx = dx / d, ny = dy / d, ov = SR * 2 - d;
+        a.x -= nx * ov / 2; a.y -= ny * ov / 2; b.x += nx * ov / 2; b.y += ny * ov / 2;
+        const rel = (a.vx - b.vx) * nx + (a.vy - b.vy) * ny;
+        if (rel > 0) {
+          const jj = rel * (1 + E) / 2;
+          a.vx -= jj * nx; a.vy -= jj * ny; b.vx += jj * nx; b.vy += jj * ny;
+          sndClack(rel);
+          shake = Math.min(8, 2 + rel * 5);
+          const px = (a.x + b.x) / 2, py = (a.y + b.y) / 2;
+          for (let q = 0; q < 10; q++) {
+            const an = Math.random() * Math.PI * 2, sp = 0.2 + Math.random() * 0.5;
+            parts.push({ x: px, y: py, vx: Math.cos(an) * sp, vy: Math.sin(an) * sp, life: 0.5, max: 0.5, c: '#ffffff' });
+          }
+        }
+      }
+    }
+  }
+}
+const allStopped = () => stones.every((s) => s.out || (s.vx === 0 && s.vy === 0));
+
+// ---------- update ----------
+let trailAcc = 0;
+function update(dt) {
+  time += dt; phaseT += dt;
+  if (hintT > 0) hintT -= dt;
+  if (sweepTextT > 0) sweepTextT -= dt;
+  shake *= Math.pow(0.02, dt);
+  let target = cam;
+  if (phase === 'title') target = houseCam() - 0.6;
+  else if (phase === 'aim') target = aimCam();
+  else if (phase === 'run') target = active ? Math.max(aimCam(), Math.min(houseCam(), followCam(active.y))) : cam;
+  else target = houseCam();
+  cam += (target - cam) * Math.min(1, dt * (phase === 'run' ? 6 : 3));
+
+  if (phase === 'run') {
+    const rate = rub / Math.max(dt, 0.001); rub = 0;
+    const tgt = Math.min(1, rate / 1400);
+    sweepFast += (tgt - sweepFast) * Math.min(1, dt * 20);
+    sweepS += (tgt - sweepS) * Math.min(1, dt * (tgt > sweepS ? 12 : 4));
+    if (active && (active.out || (active.vx === 0 && active.vy === 0))) sweepS = 0;
+    if (sweepS > 0.5 && sweepTextT <= 0) sweepTextT = 0.8;
+    physics(dt);
+    if (active && !active.out && sweepS > 0.12) {
+      trailAcc += dt;
+      if (trailAcc > 0.025) {
+        trailAcc = 0;
+        trail.push({ x: active.x + (Math.random() - 0.5) * 0.06, y: active.y + SR * 2.2 + Math.random() * 0.12, a: 0.2 + sweepS * 0.4 });
+        if (trail.length > 400) trail.shift();
+        const p = { x: active.x + (Math.random() - 0.5) * 0.12, y: active.y + 0.12 + Math.random() * 0.1 };
+        parts.push({ x: p.x, y: p.y, vx: (Math.random() - 0.5) * 0.5, vy: (Math.random() - 0.3) * 0.3, life: 0.4, max: 0.4, c: '#dff3ff' });
+      }
+    }
+    if (allStopped()) setPhase('look');
+  } else if (phase === 'look') {
+    sweepFast = 0;
+    if (phaseT > 1.0) {
+      if (thrown >= PER_END) scoreEnd();
+      else { setPhase('aim'); active = null; }
+    }
+  } else {
+    sweepFast = 0;
+  }
+  for (const s of stones) if (s.out && s.alpha > 0) s.alpha = Math.max(0, s.alpha - dt * 2);
+  for (const p of parts) { p.x += p.vx * dt; p.y += p.vy * dt; p.life -= dt; }
+  parts = parts.filter((p) => p.life > 0);
+  audioFrame();
+}
+
+// ---------- drawing ----------
+function hash(n) { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
+function fitFont(text, size, maxW, weight = 'bold') {
+  let s = size;
+  cx.font = `${weight} ${s}px ${FONT}`;
+  while (s > 12 && cx.measureText(text).width > maxW) { s -= 1; cx.font = `${weight} ${s}px ${FONT}`; }
+  return s;
+}
+function textC(text, x, y, size, color, weight = 'bold', maxW = W - 32) {
+  fitFont(text, size, maxW, weight);
+  cx.fillStyle = color; cx.textAlign = 'center'; cx.textBaseline = 'middle';
+  cx.fillText(text, x, y);
+}
+
+function drawIce() {
+  const S = PX();
+  cx.fillStyle = '#13233a'; cx.fillRect(0, 0, W, H);
+  const l = sx(-0.5), r = sx(0.5);
+  const g = cx.createLinearGradient(l, 0, r, 0);
+  g.addColorStop(0, '#d9e9f2'); g.addColorStop(0.5, '#f3f9fc'); g.addColorStop(1, '#d9e9f2');
+  cx.fillStyle = g; cx.fillRect(l, 0, r - l, H);
+  // boards
+  cx.fillStyle = '#2b4466'; cx.fillRect(l - 6, 0, 6, H); cx.fillRect(r, 0, 6, H);
+  // pebble
+  const top = cam + 0.55 * H / S, bot = cam - 0.45 * H / S;
+  cx.fillStyle = 'rgba(120,160,190,0.28)';
+  for (let i = Math.floor(bot / 0.08); i <= Math.ceil(top / 0.08); i++) {
+    for (let k = 0; k < 7; k++) {
+      const x = hash(i * 13 + k) - 0.5, y = i * 0.08 + hash(i * 7 + k * 3) * 0.08;
+      cx.fillRect(sx(x), sy(y), 1.5, 1.5);
+    }
+  }
+  // sweep shine
+  for (const t of trail) {
+    cx.fillStyle = `rgba(255,255,255,${t.a})`;
+    cx.beginPath(); cx.ellipse(sx(t.x), sy(t.y), SR * S * 1.3, SR * S * 0.5, 0, 0, Math.PI * 2); cx.fill();
+  }
+  // lines
+  cx.strokeStyle = 'rgba(70,100,140,0.35)'; cx.lineWidth = 1;
+  cx.beginPath(); cx.moveTo(sx(0), 0); cx.lineTo(sx(0), H); cx.stroke();
+  const hline = (y, w, c) => { cx.strokeStyle = c; cx.lineWidth = w; cx.beginPath(); cx.moveTo(l, sy(y)); cx.lineTo(r, sy(y)); cx.stroke(); };
+  hline(HOG, 4, 'rgba(200,70,70,0.75)');
+  // house
+  const hx = sx(0), hy = sy(HY);
+  const ring = (rad, c) => { cx.fillStyle = c; cx.beginPath(); cx.arc(hx, hy, rad * S, 0, Math.PI * 2); cx.fill(); };
+  ring(R, '#2f6fcf'); ring(R2, '#f3f9fc'); ring(R3, '#d84040'); ring(BTN, '#f3f9fc');
+  hline(HY, 1.5, 'rgba(40,60,90,0.6)');
+  hline(HY + R, 2, 'rgba(40,60,90,0.6)');
+  // hack
+  cx.fillStyle = '#333c4a';
+  cx.fillRect(sx(-0.06), sy(-0.02), 0.04 * S, 0.06 * S); cx.fillRect(sx(0.02), sy(-0.02), 0.04 * S, 0.06 * S);
+}
+
+function drawStone(s, ox = 0, oy = 0) {
+  const S = PX(), r = SR * S;
+  const x = sx(s.x) + ox, y = sy(s.y) + oy;
+  if (y < -r * 2 || y > H + r * 2) return;
+  cx.save();
+  cx.globalAlpha = s.alpha;
+  cx.fillStyle = 'rgba(20,40,70,0.25)';
+  cx.beginPath(); cx.ellipse(x + r * 0.15, y + r * 0.25, r * 1.05, r * 0.95, 0, 0, Math.PI * 2); cx.fill();
+  const g = cx.createRadialGradient(x - r * 0.3, y - r * 0.3, r * 0.2, x, y, r);
+  g.addColorStop(0, '#b9bec7'); g.addColorStop(1, '#6d737e');
+  cx.fillStyle = g; cx.beginPath(); cx.arc(x, y, r, 0, Math.PI * 2); cx.fill();
+  cx.fillStyle = s.team === 'y' ? '#f4c430' : '#e2453a';
+  cx.beginPath(); cx.arc(x, y, r * 0.66, 0, Math.PI * 2); cx.fill();
+  cx.strokeStyle = 'rgba(0,0,0,0.25)'; cx.lineWidth = 1; cx.stroke();
+  cx.translate(x, y); cx.rotate(s.rot);
+  cx.fillStyle = s.team === 'y' ? '#8a6a10' : '#7a1d17';
+  cx.fillRect(-r * 0.5, -r * 0.14, r * 1.0, r * 0.28);
+  cx.restore();
+}
+
+function drawBrooms() {
+  if (phase !== 'run') return;
+  for (const p of pointers.values()) {
+    cx.save();
+    cx.translate(p.x, p.y);
+    cx.rotate(Math.sin(time * 30) * 0.08 * sweepFast);
+    cx.fillStyle = 'rgba(40,55,90,0.85)';
+    cx.fillRect(-26, -9, 52, 18);
+    cx.fillStyle = 'rgba(240,190,60,0.9)';
+    for (let i = -22; i <= 22; i += 5) cx.fillRect(i, 5, 2, 8);
+    cx.fillStyle = 'rgba(60,40,20,0.9)';
+    cx.fillRect(-3, -40, 6, 32);
+    cx.restore();
+  }
+}
+
+function drawMini() {
+  const S = PX();
+  const hy = sy(HY);
+  const visible = hy - (R + 0.1) * S > 58 && hy + R * S < H;
+  if (visible || phase === 'title') return;
+  const M = Math.min(64, W * 0.18), cxm = W / 2, cym = 60 + M;
+  const k = M / 0.6;
+  cx.save();
+  cx.beginPath(); cx.arc(cxm, cym, M + 3, 0, Math.PI * 2);
+  cx.fillStyle = 'rgba(19,35,58,0.75)'; cx.fill();
+  cx.beginPath(); cx.arc(cxm, cym, M, 0, Math.PI * 2); cx.clip();
+  cx.fillStyle = '#eef6fa'; cx.fillRect(cxm - M, cym - M, M * 2, M * 2);
+  const ring = (rad, c) => { cx.fillStyle = c; cx.beginPath(); cx.arc(cxm, cym, rad * k, 0, Math.PI * 2); cx.fill(); };
+  ring(R, '#2f6fcf'); ring(R2, '#f3f9fc'); ring(R3, '#d84040'); ring(BTN, '#f3f9fc');
+  cx.fillStyle = 'rgba(20,40,70,0.5)';
+  cx.fillRect(cxm - 0.5 * k - 3, cym - M, 3, M * 2); cx.fillRect(cxm + 0.5 * k, cym - M, 3, M * 2);
+  for (const s of stones) {
+    if (s.alpha <= 0) continue;
+    const x = cxm + s.x * k, y = cym - (s.y - HY) * k;
+    cx.globalAlpha = s.alpha;
+    cx.fillStyle = '#7b818c'; cx.beginPath(); cx.arc(x, y, SR * k, 0, Math.PI * 2); cx.fill();
+    cx.fillStyle = s.team === 'y' ? '#f4c430' : '#e2453a';
+    cx.beginPath(); cx.arc(x, y, SR * k * 0.62, 0, Math.PI * 2); cx.fill();
+  }
+  cx.globalAlpha = 1;
+  if (phase === 'aim') {
+    const p = pullInfo();
+    const ang = p ? p.ang : 0;
+    const xh = Math.tan(ang) * (HY - Y0);
+    const x = cxm + xh * k;
+    cx.strokeStyle = 'rgba(20,30,50,0.8)'; cx.lineWidth = 2; cx.setLineDash([4, 4]);
+    cx.beginPath(); cx.moveTo(x - Math.tan(ang) * M, cym + M); cx.lineTo(x + Math.tan(ang) * M, cym - M); cx.stroke();
+    cx.setLineDash([]);
+    // curl hint arrow
+    cx.strokeStyle = '#f4c430'; cx.lineWidth = 3;
+    cx.beginPath(); cx.moveTo(x, cym + M * 0.55); cx.quadraticCurveTo(x, cym + M * 0.2, x + spin * M * 0.3, cym); cx.stroke();
+  }
+  cx.restore();
+}
+
+function drawHUD() {
+  const g = cx.createLinearGradient(0, 0, 0, 52);
+  g.addColorStop(0, 'rgba(19,35,58,0.92)'); g.addColorStop(1, 'rgba(19,35,58,0.6)');
+  cx.fillStyle = g; cx.fillRect(0, 0, W, 50);
+  cx.textBaseline = 'middle';
+  cx.fillStyle = '#fff'; cx.textAlign = 'left';
+  cx.font = `bold 20px ${FONT}`;
+  cx.fillText(`${L.score} ${total}`, 14, 25);
+  cx.textAlign = 'right';
+  cx.font = `bold 15px ${FONT}`;
+  const left = PER_END - thrown;
+  const label = `${L.end} ${Math.min(endIdx + 1, ENDS.length)}/${ENDS.length}`;
+  const dotsW = PER_END * 16;
+  cx.fillText(label, W - 14 - dotsW - 6, 25);
+  for (let i = 0; i < PER_END; i++) {
+    const x = W - 14 - dotsW + i * 16 + 8;
+    cx.beginPath(); cx.arc(x, 25, 6, 0, Math.PI * 2);
+    cx.fillStyle = i < left ? '#f4c430' : 'rgba(255,255,255,0.2)'; cx.fill();
+  }
+}
+
+function drawAim() {
+  const S = PX();
+  const bx = sx(0), by = sy(Y0);
+  const p = pullInfo();
+  if (p && p.power > 0) {
+    // guide line in world direction
+    const len = HY - Y0;
+    cx.strokeStyle = 'rgba(30,60,110,0.45)'; cx.lineWidth = 2; cx.setLineDash([6, 6]);
+    cx.beginPath(); cx.moveTo(bx, by); cx.lineTo(sx(Math.tan(p.ang) * len), sy(HY)); cx.stroke();
+    cx.setLineDash([]);
+    // rubber band to finger
+    cx.strokeStyle = 'rgba(244,196,48,0.8)'; cx.lineWidth = 3;
+    cx.beginPath(); cx.moveTo(bx, by); cx.lineTo(bx + (pull.x - pull.sx), by + (pull.y - pull.sy)); cx.stroke();
+    // power bar
+    const bw = Math.min(160, W * 0.45), bh = 14, x0 = W / 2 - bw / 2, y0 = by + SR * S + 22;
+    cx.fillStyle = 'rgba(19,35,58,0.6)'; cx.fillRect(x0 - 2, y0 - 2, bw + 4, bh + 4);
+    const gg = cx.createLinearGradient(x0, 0, x0 + bw, 0);
+    gg.addColorStop(0, '#5bc0eb'); gg.addColorStop(0.6, '#f4c430'); gg.addColorStop(1, '#e2453a');
+    cx.fillStyle = gg; cx.fillRect(x0, y0, bw * p.power, bh);
+    textC(`${L.power} ${Math.round(p.power * 100)}%`, W / 2, y0 + bh + 16, 14, '#13233a');
+  }
+  // spin button
+  const b = spinBtn();
+  cx.fillStyle = 'rgba(19,35,58,0.82)';
+  cx.beginPath(); cx.arc(b.x, b.y, b.r, 0, Math.PI * 2); cx.fill();
+  cx.strokeStyle = '#f4c430'; cx.lineWidth = 4;
+  cx.beginPath();
+  if (spin > 0) cx.arc(b.x, b.y, 15, Math.PI * 1.15, Math.PI * 2.1);
+  else cx.arc(b.x, b.y, 15, Math.PI * 0.9, Math.PI * 1.85, true);
+  cx.stroke();
+  const ea = spin > 0 ? Math.PI * 2.1 : Math.PI * 0.9;
+  const ex = b.x + Math.cos(ea) * 15, ey = b.y + Math.sin(ea) * 15;
+  cx.fillStyle = '#f4c430';
+  cx.beginPath(); cx.moveTo(ex - 6, ey - 2); cx.lineTo(ex + 6, ey - 2); cx.lineTo(ex, ey + 7); cx.fill();
+  textC(L.curl, b.x, b.y + b.r + 13, 12, '#13233a', 'bold', 110);
+  // curl arrow on the stone
+  cx.strokeStyle = 'rgba(244,196,48,0.9)'; cx.lineWidth = 3;
+  cx.beginPath(); cx.moveTo(bx, by - SR * S - 8); cx.quadraticCurveTo(bx, by - SR * S - 40, bx + spin * 22, by - SR * S - 52); cx.stroke();
+}
+
+function drawEndScore() {
+  const S = PX();
+  if (isFinite(dRedShow) && dRedShow < 1) {
+    cx.strokeStyle = 'rgba(226,69,58,0.8)'; cx.lineWidth = 2; cx.setLineDash([5, 5]);
+    cx.beginPath(); cx.arc(sx(0), sy(HY), dRedShow * S, 0, Math.PI * 2); cx.stroke(); cx.setLineDash([]);
+  }
+  labels.forEach((l, i) => {
+    const t = phaseT - 0.25 - i * 0.18;
+    if (t < 0) return;
+    const a = Math.min(1, t * 4);
+    cx.globalAlpha = a;
+    const x = sx(l.x), y = sy(l.y) - SR * S - 12 - Math.min(1, t * 3) * 10;
+    cx.font = `bold 18px ${FONT}`;
+    cx.lineWidth = 4; cx.strokeStyle = '#13233a'; cx.textAlign = 'center'; cx.textBaseline = 'middle';
+    cx.strokeText(`+${l.p}`, x, y);
+    cx.fillStyle = '#ffd84a'; cx.fillText(`+${l.p}`, x, y);
+    cx.globalAlpha = 1;
+  });
+  const py = Math.min(H - 90, sy(HY) + (R + 0.12) * S + 70);
+  cx.fillStyle = 'rgba(19,35,58,0.85)';
+  const pw = Math.min(W - 32, 300);
+  cx.fillRect(W / 2 - pw / 2, py - 50, pw, 100);
+  textC(L.endRes.replace('{n}', endIdx + 1), W / 2, py - 28, 16, '#cfe3f5', 'bold', pw - 20);
+  textC(endPts ? L.pts.replace('{p}', endPts) : L.nopts, W / 2, py + 2, 30, endPts ? '#ffd84a' : '#ffffff', 'bold', pw - 20);
+  if (phaseT > 0.9) textC(L.next, W / 2, py + 34, 14, '#ffffff', 'normal', pw - 20);
+}
+
+function rankOf(t) { return L.ranks[t >= 36 ? 5 : t >= 26 ? 4 : t >= 17 ? 3 : t >= 9 ? 2 : t >= 3 ? 1 : 0]; }
+function drawOver() {
+  cx.fillStyle = 'rgba(19,35,58,0.82)'; cx.fillRect(0, 0, W, H);
+  textC(L.total, W / 2, H * 0.28, 20, '#cfe3f5');
+  textC(`${total}${L.unit}`, W / 2, H * 0.37, 56, '#ffd84a');
+  textC(`${L.best} ${best}${L.unit}`, W / 2, H * 0.46, 18, '#ffffff');
+  if (newBest) textC(L.newBest, W / 2, H * 0.51, 20, '#7fe0a0');
+  textC(`${L.rankLabel}: ${rankOf(total)}`, W / 2, H * 0.59, 20, '#ffffff');
+  if (phaseT > 0.7) textC(L.again, W / 2, H * 0.74, 18, '#ffffff', 'normal');
+}
+
+function drawTitle() {
+  cx.fillStyle = 'rgba(19,35,58,0.55)'; cx.fillRect(0, 0, W, H);
+  cx.fillStyle = 'rgba(19,35,58,0.82)';
+  cx.fillRect(0, H * 0.14, W, H * 0.46);
+  textC(L.title, W / 2, H * 0.24, 36, '#ffd84a');
+  L.how.forEach((t, i) => textC(t, W / 2, H * 0.34 + i * 26, 15, '#ffffff', 'normal'));
+  textC(`${L.best} ${best}${L.unit}`, W / 2, H * 0.53, 15, '#cfe3f5', 'normal');
+  const a = 0.6 + 0.4 * Math.sin(time * 4);
+  cx.globalAlpha = a;
+  textC(L.start, W / 2, H * 0.8, 22, '#ffffff');
+  cx.globalAlpha = 1;
+}
+
+let titleStones = null;
+function draw() {
+  cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  const ox = (Math.random() - 0.5) * shake, oy = (Math.random() - 0.5) * shake;
+  cx.save(); cx.translate(ox, oy);
+  drawIce();
+  const list = phase === 'title' ? (titleStones || (titleStones = [mk(0.08, HY + 0.05, 'y'), mk(-0.12, HY + 0.18, 'r'), mk(0.2, HY - 0.25, 'y'), mk(-0.05, HY - 0.7, 'r')])) : stones;
+  if (phase === 'aim') drawStone({ x: 0, y: Y0, team: 'y', rot: 0, alpha: 1 }, 0, 0);
+  for (const s of list) drawStone(s);
+  const S = PX();
+  for (const p of parts) {
+    cx.globalAlpha = Math.max(0, p.life / p.max);
+    cx.fillStyle = p.c; cx.fillRect(sx(p.x) - 1.5, sy(p.y) - 1.5, 3, 3);
+  }
+  cx.globalAlpha = 1;
+  if (phase === 'aim') drawAim();
+  if (phase === 'endScore') drawEndScore();
+  cx.restore();
+  drawBrooms();
+  if (phase !== 'title' && phase !== 'over') { drawMini(); drawHUD(); }
+  if (phase === 'run' && sweepTextT > 0) {
+    cx.globalAlpha = Math.min(1, sweepTextT * 3);
+    textC(L.sweep, W / 2, H * 0.2, 26, '#2f6fcf');
+    cx.globalAlpha = 1;
+  }
+  if (hintT > 0 && (phase === 'aim' || phase === 'run')) {
+    cx.globalAlpha = Math.min(1, hintT);
+    const y = H - 128;
+    fitFont(hint, 15, W - 40, 'bold');
+    const tw = cx.measureText(hint).width;
+    cx.fillStyle = 'rgba(19,35,58,0.8)'; cx.fillRect(W / 2 - tw / 2 - 12, y - 16, tw + 24, 32);
+    textC(hint, W / 2, y, 15, '#ffffff', 'bold', W - 40);
+    cx.globalAlpha = 1;
+  }
+  if (phase === 'title') drawTitle();
+  if (phase === 'over') drawOver();
+  void S;
+}
+
+let last = 0;
+cam = houseCam() - 0.6;
+function frame(ts) {
+  const dt = Math.min(0.05, Math.max(0, (ts - (last || ts)) / 1000));
+  last = ts;
+  try { update(dt); draw(); } catch (e) { console.error(e); }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
