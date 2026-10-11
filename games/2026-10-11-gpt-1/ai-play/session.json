@@ -1,0 +1,226 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-11T03:01:54.754Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.75
+        ]
+      },
+      "desc": "tap(0.50,0.75) 120ms",
+      "note": "壁で反射する光を5発まで撃つルール。まず部屋の配置を見たいので開始する。",
+      "noteEn": "The rules allow five ricocheting shots. I start to inspect the room layout.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": [
+        {
+          "swipe": [
+            0.5,
+            0.82,
+            0.236,
+            0.289
+          ],
+          "hold": 300
+        },
+        {
+          "wait": 2300
+        }
+      ],
+      "desc": "swipe(0.50,0.82→0.24,0.29) 300ms → wait 2300ms",
+      "note": "上段の左切手へ向けて角度をつける。壁で返った後の道筋も見ながら撃つ。",
+      "noteEn": "I angle toward the upper-left stamp and watch the path after the wall rebound.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "swipe": [
+            0.5,
+            0.82,
+            0.764,
+            0.289
+          ],
+          "hold": 300
+        },
+        {
+          "wait": 2300
+        }
+      ],
+      "desc": "swipe(0.50,0.82→0.76,0.29) 300ms → wait 2300ms",
+      "note": "左は取れて残り4発。今度は右上を狙い、対称の角度で切手を取りに行く。",
+      "noteEn": "The left stamp is collected with four shots left. I try the mirrored angle for the upper-right stamp.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.47
+          ]
+        },
+        {
+          "wait": 600
+        }
+      ],
+      "desc": "tap(0.50,0.47) 120ms → wait 600ms",
+      "note": "上の2枚は取れた。最後は真ん中へまっすぐ撃って配達を終える。最初の部屋は直接狙うだけで足りた。",
+      "noteEn": "Both upper stamps are collected. I shoot straight at the middle one. Direct shots have been sufficient in this first room.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.66
+          ]
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.66) 120ms",
+      "note": "配達できた結果が出た。次の部屋で仕切りがどう効くか試したい。",
+      "noteEn": "The delivery result appears. I continue to see how partitions affect the next room.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "swipe": [
+            0.5,
+            0.82,
+            0.1,
+            0.414
+          ],
+          "hold": 350
+        },
+        {
+          "wait": 1900
+        }
+      ],
+      "desc": "swipe(0.50,0.82→0.10,0.41) 350ms → wait 1900ms",
+      "note": "中央に仕切りがある。左壁へ斜めに撃ち、仕切りの左を通って上段左の切手へ反射させたい。",
+      "noteEn": "A partition blocks the center. I shoot toward the left wall, aiming to ricochet past the partition into the upper-left stamp.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": {
+        "wait": 1500
+      },
+      "desc": "wait 1500ms",
+      "note": "1発で上段2枚が取れた。壁と天井を巡る軌道が狙い以上につながって気持ちよい。まだ配達中なので着地を待つ。",
+      "noteEn": "One shot collected both upper stamps. The wall-and-ceiling chain feels satisfying. The light is still flying, so I wait for it to finish.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.563
+          ]
+        },
+        {
+          "wait": 700
+        }
+      ],
+      "desc": "tap(0.50,0.56) 120ms → wait 700ms",
+      "note": "残りの切手は発射点の真上、仕切りの手前にある。まっすぐ狙って2部屋目を終える。",
+      "noteEn": "The remaining stamp is directly above the launcher, below the partition. I shoot straight to finish room two.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}

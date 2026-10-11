@@ -1,0 +1,223 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-11T03:07:33.649Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.75
+        ]
+      },
+      "desc": "tap(0.50,0.75) 120ms",
+      "note": "屋根で猫を守りながら左右の花へ6粒ずつ届けるルール。開始して花と描ける範囲を見る。",
+      "noteEn": "The roof must protect the cat while sending six drops to each flower. I start to inspect the drawing area.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": {
+        "path": [
+          [
+            0.194,
+            0.516
+          ],
+          [
+            0.3,
+            0.43
+          ],
+          [
+            0.5,
+            0.313
+          ],
+          [
+            0.7,
+            0.43
+          ],
+          [
+            0.806,
+            0.516
+          ]
+        ],
+        "hold": 600
+      },
+      "desc": "path(0.19,0.52→0.30,0.43→0.50,0.31→0.70,0.43→0.81,0.52) 600ms",
+      "note": "花は左と右、猫は真ん中。花の真上を両端にして山形の屋根を描き、左右へ分けたい。",
+      "noteEn": "Flowers sit on either side of the cat. I draw a peaked roof with outlets above both flowers to split the rain.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": {
+        "wait": 2600
+      },
+      "desc": "wait 2600ms",
+      "note": "屋根の両端が花の上に置けた。雨が線に当たって端へ流れるかを見守る。",
+      "noteEn": "Both roof ends sit above the flowers. I watch whether rain follows the line to its outlets.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": {
+        "wait": 2600
+      },
+      "desc": "wait 2600ms",
+      "note": "雨が屋根を伝い、両端から花に向かって落ちている。猫は濡れていないのでこの形のまま待つ。",
+      "noteEn": "Drops travel along the roof and fall from both outlets toward the flowers. The cat is dry, so I keep this roof.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": {
+        "wait": 2800
+      },
+      "desc": "wait 2800ms",
+      "note": "左3粒、右2粒まで増えた。両方に届いているので屋根を変えず、花が開くまで観察する。",
+      "noteEn": "The counters show three drops on the left and two on the right. Both outlets work, so I wait for the flowers to bloom.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": {
+        "wait": 1200
+      },
+      "desc": "wait 1200ms",
+      "note": "左は開花し、右もあと1粒。猫は0/4のまま守れている。右の最後の滴を待つ。",
+      "noteEn": "The left flower blooms and the right needs one more drop. The cat remains dry at zero of four. I wait for the last drop.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.62
+          ]
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.62) 120ms",
+      "note": "両方の花が咲いて成功した。もう一度で屋根と水がリセットされるか確認する。",
+      "noteEn": "Both flowers bloom and the success screen appears. I restart to check that the roof and water reset.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": {
+        "wait": 10000
+      },
+      "desc": "wait 10000ms",
+      "note": "屋根と水が初期状態に戻った。今度は何も描かず、雨が猫に当たる場合の失敗を確認する。",
+      "noteEn": "The roof and water reset. I leave the sky empty to test failure when rain reaches the cat.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.62
+          ]
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.62) 120ms",
+      "note": "屋根なしでは猫が4回濡れて失敗した。左の花には自然に2粒届いている。もう一度で失敗から再開できるか確認する。",
+      "noteEn": "Without a roof the cat became wet four times and failed; two drops naturally reached the left flower. I retry after the failure.",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}
