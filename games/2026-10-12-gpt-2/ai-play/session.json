@@ -1,0 +1,291 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-12T03:18:54.578Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.79
+        ]
+      },
+      "desc": "tap(0.50,0.79) 120ms",
+      "note": "押す間だけ弾幕が進むルール。まず星と予告の配置を見るため開始する。",
+      "noteEn": "The bullet field advances only while held. I start to inspect the first star and telegraphs.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": {
+        "swipe": [
+          0.5,
+          0.8125,
+          0.25,
+          0.65625
+        ],
+        "hold": 900
+      },
+      "desc": "swipe(0.50,0.81→0.25,0.66) 900ms",
+      "note": "左下の星が最初の目標。自分の光から左上へ動き、取れたら指を離して止める。",
+      "noteEn": "The first star is lower left. I drag diagonally from my light toward it, then release to freeze time.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": {
+        "wait": 1500
+      },
+      "desc": "wait 1500ms",
+      "note": "星1個を取れ、左上から赤い予告線が出た。離したまま待ち、予告や自分の位置が止まるか見る。",
+      "noteEn": "One star is collected and a red telegraph appears from the upper left. I wait with my finger released to check that positions stay frozen.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": {
+        "swipe": [
+          0.266,
+          0.667,
+          0.75,
+          0.516
+        ],
+        "hold": 1000
+      },
+      "desc": "swipe(0.27,0.67→0.75,0.52) 1000ms",
+      "note": "待っても予告と位置は変わらなかった。赤線から右へ離れ、右側の星を目指す。",
+      "noteEn": "The telegraph and positions remained unchanged while waiting. I move right away from the red line toward the next star.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": {
+        "swipe": [
+          0.72,
+          0.524,
+          0.25,
+          0.36
+        ],
+        "hold": 1000
+      },
+      "desc": "swipe(0.72,0.52→0.25,0.36) 1000ms",
+      "note": "右上から自分の下側へ予告線が伸びている。左の星へ横切り、左上の弾の進みも気にする。",
+      "noteEn": "The upper-right telegraph extends below me. I cross toward the left star while watching the existing upper-left bullet.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": {
+        "swipe": [
+          0.281,
+          0.371,
+          0.722,
+          0.266
+        ],
+        "hold": 950
+      },
+      "desc": "swipe(0.28,0.37→0.72,0.27) 950ms",
+      "note": "星3個。左からの予告線は下向きなので、上側を通って右上の星へ向かう。星の近くの弾が離れる方向も見る。",
+      "noteEn": "Three stars are collected. The left telegraph points downward, so I take the upper route toward the next star as its nearby bullet moves away.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": {
+        "path": [
+          [
+            0.694,
+            0.27
+          ],
+          [
+            0.806,
+            0.406
+          ],
+          [
+            0.75,
+            0.594
+          ],
+          [
+            0.5,
+            0.547
+          ]
+        ],
+        "hold": 1500
+      },
+      "desc": "path(0.69,0.27→0.81,0.41→0.75,0.59→0.50,0.55) 1500ms",
+      "note": "中央の星の上に弾が2つある。直線で降りず、右側を回ってから左へ曲がって取りに行く。",
+      "noteEn": "Two bullets sit above the middle star. I avoid a direct descent, loop around the right side and turn left into it.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": {
+        "swipe": [
+          0.54,
+          0.555,
+          0.5,
+          0.25
+        ],
+        "hold": 1100
+      },
+      "desc": "swipe(0.54,0.56→0.50,0.25) 1100ms",
+      "note": "星5個。最後の星は真上で、近い弾は左へ離れていく。予告線を横切る前に上へ抜ける。",
+      "noteEn": "Five stars are collected. The last is above me and the nearest bullet is moving left away from the route. I head upward before the telegraph becomes dangerous.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 6
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.64
+          ]
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.64) 120ms",
+      "note": "星6個で岸へ着き、残り3のままクリアできた。もう一度で最初の配置へ戻るか見る。",
+      "noteEn": "All six stars were collected with three lives remaining. I restart to inspect the initial state again.",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 6
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "action": {
+        "tap": [
+          0.5,
+          0.8125
+        ],
+        "hold": 15000
+      },
+      "desc": "tap(0.50,0.81) 15000ms",
+      "note": "最初の配置へリセットされた。今度はその場で押し続け、予告された弾に当たった場合の残り回数と終了を確認する。",
+      "noteEn": "The initial state reset. I now hold still to check life loss and failure when telegraphed bullets reach me.",
+      "image": "ai-play/step-10.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 6
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 0
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.64
+          ]
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.64) 120ms",
+      "note": "その場で押し続けると残り0になり、星0で終了した。失敗からも再開できるか確かめる。",
+      "noteEn": "Holding still reduced lives to zero and ended the trip with no stars. I check retry after failure.",
+      "image": "ai-play/step-11.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 6
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 0
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}

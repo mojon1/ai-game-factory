@@ -1,0 +1,892 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-12T03:09:58.099Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.79
+        ]
+      },
+      "desc": "tap(0.50,0.79) 120ms",
+      "note": "仕入れ2枚、販売3枚で棚は6個。まず予報を見て初日の配分を決める。",
+      "noteEn": "Each bread costs two and sells for three, with six shelf slots. I start to inspect the first forecast.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": [
+        {
+          "tap": [
+            0.19444444444444445,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.19444444444444445,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.19444444444444445,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.8055555555555556,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.888
+          ]
+        }
+      ],
+      "desc": "tap(0.19,0.65) 120ms → tap(0.19,0.65) 120ms → tap(0.19,0.65) 120ms → tap(0.50,0.65) 120ms → tap(0.50,0.65) 120ms → tap(0.81,0.65) 120ms → tap(0.50,0.89) 120ms",
+      "note": "需要は山3、クロワッサン2、まる1で確定。棚6個をその通りに仕入れて開店する。",
+      "noteEn": "Demand is exactly three loaves, two croissants and one roll. I fill the shelf to match and open.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.89
+          ]
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.89) 120ms",
+      "note": "初日は全6個が売れて18枚、廃棄0。次の予報に合わせて仕入れを変えたい。",
+      "noteEn": "All six breads sold; cash is eighteen with no waste. I continue to inspect the next forecast.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "tap": [
+            0.194,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.194,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.194,
+            0.75
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.806,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.806,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.888
+          ]
+        }
+      ],
+      "desc": "tap(0.19,0.65) 120ms → tap(0.19,0.65) 120ms → tap(0.19,0.75) 120ms → tap(0.50,0.65) 120ms → tap(0.50,0.65) 120ms → tap(0.50,0.65) 120ms → tap(0.81,0.65) 120ms → tap(0.81,0.65) 120ms → tap(0.50,0.89) 120ms",
+      "note": "山パンは0〜4で不確実なので1個に抑える。2個買って1個を返品し、確実に2個売れるクロワッサンを3個、まるパンを2個にして開店。",
+      "noteEn": "Loaves have uncertain zero-to-four demand, so I keep one after testing a return. I stock three croissants and two rolls, then open.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.89
+          ]
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.89) 120ms",
+      "note": "4個売れて2個廃棄、資金は18枚で横ばい。予報の上限まで買うと余るリスクが見えた。次の日へ進む。",
+      "noteEn": "Four sold and two were discarded, leaving cash unchanged at eighteen. Stocking near upper forecasts carries risk. I continue.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "tap": [
+            0.194,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.194,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.806,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.806,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.806,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.888
+          ]
+        }
+      ],
+      "desc": "tap(0.19,0.65) 120ms → tap(0.19,0.65) 120ms → tap(0.50,0.65) 120ms → tap(0.81,0.65) 120ms → tap(0.81,0.65) 120ms → tap(0.81,0.65) 120ms → tap(0.50,0.89) 120ms",
+      "note": "まるパンは2〜4なので3個に厚くする。山パン2個、クロワッサン1個に分けて開店。",
+      "noteEn": "Roll demand is two to four, so I favor three rolls, with two loaves and one croissant.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.89
+          ]
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.89) 120ms",
+      "note": "3日目も廃棄2。需要の振れで狙いが外れた。朝市では確実な需要を優先したい。",
+      "noteEn": "Two breads were wasted again as demand varied. I look for more reliable demand on market day.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": [
+        {
+          "tap": [
+            0.194,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.194,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.194,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.194,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.806,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.888
+          ]
+        }
+      ],
+      "desc": "tap(0.19,0.65) 120ms → tap(0.19,0.65) 120ms → tap(0.19,0.65) 120ms → tap(0.19,0.65) 120ms → tap(0.81,0.65) 120ms → tap(0.50,0.89) 120ms",
+      "note": "朝市は山パン3〜5。山4個とまる1個にし、需要0〜1のクロワッサンは買わず棚1個を空ける。",
+      "noteEn": "Market demand favors three to five loaves. I buy four loaves and one roll, leaving a slot empty rather than risking croissants.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 20
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.89
+          ]
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.89) 120ms",
+      "note": "山4個が売れ、まる1個は廃棄。資金は20枚へ増えた。5日目の需要を確かめる。",
+      "noteEn": "Four loaves sold and one roll was discarded. Cash rose to twenty. I inspect day five.",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 20
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.806,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.888
+          ]
+        }
+      ],
+      "desc": "tap(0.50,0.65) 120ms → tap(0.50,0.65) 120ms → tap(0.50,0.65) 120ms → tap(0.50,0.65) 120ms → tap(0.81,0.65) 120ms → tap(0.50,0.89) 120ms",
+      "note": "学校帰りはクロワッサン3〜5、まる1〜2。クロワッサン4個、まる1個にして、山パンのリスクは取らない。",
+      "noteEn": "After-school demand favors three to five croissants and one to two rolls. I stock four croissants and one roll, skipping loaves.",
+      "image": "ai-play/step-10.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 20
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 25
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.89
+          ]
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.89) 120ms",
+      "note": "5日目は完売して25枚。最後の日に進み、予報の違いがまだあるか見る。",
+      "noteEn": "Day five sold out and cash reached twenty-five. I continue to inspect the final forecast.",
+      "image": "ai-play/step-11.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 20
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 25
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 12,
+      "action": [
+        {
+          "tap": [
+            0.194,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.194,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.806,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.806,
+            0.65
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.888
+          ]
+        }
+      ],
+      "desc": "tap(0.19,0.65) 120ms → tap(0.19,0.65) 120ms → tap(0.50,0.65) 120ms → tap(0.50,0.65) 120ms → tap(0.81,0.65) 120ms → tap(0.81,0.65) 120ms → tap(0.50,0.89) 120ms",
+      "note": "最終日は全部1〜4で同じ予報。どれかに偏らせる理由は見えないので2個ずつに分け、開店する。",
+      "noteEn": "All final-day forecasts are one to four, with no visible reason to favor a type. I split evenly at two each and open.",
+      "image": "ai-play/step-12.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 20
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 25
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "best": 28
+          }
+        },
+        {
+          "agf": "end",
+          "score": 28
+        }
+      ]
+    },
+    {
+      "step": 13,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.89
+          ]
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.89) 120ms",
+      "note": "6日間で28枚、ベスト更新の結果と保存通知が出た。もう一度で初日の資金12枚へ戻るか確認する。",
+      "noteEn": "Six days ended with twenty-eight coins and a new-best save signal. I restart to check that day one returns to twelve coins.",
+      "image": "ai-play/step-13.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 18
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 20
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 25
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "best": 28
+          }
+        },
+        {
+          "agf": "end",
+          "score": 28
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}
