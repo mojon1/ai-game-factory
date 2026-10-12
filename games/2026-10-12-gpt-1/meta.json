@@ -1,0 +1,763 @@
+{
+  "id": "2026-10-12-gpt-1",
+  "status": "published",
+  "title": "六日間のパン棚",
+  "genre": "経営",
+  "concept": "需要予報を見て、6個しか置けない棚に3種類のパンを仕込む。1個2枚で仕入れ3枚で売れるが、売れ残りは翌日に持ち越せない。確実な需要に寄せるか幅の広い人気予報に賭けるか、6日間の資金配分を考える小さな経営。",
+  "howToPlay": "＋で仕入れ、−で戻します。棚は6個まで。予報を見て開店すると販売・廃棄し、6日後のコインを競います。",
+  "libraryDecision": "共有棚は使わない。需要予報と仕入れの判断が核なので、Canvasで棚・予報・収支を同時に読みやすく表示する。3Dや物理より意思決定に必要な情報の比較を優先する。",
+  "soundDecision": "Web Audioで仕入れの小さな打音、販売時のレジ音、最終日の短い和音を生成する。静かに考えられるようBGMを付けず、収支が確定する区切りに音を添える。",
+  "planning": {
+    "genreDraw": {
+      "ja": "経営",
+      "en": "Management / tycoon",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "六日間のパン棚。需要の幅を見て仕入れを配分し、棚6個と資金の中で売れ残りを避ける経営。",
+        "ideaEn": "Six Days of Bread: allocate purchases from demand ranges while managing six shelf slots and limited cash.",
+        "fromDraw": true
+      },
+      {
+        "idea": "ふたりの影時計。2本の影の向きをずらし、影が重なる瞬間を選んで眠る街の橋を渡る。",
+        "ideaEn": "Twin Shadow Clock: shift two shadows and cross bridges when their directions align.",
+        "fromDraw": false
+      },
+      {
+        "idea": "星くずの織機。横糸を引いて光の模様を編み、行き止まりをほどいて一枚の布を完成させる。",
+        "ideaEn": "Stardust Loom: pull cross-threads to weave light patterns and untangle dead ends into a finished cloth.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "limit",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Six Days of Bread",
+      "concept": "Use demand forecasts to stock three breads on a six-slot shelf. Each costs two coins and sells for three, while leftovers expire daily. Choose reliable sales or uncertain popularity and manage cash through six days.",
+      "howToPlay": "Use + to buy and − to return before opening. Stock up to six breads, open to sell and discard leftovers, and maximize coins after six days.",
+      "libraryDecision": "Use no shelf libraries. Canvas keeps forecasts, shelf counts and cash readable together. Decision-relevant comparisons matter more than physical or 3D presentation.",
+      "soundDecision": "Web Audio generates quiet stocking taps, a cash-register note and a short final chord. No background music interrupts planning."
+    }
+  },
+  "createdAt": "2026-10-12T12:07:31+09:00",
+  "specVersion": 8,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-12T12:07:31+09:00",
+    "metricsFrom": "2026-10-12T03:06:29.869Z",
+    "transcript": null,
+    "validationRuns": 1,
+    "finishedAt": "2026-10-12T12:15:41+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-12T12:09:46+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "7.6KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=60",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=81",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=47",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=47",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 7767,
+    "lines": 4
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "画像を見ながら13手で6日間を終え、28枚になった。返品、完売、廃棄、最終ベスト保存、初日への再開を確認。需要の幅で少し迷えるが、ほぼ平均需要を選ぶ計算になり、店が育つ変化や客の反応がなく単調。保存は通知を確認したが別ページからの永続読み込みまでは試していない。",
+    "similar": [
+      {
+        "title": "Lemonade Stand",
+        "url": "https://www.coolmathgames.com/0-lemonade-stand",
+        "similarity": "高",
+        "note": "天候を見て仕入れ、日数の中で資金を増やす経営の流れが近い。こちらは3種類の完成品を6枠へ配分し需要の数値範囲を使う。レシピ・価格・広告の変更はない。",
+        "note_en": "Both use forecasts, stocking and multi-day cash management. This game allocates three finished breads across six slots using numeric demand ranges, without recipe, pricing or advertising controls."
+      }
+    ],
+    "research": "ウェブ検索2回でパン屋の在庫経営と天候需要の経営ゲームを調査。Lemonade Standの公式配信ページの説明を確認して比較。Brioche Tycoonは検索結果にあったが本文が404のため比較から除外した。",
+    "i18n": {
+      "en": {
+        "comment": "Played thirteen image-guided moves through all six days, finishing with twenty-eight coins. Confirmed returns, sellouts, waste, final best-save signaling and restart. Demand ranges create some uncertainty, but choices mostly reduce to average-demand arithmetic and the shop lacks growth or customer reactions. Verified the save signal, not persistence across page visits.",
+        "research": "Two searches investigated bakery inventory management and weather-based demand games. Verified Lemonade Stand on its official distribution page. Brioche Tycoon appeared in search but its page returned 404, so it was excluded."
+      }
+    },
+    "method": "スマホ縦画面で 13 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 13 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.79) 120ms",
+        "note": "仕入れ2枚、販売3枚で棚は6個。まず予報を見て初日の配分を決める。",
+        "noteEn": "Each bread costs two and sells for three, with six shelf slots. I start to inspect the first forecast.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.19,0.65) 120ms → tap(0.19,0.65) 120ms → tap(0.19,0.65) 120ms → tap(0.50,0.65) 120ms → tap(0.50,0.65) 120ms → tap(0.81,0.65) 120ms → tap(0.50,0.89) 120ms",
+        "note": "需要は山3、クロワッサン2、まる1で確定。棚6個をその通りに仕入れて開店する。",
+        "noteEn": "Demand is exactly three loaves, two croissants and one roll. I fill the shelf to match and open.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 900ms → tap(0.50,0.89) 120ms",
+        "note": "初日は全6個が売れて18枚、廃棄0。次の予報に合わせて仕入れを変えたい。",
+        "noteEn": "All six breads sold; cash is eighteen with no waste. I continue to inspect the next forecast.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.19,0.65) 120ms → tap(0.19,0.65) 120ms → tap(0.19,0.75) 120ms → tap(0.50,0.65) 120ms → tap(0.50,0.65) 120ms → tap(0.50,0.65) 120ms → tap(0.81,0.65) 120ms → tap(0.81,0.65) 120ms → tap(0.50,0.89) 120ms",
+        "note": "山パンは0〜4で不確実なので1個に抑える。2個買って1個を返品し、確実に2個売れるクロワッサンを3個、まるパンを2個にして開店。",
+        "noteEn": "Loaves have uncertain zero-to-four demand, so I keep one after testing a return. I stock three croissants and two rolls, then open.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 900ms → tap(0.50,0.89) 120ms",
+        "note": "4個売れて2個廃棄、資金は18枚で横ばい。予報の上限まで買うと余るリスクが見えた。次の日へ進む。",
+        "noteEn": "Four sold and two were discarded, leaving cash unchanged at eighteen. Stocking near upper forecasts carries risk. I continue.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.19,0.65) 120ms → tap(0.19,0.65) 120ms → tap(0.50,0.65) 120ms → tap(0.81,0.65) 120ms → tap(0.81,0.65) 120ms → tap(0.81,0.65) 120ms → tap(0.50,0.89) 120ms",
+        "note": "まるパンは2〜4なので3個に厚くする。山パン2個、クロワッサン1個に分けて開店。",
+        "noteEn": "Roll demand is two to four, so I favor three rolls, with two loaves and one croissant.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 900ms → tap(0.50,0.89) 120ms",
+        "note": "3日目も廃棄2。需要の振れで狙いが外れた。朝市では確実な需要を優先したい。",
+        "noteEn": "Two breads were wasted again as demand varied. I look for more reliable demand on market day.",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.19,0.65) 120ms → tap(0.19,0.65) 120ms → tap(0.19,0.65) 120ms → tap(0.19,0.65) 120ms → tap(0.81,0.65) 120ms → tap(0.50,0.89) 120ms",
+        "note": "朝市は山パン3〜5。山4個とまる1個にし、需要0〜1のクロワッサンは買わず棚1個を空ける。",
+        "noteEn": "Market demand favors three to five loaves. I buy four loaves and one roll, leaving a slot empty rather than risking croissants.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 20
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 900ms → tap(0.50,0.89) 120ms",
+        "note": "山4個が売れ、まる1個は廃棄。資金は20枚へ増えた。5日目の需要を確かめる。",
+        "noteEn": "Four loaves sold and one roll was discarded. Cash rose to twenty. I inspect day five.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 20
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.50,0.65) 120ms → tap(0.50,0.65) 120ms → tap(0.50,0.65) 120ms → tap(0.50,0.65) 120ms → tap(0.81,0.65) 120ms → tap(0.50,0.89) 120ms",
+        "note": "学校帰りはクロワッサン3〜5、まる1〜2。クロワッサン4個、まる1個にして、山パンのリスクは取らない。",
+        "noteEn": "After-school demand favors three to five croissants and one to two rolls. I stock four croissants and one roll, skipping loaves.",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 20
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 25
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "wait 900ms → tap(0.50,0.89) 120ms",
+        "note": "5日目は完売して25枚。最後の日に進み、予報の違いがまだあるか見る。",
+        "noteEn": "Day five sold out and cash reached twenty-five. I continue to inspect the final forecast.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 20
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 25
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.19,0.65) 120ms → tap(0.19,0.65) 120ms → tap(0.50,0.65) 120ms → tap(0.50,0.65) 120ms → tap(0.81,0.65) 120ms → tap(0.81,0.65) 120ms → tap(0.50,0.89) 120ms",
+        "note": "最終日は全部1〜4で同じ予報。どれかに偏らせる理由は見えないので2個ずつに分け、開店する。",
+        "noteEn": "All final-day forecasts are one to four, with no visible reason to favor a type. I split evenly at two each and open.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 20
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 25
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 28
+            }
+          },
+          {
+            "agf": "end",
+            "score": 28
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "wait 900ms → tap(0.50,0.89) 120ms",
+        "note": "6日間で28枚、ベスト更新の結果と保存通知が出た。もう一度で初日の資金12枚へ戻るか確認する。",
+        "noteEn": "Six days ended with twenty-eight coins and a new-best save signal. I restart to check that day one returns to twelve coins.",
+        "image": "ai-play/step-13.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 20
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 25
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 28
+            }
+          },
+          {
+            "agf": "end",
+            "score": 28
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-12T12:15:41+09:00"
+  },
+  "publishedAt": "2026-10-12T12:15:41+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 2244,
+    "outputTokens": 8408,
+    "contextTokens": 6242196,
+    "turns": 33,
+    "toolCalls": 33,
+    "webSearches": null,
+    "minutes": 9.2,
+    "from": "2026-10-12T03:06:29.869Z",
+    "to": "2026-10-12T03:15:44.422Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力から思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated Codex token_usage_record entries by unique response_id from planning through review. Input includes cached tokens; output excludes reasoning. Tools count top-level calls only.",
+    "recordedAt": "2026-10-12T12:15:44+09:00",
+    "validationRuns": 1,
+    "codeKB": 7.6,
+    "evidence": "metrics-evidence.json"
+  }
+}

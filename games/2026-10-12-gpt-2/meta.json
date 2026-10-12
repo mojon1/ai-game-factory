@@ -1,0 +1,406 @@
+{
+  "id": "2026-10-12-gpt-2",
+  "status": "published",
+  "title": "ひと息の星渡り",
+  "genre": "弾よけ",
+  "concept": "指を置く間だけ弾幕の時間が進み、離せばその場で止まる。赤い予告線を見て次の進路を考え、星へ滑り込む6個の旅。速さだけでなく、危険の手前でひと息ついて道を選び直す判断を面白さの核にした。",
+  "howToPlay": "押しながら指で移動し、星6個を集めよう。指を離すと弾が止まります。赤い予告線から弾が来ます。3回当たると終了。",
+  "libraryDecision": "共有棚は使わない。指を離すと移動と弾幕を一緒に止める核には、Canvasの位置計算で時間を明確に制御する。物理慣性や3Dを加えず、予告と実際の進路が一致することを優先する。",
+  "soundDecision": "Web Audioで予告の低い短音、星の取得音、被弾の柔らかい濁音を生成する。指を離した静止中は新しい音を鳴らさず、時間が動く感覚を音でも伝える。BGMは付けない。",
+  "planning": {
+    "genreDraw": {
+      "ja": "弾よけ",
+      "en": "Bullet dodging",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "ひと息の星渡り。指を押す間だけ進む弾幕で、止めて進路を読み直しながら星へ渡る。",
+        "ideaEn": "Breathing Between Stars: hold to advance a bullet field and release to plan the next route.",
+        "fromDraw": true
+      },
+      {
+        "idea": "月のいれもの。透明な器を回して重なる月の欠片を別々の影へ戻す立体パズル。",
+        "ideaEn": "Moon Vessels: rotate transparent containers to return overlapping lunar pieces to separate shadows.",
+        "fromDraw": false
+      },
+      {
+        "idea": "ひだまり切符。余白に小さな道を描き、通るたびに咲く花で散歩帳を完成させる。",
+        "ideaEn": "Sunlit Tickets: draw little paths whose flowers bloom as walkers complete a travel journal.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "fail",
+    "input": [
+      "drag",
+      "hold"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Breathing Between Stars",
+      "concept": "The bullet field advances only while your finger is down. Release to freeze it, read the red telegraphs and plan a route through six stars. Taking a breath before danger matters as much as movement speed.",
+      "howToPlay": "Hold and drag to move through six stars. Release to freeze bullets. Red lines announce incoming shots. Three hits end the trip.",
+      "libraryDecision": "Use no shelf libraries. Canvas position updates precisely freeze movement and bullets together. Avoid inertia and 3D so telegraphs remain directly connected to paths.",
+      "soundDecision": "Web Audio generates low warning taps, star notes and gentle dissonant hit tones. No new sounds trigger while time is frozen; no background music distracts from planning."
+    }
+  },
+  "createdAt": "2026-10-12T12:16:46+09:00",
+  "specVersion": 8,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-12T12:16:46+09:00",
+    "metricsFrom": "2026-10-12T03:15:44.564Z",
+    "transcript": null,
+    "validationRuns": 1,
+    "finishedAt": "2026-10-12T12:23:54+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-12T12:18:31+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "7.4KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=60",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=103",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=43",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=80",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 7555,
+    "lines": 4
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "画像を見ながら11手プレイ。指を離して待っても予告と位置が止まり、動かすと進むことを確認。迂回しながら星6個を被弾なしで取り、クリア後に再開。その場で押し続けると3被弾で終了し再開できた。止めて道を選べる安心感はよいが、星の位置が固定で短く、繰り返すと読み合いの幅は小さい。",
+    "similar": [
+      {
+        "title": "SUPERHOT",
+        "url": "https://store.steampowered.com/app/322500/SUPERHOT/",
+        "similarity": "高",
+        "note": "自分の操作と時間進行を結び、止めて弾を読める発想が近い。こちらは移動量ではなく押している間だけ時間が進み、俯瞰の星集めで射撃・武器はない。",
+        "note_en": "Closely related in linking action to time and reading bullets while stopped. Here holding rather than movement advances time; it is top-down star collection without shooting or weapons."
+      },
+      {
+        "title": "Chrono Control",
+        "url": "https://heg28.itch.io/chrono-control",
+        "similarity": "中",
+        "note": "作者の検索結果説明では弾幕にスロー・停止・巻き戻しを組み合わせる。こちらは指を離す停止だけを使う短い星集め。本文取得は失敗したため説明範囲のみ比較。",
+        "note_en": "The developer search excerpt combines bullet hell with slow motion, pause and rewind. This game uses only release-to-freeze for a short star route. Full-page retrieval failed, so comparison is limited to that excerpt."
+      }
+    ],
+    "research": "ウェブ検索2回でSUPERHOTの公式説明と時間操作を使う弾幕作品を調査。公式サイト経由のSteam本文でSUPERHOTの時間進行を確認。Chrono Controlは検索結果の作者説明を参照し、本文取得失敗を明記した。",
+    "i18n": {
+      "en": {
+        "comment": "Played eleven image-guided moves. Waiting with the finger released froze positions and telegraphs. Collected six stars without damage using a detour, cleared and retried. Holding still caused three hits and failure, then retry worked. Planning while frozen feels reassuring, but the short fixed star route limits replay variety.",
+        "research": "Two searches investigated official SUPERHOT descriptions and time-manipulation bullet games. Verified SUPERHOT on Steam through its official site. Chrono Control uses the developer search excerpt with full-page fetch failure disclosed."
+      }
+    },
+    "method": "スマホ縦画面で 11 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 11 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.79) 120ms",
+        "note": "押す間だけ弾幕が進むルール。まず星と予告の配置を見るため開始する。",
+        "noteEn": "The bullet field advances only while held. I start to inspect the first star and telegraphs.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "swipe(0.50,0.81→0.25,0.66) 900ms",
+        "note": "左下の星が最初の目標。自分の光から左上へ動き、取れたら指を離して止める。",
+        "noteEn": "The first star is lower left. I drag diagonally from my light toward it, then release to freeze time.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 1500ms",
+        "note": "星1個を取れ、左上から赤い予告線が出た。離したまま待ち、予告や自分の位置が止まるか見る。",
+        "noteEn": "One star is collected and a red telegraph appears from the upper left. I wait with my finger released to check that positions stay frozen.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "swipe(0.27,0.67→0.75,0.52) 1000ms",
+        "note": "待っても予告と位置は変わらなかった。赤線から右へ離れ、右側の星を目指す。",
+        "noteEn": "The telegraph and positions remained unchanged while waiting. I move right away from the red line toward the next star.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "swipe(0.72,0.52→0.25,0.36) 1000ms",
+        "note": "右上から自分の下側へ予告線が伸びている。左の星へ横切り、左上の弾の進みも気にする。",
+        "noteEn": "The upper-right telegraph extends below me. I cross toward the left star while watching the existing upper-left bullet.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "swipe(0.28,0.37→0.72,0.27) 950ms",
+        "note": "星3個。左からの予告線は下向きなので、上側を通って右上の星へ向かう。星の近くの弾が離れる方向も見る。",
+        "noteEn": "Three stars are collected. The left telegraph points downward, so I take the upper route toward the next star as its nearby bullet moves away.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "path(0.69,0.27→0.81,0.41→0.75,0.59→0.50,0.55) 1500ms",
+        "note": "中央の星の上に弾が2つある。直線で降りず、右側を回ってから左へ曲がって取りに行く。",
+        "noteEn": "Two bullets sit above the middle star. I avoid a direct descent, loop around the right side and turn left into it.",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "swipe(0.54,0.56→0.50,0.25) 1100ms",
+        "note": "星5個。最後の星は真上で、近い弾は左へ離れていく。予告線を横切る前に上へ抜ける。",
+        "noteEn": "Five stars are collected. The last is above me and the nearest bullet is moving left away from the route. I head upward before the telegraph becomes dangerous.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 6
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 900ms → tap(0.50,0.64) 120ms",
+        "note": "星6個で岸へ着き、残り3のままクリアできた。もう一度で最初の配置へ戻るか見る。",
+        "noteEn": "All six stars were collected with three lives remaining. I restart to inspect the initial state again.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.50,0.81) 15000ms",
+        "note": "最初の配置へリセットされた。今度はその場で押し続け、予告された弾に当たった場合の残り回数と終了を確認する。",
+        "noteEn": "The initial state reset. I now hold still to check life loss and failure when telegraphed bullets reach me.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "wait 900ms → tap(0.50,0.64) 120ms",
+        "note": "その場で押し続けると残り0になり、星0で終了した。失敗からも再開できるか確かめる。",
+        "noteEn": "Holding still reduced lives to zero and ended the trip with no stars. I check retry after failure.",
+        "image": "ai-play/step-11.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 0
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-12T12:23:54+09:00"
+  },
+  "publishedAt": "2026-10-12T12:23:54+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 2105,
+    "outputTokens": 7544,
+    "contextTokens": 6029730,
+    "turns": 28,
+    "toolCalls": 28,
+    "webSearches": null,
+    "minutes": 8.2,
+    "from": "2026-10-12T03:15:44.564Z",
+    "to": "2026-10-12T03:23:57.052Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力から思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated Codex token_usage_record entries by unique response_id from planning through review. Input includes cached tokens; output excludes reasoning. Tools count top-level calls only.",
+    "recordedAt": "2026-10-12T12:23:57+09:00",
+    "validationRuns": 1,
+    "codeKB": 7.4,
+    "evidence": "metrics-evidence.json"
+  }
+}
