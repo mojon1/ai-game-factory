@@ -1,0 +1,218 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-13T03:16:56.624Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.9
+        ]
+      },
+      "desc": "tap(0.50,0.90) 120ms",
+      "note": "攻撃で剣を交換する説明を読み開始する。",
+      "noteEn": "Read that attacking trades swords and start.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": {
+        "tap": [
+          0.5,
+          0.84
+        ]
+      },
+      "desc": "tap(0.50,0.84) 120ms",
+      "note": "敵は構えるので攻撃が来ない。守って気合を3ためる。",
+      "noteEn": "The enemy prepares without attacking. Guard to build three focus.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.19,
+            0.84
+          ]
+        }
+      ],
+      "desc": "wait 300ms → tap(0.19,0.84) 120ms",
+      "note": "気合が3になった。敵に弱い剣2を渡す攻撃を選び、反撃も弱めたい。",
+      "noteEn": "Focus is three. Strike while handing the enemy my weak sword, reducing its retaliation.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.5,
+            0.84
+          ]
+        }
+      ],
+      "desc": "wait 300ms → tap(0.50,0.84) 120ms",
+      "note": "敵に5ダメージを与え反撃は2だった。強い剣を保つためここは守る。",
+      "noteEn": "Dealt five and took two after the swap. Guard to keep the strong sword.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": [
+        {
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.19,
+            0.84
+          ]
+        }
+      ],
+      "desc": "wait 300ms → tap(0.19,0.84) 120ms",
+      "note": "気合込みで8、敵は残り7。攻撃でこの戦いを終える。",
+      "noteEn": "Eight attack power versus seven enemy HP. Strike to finish the battle.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "wait": 1000
+        },
+        {
+          "tap": [
+            0.5,
+            0.6
+          ]
+        }
+      ],
+      "desc": "wait 1000ms → tap(0.50,0.60) 120ms",
+      "note": "敵を倒せた。体力と剣を持ち越して次へ進む。",
+      "noteEn": "Enemy defeated. Continue and inspect carried health and sword.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": {
+        "tap": [
+          0.81,
+          0.84
+        ]
+      },
+      "desc": "tap(0.81,0.84) 120ms",
+      "note": "体力15と剣2が持ち越された。敵が構える間に薬を飲み回復を確認する。",
+      "noteEn": "Fifteen HP and sword two carried over. Drink a potion while the enemy prepares.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": [
+        {
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.5,
+            0.84
+          ]
+        },
+        {
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.5,
+            0.84
+          ]
+        }
+      ],
+      "desc": "wait 300ms → tap(0.50,0.84) 120ms → wait 300ms → tap(0.50,0.84) 120ms",
+      "note": "薬で上限18に回復し残り1本。二回の守りで攻撃をしのぎ、気合を上限6までためる。",
+      "noteEn": "Potion restores HP to eighteen and leaves one bottle. Guard twice through the two incoming attacks, building focus to six.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": [
+        {
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.19,
+            0.84
+          ]
+        }
+      ],
+      "desc": "wait 300ms → tap(0.19,0.84) 120ms",
+      "note": "二回の守りで失う体力は2、気合6。安全な構えのターンに8の攻撃を使う。",
+      "noteEn": "Two guards cost two HP and build six focus. Use the eight-power strike on a safe preparation turn.",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}
