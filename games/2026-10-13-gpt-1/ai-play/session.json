@@ -1,0 +1,233 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-13T03:11:04.105Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.9
+        ]
+      },
+      "desc": "tap(0.50,0.90) 120ms",
+      "note": "番号を覚えて配達する説明を読み開始する。",
+      "noteEn": "Read the route-memory instructions and start.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": {
+        "wait": 5000
+      },
+      "desc": "wait 5000ms",
+      "note": "右下1→左2→左3→上4の折れた道を記憶し、消えるまで待つ。",
+      "noteEn": "Remember bottom-right, left, left, up; wait for the route to fade.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "tap": [
+            0.806,
+            0.722
+          ]
+        },
+        {
+          "tap": [
+            0.594,
+            0.722
+          ]
+        },
+        {
+          "tap": [
+            0.383,
+            0.722
+          ]
+        },
+        {
+          "tap": [
+            0.383,
+            0.603
+          ]
+        }
+      ],
+      "desc": "tap(0.81,0.72) 120ms → tap(0.59,0.72) 120ms → tap(0.38,0.72) 120ms → tap(0.38,0.60) 120ms",
+      "note": "番号が消えた。記憶した右下から左左上を押して届ける。",
+      "noteEn": "The numbers have faded. Tap the remembered rightmost bottom cell, left, left, up.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": {
+        "wait": 1500
+      },
+      "desc": "wait 1500ms",
+      "note": "四マスが緑になり配達成功。次の帰り便を見る。",
+      "noteEn": "All four cells turn green: delivered. Look at the next return route.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": [
+        {
+          "wait": 5000
+        },
+        {
+          "tap": [
+            0.383,
+            0.603
+          ]
+        },
+        {
+          "tap": [
+            0.594,
+            0.603
+          ]
+        },
+        {
+          "tap": [
+            0.594,
+            0.484
+          ]
+        },
+        {
+          "tap": [
+            0.383,
+            0.484
+          ]
+        },
+        {
+          "tap": [
+            0.172,
+            0.484
+          ]
+        }
+      ],
+      "desc": "wait 5000ms → tap(0.38,0.60) 120ms → tap(0.59,0.60) 120ms → tap(0.59,0.48) 120ms → tap(0.38,0.48) 120ms → tap(0.17,0.48) 120ms",
+      "note": "帰り便は5→4→3→2→1。下中央から右上左左の折り返しを覚えて逆順に押す。",
+      "noteEn": "Return mail is 5,4,3,2,1. Remember lower-center, right, up, left, left and tap after fading.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": {
+        "wait": 1500
+      },
+      "desc": "wait 1500ms",
+      "note": "逆順でも成功した。三通目は道が六マスに伸びるか観察する。",
+      "noteEn": "The reverse route worked. Observe the longer third route.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "wait": 5200
+        },
+        {
+          "tap": [
+            0.806,
+            0.722
+          ]
+        },
+        {
+          "tap": [
+            0.806,
+            0.722
+          ]
+        },
+        {
+          "tap": [
+            0.806,
+            0.722
+          ]
+        }
+      ],
+      "desc": "wait 5200ms → tap(0.81,0.72) 120ms → tap(0.81,0.72) 120ms → tap(0.81,0.72) 120ms",
+      "note": "六マスに増えた。失敗時の区切りを確かめるため、道にない右下を三回押す。",
+      "noteEn": "The route grows to six cells. Deliberately tap the unused bottom-right three times to inspect failure.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 2
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": [
+        {
+          "wait": 1000
+        },
+        {
+          "tap": [
+            0.5,
+            0.9
+          ]
+        }
+      ],
+      "desc": "wait 1000ms → tap(0.50,0.90) 120ms",
+      "note": "三ミスで終了し正解の道が出た。上部に直前の文字が薄く残り読みにくい。待って再開する。",
+      "noteEn": "Three mistakes end the run and reveal the route. Faint previous text behind the result is distracting. Wait and restart.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 2
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}

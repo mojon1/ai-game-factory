@@ -1,0 +1,340 @@
+{
+  "id": "2026-10-13-gpt-1",
+  "status": "published",
+  "title": "往復きつね便",
+  "genre": "記憶",
+  "concept": "番号つきの足あとを覚え、消えたあとに配達する。行きは順番どおり、帰りは逆順なので、同じ道でも頭の中で向きを変える必要がある。五通の手紙を届けるほど道が長くなり、覚えた形を頼りに迷いなく押せる瞬間を核にした。",
+  "howToPlay": "光る道を覚え、消えたらマスを順にタップ。帰り便は番号の逆順。3回間違える前に5通届けよう。",
+  "libraryDecision": "道の形と番号を明瞭に読むことが核なのでCanvasで描く。3Dや物理は記憶すべき形を曖昧にし、音ライブラリも短い確認音以上の利点はないため使わない。",
+  "soundDecision": "正解を高くなる短音、間違いを低い音で知らせる。記憶中に干渉しないようBGMは入れない。",
+  "planning": {
+    "genreDraw": {
+      "ja": "レース",
+      "en": "Racing",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "潮が引く瞬間だけ砂の近道が現れる海辺レース。波の周期を読んで追い抜く。",
+        "ideaEn": "A beach race with shortcuts exposed only at low tide.",
+        "fromDraw": true
+      },
+      {
+        "idea": "番号つきの足あとを記憶し、行きは順、帰りは逆にたどるきつねの配達。",
+        "ideaEn": "Memorize numbered footprints and deliver forward or backward.",
+        "fromDraw": false
+      },
+      {
+        "idea": "色つきの透明な花びらを重ね、注文どおりの色を作る花屋。",
+        "ideaEn": "Overlap translucent petals to mix requested colors.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 1
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "fail",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Fox Mail, There and Back",
+      "concept": "Memorize a numbered footprint route, then deliver after it fades. Outbound letters follow the numbers; return letters reverse them. Routes grow across five deliveries, rewarding a clear mental picture and confident taps.",
+      "howToPlay": "Remember the glowing route. Tap its cells after it fades; return mail reverses the numbers. Deliver five letters before three mistakes.",
+      "libraryDecision": "Canvas keeps route shapes and numbers clear. Physics or depth would obscure the memory task; sound libraries add little to brief confirmation tones.",
+      "soundDecision": "Rising short tones confirm progress; a low tone marks mistakes. No music competes with memorization."
+    }
+  },
+  "createdAt": "2026-10-13T12:08:46+09:00",
+  "specVersion": 8,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-13T12:08:46+09:00",
+    "metricsFrom": "2026-10-13T03:08:11.435Z",
+    "transcript": null,
+    "validationRuns": 2,
+    "finishedAt": "2026-10-13T12:14:20+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-13T12:10:52+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "5.4KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=35",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=42",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=43",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=48",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 5547,
+    "lines": 10
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "8手を画像で確認。行き4マスと帰り5マスを配達でき、六マスへの増加、三ミス終了、再開も確認した。逆順は少し考えるが基本は定番の記憶課題。終了表示に直前の文字が薄く残るのが惜しい。五通クリアまでは遊んでいない。",
+    "similar": [
+      {
+        "title": "Human Benchmark — Sequence Memory",
+        "url": "https://humanbenchmark.com/tests/sequence",
+        "similarity": "高",
+        "note": "場所の順を記憶して再入力する核が同じ。本作は道を番号で一度に見せ、順と逆順を交互に要求する。",
+        "note_en": "Both memorize spatial sequences and reproduce them. This game shows a numbered route all at once and alternates forward and reverse recall."
+      }
+    ],
+    "research": "Web検索を2件実施。公式Human Benchmarkの紹介でSequence Memoryの規則を確認し公式ゲームURLも開いた。Cogmed検索はゲーム固有の比較に不足したため掲載せず。",
+    "i18n": {
+      "en": {
+        "comment": "Viewed eight steps: delivered forward four-cell and reverse five-cell routes, saw growth to six cells, three-mistake failure and restart. Reversal adds thought, but this remains a familiar memory task. Faint prior text behind the result is distracting. Did not complete all five deliveries.",
+        "research": "Ran two web searches. Verified Sequence Memory through the official Human Benchmark introduction and opened its official game URL. Cogmed results lacked game-specific comparison detail and were omitted."
+      }
+    },
+    "method": "スマホ縦画面で 8 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 8 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.90) 120ms",
+        "note": "番号を覚えて配達する説明を読み開始する。",
+        "noteEn": "Read the route-memory instructions and start.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "wait 5000ms",
+        "note": "右下1→左2→左3→上4の折れた道を記憶し、消えるまで待つ。",
+        "noteEn": "Remember bottom-right, left, left, up; wait for the route to fade.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.81,0.72) 120ms → tap(0.59,0.72) 120ms → tap(0.38,0.72) 120ms → tap(0.38,0.60) 120ms",
+        "note": "番号が消えた。記憶した右下から左左上を押して届ける。",
+        "noteEn": "The numbers have faded. Tap the remembered rightmost bottom cell, left, left, up.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 1500ms",
+        "note": "四マスが緑になり配達成功。次の帰り便を見る。",
+        "noteEn": "All four cells turn green: delivered. Look at the next return route.",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 5000ms → tap(0.38,0.60) 120ms → tap(0.59,0.60) 120ms → tap(0.59,0.48) 120ms → tap(0.38,0.48) 120ms → tap(0.17,0.48) 120ms",
+        "note": "帰り便は5→4→3→2→1。下中央から右上左左の折り返しを覚えて逆順に押す。",
+        "noteEn": "Return mail is 5,4,3,2,1. Remember lower-center, right, up, left, left and tap after fading.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 1500ms",
+        "note": "逆順でも成功した。三通目は道が六マスに伸びるか観察する。",
+        "noteEn": "The reverse route worked. Observe the longer third route.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 5200ms → tap(0.81,0.72) 120ms → tap(0.81,0.72) 120ms → tap(0.81,0.72) 120ms",
+        "note": "六マスに増えた。失敗時の区切りを確かめるため、道にない右下を三回押す。",
+        "noteEn": "The route grows to six cells. Deliberately tap the unused bottom-right three times to inspect failure.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 2
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 1000ms → tap(0.50,0.90) 120ms",
+        "note": "三ミスで終了し正解の道が出た。上部に直前の文字が薄く残り読みにくい。待って再開する。",
+        "noteEn": "Three mistakes end the run and reveal the route. Faint previous text behind the result is distracting. Wait and restart.",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-13T12:14:20+09:00"
+  },
+  "publishedAt": "2026-10-13T12:14:20+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 437,
+    "outputTokens": 5457,
+    "contextTokens": 1503680,
+    "turns": 23,
+    "toolCalls": 23,
+    "webSearches": null,
+    "minutes": 6.3,
+    "from": "2026-10-13T03:08:11.435Z",
+    "to": "2026-10-13T03:14:28.180Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力から思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated Codex token_usage_record entries by unique response_id from planning through review. Input includes cached tokens; output excludes reasoning. Tools count top-level calls only.",
+    "recordedAt": "2026-10-13T12:14:28+09:00",
+    "validationRuns": 2,
+    "codeKB": 5.4,
+    "evidence": "metrics-evidence.json"
+  }
+}
