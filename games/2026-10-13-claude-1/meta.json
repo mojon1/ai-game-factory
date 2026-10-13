@@ -1,0 +1,640 @@
+{
+  "id": "2026-10-13-claude-1",
+  "status": "published",
+  "title": "スリップストリーム",
+  "genre": "レース",
+  "concept": "前の車の真後ろは風よけになり、吸い寄せられるように速くなる。真後ろで青い勢いをため、横へ抜けた瞬間に一気に追い抜く「スリングショット」を核にした。自力では最速の車に届かないので、どの車について、いつ抜けるかがレースのすべてになる。",
+  "howToPlay": "左右にドラッグしてハンドル。前の車の真後ろで勢いをため、横へ抜けて追い抜き、1位でゴールすれば次のコースへ。",
+  "libraryDecision": "使わない。車は上から見た2Dの道路を走るだけで、勝負は「真後ろにつく位置」と「抜けるタイミング」にある。3D化や物理演算は核を強めず、自前の簡単な当たり判定のほうが車列の動きを読みやすいため。",
+  "soundDecision": "Web Audio で自作。速度で音程が上がるエンジン音、真後ろについている間だけ強くなる風の音、抜けた瞬間のヒュッという加速音、追い抜きの音を鳴らす。画面を見なくても「いま風に乗っている」と耳で分かり、抜くタイミングの手触りが強まるため。BGMはエンジンと風の音を邪魔するので入れない。",
+  "planning": {
+    "genreDraw": {
+      "ja": "レース",
+      "en": "Racing",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "スリップストリームのレース。前の車の真後ろで風に吸われて加速し、勢いをためて横へ抜けると一気に追い抜ける。自力では勝てない相手に、どの車について、いつ抜けるかで勝つ。",
+        "ideaEn": "A slipstream race: tuck in behind a car to get pulled along, charge up, then swing out to slingshot past. You cannot win on raw speed — it is all about whom to follow and when to pull out.",
+        "fromDraw": true
+      },
+      {
+        "idea": "雪玉ころがし。坂を転がる雪玉を左右にドラッグで導く。雪を拾うほど大きく速くなるが曲がりにくくなり、木や岩を壊せるかぎりぎり避けるかの判断になる。",
+        "ideaEn": "Snowball roll: steer a snowball down a slope. It grows and speeds up as it gathers snow but turns worse, so you weigh smashing through obstacles against dodging them.",
+        "fromDraw": false
+      },
+      {
+        "idea": "ドミノ設計。指でなぞった線の上にドミノが並び、最後に1枚押すと倒れていく。分かれ道やベルを巻き込み、1回で何個鳴らせるかを考える。",
+        "ideaEn": "Domino design: draw a line and dominoes are placed along it, then push the first one. Plan branches to ring as many bells as possible in a single run.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Slipstream",
+      "concept": "Right behind another car you get out of the wind and are pulled along. Charge up blue momentum there, then swing out and slingshot past — that is the core. You can never reach the fastest car on raw speed, so the race is all about which car to follow and when to pull out.",
+      "howToPlay": "Drag left/right to steer. Charge up right behind a car, swing out to overtake, and win the race to unlock the next course.",
+      "libraryDecision": "None. The cars run on a top-down 2D road and the game lives in where you sit behind a car and when you pull out. 3D or a physics engine would not strengthen that, and simple hand-made collisions keep the pack easier to read.",
+      "soundDecision": "Hand-made with Web Audio: an engine whose pitch rises with speed, a wind hiss that swells only while you are drafting, a whoosh when you slingshot, and a ping for each overtake. You can hear that you are riding the wind without looking, which sharpens the timing of the pull-out. No BGM, since it would mask the engine and wind."
+    }
+  },
+  "createdAt": "2026-10-13T09:05:53+09:00",
+  "specVersion": 8,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-13T09:05:53+09:00",
+    "metricsFrom": "2026-10-13T00:05:35.818Z",
+    "transcript": "8a52d05f-db7d-4c56-974f-621d02b27022.jsonl",
+    "validationRuns": 2,
+    "finishedAt": "2026-10-13T09:16:27+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-13T09:10:24+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "30.4KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=176",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=185",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=133",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=211",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 31152,
+    "lines": 720
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 3
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "真後ろについて青い輪がたまり、横へ抜けた瞬間に313km/hまで伸びて2台まとめて抜けた場面は気持ちよかった。風の音と加速音で「いま乗っている」が分かる。一方、道がうねるので真後ろを保つには細かくハンドルを切り続ける必要があり、少し動かしただけで芝生に出て失速、抜いた相手に抜き返されることも多かった。早く抜けすぎると伸びが小さい、という判断の手応えはある。コース1でも5位止まりで、上位3台は集団で先に行ってしまい、初見では優勝が遠く感じる。「スリングショット！」の文字が流れて下の速度表示に重なるのも気になった。自己プレイは1手ごとに止まる方式で、連続して指を動かす実機より追従は難しかったはず。",
+    "similar": [
+      {
+        "title": "マリオカート（スリップストリーム）",
+        "url": "https://www.mariowiki.com/Slipstreaming",
+        "similarity": "高",
+        "note": "前の車の後ろにつくと青い風が出て加速する演出・仕組みはほぼ同じ。こちらはアイテムが無く、スリップと抜けるタイミングだけで勝負する",
+        "note_en": "Nearly the same idea and blue-wind visual for drafting. This game has no items; drafting and pull-out timing are the whole race."
+      },
+      {
+        "title": "グランツーリスモ7（スリップストリームの解説）",
+        "url": "https://gran-turismo.com/gb/gt7/apex/driving_technique/12",
+        "similarity": "中",
+        "note": "実際のモータースポーツの技術としてのスリップストリーム。抜けるのが早すぎると届かないという考え方は共通。こちらは縦画面の簡単な操作に絞った",
+        "note_en": "Drafting as a real motorsport technique; shares the idea that pulling out too early fails. This game reduces it to a simple portrait-mode control."
+      },
+      {
+        "title": "Super Power Racing",
+        "url": "https://monsterfingergames.itch.io/superpowerracing/devlog/988752/demo-v206-update",
+        "similarity": "中",
+        "note": "見下ろし視点のアーケードレースにドラフトブーストがある点が近い。こちらはドリフトが無く、ためた量で加速が決まるスリングショットが中心",
+        "note_en": "A top-down arcade racer with a draft boost. This game has no drifting; it centres on a slingshot whose strength depends on the stored charge."
+      },
+      {
+        "title": "Circuit Superstars",
+        "url": "https://steamdb.info/patchnotes/7851670",
+        "similarity": "低",
+        "note": "見下ろし視点のレースで後からドラフトが追加された。こちらはスマホ片手のドラッグ操作で、勝つにはスリップが必須になるよう相手の速さを決めている",
+        "note_en": "Top-down racer that later added drafting. Here it is one-finger drag on a phone, and rival speeds are tuned so drafting is required to win."
+      }
+    ],
+    "research": "WebSearchで「slipstream drafting racing game slingshot」「top-down mobile racing drafting boost」を検索し、マリオカートのスリップストリーム、GT7の解説、見下ろし型レースのドラフト導入例を確認した。",
+    "i18n": {
+      "en": {
+        "comment": "Tucking in until the blue ring filled, then swinging out to hit 313 km/h and pass two cars at once felt great, and the wind hiss and whoosh tell you when you are riding the draft. But the road keeps bending, so staying right behind a car needs constant small corrections; a slightly large move put me on the grass, slowed me down, and let passed cars retake me. Pulling out too early gives a weak boost, which makes the timing feel meaningful. I only managed 5th on Course 1; the top three ran away as a pack, so a first win feels far off. The floating 'SLINGSHOT!' text also drifts down over the speed readout. My self-play paused between moves, which made tracking harder than continuous finger control on a real phone.",
+        "research": "Searched the web for 'slipstream drafting racing game slingshot' and 'top-down mobile racing drafting boost'; found Mario Kart's slipstream, GT7's technique guide, and top-down racers that use draft boosts."
+      }
+    },
+    "method": "スマホ縦画面で 19 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 19 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.60) 100ms",
+        "note": "タイトル画面。遊び方3行とコース1が表示。タップで開始",
+        "noteEn": "Title screen with three lines of rules and Course 1. Tap to start.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "wait 3000ms",
+        "note": "カウントダウン。真後ろの7番の後ろにそのままつく",
+        "noteEn": "Countdown. Staying right behind car 7.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "path(0.50,0.80→0.50,0.80→0.50,0.80→0.51,0.80) 2000ms",
+        "note": "7番の真後ろで青いゲージをためる",
+        "noteEn": "Charging the blue gauge right behind car 7.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "path(0.50,0.80→0.54,0.80→0.54,0.80→0.54,0.80) 2500ms",
+        "note": "抜けた瞬間スリングショットで7位に。次はピンクの5番の後ろへ",
+        "noteEn": "Slingshot on pulling out, now 7th. Next: get behind pink car 5.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "path(0.40,0.80→0.56,0.80→0.57,0.80→0.58,0.80) 2500ms",
+        "note": "カーブで左に流されていた。右へ寄せて5番の後ろを狙う",
+        "noteEn": "The bend pushed me left. Steering right to get behind car 5.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "path(0.50,0.80→0.55,0.80→0.55,0.80→0.55,0.80→0.55,0.80→0.55,0.80) 3000ms",
+        "note": "6位。5番の真後ろにぴったり合わせて風をためる",
+        "noteEn": "6th. Lining up exactly behind car 5 to charge.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "path(0.50,0.80→0.59,0.80→0.59,0.80→0.60,0.80) 1500ms",
+        "note": "またカーブでずれた。道の曲がりに合わせてハンドルを切り続ける必要がある",
+        "noteEn": "Drifted off again on the bend; you have to keep steering with the curves.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "path(0.50,0.80→0.50,0.80→0.49,0.80→0.49,0.80→0.38,0.80) 1500ms",
+        "note": "真後ろで青い輪がたまってきた。左へ抜けてスリングショットを狙う",
+        "noteEn": "The blue ring is filling. Swinging left to slingshot.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "path(0.50,0.80→0.42,0.80→0.42,0.80) 1200ms",
+        "note": "左へ抜ける",
+        "noteEn": "Pulling out to the left.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "path(0.50,0.80→0.33,0.80→0.33,0.80) 1000ms",
+        "note": "カーブに相殺されて抜けきれていなかった。ゲージ満タン近く、大きく左へ",
+        "noteEn": "The bend cancelled my move. Gauge almost full, swinging hard left.",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "path(0.40,0.80→0.64,0.80→0.64,0.80→0.65,0.80→0.65,0.80) 3000ms",
+        "note": "満タンで抜けると313km/hまで伸びて一気に5位。気持ちいい。次は紫の4番",
+        "noteEn": "A full-gauge pull-out shot me to 313 km/h and 5th. Feels great. Next: purple car 4.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "path(0.60,0.80→0.35,0.80→0.35,0.80→0.35,0.80→0.35,0.80→0.35,0.80) 3500ms",
+        "note": "勢いのまま4番も抜いて4位。左の黄色3番の後ろへ",
+        "noteEn": "Passed car 4 on the remaining boost, now 4th. Heading behind yellow car 3.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "path(0.40,0.80→0.55,0.80→0.55,0.80→0.55,0.80→0.55,0.80) 3000ms",
+        "note": "曲がりに合わせきれず芝生に出て減速。土ぼこりが出る。右へ戻して3番を追う",
+        "noteEn": "Overshot onto the grass and slowed down (dust kicks up). Steering back right to chase car 3.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "path(0.50,0.80→0.60,0.80→0.60,0.80→0.60,0.80→0.60,0.80→0.60,0.80→0.45,0.80) 4000ms",
+        "note": "芝生で失速した間に4番に抜き返され5位。もう一度4番の後ろについて、ためてから左へ",
+        "noteEn": "Car 4 got back past while I was slowed on the grass; 5th. Draft car 4 again, charge, then pull out left.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "path(0.50,0.80→0.62,0.80→0.62,0.80→0.62,0.80→0.62,0.80→0.62,0.80→0.62,0.80→0.50,0.80) 6000ms",
+        "note": "ためが少ないうちに抜けたので伸びが小さかった。もう一度4番の後ろで長めにためる",
+        "noteEn": "Pulled out with too little charge, so the boost was small. Draft car 4 longer this time.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "path(0.50,0.80→0.50,0.80→0.60,0.80→0.60,0.80→0.60,0.80→0.60,0.80→0.60,0.80→0.60,0.80) 8000ms",
+        "note": "5番にも抜かれて6位。風をためて右へ抜け、ゴールまで走る",
+        "noteEn": "Car 5 passed me too; 6th. Charge, pull out right, and run to the finish.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 17,
+        "action": "wait 5000ms",
+        "note": "早く抜けすぎて風を失い、5番が遠ざかる。そのままゴールへ",
+        "noteEn": "Pulled out too early and lost the wind; car 5 drifts away. Running to the line.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 18,
+        "action": "wait 2500ms",
+        "note": "ゴールラインが見えた",
+        "noteEn": "The finish line is in sight.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "unlocked": 0,
+              "course": 0,
+              "bests": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 0,
+            "place": 5
+          }
+        ]
+      },
+      {
+        "step": 19,
+        "action": "tap(0.50,0.70) 80ms → wait 2500ms",
+        "note": "5位でゴール。優勝しないと次のコースへ進めない。タップで再挑戦",
+        "noteEn": "Finished 5th. You must win to unlock the next course. Tap to retry.",
+        "image": "ai-play/step-19.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "unlocked": 0,
+              "course": 0,
+              "bests": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 0,
+            "place": 5
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-13T09:16:27+09:00"
+  },
+  "publishedAt": "2026-10-13T09:16:27+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 8833,
+    "outputTokens": 27738,
+    "contextTokens": 6797114,
+    "turns": 51,
+    "toolCalls": 53,
+    "webSearches": 0,
+    "minutes": 10.9,
+    "from": "2026-10-13T00:05:35.818Z",
+    "to": "2026-10-13T00:16:28.062Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-13T09:16:28+09:00",
+    "validationRuns": 2,
+    "codeKB": 30.4
+  }
+}

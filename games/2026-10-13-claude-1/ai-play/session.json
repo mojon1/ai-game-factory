@@ -1,0 +1,811 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-13T00:10:29.120Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.6
+        ],
+        "hold": 100
+      },
+      "desc": "tap(0.50,0.60) 100ms",
+      "note": "タイトル画面。遊び方3行とコース1が表示。タップで開始",
+      "noteEn": "Title screen with three lines of rules and Course 1. Tap to start.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": {
+        "wait": 3000
+      },
+      "desc": "wait 3000ms",
+      "note": "カウントダウン。真後ろの7番の後ろにそのままつく",
+      "noteEn": "Countdown. Staying right behind car 7.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": {
+        "path": [
+          [
+            0.5,
+            0.8
+          ],
+          [
+            0.5,
+            0.8
+          ],
+          [
+            0.5,
+            0.8
+          ],
+          [
+            0.51,
+            0.8
+          ]
+        ],
+        "hold": 2000
+      },
+      "desc": "path(0.50,0.80→0.50,0.80→0.50,0.80→0.51,0.80) 2000ms",
+      "note": "7番の真後ろで青いゲージをためる",
+      "noteEn": "Charging the blue gauge right behind car 7.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": {
+        "path": [
+          [
+            0.5,
+            0.8
+          ],
+          [
+            0.535,
+            0.8
+          ],
+          [
+            0.535,
+            0.8
+          ],
+          [
+            0.535,
+            0.8
+          ]
+        ],
+        "hold": 2500
+      },
+      "desc": "path(0.50,0.80→0.54,0.80→0.54,0.80→0.54,0.80) 2500ms",
+      "note": "抜けた瞬間スリングショットで7位に。次はピンクの5番の後ろへ",
+      "noteEn": "Slingshot on pulling out, now 7th. Next: get behind pink car 5.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": {
+        "path": [
+          [
+            0.4,
+            0.8
+          ],
+          [
+            0.56,
+            0.8
+          ],
+          [
+            0.57,
+            0.8
+          ],
+          [
+            0.58,
+            0.8
+          ]
+        ],
+        "hold": 2500
+      },
+      "desc": "path(0.40,0.80→0.56,0.80→0.57,0.80→0.58,0.80) 2500ms",
+      "note": "カーブで左に流されていた。右へ寄せて5番の後ろを狙う",
+      "noteEn": "The bend pushed me left. Steering right to get behind car 5.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": {
+        "path": [
+          [
+            0.5,
+            0.8
+          ],
+          [
+            0.545,
+            0.8
+          ],
+          [
+            0.545,
+            0.8
+          ],
+          [
+            0.545,
+            0.8
+          ],
+          [
+            0.545,
+            0.8
+          ],
+          [
+            0.545,
+            0.8
+          ]
+        ],
+        "hold": 3000
+      },
+      "desc": "path(0.50,0.80→0.55,0.80→0.55,0.80→0.55,0.80→0.55,0.80→0.55,0.80) 3000ms",
+      "note": "6位。5番の真後ろにぴったり合わせて風をためる",
+      "noteEn": "6th. Lining up exactly behind car 5 to charge.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": {
+        "path": [
+          [
+            0.5,
+            0.8
+          ],
+          [
+            0.59,
+            0.8
+          ],
+          [
+            0.595,
+            0.8
+          ],
+          [
+            0.6,
+            0.8
+          ]
+        ],
+        "hold": 1500
+      },
+      "desc": "path(0.50,0.80→0.59,0.80→0.59,0.80→0.60,0.80) 1500ms",
+      "note": "またカーブでずれた。道の曲がりに合わせてハンドルを切り続ける必要がある",
+      "noteEn": "Drifted off again on the bend; you have to keep steering with the curves.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": {
+        "path": [
+          [
+            0.5,
+            0.8
+          ],
+          [
+            0.5,
+            0.8
+          ],
+          [
+            0.49,
+            0.8
+          ],
+          [
+            0.49,
+            0.8
+          ],
+          [
+            0.38,
+            0.8
+          ]
+        ],
+        "hold": 1500
+      },
+      "desc": "path(0.50,0.80→0.50,0.80→0.49,0.80→0.49,0.80→0.38,0.80) 1500ms",
+      "note": "真後ろで青い輪がたまってきた。左へ抜けてスリングショットを狙う",
+      "noteEn": "The blue ring is filling. Swinging left to slingshot.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": {
+        "path": [
+          [
+            0.5,
+            0.8
+          ],
+          [
+            0.42,
+            0.8
+          ],
+          [
+            0.42,
+            0.8
+          ]
+        ],
+        "hold": 1200
+      },
+      "desc": "path(0.50,0.80→0.42,0.80→0.42,0.80) 1200ms",
+      "note": "左へ抜ける",
+      "noteEn": "Pulling out to the left.",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "action": {
+        "path": [
+          [
+            0.5,
+            0.8
+          ],
+          [
+            0.33,
+            0.8
+          ],
+          [
+            0.33,
+            0.8
+          ]
+        ],
+        "hold": 1000
+      },
+      "desc": "path(0.50,0.80→0.33,0.80→0.33,0.80) 1000ms",
+      "note": "カーブに相殺されて抜けきれていなかった。ゲージ満タン近く、大きく左へ",
+      "noteEn": "The bend cancelled my move. Gauge almost full, swinging hard left.",
+      "image": "ai-play/step-10.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "action": {
+        "path": [
+          [
+            0.4,
+            0.8
+          ],
+          [
+            0.64,
+            0.8
+          ],
+          [
+            0.64,
+            0.8
+          ],
+          [
+            0.65,
+            0.8
+          ],
+          [
+            0.65,
+            0.8
+          ]
+        ],
+        "hold": 3000
+      },
+      "desc": "path(0.40,0.80→0.64,0.80→0.64,0.80→0.65,0.80→0.65,0.80) 3000ms",
+      "note": "満タンで抜けると313km/hまで伸びて一気に5位。気持ちいい。次は紫の4番",
+      "noteEn": "A full-gauge pull-out shot me to 313 km/h and 5th. Feels great. Next: purple car 4.",
+      "image": "ai-play/step-11.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 12,
+      "action": {
+        "path": [
+          [
+            0.6,
+            0.8
+          ],
+          [
+            0.355,
+            0.8
+          ],
+          [
+            0.355,
+            0.8
+          ],
+          [
+            0.35,
+            0.8
+          ],
+          [
+            0.35,
+            0.8
+          ],
+          [
+            0.35,
+            0.8
+          ]
+        ],
+        "hold": 3500
+      },
+      "desc": "path(0.60,0.80→0.35,0.80→0.35,0.80→0.35,0.80→0.35,0.80→0.35,0.80) 3500ms",
+      "note": "勢いのまま4番も抜いて4位。左の黄色3番の後ろへ",
+      "noteEn": "Passed car 4 on the remaining boost, now 4th. Heading behind yellow car 3.",
+      "image": "ai-play/step-12.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 13,
+      "action": {
+        "path": [
+          [
+            0.4,
+            0.8
+          ],
+          [
+            0.55,
+            0.8
+          ],
+          [
+            0.55,
+            0.8
+          ],
+          [
+            0.55,
+            0.8
+          ],
+          [
+            0.55,
+            0.8
+          ]
+        ],
+        "hold": 3000
+      },
+      "desc": "path(0.40,0.80→0.55,0.80→0.55,0.80→0.55,0.80→0.55,0.80) 3000ms",
+      "note": "曲がりに合わせきれず芝生に出て減速。土ぼこりが出る。右へ戻して3番を追う",
+      "noteEn": "Overshot onto the grass and slowed down (dust kicks up). Steering back right to chase car 3.",
+      "image": "ai-play/step-13.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 14,
+      "action": {
+        "path": [
+          [
+            0.5,
+            0.8
+          ],
+          [
+            0.6,
+            0.8
+          ],
+          [
+            0.6,
+            0.8
+          ],
+          [
+            0.6,
+            0.8
+          ],
+          [
+            0.6,
+            0.8
+          ],
+          [
+            0.6,
+            0.8
+          ],
+          [
+            0.45,
+            0.8
+          ]
+        ],
+        "hold": 4000
+      },
+      "desc": "path(0.50,0.80→0.60,0.80→0.60,0.80→0.60,0.80→0.60,0.80→0.60,0.80→0.45,0.80) 4000ms",
+      "note": "芝生で失速した間に4番に抜き返され5位。もう一度4番の後ろについて、ためてから左へ",
+      "noteEn": "Car 4 got back past while I was slowed on the grass; 5th. Draft car 4 again, charge, then pull out left.",
+      "image": "ai-play/step-14.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 15,
+      "action": {
+        "path": [
+          [
+            0.5,
+            0.8
+          ],
+          [
+            0.62,
+            0.8
+          ],
+          [
+            0.62,
+            0.8
+          ],
+          [
+            0.62,
+            0.8
+          ],
+          [
+            0.62,
+            0.8
+          ],
+          [
+            0.62,
+            0.8
+          ],
+          [
+            0.62,
+            0.8
+          ],
+          [
+            0.5,
+            0.8
+          ]
+        ],
+        "hold": 6000
+      },
+      "desc": "path(0.50,0.80→0.62,0.80→0.62,0.80→0.62,0.80→0.62,0.80→0.62,0.80→0.62,0.80→0.50,0.80) 6000ms",
+      "note": "ためが少ないうちに抜けたので伸びが小さかった。もう一度4番の後ろで長めにためる",
+      "noteEn": "Pulled out with too little charge, so the boost was small. Draft car 4 longer this time.",
+      "image": "ai-play/step-15.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 16,
+      "action": {
+        "path": [
+          [
+            0.5,
+            0.8
+          ],
+          [
+            0.5,
+            0.8
+          ],
+          [
+            0.6,
+            0.8
+          ],
+          [
+            0.6,
+            0.8
+          ],
+          [
+            0.6,
+            0.8
+          ],
+          [
+            0.6,
+            0.8
+          ],
+          [
+            0.6,
+            0.8
+          ],
+          [
+            0.6,
+            0.8
+          ]
+        ],
+        "hold": 8000
+      },
+      "desc": "path(0.50,0.80→0.50,0.80→0.60,0.80→0.60,0.80→0.60,0.80→0.60,0.80→0.60,0.80→0.60,0.80) 8000ms",
+      "note": "5番にも抜かれて6位。風をためて右へ抜け、ゴールまで走る",
+      "noteEn": "Car 5 passed me too; 6th. Charge, pull out right, and run to the finish.",
+      "image": "ai-play/step-16.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 17,
+      "action": {
+        "wait": 5000
+      },
+      "desc": "wait 5000ms",
+      "note": "早く抜けすぎて風を失い、5番が遠ざかる。そのままゴールへ",
+      "noteEn": "Pulled out too early and lost the wind; car 5 drifts away. Running to the line.",
+      "image": "ai-play/step-17.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 18,
+      "action": {
+        "wait": 2500
+      },
+      "desc": "wait 2500ms",
+      "note": "ゴールラインが見えた",
+      "noteEn": "The finish line is in sight.",
+      "image": "ai-play/step-18.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "unlocked": 0,
+            "course": 0,
+            "bests": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "agf": "end",
+          "score": 0,
+          "place": 5
+        }
+      ]
+    },
+    {
+      "step": 19,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.7
+          ],
+          "hold": 80
+        },
+        {
+          "wait": 2500
+        }
+      ],
+      "desc": "tap(0.50,0.70) 80ms → wait 2500ms",
+      "note": "5位でゴール。優勝しないと次のコースへ進めない。タップで再挑戦",
+      "noteEn": "Finished 5th. You must win to unlock the next course. Tap to retry.",
+      "image": "ai-play/step-19.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "unlocked": 0,
+            "course": 0,
+            "bests": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "agf": "end",
+          "score": 0,
+          "place": 5
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}
