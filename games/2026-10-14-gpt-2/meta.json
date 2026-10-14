@@ -1,0 +1,426 @@
+{
+  "id": "2026-10-14-gpt-2",
+  "status": "published",
+  "title": "ほどける星の糸",
+  "genre": "パズル",
+  "concept": "星を動かすとつながった糸も動き、交差する場所だけが桃色に光る。結び目を一つ減らすつもりで引いた星が別の糸を交差させるため、外へ開くか内へ通すかを形で考える。時間に追われず三つの星座をほどく、試して戻せる手触りが核。",
+  "howToPlay": "星をドラッグして、糸の交差を全部なくそう。星どうしは少し離して置く。3つの星座をほどくと完成。",
+  "libraryDecision": "糸の交差を正確に読み、指を動かした分だけ形が変わることが核。物理の揺れや3Dの奥行きは交差の意味を曖昧にするので使わず、Canvasで線を直接描く。",
+  "soundDecision": "星を離したとき、結び目が減れば高い短音、増えれば低い短音を鳴らす。静かな観察を保つためBGMは入れない。",
+  "planning": {
+    "genreDraw": {
+      "ja": "ステルス",
+      "en": "Stealth",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "急ぐと足音が広がって見張りを呼ぶステルス。小さな移動で静かに宝を運ぶ。",
+        "ideaEn": "A stealth game where rushing spreads noise and draws guards; move quietly to carry treasure.",
+        "fromDraw": true
+      },
+      {
+        "idea": "星をドラッグして交差した糸をほどき、三つの星座を整える。",
+        "ideaEn": "Drag stars to untangle crossing threads and arrange three constellations.",
+        "fromDraw": false
+      },
+      {
+        "idea": "二つの波の周期を見て、同時に引いた瞬間だけ渡るリズムの浜辺。",
+        "ideaEn": "Cross a rhythmic beach only when two waves retreat together.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 1
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Untangle the Star Threads",
+      "concept": "Moving stars moves their threads; crossing threads glow pink. A move that removes one knot can create another, inviting you to open the shape outward or pass a star through the middle. Untangle three constellations without a timer, freely trying and reversing arrangements.",
+      "howToPlay": "Drag stars to remove every thread crossing. Keep the stars spaced apart. Untangle three constellations to finish.",
+      "libraryDecision": "Exact crossings and immediate response are the core. Physics wobble and 3D depth would obscure the meaning of a crossing, so Canvas draws the lines directly.",
+      "soundDecision": "Releasing a star plays a higher short tone if knots decreased and a lower tone if they increased. No music distracts from observation."
+    }
+  },
+  "createdAt": "2026-10-14T12:09:46+09:00",
+  "specVersion": 8,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-14T12:09:46+09:00",
+    "metricsFrom": "2026-10-14T03:08:33.893Z",
+    "transcript": null,
+    "validationRuns": 1,
+    "finishedAt": "2026-10-14T12:18:12+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-14T12:11:47+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "6.5KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=59",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=108",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=47",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=89",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 6642,
+    "lines": 7
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "11手を画像で確認。第一星座を3ドラッグ、第二星座をさらに6ドラッグで完成し、交差6→3→1→0、次の12→15→13→13→10→5→0という増減と次へ進む操作を確認した。糸がほどける反応は分かりやすく、気軽に戻して考えられる。一方、番号順に外周へ並べれば解ける同じ扇形構造なので、独自性と解法の幅は小さい。星を近づけすぎる表示も確認。第三星座・全クリア・再開は未確認。",
+    "similar": [
+      {
+        "title": "Planarity",
+        "url": "https://planarity.net/",
+        "similarity": "高",
+        "note": "頂点をドラッグして辺の交差をなくす基本ルールが同じ。本作は星の見た目、交差する糸の色、短い三段階と間隔の条件を加えたが、核は既存の平面化パズル。",
+        "note_en": "Both drag vertices to remove edge crossings. Stars, crossing colors, three short stages and spacing constraints alter presentation, but the core is the established graph-planarity puzzle."
+      },
+      {
+        "title": "Untangle — Simon Tatham’s Portable Puzzle Collection",
+        "url": "https://www.chiark.greenend.org.uk/~sgtatham/puzzles/js/untangle.html",
+        "similarity": "高",
+        "note": "点を動かして線をほどく遊びが共通。本作は星の番号と中心から伸びる扇形が固定で、生成される構造の幅は狭い。",
+        "note_en": "Both untangle lines by moving points. This game uses numbered stars and a fixed fan structure, giving a narrower range of generated graphs."
+      }
+    ],
+    "research": "Web検索を3件実施。Planarity公式の作者と遊び方案内、Simon Tatham公式のUntangle掲載を確認。Untangle説明ページの取得はタイムアウトしたため、そのページ本文を読めたとは扱わない。",
+    "i18n": {
+      "en": {
+        "comment": "Viewed eleven steps. Solved the first pattern in three drags and the second in six more. Crossings changed 6–3–1–0, then 12–15–13–13–10–5–0, and continuation worked. Untangling feedback is readable and moves are freely reversible. However, the repeated fan structure can be solved by putting numbered stars around the boundary, limiting originality and solution variety. Also saw the spacing warning. Third pattern, final clear and restart remain untested.",
+        "research": "Ran three web searches. Verified Planarity’s official author and instructions link and Untangle’s listing on Simon Tatham’s official site. The Untangle documentation fetch timed out, so its body was not treated as read."
+      }
+    },
+    "method": "スマホ縦画面で 11 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 11 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.90) 120ms",
+        "note": "桃色の交差をほどく説明を読み、星座を開く。",
+        "noteEn": "Read the crossing-thread instructions and open the constellation.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "path(0.80,0.42→0.85,0.55→0.86,0.76) 400ms",
+        "note": "6つの交差。3番の糸が中央を横切るので、3番を右下の外側へ引いてみる。",
+        "noteEn": "Six crossings. Star three cuts through the middle; pull it outward to the lower-right.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "path(0.50,0.30→0.67,0.30→0.86,0.32) 400ms",
+        "note": "交差が6から3になった。4番を右上に開き、右側の糸を外へ逃がす。",
+        "noteEn": "Crossings fell from six to three. Open star four toward the upper-right.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "path(0.80,0.67→0.65,0.50→0.50,0.30) 400ms",
+        "note": "残り1交差は1―4と6―5。5番を上中央へ動かしてこの交差をほどく。",
+        "noteEn": "The last crossing is between 1–4 and 6–5. Move five to the upper center to untangle it.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 900ms → tap(0.50,0.92) 120ms",
+        "note": "3回の移動で全て青緑になり完成。次の7つの星へ進む。",
+        "noteEn": "All threads turn teal after three moves. Continue to the seven-star pattern.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "path(0.50,0.30→0.75,0.34→0.89,0.52) 400ms",
+        "note": "7つの星になり交差12。中央を横切る4番を右の外側へ開く。",
+        "noteEn": "Seven stars and twelve crossings. Pull star four from the top toward the outer right.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "path(0.65,0.77→0.56,0.50→0.50,0.29) 400ms",
+        "note": "4番を外へ出すだけでは交差が15に増えた。2番を上の空きへ動かし、1から2への糸を外周にする。",
+        "noteEn": "Moving four outward increased crossings to fifteen. Move two to the empty top, putting 1–2 on the outside.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "path(0.35,0.77→0.50,0.79→0.68,0.78) 400ms",
+        "note": "交差13。5番を右下へ動かして、4―5を右側に寄せる。",
+        "noteEn": "Thirteen crossings. Move five to the lower-right, bringing 4–5 to the right side.",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "path(0.77,0.40→0.55,0.60→0.31,0.80) 400ms",
+        "note": "5番の移動では数は変わらなかった。6番を左下の空いた場所へ引き、5―6を下側にする。",
+        "noteEn": "Moving five left the count unchanged. Pull six into the empty lower-left to put 5–6 along the bottom.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "path(0.84,0.60→0.50,0.65→0.11,0.59) 400ms",
+        "note": "交差10。1―7と6―7が長く横切っているので、7番を左端へ運ぶ。",
+        "noteEn": "Ten crossings. Long 1–7 and 6–7 threads cut across the shape; move seven to the left edge.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "path(0.16,0.60→0.50,0.45→0.83,0.39) 400ms",
+        "note": "5交差に減ったが、7と3が近すぎる表示。3番を右上へ離して2―3―4の順に整える。",
+        "noteEn": "Five crossings remain, but three and seven are too close. Move three to the upper-right to arrange 2–3–4.",
+        "image": "ai-play/step-11.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 9
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-14T12:18:12+09:00"
+  },
+  "publishedAt": "2026-10-14T12:18:12+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 1924,
+    "outputTokens": 7128,
+    "contextTokens": 4488295,
+    "turns": 28,
+    "toolCalls": 28,
+    "webSearches": null,
+    "minutes": 9.9,
+    "from": "2026-10-14T03:08:33.893Z",
+    "to": "2026-10-14T03:18:27.687Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力から思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated Codex token_usage_record entries by unique response_id from planning through review. Input includes cached tokens; output excludes reasoning. Tools count top-level calls only.",
+    "recordedAt": "2026-10-14T12:18:27+09:00",
+    "validationRuns": 1,
+    "codeKB": 6.5,
+    "evidence": "metrics-evidence.json"
+  }
+}
