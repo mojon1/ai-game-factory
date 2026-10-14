@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>なぞってドミノ / Domino Doodle</title>
+<style>
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#2a2d38}
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; }
+canvas{display:block;width:100vw;height:100vh;height:100dvh}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+'use strict';
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const JA = LANG === 'ja';
+const TXT = {
+  ja: {
+    title: 'なぞってドミノ', l1: '指でなぞってドミノを並べる', l2: 'たおして、鐘をぜんぶ鳴らそう', tap: 'タップでスタート',
+    cont: (n) => `ステージ ${n} から`, stage: 'ステージ', left: 'のこり', undo: 'もどす', clear: 'けす', go: 'たおす！',
+    empty: 'ドミノがもうない！', clearT: 'ステージクリア！', leftover: (n) => `のこりドミノ ${n} こ`, best: (n) => `ベスト ${n} こ`, newBest: 'ベスト更新！',
+    next: 'タップで次へ', again: 'タップでもう一度', fail: (n) => `鐘 あと ${n} つ…`, retry: 'タップで並べなおす', all: 'ぜんぶ鳴らした！', allSub: '全8ステージクリア',
+    hints: ['指でなぞって並べ、「たおす！」で倒そう', 'かべの間をぬって、鐘まで', 'ドミノのすぐ横から引くと、枝分かれ', '迷路をぬけて、いちばん奥の鐘へ',
+      'スイッチを倒すと、同じ色の扉がひらく', '扉に着く前に、スイッチを倒せるかな', '左のスイッチは右の扉、右のスイッチは左の扉', '3つの鐘。ドミノは足りるかな'],
+    names: ['ひとすじ', 'まがりかど', 'ふたまた', 'めいろ', 'とびら', 'まわりみち', 'いれちがい', 'みっつの鐘'],
+  },
+  en: {
+    title: 'Domino Doodle', l1: 'Draw with your finger to lay dominoes', l2: 'Topple them and ring every bell', tap: 'Tap to start',
+    cont: (n) => `Continue from stage ${n}`, stage: 'Stage', left: 'Left', undo: 'Undo', clear: 'Clear', go: 'TOPPLE!',
+    empty: 'Out of dominoes!', clearT: 'Stage clear!', leftover: (n) => `${n} dominoes left`, best: (n) => `Best: ${n} left`, newBest: 'New best!',
+    next: 'Tap to continue', again: 'Tap to play again', fail: (n) => `${n} bell${n > 1 ? 's' : ''} still silent…`, retry: 'Tap to stand them up', all: 'Every bell rang!', allSub: 'All 8 stages clear',
+    hints: ['Draw a line, then tap TOPPLE!', 'Weave between the walls to the bell', 'Start a line right beside a domino to branch', 'Find your way through the maze',
+      'Knock a switch to open the gate of its color', 'Can the switch fall before the chain reaches the gate?', 'Left switch opens the right gate, and vice versa', 'Three bells. Will you have enough?'],
+    names: ['One Line', 'Corners', 'Fork', 'Maze', 'Gate', 'Detour', 'Crossed', 'Three Bells'],
+  },
+};
+const L = TXT[JA ? 'ja' : 'en'];
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+
+// ---------- stages (field 360 x 560) ----------
+// s: start [x,y,deg]  w: walls  g: gates [x,y,w,h,id]  sw: switches [x,y,id]  b: bells  k: domino budget
+const STAGES = [
+  { s: [180, 510, -90], w: [[120, 250, 120, 24]], b: [[180, 80]], k: 45 },
+  { s: [40, 510, 0], w: [[0, 380, 280, 20], [80, 220, 280, 20]], b: [[50, 90]], k: 76 },
+  { s: [180, 520, -90], w: [[140, 120, 80, 260]], b: [[60, 70], [300, 70]], k: 80 },
+  { s: [40, 525, 0], w: [[0, 430, 290, 20], [70, 320, 290, 20], [0, 210, 290, 20]], b: [[50, 90]], k: 115 },
+  { s: [60, 520, -90], w: [[220, 0, 20, 220]], g: [[240, 200, 120, 16, 0]], sw: [[60, 80, 0]], b: [[300, 90]], k: 85 },
+  { s: [60, 520, 0], w: [[0, 300, 140, 20], [220, 300, 140, 20]], g: [[140, 300, 80, 20, 0]], sw: [[330, 520, 0]], b: [[180, 90]], k: 65 },
+  { s: [180, 520, -90], w: [[120, 0, 20, 196], [220, 0, 20, 196]], g: [[0, 180, 120, 16, 0], [240, 180, 120, 16, 1]], sw: [[300, 330, 0], [60, 330, 1]], b: [[60, 80], [300, 80]], k: 80 },
+  { s: [180, 530, -90], w: [[60, 140, 240, 20]], b: [[40, 60], [320, 60], [180, 250]], k: 82 },
+];
+const GATE_COL = ['#e0567a', '#2a9fa6'];
+const FW = 360, FH = 560, SP = 16, DH = 20, DT = 4, DW = 13, REACH = 27, FTIME = 0.13;
+
+// ---------- canvas ----------
+const cv = document.getElementById('c');
+const cx = cv.getContext('2d');
+let W = 1, H = 1, DPR = 1, fs = 1, fx = 0, fy = 0;
+let btns = [];
+function resize() {
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = Math.max(1, innerWidth); H = Math.max(1, innerHeight);
+  cv.width = Math.max(1, Math.round(W * DPR)); cv.height = Math.max(1, Math.round(H * DPR));
+  const top = 52, bottom = 88;
+  const aw = W - 12, ah = Math.max(10, H - top - bottom - 6);
+  fs = Math.max(0.05, Math.min(aw / FW, ah / FH));
+  fx = (W - FW * fs) / 2; fy = top + (ah - FH * fs) / 2 + 3;
+  const by = H - bottom + 14, bh = Math.min(58, bottom - 22), m = 12, gap = 10;
+  const sw = (W - m * 2 - gap * 2) * 0.27;
+  btns = [
+    { id: 'undo', x: m, y: by, w: sw, h: bh },
+    { id: 'clear', x: m + sw + gap, y: by, w: sw, h: bh },
+    { id: 'go', x: m + sw * 2 + gap * 2, y: by, w: W - m * 2 - sw * 2 - gap * 2, h: bh },
+  ];
+}
+addEventListener('resize', resize);
+resize();
+const X = (x) => fx + x * fs, Y = (y) => fy + y * fs;
+
+// ---------- audio ----------
+let AC = null, master = null, noiseBuf = null, lastClick = 0;
+function initAudio() {
+  if (AC) { if (AC.state === 'suspended') AC.resume().catch(() => {}); return; }
+  try {
+    AC = new (window.AudioContext || window.webkitAudioContext)();
+    master = AC.createGain(); master.gain.value = 0.55; master.connect(AC.destination);
+    noiseBuf = AC.createBuffer(1, Math.floor(AC.sampleRate * 0.06), AC.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 3);
+    if (AC.state === 'suspended') AC.resume().catch(() => {});
+  } catch (e) { AC = null; }
+}
+function clack(n, vol = 1) {
+  if (!AC) return;
+  const t = AC.currentTime;
+  if (t - lastClick < 0.022) return;
+  lastClick = t;
+  try {
+    const src = AC.createBufferSource(); src.buffer = noiseBuf;
+    const bp = AC.createBiquadFilter(); bp.type = 'bandpass';
+    bp.frequency.value = (1300 + Math.min(1700, n * 14)) * (0.92 + Math.random() * 0.16); bp.Q.value = 5;
+    const g = AC.createGain(); g.gain.setValueAtTime(0.5 * vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+    src.connect(bp); bp.connect(g); g.connect(master); src.start(t); src.stop(t + 0.06);
+    const o = AC.createOscillator(); o.type = 'triangle'; o.frequency.value = bp.frequency.value / 3;
+    const g2 = AC.createGain(); g2.gain.setValueAtTime(0.08 * vol, t); g2.gain.exponentialRampToValueAtTime(0.001, t + 0.03);
+    o.connect(g2); g2.connect(master); o.start(t); o.stop(t + 0.04);
+  } catch (e) {}
+}
+function tone(freq, dur, type, vol, when = 0, slide = 0) {
+  if (!AC) return;
+  try {
+    const t = AC.currentTime + when;
+    const o = AC.createOscillator(); o.type = type; o.frequency.setValueAtTime(freq, t);
+    if (slide) o.frequency.exponentialRampToValueAtTime(freq * slide, t + dur);
+    const g = AC.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.02);
+  } catch (e) {}
+}
+const PENTA = [659.3, 784, 880, 1046.5, 1174.7, 1318.5];
+function bellSound(k) {
+  const f = PENTA[k % PENTA.length];
+  tone(f, 1.8, 'sine', 0.22); tone(f * 2.76, 0.9, 'sine', 0.06); tone(f * 5.4, 0.4, 'sine', 0.03); tone(f * 0.5, 1.2, 'sine', 0.05);
+}
+function tick() { tone(1900 + Math.random() * 200, 0.025, 'sine', 0.035); }
+function thunk() { tone(160, 0.2, 'sine', 0.3, 0, 0.45); tone(420, 0.25, 'square', 0.03, 0.05, 1.6); }
+function fanfare() { [0, 2, 4, 5].forEach((k, i) => { const f = PENTA[k]; tone(f, 0.9, 'sine', 0.16, i * 0.11); tone(f * 2, 0.5, 'triangle', 0.04, i * 0.11); }); }
+function sadTone() { tone(392, 0.35, 'triangle', 0.08); tone(330, 0.5, 'triangle', 0.08, 0.18); }
+
+// ---------- geometry ----------
+function segRect(ax, ay, bx, by, r) {
+  // Liang-Barsky: does segment a-b intersect rect r=[x,y,w,h]?
+  let t0 = 0, t1 = 1; const dx = bx - ax, dy = by - ay;
+  const p = [-dx, dx, -dy, dy], q = [ax - r[0], r[0] + r[2] - ax, ay - r[1], r[1] + r[3] - ay];
+  for (let i = 0; i < 4; i++) {
+    if (p[i] === 0) { if (q[i] < 0) return false; }
+    else { const t = q[i] / p[i]; if (p[i] < 0) { if (t > t1) return false; if (t > t0) t0 = t; } else { if (t < t0) return false; if (t < t1) t1 = t; } }
+  }
+  return true;
+}
+function circRect(x, y, rad, r) {
+  const nx = Math.max(r[0], Math.min(x, r[0] + r[2])), ny = Math.max(r[1], Math.min(y, r[1] + r[3]));
+  return (x - nx) ** 2 + (y - ny) ** 2 < rad * rad;
+}
+
+// ---------- world ----------
+function makeWorld(st) {
+  const w = { st, doms: [], bellHit: st.b.map(() => false), swHit: (st.sw || []).map(() => false), gateOpen: (st.g || []).map(() => 0), gateFlag: (st.g || []).map(() => false), fallCount: 0, bellsRung: 0 };
+  const a = st.s[2] * Math.PI / 180;
+  w.doms.push(newDom(st.s[0], st.s[1], Math.cos(a), Math.sin(a), 0));
+  return w;
+}
+function newDom(x, y, dx, dy, stroke) { return { x, y, dx, dy, st: 0, p: 0, fx: dx, fy: dy, trig: false, stroke, wob: 0 }; }
+function blocked(w, ax, ay, bx, by) {
+  for (const r of w.st.w) if (segRect(ax, ay, bx, by, r)) return true;
+  const g = w.st.g || [];
+  for (let i = 0; i < g.length; i++) if (!w.gateFlag[i] && segRect(ax, ay, bx, by, g[i])) return true;
+  return false;
+}
+function topple(w, d, fxv, fyv, sound) {
+  d.st = 1; d.p = 0; d.fx = fxv; d.fy = fyv; d.trig = false;
+  w.fallCount++;
+  if (sound) clack(w.fallCount);
+}
+function stepWorld(w, dt, sound) {
+  let falling = 0;
+  const doms = w.doms;
+  for (let i = 0; i < doms.length; i++) {
+    const d = doms[i];
+    if (d.wob > 0) d.wob = Math.max(0, d.wob - dt * 4);
+    if (d.st !== 1) continue;
+    falling++;
+    d.p += dt / FTIME;
+    if (!d.trig && d.p >= 0.55) {
+      d.trig = true;
+      for (let j = 0; j < doms.length; j++) {
+        const e = doms[j];
+        if (e.st !== 0) continue;
+        const vx = e.x - d.x, vy = e.y - d.y, dist = Math.hypot(vx, vy);
+        if (dist > REACH || dist < 0.01) continue;
+        const ux = vx / dist, uy = vy / dist;
+        if (ux * d.fx + uy * d.fy < -0.2) continue;
+        if (blocked(w, d.x, d.y, e.x, e.y)) continue;
+        const dd = e.dx * ux + e.dy * uy;
+        if (Math.abs(dd) > 0.35) { const s = Math.sign(dd); topple(w, e, e.dx * s, e.dy * s, sound); }
+        else topple(w, e, ux, uy, sound);
+      }
+      const tx = d.x + d.fx * DH * 0.85, ty = d.y + d.fy * DH * 0.85;
+      w.st.b.forEach((b, k) => {
+        if (w.bellHit[k]) return;
+        if ((Math.hypot(tx - b[0], ty - b[1]) < 19 || Math.hypot(d.x - b[0], d.y - b[1]) < 24) && !blocked(w, d.x, d.y, b[0], b[1])) {
+          w.bellHit[k] = true; w.bellsRung++;
+          if (sound) { bellSound(w.bellsRung - 1 + stageIdx); fx_rings.push({ x: b[0], y: b[1], t: 0, col: '#ffcf3a', big: 1 }); shake = 0.25; }
+        }
+      });
+      (w.st.sw || []).forEach((s, k) => {
+        if (w.swHit[k]) return;
+        if ((Math.hypot(tx - s[0], ty - s[1]) < 17 || Math.hypot(d.x - s[0], d.y - s[1]) < 18) && !blocked(w, d.x, d.y, s[0], s[1])) {
+          w.swHit[k] = true;
+          (w.st.g || []).forEach((g, gi) => { if (g[4] === s[2]) w.gateFlag[gi] = true; });
+          if (sound) { thunk(); fx_rings.push({ x: s[0], y: s[1], t: 0, col: GATE_COL[s[2]], big: 0 }); }
+        }
+      });
+    }
+    if (d.p >= 1) { d.p = 1; d.st = 2; }
+  }
+  for (let i = 0; i < w.gateOpen.length; i++) if (w.gateFlag[i]) w.gateOpen[i] = Math.min(1, w.gateOpen[i] + dt * 3);
+  return falling;
+}
+function standUp(w) {
+  for (const d of w.doms) { d.st = 0; d.p = 0; d.trig = false; d.fx = d.dx; d.fy = d.dy; d.wob = 1; }
+  w.bellHit = w.bellHit.map(() => false); w.swHit = w.swHit.map(() => false);
+  w.gateOpen = w.gateOpen.map(() => 0); w.gateFlag = w.gateFlag.map(() => false);
+  w.fallCount = 0; w.bellsRung = 0;
+}
+
+// ---------- game state ----------
+let scene = 'title', sceneT = 0, stageIdx = 0, maxStage = 0, best = [];
+let world = null, strokeId = 0, idle = 0, clearWait = -1, shake = 0, emptyFlash = 0, hintT = 0, lastLeft = 0, wasBest = false;
+let fx_rings = [];
+let demo = null, demoT = 0;
+let drawPid = null, pending = null, last = null;
+
+addEventListener('message', (e) => {
+  if (e.data && e.data.agf === 'loaded' && e.data.data) {
+    const s = e.data.data;
+    if (typeof s.stage === 'number') maxStage = Math.max(0, Math.min(STAGES.length - 1, s.stage | 0));
+    if (Array.isArray(s.best)) best = s.best.slice(0, STAGES.length);
+  }
+});
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+function persist() { try { parent.postMessage({ agf: 'save', data: { stage: maxStage, best } }, '*'); } catch (e) {} }
+
+function budgetLeft() { return world ? world.st.k - (world.doms.length - 1) : 0; }
+function setScene(s) { scene = s; sceneT = 0; }
+function startStage(i) {
+  stageIdx = i; world = makeWorld(STAGES[i]); strokeId = 0; idle = 0; clearWait = -1; hintT = 0; fx_rings = [];
+  setScene('edit');
+}
+
+function buildDemo() {
+  const st = { w: [], b: [], k: 999, s: [30, 300, 0] };
+  const w = makeWorld(st); w.doms = [];
+  const pts = [];
+  for (let x = 24; x <= 336; x += 1) pts.push([x, 300 + Math.sin((x - 24) / 312 * Math.PI * 3) * 80]);
+  let lx = pts[0][0], ly = pts[0][1];
+  w.doms.push(newDom(lx, ly, 1, 0, 1));
+  for (const p of pts) {
+    const dl = Math.hypot(p[0] - lx, p[1] - ly);
+    if (dl >= SP) { const ux = (p[0] - lx) / dl, uy = (p[1] - ly) / dl; lx += ux * SP; ly += uy * SP; w.doms.push(newDom(lx, ly, ux, uy, 1)); }
+  }
+  return w;
+}
+demo = buildDemo();
+
+// ---------- input ----------
+function toField(x, y) { return [(x - fx) / fs, (y - fy) / fs]; }
+function inBtn(b, x, y) { return x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h; }
+function canPlace(x, y) {
+  if (x < 6 || y < 6 || x > FW - 6 || y > FH - 6) return false;
+  for (const r of world.st.w) if (circRect(x, y, 5, r)) return false;
+  for (const b of world.st.b) if (Math.hypot(x - b[0], y - b[1]) < 16) return false;
+  for (const d of world.doms) if (Math.hypot(x - d.x, y - d.y) < 10) return false;
+  return true;
+}
+function tryPlace(x, y, ux, uy) {
+  if (budgetLeft() <= 0) { if (emptyFlash <= 0) sadTone(); emptyFlash = 1; return; }
+  if (!canPlace(x, y)) return;
+  const d = newDom(x, y, ux, uy, strokeId); d.wob = 0.6;
+  world.doms.push(d); tick();
+}
+cv.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  initAudio();
+  const x = e.clientX, y = e.clientY;
+  if (scene === 'title') {
+    if (sceneT < 0.25) return;
+    signal('start'); startStage(maxStage); return;
+  }
+  if (scene === 'clear') {
+    if (sceneT < 0.7) return;
+    if (stageIdx + 1 >= STAGES.length) { setScene('done'); return; }
+    signal('start'); startStage(stageIdx + 1); return;
+  }
+  if (scene === 'done') {
+    if (sceneT < 0.7) return;
+    maxStage = 0; persist(); signal('start'); startStage(0); return;
+  }
+  if (scene === 'fail') {
+    if (sceneT < 0.7) return;
+    standUp(world); setScene('edit'); return;
+  }
+  if (scene !== 'edit') return;
+  for (const b of btns) {
+    if (!inBtn(b, x, y)) continue;
+    if (b.id === 'undo') {
+      if (strokeId > 0) { const s = strokeId; world.doms = world.doms.filter((d) => d.stroke !== s); strokeId--; tone(500, 0.08, 'triangle', 0.06, 0, 0.6); }
+    } else if (b.id === 'clear') {
+      if (world.doms.length > 1) { world.doms = world.doms.slice(0, 1); strokeId = 0; tone(400, 0.15, 'triangle', 0.06, 0, 0.5); }
+    } else if (b.id === 'go') {
+      const d0 = world.doms[0]; topple(world, d0, d0.dx, d0.dy, true); idle = 0; clearWait = -1; setScene('run');
+    }
+    return;
+  }
+  if (drawPid !== null) return;
+  const p = toField(x, y);
+  if (p[0] < -10 || p[1] < -10 || p[0] > FW + 10 || p[1] > FH + 10) return;
+  drawPid = e.pointerId; pending = p; last = null; strokeId++;
+  hintT = Math.max(hintT, 3.2);
+});
+function onMove(e) {
+  if (e.pointerId !== drawPid || scene !== 'edit') return;
+  const p = toField(e.clientX, e.clientY);
+  if (pending) {
+    const dl = Math.hypot(p[0] - pending[0], p[1] - pending[1]);
+    if (dl < 5) return;
+    tryPlace(pending[0], pending[1], (p[0] - pending[0]) / dl, (p[1] - pending[1]) / dl);
+    last = pending; pending = null;
+  }
+  let guard = 0;
+  while (guard++ < 60) {
+    const dl = Math.hypot(p[0] - last[0], p[1] - last[1]);
+    if (dl < SP) break;
+    const ux = (p[0] - last[0]) / dl, uy = (p[1] - last[1]) / dl;
+    const nx = last[0] + ux * SP, ny = last[1] + uy * SP;
+    tryPlace(nx, ny, ux, uy);
+    last = [nx, ny];
+  }
+}
+function onUp(e) {
+  if (e.pointerId !== drawPid) return;
+  drawPid = null; pending = null; last = null;
+  if (world && strokeId > 0 && !world.doms.some((d) => d.stroke === strokeId)) strokeId--;
+}
+addEventListener('pointermove', onMove);
+addEventListener('pointerup', onUp);
+addEventListener('pointercancel', onUp);
+
+// ---------- update ----------
+function update(dt) {
+  sceneT += dt;
+  if (shake > 0) shake = Math.max(0, shake - dt);
+  if (emptyFlash > 0) emptyFlash = Math.max(0, emptyFlash - dt * 1.5);
+  hintT += dt;
+  for (const r of fx_rings) r.t += dt;
+  fx_rings = fx_rings.filter((r) => r.t < 1.2);
+  if (scene === 'title') {
+    demoT += dt;
+    if (demoT > 0.8 && demo.doms[0].st === 0 && demo.fallCount === 0) topple(demo, demo.doms[0], 1, 0, false);
+    const f = stepWorld(demo, dt, false);
+    if (f === 0 && demo.fallCount > 0) { if (demo.endT === undefined) demo.endT = 0; demo.endT += dt; if (demo.endT > 1.4) { standUp(demo); demo.endT = undefined; demoT = 0; } }
+    return;
+  }
+  if (!world) return;
+  const falling = stepWorld(world, dt, scene === 'run');
+  if (scene === 'run') {
+    const all = world.bellHit.every(Boolean);
+    if (all && clearWait < 0) clearWait = 0;
+    if (clearWait >= 0) {
+      clearWait += dt;
+      if (clearWait > 1.1) onClear();
+      return;
+    }
+    if (falling === 0) { idle += dt; if (idle > 0.6) { setScene('fail'); sadTone(); } }
+    else idle = 0;
+  }
+}
+function onClear() {
+  const left = budgetLeft();
+  lastLeft = left;
+  wasBest = best[stageIdx] == null || left > best[stageIdx];
+  if (wasBest) best[stageIdx] = left;
+  if (stageIdx + 1 > maxStage && stageIdx + 1 < STAGES.length) maxStage = stageIdx + 1;
+  persist();
+  fanfare();
+  signal('end', { score: stageIdx + 1 });
+  setScene('clear');
+}
+
+// ---------- drawing ----------
+function rr(x, y, w, h, r) { cx.beginPath(); cx.moveTo(x + r, y); cx.arcTo(x + w, y, x + w, y + h, r); cx.arcTo(x + w, y + h, x, y + h, r); cx.arcTo(x, y + h, x, y, r); cx.arcTo(x, y, x + w, y, r); cx.closePath(); }
+function text(str, x, y, size, col, maxW, weight = '700', align = 'center') {
+  cx.font = `${weight} ${size}px ${FONT}`;
+  let s = size;
+  if (maxW) { const m = cx.measureText(str).width; if (m > maxW) { s = Math.max(12, size * maxW / m); cx.font = `${weight} ${s}px ${FONT}`; } }
+  cx.fillStyle = col; cx.textAlign = align; cx.textBaseline = 'middle'; cx.fillText(str, x, y);
+}
+function domColor(i, w) { return `hsl(${(i * 7 + stageIdx * 45 + 10) % 360},72%,${w ? 66 : 58}%)`; }
+function drawField(w) {
+  // table
+  cx.fillStyle = '#efe4cc'; rr(X(0) - 4, Y(0) - 4, FW * fs + 8, FH * fs + 8, 10 * fs); cx.fill();
+  cx.strokeStyle = 'rgba(120,90,50,0.10)'; cx.lineWidth = 1;
+  cx.beginPath();
+  for (let gx = 40; gx < FW; gx += 40) { cx.moveTo(X(gx), Y(0)); cx.lineTo(X(gx), Y(FH)); }
+  for (let gy = 40; gy < FH; gy += 40) { cx.moveTo(X(0), Y(gy)); cx.lineTo(X(FW), Y(gy)); }
+  cx.stroke();
+  if (!w) return;
+  const st = w.st;
+  // gates
+  (st.g || []).forEach((g, i) => {
+    const o = w.gateOpen[i], col = GATE_COL[g[4]];
+    cx.save();
+    if (o < 1) {
+      cx.globalAlpha = 1 - o * 0.85;
+      const horiz = g[2] >= g[3];
+      const sx = horiz ? g[2] * (1 - o) : g[2], sy = horiz ? g[3] : g[3] * (1 - o);
+      cx.fillStyle = col; rr(X(g[0] + (g[2] - sx) / 2), Y(g[1] + (g[3] - sy) / 2), sx * fs, sy * fs, 3 * fs); cx.fill();
+      cx.strokeStyle = 'rgba(255,255,255,0.5)'; cx.lineWidth = 2 * fs; cx.beginPath();
+      for (let k = 8; k < g[2]; k += 14) { cx.moveTo(X(g[0] + k), Y(g[1] + 2)); cx.lineTo(X(g[0] + k - 6), Y(g[1] + g[3] - 2)); }
+      cx.stroke();
+    }
+    cx.globalAlpha = 0.6; cx.setLineDash([4 * fs, 4 * fs]); cx.strokeStyle = col; cx.lineWidth = 1.5 * fs;
+    cx.strokeRect(X(g[0]), Y(g[1]), g[2] * fs, g[3] * fs); cx.setLineDash([]);
+    cx.restore();
+  });
+  // walls
+  for (const r of st.w) {
+    cx.fillStyle = 'rgba(0,0,0,0.18)'; rr(X(r[0]) + 3 * fs, Y(r[1]) + 4 * fs, r[2] * fs, r[3] * fs, 4 * fs); cx.fill();
+    cx.fillStyle = '#5d4b40'; rr(X(r[0]), Y(r[1]), r[2] * fs, r[3] * fs, 4 * fs); cx.fill();
+    cx.fillStyle = '#7a6455'; rr(X(r[0]) + 2 * fs, Y(r[1]) + 2 * fs, r[2] * fs - 4 * fs, Math.min(6, r[3] * 0.35) * fs, 3 * fs); cx.fill();
+  }
+  // switches
+  (st.sw || []).forEach((s, i) => {
+    const hit = w.swHit[i], col = GATE_COL[s[2]];
+    cx.fillStyle = 'rgba(0,0,0,0.2)'; cx.beginPath(); cx.arc(X(s[0]) + 2 * fs, Y(s[1]) + 3 * fs, 14 * fs, 0, 7); cx.fill();
+    cx.fillStyle = '#ddd'; cx.beginPath(); cx.arc(X(s[0]), Y(s[1]), 14 * fs, 0, 7); cx.fill();
+    cx.fillStyle = col; cx.beginPath(); cx.arc(X(s[0]), Y(s[1] - (hit ? 0 : 2)), (hit ? 8 : 10) * fs, 0, 7); cx.fill();
+    if (!hit) { cx.fillStyle = 'rgba(255,255,255,0.45)'; cx.beginPath(); cx.arc(X(s[0] - 3), Y(s[1] - 5), 3 * fs, 0, 7); cx.fill(); }
+  });
+  // bells
+  st.b.forEach((b, i) => drawBell(b[0], b[1], w.bellHit[i]));
+}
+function drawBell(x, y, hit) {
+  const t = performance.now() / 1000;
+  cx.save(); cx.translate(X(x), Y(y));
+  const sw = hit ? Math.sin(t * 9) * 0.25 : Math.sin(t * 2 + x) * 0.04;
+  if (hit) { cx.fillStyle = 'rgba(255,214,80,0.28)'; cx.beginPath(); cx.arc(0, 0, (20 + Math.sin(t * 6) * 2) * fs, 0, 7); cx.fill(); }
+  else { cx.strokeStyle = 'rgba(200,150,30,0.35)'; cx.lineWidth = 1.5 * fs; cx.setLineDash([3 * fs, 3 * fs]); cx.beginPath(); cx.arc(0, 0, 19 * fs, 0, 7); cx.stroke(); cx.setLineDash([]); }
+  cx.rotate(sw); cx.scale(fs, fs);
+  cx.fillStyle = 'rgba(0,0,0,0.18)'; cx.beginPath(); cx.ellipse(2, 11, 12, 4, 0, 0, 7); cx.fill();
+  cx.fillStyle = hit ? '#ffd23f' : '#d8a628';
+  cx.beginPath(); cx.moveTo(-10, 7); cx.quadraticCurveTo(-10, -11, 0, -11); cx.quadraticCurveTo(10, -11, 10, 7); cx.lineTo(12, 9); cx.lineTo(-12, 9); cx.closePath(); cx.fill();
+  cx.strokeStyle = '#9a6d12'; cx.lineWidth = 1.2; cx.stroke();
+  cx.fillStyle = '#9a6d12'; cx.beginPath(); cx.arc(0, 11, 2.6, 0, 7); cx.fill(); cx.beginPath(); cx.arc(0, -12.5, 2, 0, 7); cx.fill();
+  cx.fillStyle = 'rgba(255,255,255,0.5)'; cx.beginPath(); cx.ellipse(-4, -3, 2, 5, 0.3, 0, 7); cx.fill();
+  cx.restore();
+}
+function drawDoms(w, showStart) {
+  const ds = w.doms;
+  // shadows first
+  for (let i = 0; i < ds.length; i++) {
+    const d = ds[i];
+    const e = d.st === 0 ? 0 : (d.st === 2 ? 1 : d.p * d.p);
+    const ang = d.st ? Math.atan2(d.fy, d.fx) : Math.atan2(d.dy, d.dx);
+    const len = DT + (DH - DT) * e;
+    const off = 1.5 + (1 - e) * 4;
+    cx.save(); cx.translate(X(d.x) + off * fs * 0.6, Y(d.y) + off * fs); cx.rotate(ang);
+    cx.fillStyle = 'rgba(60,40,20,0.22)'; cx.fillRect(-DT / 2 * fs, -DW / 2 * fs, len * fs, DW * fs);
+    cx.restore();
+  }
+  for (let i = 0; i < ds.length; i++) {
+    const d = ds[i];
+    const e = d.st === 0 ? 0 : (d.st === 2 ? 1 : d.p * d.p);
+    const ang = d.st ? Math.atan2(d.fy, d.fx) : Math.atan2(d.dy, d.dx);
+    const len = DT + (DH - DT) * e;
+    const wob = d.wob > 0 ? Math.sin(d.wob * 20) * d.wob * 0.25 : 0;
+    cx.save(); cx.translate(X(d.x), Y(d.y)); cx.rotate(ang + wob);
+    const isStart = i === 0 && showStart;
+    cx.fillStyle = isStart ? '#ffffff' : domColor(i, e > 0.5);
+    cx.fillRect(-DT / 2 * fs, -DW / 2 * fs, len * fs, DW * fs);
+    cx.strokeStyle = isStart ? '#d23b3b' : 'rgba(40,30,30,0.55)'; cx.lineWidth = (isStart ? 1.8 : 0.9) * fs;
+    cx.strokeRect(-DT / 2 * fs, -DW / 2 * fs, len * fs, DW * fs);
+    if (e > 0.7) {
+      cx.fillStyle = 'rgba(40,30,30,0.55)';
+      cx.fillRect((-DT / 2 + len * 0.5) * fs - 0.5 * fs, -DW / 2 * fs + 2 * fs, 1 * fs, (DW - 4) * fs);
+      cx.beginPath(); cx.arc((-DT / 2 + len * 0.25) * fs, 0, 1.4 * fs, 0, 7); cx.arc((-DT / 2 + len * 0.75) * fs, -3 * fs, 1.4 * fs, 0, 7); cx.fill();
+      cx.beginPath(); cx.arc((-DT / 2 + len * 0.75) * fs, 3 * fs, 1.4 * fs, 0, 7); cx.fill();
+    }
+    cx.restore();
+  }
+  if (showStart && ds[0].st === 0) {
+    const d = ds[0], t = performance.now() / 1000;
+    const k = 14 + Math.sin(t * 5) * 3;
+    cx.save(); cx.translate(X(d.x + d.dx * k), Y(d.y + d.dy * k)); cx.rotate(Math.atan2(d.dy, d.dx));
+    cx.fillStyle = 'rgba(210,59,59,0.85)'; cx.beginPath(); cx.moveTo(6 * fs, 0); cx.lineTo(-3 * fs, -5 * fs); cx.lineTo(-3 * fs, 5 * fs); cx.closePath(); cx.fill();
+    cx.restore();
+  }
+}
+function drawRings() {
+  for (const r of fx_rings) {
+    const k = r.t / 1.2;
+    cx.strokeStyle = r.col; cx.globalAlpha = 1 - k; cx.lineWidth = (r.big ? 4 : 3) * fs;
+    cx.beginPath(); cx.arc(X(r.x), Y(r.y), (16 + k * (r.big ? 70 : 40)) * fs, 0, 7); cx.stroke();
+    cx.globalAlpha = 1;
+  }
+}
+function drawHUD() {
+  cx.fillStyle = 'rgba(0,0,0,0.25)'; cx.fillRect(0, 0, W, 48);
+  text(`${L.stage} ${stageIdx + 1}/${STAGES.length}`, 14, 17, 15, '#ffe9b8', W * 0.45, '700', 'left');
+  text(L.names[stageIdx], 14, 36, 13, '#c9c3b5', W * 0.45, '600', 'left');
+  const left = budgetLeft();
+  const flash = emptyFlash > 0 && Math.floor(emptyFlash * 8) % 2 === 0;
+  text(`${L.left}`, W - 14, 14, 12, '#c9c3b5', W * 0.4, '600', 'right');
+  text(`▮ ${left}`, W - 14, 33, 20, flash ? '#ff6b6b' : (left <= 5 ? '#ffb36b' : '#ffffff'), W * 0.4, '800', 'right');
+}
+function drawButtons() {
+  const dis = scene !== 'edit';
+  for (const b of btns) {
+    const go = b.id === 'go';
+    cx.globalAlpha = dis ? 0.35 : 1;
+    const t = performance.now() / 1000;
+    const pulse = go && !dis && world && world.doms.length > 3 ? Math.sin(t * 4) * 0.5 + 0.5 : 0;
+    cx.fillStyle = go ? `rgb(${220 + pulse * 20},${80 + pulse * 20},70)` : '#4a4f5e';
+    rr(b.x, b.y + 3, b.w, b.h, 14); cx.fillStyle = 'rgba(0,0,0,0.35)'; cx.fill();
+    cx.fillStyle = go ? `rgb(${222 + pulse * 22},${82 + pulse * 25},66)` : '#535a6b';
+    rr(b.x, b.y, b.w, b.h, 14); cx.fill();
+    text(L[b.id], b.x + b.w / 2, b.y + b.h / 2, go ? 20 : 15, '#fff', b.w - 12, '800');
+    cx.globalAlpha = 1;
+  }
+}
+function panel(y0, h) {
+  cx.fillStyle = 'rgba(30,26,34,0.82)'; rr(18, y0, W - 36, h, 18); cx.fill();
+}
+function draw() {
+  cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  cx.fillStyle = '#2a2d38'; cx.fillRect(0, 0, W, H);
+  if (scene === 'title') {
+    drawField(null);
+    drawDoms(demo, false);
+    const cy = H * 0.24;
+    cx.fillStyle = 'rgba(239,228,204,0.88)'; rr(18, cy - 54, W - 36, 150, 18); cx.fill();
+    text(L.title, W / 2, cy - 12, 40, '#3b2c22', W - 60, '900');
+    text(L.l1, W / 2, cy + 34, 16, '#5d4b40', W - 60, '700');
+    text(L.l2, W / 2, cy + 60, 16, '#5d4b40', W - 60, '700');
+    const a = 0.6 + Math.sin(performance.now() / 300) * 0.4;
+    cx.globalAlpha = a;
+    cx.fillStyle = 'rgba(30,26,34,0.75)'; rr(W / 2 - 120, H * 0.78 - 26, 240, 52, 26); cx.fill();
+    text(L.tap, W / 2, H * 0.78, 20, '#fff', 220, '800');
+    cx.globalAlpha = 1;
+    if (maxStage > 0) text(L.cont(maxStage + 1), W / 2, H * 0.78 + 46, 14, '#ffe9b8', W - 40, '700');
+    return;
+  }
+  const sh = shake > 0 ? shake * 10 : 0;
+  cx.save(); if (sh) cx.translate((Math.random() - 0.5) * sh, (Math.random() - 0.5) * sh);
+  drawField(world);
+  drawDoms(world, true);
+  drawRings();
+  cx.restore();
+  drawHUD();
+  drawButtons();
+  if (scene === 'edit' && hintT < 5) {
+    const a = hintT < 4 ? 1 : 5 - hintT;
+    cx.globalAlpha = a;
+    const hy = btns[0].y - 26;
+    cx.fillStyle = 'rgba(30,26,34,0.8)'; rr(16, hy - 17, W - 32, 34, 17); cx.fill();
+    text(L.hints[stageIdx], W / 2, hy, 14, '#fff', W - 48, '700');
+    cx.globalAlpha = 1;
+  }
+  if (emptyFlash > 0 && scene === 'edit') {
+    cx.globalAlpha = Math.min(1, emptyFlash * 2);
+    text(L.empty, W / 2, 66, 16, '#ff7b7b', W - 40, '800');
+    cx.globalAlpha = 1;
+  }
+  if (scene === 'fail') {
+    const n = world.bellHit.filter((b) => !b).length;
+    const y0 = H * 0.38;
+    panel(y0, 110);
+    text(L.fail(n), W / 2, y0 + 40, 24, '#ffe9b8', W - 70, '800');
+    if (sceneT > 0.7) text(L.retry, W / 2, y0 + 80, 16, '#fff', W - 70, '700');
+  }
+  if (scene === 'clear') {
+    const y0 = H * 0.3;
+    panel(y0, 190);
+    text(L.clearT, W / 2, y0 + 44, 32, '#ffd23f', W - 70, '900');
+    text(L.leftover(lastLeft), W / 2, y0 + 92, 20, '#fff', W - 70, '800');
+    text(wasBest ? L.newBest : L.best(best[stageIdx]), W / 2, y0 + 124, 16, wasBest ? '#ffb36b' : '#c9c3b5', W - 70, '700');
+    if (sceneT > 0.7) text(stageIdx + 1 >= STAGES.length ? L.next : L.next, W / 2, y0 + 164, 16, '#fff', W - 70, '700');
+  }
+  if (scene === 'done') {
+    const y0 = H * 0.3;
+    panel(y0, 170);
+    text(L.all, W / 2, y0 + 50, 30, '#ffd23f', W - 70, '900');
+    text(L.allSub, W / 2, y0 + 96, 17, '#fff', W - 70, '700');
+    if (sceneT > 0.7) text(L.again, W / 2, y0 + 138, 16, '#fff', W - 70, '700');
+  }
+}
+
+let prev = performance.now();
+function frame(now) {
+  const dt = Math.min(0.05, Math.max(0, (now - prev) / 1000)); prev = now;
+  update(dt);
+  draw();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
