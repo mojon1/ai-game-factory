@@ -1,0 +1,600 @@
+{
+  "id": "2026-10-15-claude-1",
+  "status": "published",
+  "title": "くるっとパンケーキ",
+  "genre": "料理",
+  "concept": "指を上にはじくとパンケーキが宙で回り、強さで回転数が決まる。表面にぷつぷつ穴が開いたら返しどき。両面をきつね色に焼き、くるっと返してぴたっと受け、最後はお皿へ放りこんで積み上げる。返す手触りと焼き色を読む楽しさが核。",
+  "howToPlay": "指を上にはじいてパンケーキを返し、左右にドラッグしてフライパンで受ける。両面きつね色になったら左のお皿の上で放り上げ、フライパンをどけて落とす。5枚の合計点を競う。",
+  "libraryDecision": "使わない。パンケーキの回転は「はじく強さ→高さと回転数」を自分で決めた式で動かしたほうが、狙って1回転・2回転を返せる手触りを作れる。matter-jsの物理では回転が不安定になり、three.jsの3Dも円盤1枚の表裏が見えれば十分なので、疑似3Dの楕円で描いた。",
+  "soundDecision": "BGMは付けない。ジュウジュウという焼ける音を常に鳴らし、火に近いほど・生地が生のほど大きくして、音でも焼け具合と火加減が分かるようにした。返す風切り音、ぴたっと受けた音、くるくる回った時の上がる音、お皿に乗った時の小さな和音で、上手く返せた手応えを強める。",
+  "planning": {
+    "genreDraw": {
+      "ja": "ダンジョン探索",
+      "en": "Dungeon crawler",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "たいまつの明かりだけで進む一人称のダンジョン。曲がり角で耳を澄ますと足音の方向が分かり、敵を避けて宝を持ち帰る。",
+        "ideaEn": "A first-person dungeon lit only by a torch. Listen at corners to hear which way footsteps come from, avoid monsters and bring the treasure back.",
+        "fromDraw": true
+      },
+      {
+        "idea": "指を上にはじいてパンケーキを宙で返す料理ゲーム。はじく強さで回転数が変わり、泡の穴を見て返しどきを読み、両面きつね色でお皿へ積む。",
+        "ideaEn": "A cooking game where you flick up to flip pancakes in the air. Flick strength sets the spin; read the bubbles to time the flip, cook both sides golden and stack them on the plate.",
+        "fromDraw": false
+      },
+      {
+        "idea": "窓ガラスの水滴を指で寄せて合体させ、重くなった滴を下のコップまで流す。",
+        "ideaEn": "Push raindrops on a window together so they merge, and let the heavy drop run down into the cup.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 1
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "limit",
+    "input": [
+      "swipe",
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Pancake Flip",
+      "concept": "Flick up and the pancake spins in the air; how hard you flick decides how many turns. When bubbles pop open on top, it is time to flip. Cook both sides golden, catch it flat, then toss it onto the plate to build a stack. The core is the feel of the flip and reading the colour.",
+      "howToPlay": "Flick up to flip the pancake and drag sideways to catch it with the pan. When both sides are golden, toss it above the plate on the left and move the pan away so it drops. Score the total of 5 pancakes.",
+      "libraryDecision": "None. A hand-written rule (flick strength → height and number of turns) lets you aim for a single or double flip; matter-js would make the spin unpredictable, and a pseudo-3D ellipse is enough to show both faces, so three.js was not needed.",
+      "soundDecision": "No BGM. A constant sizzle gets louder near the flame and while the batter is still raw, so you can hear the heat and doneness. A whoosh on the toss, a soft slap on a clean catch, a rising chime for multi-spins and a small chord on the plate reward a good flip."
+    }
+  },
+  "createdAt": "2026-10-15T11:20:07+09:00",
+  "specVersion": 8,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-15T11:20:07+09:00",
+    "metricsFrom": "2026-10-15T02:17:33.239Z",
+    "transcript": "800c0fbd-6fc2-48f4-ac8e-f35c92c84068.jsonl",
+    "validationRuns": 1,
+    "finishedAt": "2026-10-15T11:29:53+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-15T11:23:59+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "31.4KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=140",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=187",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=117",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=148",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 32197,
+    "lines": 633
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 3
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "はじく強さで1回転・半回転が変わり、ぴたっと受けた時の音と手応えは気持ちいい。泡の穴と焼ける音で返しどきが分かり、両面きつね色で+96が出た時は嬉しかった。一方、強くはじくと同じ面に戻って下が焼けすぎるなど判断はあるが、5枚で終わるので上達を味わう前に終わる感じもある。お皿へ落とす操作はフライパンを大きくどける必要があり、右端に寄せきれず受け直してしまう場面があった。焦がした1枚が塔に黒く残るのは良い思い出になる。",
+    "similar": [
+      {
+        "title": "Pancake – The Game",
+        "url": "https://apps.apple.com/us/app/-/id965965461",
+        "similarity": "高",
+        "note": "フライパンでパンケーキを放って回す手触りが中心という点が同じ。こちらは焼き色を読む料理要素と、お皿へ積む区切りがある",
+        "note_en": "Same core of tossing and spinning a pancake with a pan. Mine adds reading doneness colour and stacking onto a plate."
+      },
+      {
+        "title": "WarioWare: Flip Out!",
+        "url": "https://www.mariowiki.com/Flip_Out!",
+        "similarity": "中",
+        "note": "パンケーキを返し、落ちる場所へフライパンを動かして受ける点が似ている。こちらは傾きでなく指ではじく強さで回転数を決める",
+        "note_en": "Flip a pancake and move the pan to catch it. Here the flick strength, not tilt, sets the number of turns."
+      },
+      {
+        "title": "Cooking Mama",
+        "url": "https://en.wikipedia.org/wiki/Cooking_Mama_(video_game)",
+        "similarity": "中",
+        "note": "タッチでフライパンの料理を返す料理ミニゲームのルーツ。こちらは焼き加減と回転の両方を1つの料理で通して扱う",
+        "note_en": "Roots in touch cooking minigames that flip food in pans. Mine carries doneness and spin through one dish."
+      },
+      {
+        "title": "Papa's Pancakeria",
+        "similarity": "低",
+        "note": "パンケーキを焼いて返して出す料理ゲーム。経営要素が中心で、返す手触りは主役ではない",
+        "note_en": "Cook, flip and serve pancakes, but it is a management game where the flip feel is not the focus."
+      }
+    ],
+    "research": "WebSearchで「pancake flip mobile game」「Cooking Mama pancake flip」を検索し、実在を確認できた作品を挙げた",
+    "i18n": {
+      "en": {
+        "comment": "Flick strength changes half vs full turns, and the slap of a clean catch feels good. Bubbles and the sizzle tell you when to flip, and getting +96 for two golden sides was satisfying. Flicking hard brings it back to the same side and overcooks the bottom, so there are choices, but five pancakes end before you feel much improvement. Serving needs you to pull the pan well away; once I couldn't pull it far enough right and caught it again. The burnt one stays dark in the stack, which is a nice memory.",
+        "research": "Searched the web for pancake-flip mobile games and Cooking Mama flipping; listed works confirmed in results"
+      }
+    },
+    "method": "スマホ縦画面で 17 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 17 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 1500ms",
+        "note": "タイトルをタップして開始。生地が流しこまれる",
+        "noteEn": "Tapped the title to start; batter is poured",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "wait 4200ms",
+        "note": "火の上で待つ。表面にぷつぷつ泡が出てくるのを見る",
+        "noteEn": "Waiting over the flame, watching bubbles appear on top",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "swipe(0.60,0.80→0.60,0.50) 120ms → wait 500ms",
+        "note": "下がこんがりになってしまった。上にはじいて返す",
+        "noteEn": "Bottom went brown already; flicking up to flip",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 700ms",
+        "note": "宙で回っている。そのまま待って受ける",
+        "noteEn": "It is spinning in the air; waiting to catch",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 3300ms",
+        "note": "ぴたっと返った。今度は早めに下面をきつね色で止めたい",
+        "noteEn": "Clean flip. This time I want to stop the bottom at golden",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "path(0.70,0.85→0.20,0.85) 500ms → swipe(0.50,0.85→0.50,0.60) 110ms → path(0.30,0.85→0.85,0.85) 250ms → wait 900ms",
+        "note": "下がきつね色。お皿の上へ運び、はじいてフライパンをどける",
+        "noteEn": "Bottom is golden. Carry it over the plate, flick, and pull the pan away",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "path(0.60,0.85→0.52,0.85) 150ms → wait 3600ms",
+        "note": "2枚目は火が強い。フライパンを火の上に戻して泡を待つ",
+        "noteEn": "Second one: higher heat. Pan back over the flame, waiting for bubbles",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "swipe(0.50,0.85→0.50,0.45) 100ms → wait 1300ms",
+        "note": "下がきつね色。強めにはじいてみる",
+        "noteEn": "Bottom is golden. Trying a stronger flick",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "swipe(0.50,0.85→0.50,0.55) 120ms → wait 1300ms",
+        "note": "1回転して同じ面に戻った（+8）。下が焼けすぎる前に弱めではじき直す",
+        "noteEn": "Did a full turn back to the same side (+8). Gentle flick now before the bottom overcooks",
+        "image": "ai-play/step-09.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 3000ms → path(0.70,0.85→0.22,0.85) 450ms → swipe(0.50,0.85→0.50,0.60) 110ms → path(0.30,0.85→0.85,0.85) 250ms → wait 900ms",
+        "note": "裏も焼けたらお皿へ運んで放る",
+        "noteEn": "Once the second side is done, carry it to the plate and toss",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "wait 4500ms → swipe(0.50,0.85→0.75,0.60) 110ms → path(0.60,0.85→0.30,0.85) 200ms → wait 400ms",
+        "note": "3枚目は大きい。右ななめにはじいて、フライパンを逆に動かしてしまう",
+        "noteEn": "Third is big. Flicked up-right and moved the pan the wrong way",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "path(0.40,0.85→0.60,0.85) 200ms → wait 3800ms → path(0.70,0.85→0.22,0.85) 450ms → swipe(0.50,0.85→0.50,0.60) 110ms → path(0.30,0.85→0.85,0.85) 250ms → wait 900ms",
+        "note": "火の上に戻して裏を焼き、お皿へ",
+        "noteEn": "Back over the flame, cook the other side, then to the plate",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "path(0.40,0.85→0.62,0.85) 200ms → wait 3000ms → swipe(0.50,0.85→0.50,0.60) 110ms → wait 1200ms → wait 2600ms → path(0.70,0.85→0.45,0.85) 300ms → swipe(0.50,0.85→0.50,0.60) 110ms → path(0.30,0.85→0.85,0.85) 250ms → wait 1200ms",
+        "note": "4枚目（小さい）。返したあと、お皿の手前で放ってしまう",
+        "noteEn": "Fourth (small). After flipping, I toss it short of the plate",
+        "image": "ai-play/step-13.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "path(0.80,0.85→0.62,0.85) 200ms → wait 3200ms → path(0.70,0.85→0.22,0.85) 450ms → swipe(0.50,0.85→0.50,0.60) 110ms → path(0.30,0.85→0.85,0.85) 250ms → wait 1000ms",
+        "note": "フライパンを右に寄せすぎて受けてしまい、火からも外れていた。火に戻して焼き直す",
+        "noteEn": "Pulled the pan too far right, caught it again and was off the flame. Back on the heat",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "path(0.80,0.85→0.65,0.85) 200ms → wait 2900ms → swipe(0.50,0.85→0.50,0.55) 120ms → wait 1300ms → wait 1700ms → path(0.70,0.85→0.22,0.85) 450ms → swipe(0.50,0.85→0.50,0.60) 110ms → path(0.30,0.85→0.85,0.85) 250ms → wait 1800ms",
+        "note": "ラストは強火。早めに返して、早めにお皿へ",
+        "noteEn": "Last one on high heat: flip early and serve early",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 277
+            }
+          },
+          {
+            "agf": "end",
+            "score": 277
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "wait 1200ms",
+        "note": "5枚の合計277点、ベスト更新。シロップとバターがのった塔が残る",
+        "noteEn": "277 total over 5, new best. The stack gets syrup and butter",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 277
+            }
+          },
+          {
+            "agf": "end",
+            "score": 277
+          }
+        ]
+      },
+      {
+        "step": 17,
+        "action": "tap(0.50,0.40) 120ms → wait 1500ms",
+        "note": "タップでもう一度。皿が空になって1枚目から",
+        "noteEn": "Tap to play again; plate is cleared and it starts from the first pancake",
+        "image": "ai-play/step-17.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 277
+            }
+          },
+          {
+            "agf": "end",
+            "score": 277
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-15T11:29:53+09:00"
+  },
+  "publishedAt": "2026-10-15T11:29:53+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 19478,
+    "outputTokens": 27537,
+    "contextTokens": 6093601,
+    "turns": 40,
+    "toolCalls": 43,
+    "webSearches": 0,
+    "minutes": 12.3,
+    "from": "2026-10-15T02:17:33.239Z",
+    "to": "2026-10-15T02:29:53.883Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-15T11:29:53+09:00",
+    "validationRuns": 1,
+    "codeKB": 31.4
+  }
+}

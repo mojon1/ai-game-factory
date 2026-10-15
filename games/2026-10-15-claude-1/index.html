@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>くるっとパンケーキ / Pancake Flip</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #2b1d14; }
+canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const T = {
+  ja: {
+    title: 'くるっとパンケーキ', sub: 'PANCAKE FLIP',
+    how1: '上にはじいて ひっくり返す', how2: '左右にドラッグして フライパンで受ける', how3: '両面きつね色になったら 左のお皿へ',
+    tap: 'タップでスタート', again: 'タップでもう一度',
+    hint: '指を上にはじくと返る・左右に動かして受ける',
+    score: 'スコア', best: 'ベスト', top: '上', bottom: '下', plate: 'お皿へ',
+    raw: 'なま', light: 'うすい', golden: 'きつね色', brown: 'こんがり', burnt: 'こげ',
+    clean: 'ぴたっ！', sloppy: 'べちゃ', crash: 'ぐしゃっ', spin2: 'くるっ！', spin3: 'くるくる！！',
+    floor: 'あっ… 落ちた', served: 'できあがり', done: 'できあがり！', newBest: 'ベスト更新！',
+    sheet: (i) => `${i}/5まい`, last: 'ラスト！強火', big: '大きいぞ', small: '小さくて よく回る', hot: '火が強くなった',
+  },
+  en: {
+    title: 'Pancake Flip', sub: 'くるっとパンケーキ',
+    how1: 'Flick up to flip it', how2: 'Drag sideways to catch with the pan', how3: 'Golden on both sides? Toss it onto the plate',
+    tap: 'Tap to start', again: 'Tap to play again',
+    hint: 'Flick up to flip · drag sideways to catch',
+    score: 'Score', best: 'Best', top: 'Top', bottom: 'Btm', plate: 'Plate',
+    raw: 'raw', light: 'pale', golden: 'golden', brown: 'brown', burnt: 'burnt',
+    clean: 'Perfect!', sloppy: 'Splat', crash: 'Crumple', spin2: 'Spin!', spin3: 'Triple!!',
+    floor: 'Oops… on the floor', served: 'Served', done: 'All done!', newBest: 'New best!',
+    sheet: (i) => `${i}/5`, last: 'Last one! High heat', big: 'A big one', small: 'Small & spinny', hot: 'Heat is up',
+  },
+}[LANG === 'ja' ? 'ja' : 'en'];
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d');
+let W = 360, H = 640, U = 360, DPR = 1;
+function resize() {
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = Math.max(1, window.innerWidth || cv.clientWidth || 360);
+  H = Math.max(1, window.innerHeight || cv.clientHeight || 640);
+  U = Math.max(1, Math.min(W, H * 0.6));
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+  layout();
+}
+addEventListener('resize', resize);
+
+const PHI = 0.5; // camera elevation
+const G = () => H * 2.7; // gravity px/s^2
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const rnd = (a, b) => a + Math.random() * (b - a);
+
+// ---------- layout ----------
+const pan = { x: 0, y: 0, baseY: 0, jerk: 0, tilt: 0 };
+const burner = { x: 0, y: 0 };
+const plate = { x: 0, y: 0, r: 0 };
+let panR = 90, thick = 12;
+function layout() {
+  panR = U * 0.27; thick = U * 0.034;
+  pan.baseY = H * 0.6;
+  burner.x = W * 0.7; burner.y = H * 0.75;
+  plate.x = W * 0.2; plate.y = H * 0.87; plate.r = Math.min(W * 0.2, U * 0.26);
+  if (!pan.x) { pan.x = burner.x; pan.y = pan.baseY; }
+  pan.x = clamp(pan.x, panR * 0.5, W - panR * 0.5);
+}
+const heatAt = (x) => clamp(1 - Math.abs(x - burner.x) / (U * 0.3), 0, 1);
+
+// ---------- colours ----------
+const CSTOPS = [[0, [244, 228, 184]], [0.32, [242, 207, 132]], [0.62, [218, 150, 64]], [0.82, [170, 100, 42]], [1.0, [92, 52, 24]], [1.25, [40, 26, 18]]];
+function dCol(d, k = 1) {
+  d = clamp(d, 0, 1.25);
+  let i = 0; while (i < CSTOPS.length - 2 && d > CSTOPS[i + 1][0]) i++;
+  const [a, ca] = CSTOPS[i], [b, cb] = CSTOPS[i + 1];
+  const t = clamp((d - a) / (b - a), 0, 1);
+  return `rgb(${Math.round(lerp(ca[0], cb[0], t) * k)},${Math.round(lerp(ca[1], cb[1], t) * k)},${Math.round(lerp(ca[2], cb[2], t) * k)})`;
+}
+function dWord(d) { return d < 0.3 ? T.raw : d < 0.5 ? T.light : d < 0.76 ? T.golden : d < 0.92 ? T.brown : T.burnt; }
+function sideScore(d) { return Math.round(40 * clamp(1 - Math.abs(d - 0.62) / 0.3, 0, 1)); }
+
+// ---------- audio ----------
+let ac = null, master = null, noiseBuf = null, sizzle = null;
+function initAudio() {
+  if (ac) { if (ac.state === 'suspended') ac.resume(); return; }
+  try {
+    ac = new (window.AudioContext || window.webkitAudioContext)();
+    master = ac.createGain(); master.gain.value = 0.7; master.connect(ac.destination);
+    noiseBuf = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    const src = ac.createBufferSource(); src.buffer = noiseBuf; src.loop = true;
+    const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 5200; bp.Q.value = 0.6;
+    const hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 1800;
+    const g = ac.createGain(); g.gain.value = 0;
+    src.connect(bp); bp.connect(hp); hp.connect(g); g.connect(master); src.start();
+    sizzle = g;
+    ac.resume();
+  } catch (e) { ac = null; }
+}
+function noise(dur, f0, f1, vol, type = 'bandpass', q = 1, delay = 0) {
+  if (!ac) return;
+  try {
+    const t = ac.currentTime + delay;
+    const s = ac.createBufferSource(); s.buffer = noiseBuf;
+    const f = ac.createBiquadFilter(); f.type = type; f.Q.value = q;
+    f.frequency.setValueAtTime(f0, t); f.frequency.exponentialRampToValueAtTime(Math.max(30, f1), t + dur);
+    const g = ac.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(f); f.connect(g); g.connect(master); s.start(t, Math.random()); s.stop(t + dur + 0.05);
+  } catch (e) {}
+}
+function tone(f0, f1, dur, vol, type = 'sine', delay = 0) {
+  if (!ac) return;
+  try {
+    const t = ac.currentTime + delay;
+    const o = ac.createOscillator(); o.type = type;
+    o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(Math.max(20, f1), t + dur);
+    const g = ac.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.05);
+  } catch (e) {}
+}
+const sfx = {
+  toss(s) { noise(0.28, 500, 2400, 0.18 + 0.15 * s, 'bandpass', 1.2); tone(220, 160, 0.08, 0.08, 'triangle'); },
+  clean() { tone(150, 70, 0.14, 0.35); noise(0.09, 1800, 600, 0.12, 'lowpass'); noise(0.5, 6000, 4000, 0.12, 'bandpass', 0.6, 0.03); },
+  sloppy() { tone(110, 55, 0.18, 0.35); noise(0.2, 900, 200, 0.22, 'lowpass'); },
+  crash() { tone(90, 40, 0.25, 0.4); noise(0.3, 1200, 150, 0.3, 'lowpass'); },
+  spin(n) { const base = 660; for (let i = 0; i < n; i++) tone(base * Math.pow(1.26, i), base * Math.pow(1.26, i), 0.12, 0.08, 'triangle', 0.05 + i * 0.07); },
+  plate(q) { tone(120, 80, 0.12, 0.25); noise(0.12, 1200, 400, 0.12, 'lowpass'); const notes = q > 0.75 ? [523, 659, 784, 1047] : q > 0.4 ? [523, 659, 784] : [440, 523]; notes.forEach((f, i) => tone(f, f, 0.22, 0.09, 'sine', 0.08 + i * 0.08)); },
+  floor() { tone(100, 45, 0.3, 0.4); noise(0.25, 700, 120, 0.25, 'lowpass'); tone(330, 220, 0.35, 0.06, 'triangle', 0.18); },
+  pour() { noise(0.7, 400, 250, 0.12, 'lowpass', 2); },
+  pop() { tone(rnd(1400, 2200), 900, 0.03, 0.03, 'sine'); },
+  jingle() { [523, 659, 784, 1047, 784, 1047].forEach((f, i) => tone(f, f, 0.25, 0.08, 'triangle', i * 0.1)); },
+};
+
+// ---------- game state ----------
+const LV = [
+  { R: 0.19, heat: 1.0, spin: 1.0 },
+  { R: 0.19, heat: 1.25, spin: 1.0, note: 'hot' },
+  { R: 0.235, heat: 1.05, spin: 0.85, note: 'big' },
+  { R: 0.15, heat: 1.3, spin: 1.15, note: 'small' },
+  { R: 0.2, heat: 1.6, spin: 1.0, note: 'last' },
+];
+let state = 'title', score = 0, best = 0, idx = 0, pc = null, stack = [], results = [], tState = 0, resultAt = 0, hintT = 0;
+let popups = [], parts = [], nextAt = 0, plateHintSeen = false, newBest = false;
+let save = null;
+addEventListener('message', (e) => { if (e.data && e.data.agf === 'loaded') { save = e.data.data; if (save && typeof save.best === 'number') best = Math.max(best, save.best); } });
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+
+function makeBubbles() {
+  const b = [];
+  for (let i = 0; i < 18; i++) {
+    const a = Math.random() * Math.PI * 2, r = Math.sqrt(Math.random()) * 0.78;
+    b.push({ u: Math.cos(a) * r, v: Math.sin(a) * r, t: rnd(0.12, 0.5), s: rnd(0.6, 1.2), popped: false });
+  }
+  return b;
+}
+function newPancake() {
+  const lv = LV[idx];
+  pc = { x: pan.x, y: pan.y, vx: 0, vy: 0, th: 0, om: 0, R: lv.R * U, lv, dA: 0, dB: 0, mode: 'pour', pourT: 0, style: 0, bubbles: makeBubbles(), tossFrom: 0, sT: 0, sFrom: 0, sTo: 0, wob: 0, served: false };
+  sfx.pour();
+  const n = lv.note ? T[lv.note] : null;
+  if (n) addPop(n, W / 2, H * 0.3, '#ffe9a8', 20);
+}
+function startGame() {
+  state = 'play'; score = 0; idx = 0; stack = []; results = []; popups = []; parts = []; newBest = false; plateHintSeen = false;
+  pan.x = burner.x; pan.y = pan.baseY; hintT = 4.5;
+  newPancake();
+  signal('start');
+}
+function finishPancake(points, lost) {
+  results.push(lost ? 0 : points);
+  score += lost ? 0 : points;
+  pc.mode = 'gone';
+  idx++;
+  nextAt = 0.9;
+}
+function endGame() {
+  state = 'result'; resultAt = 0;
+  if (score > best) { best = score; newBest = true; } else newBest = false;
+  try { parent.postMessage({ agf: 'save', data: { best } }, '*'); } catch (e) {}
+  signal('end', { score });
+  sfx.jingle();
+}
+function addPop(text, x, y, col = '#fff', size = 22) { popups.push({ text, x, y, col, size, t: 0 }); }
+
+// ---------- input ----------
+let ptr = null; // {id, x, y, samples:[], flick:null}
+function toss(s, dxs) {
+  if (!pc || (pc.mode !== 'pan' && pc.mode !== 'settle')) return;
+  if (pc.mode === 'settle') { pc.th = pc.sTo; }
+  const g = G();
+  const h = H * (0.17 + 0.24 * s);
+  const vy = -Math.sqrt(2 * g * h);
+  const tAir = 2 * -vy / g;
+  const rot = Math.PI * (0.45 + 2.6 * s) * pc.lv.spin;
+  const dir = dxs < -0.25 ? -1 : 1;
+  pc.mode = 'air'; pc.vy = vy; pc.vx = clamp(dxs * W * 0.22, -W * 0.65, W * 0.65); pc.om = dir * rot / tAir;
+  pc.tossFrom = Math.round(pc.th / Math.PI) * Math.PI;
+  pan.jerk = 1;
+  sfx.toss(s);
+}
+function fireFlick() {
+  if (!ptr || !ptr.flick) return;
+  const f = ptr.flick; ptr.flick = null; ptr.used = true;
+  const s = clamp((f.peak - 1.5) / 4.5, 0, 1);
+  toss(s, f.dx);
+}
+cv.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  initAudio();
+  if (state === 'title') { startGame(); return; }
+  if (state === 'result') { if (resultAt > 0.7) startGame(); return; }
+  if (ptr) return;
+  ptr = { id: e.pointerId, x: e.clientX, y: e.clientY, samples: [{ t: performance.now(), x: e.clientX, y: e.clientY }], flick: null, used: false };
+  try { cv.setPointerCapture(e.pointerId); } catch (er) {}
+}, { passive: false });
+cv.addEventListener('pointermove', (e) => {
+  if (!ptr || e.pointerId !== ptr.id || state !== 'play') return;
+  const now = performance.now();
+  const dx = e.clientX - ptr.x, dy = e.clientY - ptr.y;
+  ptr.x = e.clientX; ptr.y = e.clientY;
+  pan.x = clamp(pan.x + dx, panR * 0.45, W - panR * 0.45);
+  pan.y = clamp(pan.y + dy * 0.6, pan.baseY - H * 0.07, pan.baseY + H * 0.05);
+  ptr.samples.push({ t: now, x: e.clientX, y: e.clientY });
+  while (ptr.samples.length > 2 && now - ptr.samples[0].t > 90) ptr.samples.shift();
+  const s0 = ptr.samples[0], dt = Math.max(8, now - s0.t);
+  const vy = (e.clientY - s0.y) / dt, vx = (e.clientX - s0.x) / dt; // px/ms
+  const up = -vy * 1000 / H; // screens per second
+  const side = vx * 1000 / W;
+  if (ptr.flick) {
+    if (up > ptr.flick.peak) { ptr.flick.peak = up; ptr.flick.dx = side; }
+    if (up < ptr.flick.peak * 0.55 || now - ptr.flick.t > 90) fireFlick();
+  } else if (!ptr.used && up > 1.5 && -vy > Math.abs(vx) * 1.1 && pc && (pc.mode === 'pan' || pc.mode === 'settle')) {
+    ptr.flick = { t: now, peak: up, dx: side };
+  }
+  if (ptr.used && up < 0.4) ptr.used = false;
+}, { passive: false });
+function endPtr(e) {
+  if (!ptr || e.pointerId !== ptr.id) return;
+  if (ptr.flick) fireFlick();
+  ptr = null;
+}
+cv.addEventListener('pointerup', endPtr);
+cv.addEventListener('pointercancel', endPtr);
+
+// ---------- update ----------
+function bottomSide(th) { return Math.cos(th) > 0 ? 'A' : 'B'; }
+function update(dt) {
+  tState += dt;
+  for (const p of popups) p.t += dt;
+  popups = popups.filter((p) => p.t < 1.4);
+  for (const p of parts) { p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += (p.g || 0) * dt; }
+  parts = parts.filter((p) => p.t < p.life);
+  pan.jerk = Math.max(0, pan.jerk - dt * 5);
+  if (!ptr) pan.y = lerp(pan.y, pan.baseY, Math.min(1, dt * 6));
+  if (state === 'result') { resultAt += dt; return; }
+  if (state !== 'play') return;
+  if (hintT > 0) hintT -= dt;
+  if (ptr && ptr.flick && performance.now() - ptr.flick.t > 100) fireFlick();
+  if (!pc) return;
+  if (pc.mode === 'gone') {
+    nextAt -= dt;
+    if (nextAt <= 0) { if (idx >= LV.length) { endGame(); pc = null; } else newPancake(); }
+    sizzleTo(0);
+    return;
+  }
+  const heat = heatAt(pan.x) * pc.lv.heat;
+  const onPan = pc.mode === 'pan' || pc.mode === 'settle' || pc.mode === 'pour';
+  if (onPan) {
+    const k = bottomSide(pc.th) === 'A' ? 'dA' : 'dB';
+    const prev = pc[k];
+    pc[k] += heat * dt / 7.2;
+    // bubbles pop on the raw top side as the bottom cooks
+    const top = k === 'dA' ? pc.dB : pc.dA;
+    if (top < 0.2) for (const b of pc.bubbles) { if (!b.popped && pc[k] > b.t + 0.16 && prev <= b.t + 0.16) { b.popped = true; if (Math.random() < 0.6) sfx.pop(); } }
+    pc.x = lerp(pc.x, pan.x, Math.min(1, dt * 12));
+    pc.y = pan.y - pan.jerk * H * 0.02 - thick * 0.4;
+    pc.wob = Math.max(0, pc.wob - dt * 3);
+    sizzleTo(heat > 0.05 ? 0.05 + 0.1 * heat * clamp(1.1 - pc[k] * 0.7, 0.35, 1) : 0);
+    if (heat > 0.2 && Math.random() < dt * 10 * heat) parts.push({ x: pc.x + rnd(-pc.R, pc.R), y: pc.y - thick, vx: rnd(-8, 8), vy: -rnd(25, 50), t: 0, life: rnd(0.8, 1.4), steam: true, r: rnd(4, 9) });
+    if (pc[k] > 0.92 && heat > 0.1 && Math.random() < dt * 14) parts.push({ x: pc.x + rnd(-pc.R, pc.R) * 0.9, y: pc.y, vx: rnd(-10, 10), vy: -rnd(30, 60), t: 0, life: 1.4, smoke: true, r: rnd(6, 12) });
+    if (!plateHintSeen && pc.dA > 0.5 && pc.dB > 0.5) plateHintSeen = true;
+  } else sizzleTo(0);
+  if (pc.mode === 'pour') {
+    pc.pourT += dt;
+    if (pc.pourT >= 0.8) pc.mode = 'pan';
+  } else if (pc.mode === 'settle') {
+    pc.sT += dt;
+    const t = clamp(pc.sT / 0.14, 0, 1);
+    pc.th = lerp(pc.sFrom, pc.sTo, 1 - (1 - t) * (1 - t));
+    if (t >= 1) { pc.th = pc.sTo; pc.mode = 'pan'; normTh(); }
+  } else if (pc.mode === 'air') {
+    const g = G();
+    const prevRelPan = pc.y - (pan.y - thick * 0.4);
+    pc.vy += g * dt; pc.x += pc.vx * dt; pc.y += pc.vy * dt; pc.th += pc.om * dt;
+    if (pc.x < pc.R * 0.6) { pc.x = pc.R * 0.6; pc.vx = Math.abs(pc.vx) * 0.4; }
+    if (pc.x > W - pc.R * 0.6) { pc.x = W - pc.R * 0.6; pc.vx = -Math.abs(pc.vx) * 0.4; }
+    const relPan = pc.y - (pan.y - thick * 0.4);
+    if (pc.vy > 0 && prevRelPan < 0 && relPan >= 0 && Math.abs(pc.x - pan.x) < panR * 0.92) land();
+    else {
+      const topY = plate.y - thick * 0.6 - stack.length * thick * 0.95;
+      if (pc.vy > 0 && pc.y >= topY && pc.y - pc.vy * dt < topY && Math.abs(pc.x - plate.x) < plate.r * 0.95) serve();
+      else if (pc.y > H * 0.97) {
+        sfx.floor(); addPop(T.floor, clamp(pc.x, W * 0.25, W * 0.75), H * 0.8, '#ffb3a0', 20);
+        finishPancake(0, true);
+      }
+    }
+  }
+}
+function normTh() { pc.th = ((pc.th % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI); }
+function landing() {
+  const target = Math.round(pc.th / Math.PI) * Math.PI;
+  const e = Math.abs(pc.th - target);
+  return { target, e, q: e < 0.62 ? 'clean' : e < 1.22 ? 'sloppy' : 'crash' };
+}
+function land() {
+  const L = landing();
+  const halves = Math.round(Math.abs(L.target - pc.tossFrom) / Math.PI);
+  pc.mode = 'settle'; pc.sT = 0; pc.sFrom = pc.th; pc.sTo = L.target; pc.vx = 0; pc.vy = 0; pc.wob = 1;
+  pc.x = clamp(pc.x, pan.x - panR * 0.5, pan.x + panR * 0.5);
+  pc.y = pan.y - thick * 0.4;
+  let pts = 0, label = '', col = '#fff';
+  if (L.q === 'clean') {
+    sfx.clean();
+    if (halves >= 3) { pts = 15; label = T.spin3; col = '#ffd84a'; sfx.spin(4); }
+    else if (halves === 2) { pts = 8; label = T.spin2; col = '#ffe58a'; sfx.spin(2); }
+    else if (halves === 1) { pts = 5; label = T.clean; col = '#fff3c4'; }
+    else { pts = 1; label = T.clean; col = '#fff3c4'; }
+  } else if (L.q === 'sloppy') { sfx.sloppy(); pts = -4; label = T.sloppy; col = '#ffc7a8'; }
+  else { sfx.crash(); pts = -10; label = T.crash; col = '#ff9c8a'; }
+  pc.style += pts;
+  addPop(label + (pts > 0 ? ` +${pts}` : ` ${pts}`), pc.x, pc.y - H * 0.08, col, 22);
+  for (let i = 0; i < 8; i++) parts.push({ x: pc.x + rnd(-pc.R, pc.R), y: pc.y, vx: rnd(-40, 40), vy: -rnd(20, 70), t: 0, life: 0.5, crumb: true, r: rnd(2, 3.5), g: 300 });
+}
+function serve() {
+  const L = landing();
+  const up = Math.cos(L.target) > 0 ? 'B' : 'A';
+  const sA = sideScore(pc.dA), sB = sideScore(pc.dB);
+  let bonus = L.q === 'clean' ? 10 : L.q === 'sloppy' ? 4 : 0;
+  const total = Math.max(0, sA + sB + pc.style + bonus);
+  stack.push({ col: up === 'B' ? pc.dB : pc.dA, edge: (pc.dA + pc.dB) / 2, R: pc.R, off: L.q === 'clean' ? rnd(-0.03, 0.03) * pc.R : rnd(-0.18, 0.18) * pc.R, sq: L.q === 'crash' ? 0.6 : 1 });
+  sfx.plate(total / 100);
+  const y0 = plate.y - stack.length * thick - H * 0.1;
+  addPop(`${T.top}:${dWord(up === 'B' ? pc.dB : pc.dA)} / ${T.bottom}:${dWord(up === 'B' ? pc.dA : pc.dB)}`, W * 0.5, y0 - 30, '#fff', 16);
+  addPop(`+${total}`, W * 0.5, y0, total >= 70 ? '#ffd84a' : '#ffe9c0', 30);
+  finishPancake(total, false);
+}
+let sizzleLevel = 0;
+function sizzleTo(v) {
+  sizzleLevel = lerp(sizzleLevel, v, 0.2);
+  if (sizzle && ac) { try { sizzle.gain.setTargetAtTime(sizzleLevel * rnd(0.7, 1.3), ac.currentTime, 0.03); } catch (e) {} }
+}
+
+// ---------- drawing ----------
+function ell(x, y, rx, ry) { ctx.beginPath(); ctx.ellipse(x, y, Math.max(0.5, rx), Math.max(0.5, ry), 0, 0, Math.PI * 2); }
+function drawBG() {
+  const g = ctx.createLinearGradient(0, 0, 0, H * 0.7);
+  g.addColorStop(0, '#f6e3c6'); g.addColorStop(1, '#e9c99e');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H * 0.7);
+  // tiles
+  ctx.strokeStyle = 'rgba(160,110,70,0.13)'; ctx.lineWidth = 1;
+  const ts = U * 0.12;
+  ctx.beginPath();
+  for (let y = ts; y < H * 0.7; y += ts) { ctx.moveTo(0, y); ctx.lineTo(W, y); }
+  for (let x = ts / 2; x < W; x += ts) { ctx.moveTo(x, 0); ctx.lineTo(x, H * 0.7); }
+  ctx.stroke();
+  // window light
+  const wl = ctx.createRadialGradient(W * 0.15, H * 0.12, 10, W * 0.15, H * 0.12, U * 0.7);
+  wl.addColorStop(0, 'rgba(255,250,230,0.55)'); wl.addColorStop(1, 'rgba(255,250,230,0)');
+  ctx.fillStyle = wl; ctx.fillRect(0, 0, W, H * 0.7);
+  // counter
+  const cg = ctx.createLinearGradient(0, H * 0.7, 0, H);
+  cg.addColorStop(0, '#9a6a44'); cg.addColorStop(0.04, '#b98458'); cg.addColorStop(1, '#7a5233');
+  ctx.fillStyle = cg; ctx.fillRect(0, H * 0.7, W, H * 0.3);
+  ctx.fillStyle = 'rgba(0,0,0,0.15)'; ctx.fillRect(0, H * 0.7, W, 3);
+  // wood grain
+  ctx.strokeStyle = 'rgba(70,40,20,0.15)';
+  ctx.beginPath();
+  for (let i = 1; i < 6; i++) { const y = H * 0.7 + i * H * 0.05; ctx.moveTo(0, y); ctx.bezierCurveTo(W * 0.3, y + 4, W * 0.6, y - 4, W, y + 2); }
+  ctx.stroke();
+}
+function drawStove(heat) {
+  // stove plate
+  ctx.fillStyle = '#3b3633'; ell(burner.x, burner.y + U * 0.02, U * 0.3, U * 0.3 * Math.sin(PHI) * 0.7); ctx.fill();
+  ctx.fillStyle = '#26221f'; ell(burner.x, burner.y, U * 0.16, U * 0.16 * Math.sin(PHI) * 0.6); ctx.fill();
+  ctx.strokeStyle = '#6b6560'; ctx.lineWidth = 3; ell(burner.x, burner.y, U * 0.12, U * 0.12 * Math.sin(PHI) * 0.6); ctx.stroke();
+  // flames
+  const n = 12, t = tState;
+  for (let i = 0; i < n; i++) {
+    const a = (i / n) * Math.PI * 2;
+    const fx = burner.x + Math.cos(a) * U * 0.12, fy = burner.y + Math.sin(a) * U * 0.12 * Math.sin(PHI) * 0.6;
+    const hgt = U * (0.035 + 0.03 * Math.sin(t * 17 + i * 2.1) * 0.5 + 0.02);
+    const gg = ctx.createLinearGradient(fx, fy, fx, fy - hgt);
+    gg.addColorStop(0, 'rgba(80,140,255,0.9)'); gg.addColorStop(0.6, 'rgba(120,180,255,0.6)'); gg.addColorStop(1, 'rgba(255,170,80,0)');
+    ctx.fillStyle = gg;
+    ctx.beginPath(); ctx.moveTo(fx - 4, fy); ctx.quadraticCurveTo(fx, fy - hgt * 1.4, fx + 4, fy); ctx.fill();
+  }
+  if (heat > 0.05) {
+    const gl = ctx.createRadialGradient(pan.x, pan.y + U * 0.04, 4, pan.x, pan.y + U * 0.04, panR * 1.2);
+    gl.addColorStop(0, `rgba(255,140,60,${0.25 * heat})`); gl.addColorStop(1, 'rgba(255,140,60,0)');
+    ctx.fillStyle = gl; ctx.fillRect(pan.x - panR * 1.3, pan.y - panR, panR * 2.6, panR * 2);
+  }
+}
+function drawPlate() {
+  const ry = plate.r * Math.sin(PHI);
+  ctx.fillStyle = 'rgba(0,0,0,0.2)'; ell(plate.x + 4, plate.y + 6, plate.r * 1.05, ry * 1.05); ctx.fill();
+  ctx.fillStyle = '#f4f1ea'; ell(plate.x, plate.y, plate.r, ry); ctx.fill();
+  ctx.fillStyle = '#e1ddd3'; ell(plate.x, plate.y + 1, plate.r * 0.72, ry * 0.72); ctx.fill();
+  ctx.strokeStyle = '#7fb0c8'; ctx.lineWidth = 2; ell(plate.x, plate.y, plate.r * 0.92, ry * 0.92); ctx.stroke();
+  for (let i = 0; i < stack.length; i++) {
+    const s = stack[i];
+    const y = plate.y - thick * 0.6 - i * thick * 0.95;
+    drawDisk(plate.x + s.off, y, s.R, 0, s.edge, s.col, thick * 0.9 * s.sq, null, 0);
+  }
+  if (state === 'result' && stack.length) {
+    // syrup and butter
+    const top = stack[stack.length - 1];
+    const y = plate.y - thick * 0.6 - (stack.length - 1) * thick * 0.95 - thick * 0.45;
+    const k = clamp(resultAt / 1.2, 0, 1);
+    ctx.fillStyle = 'rgba(150,70,10,0.75)'; ell(plate.x + top.off, y, top.R * 0.62 * k, top.R * 0.62 * k * Math.sin(PHI)); ctx.fill();
+    ctx.fillStyle = '#fff2a8'; ctx.fillRect(plate.x + top.off - U * 0.03, y - U * 0.035, U * 0.06, U * 0.035);
+    ctx.fillStyle = '#f2df7a'; ctx.fillRect(plate.x + top.off - U * 0.03, y - U * 0.012, U * 0.06, U * 0.012);
+  }
+}
+function drawPan() {
+  const jy = -pan.jerk * H * 0.02;
+  const x = pan.x, y = pan.y + jy, ry = panR * Math.sin(PHI);
+  // handle
+  ctx.save();
+  ctx.strokeStyle = '#2b2622'; ctx.lineCap = 'round'; ctx.lineWidth = U * 0.045;
+  ctx.beginPath(); ctx.moveTo(x + panR * 0.9, y + ry * 0.25); ctx.lineTo(x + panR * 1.9, y + ry * 0.9 - pan.jerk * 8); ctx.stroke();
+  ctx.strokeStyle = '#4a3a2c'; ctx.lineWidth = U * 0.05;
+  ctx.beginPath(); ctx.moveTo(x + panR * 1.35, y + ry * 0.55 - pan.jerk * 5); ctx.lineTo(x + panR * 1.95, y + ry * 0.95 - pan.jerk * 8); ctx.stroke();
+  ctx.restore();
+  // body
+  ctx.fillStyle = '#1d1a18'; ell(x, y + U * 0.025, panR * 1.02, ry * 1.05); ctx.fill();
+  ctx.fillStyle = '#4b4743'; ell(x, y, panR, ry); ctx.fill();
+  const g = ctx.createRadialGradient(x - panR * 0.3, y - ry * 0.3, 2, x, y, panR);
+  g.addColorStop(0, '#5a5550'); g.addColorStop(1, '#2c2826');
+  ctx.fillStyle = g; ell(x, y + 1, panR * 0.9, ry * 0.88); ctx.fill();
+}
+// pancake disk: th rotation around screen-x axis; dA = side A (bottom at th=0), dB = side B (top at th=0)
+function drawDisk(x, y, R, th, dA, dB, th_k, bubbles, wob) {
+  const s = Math.sin(th + PHI), c = Math.cos(th + PHI);
+  const ry = Math.max(1.2, R * Math.abs(s)) * (1 - 0.08 * wob * Math.sin(tState * 40));
+  const rx = R * (1 + 0.05 * wob);
+  const visB = s > 0;
+  const L = 5;
+  for (let i = 0; i <= L; i++) {
+    const k = visB ? -1 + 2 * i / L : 1 - 2 * i / L; // -1 = A face, +1 = B face
+    const oy = -k * (th_k / 2) * c;
+    let col;
+    if (i === L) col = dCol(visB ? dB : dA);
+    else if (i === 0) col = dCol(visB ? dA : dB, 0.92);
+    else col = dCol(lerp(dA, dB, (k + 1) / 2) * 0.55, 0.95);
+    ctx.fillStyle = col; ell(x, y + oy, rx, ry); ctx.fill();
+  }
+  const top = visB ? dB : dA;
+  const fy = y - (visB ? 1 : -1) * (th_k / 2) * c;
+  // sheen
+  if (ry > 4) {
+    const gg = ctx.createRadialGradient(x - rx * 0.3, fy - ry * 0.4, 1, x, fy, rx);
+    gg.addColorStop(0, top < 0.15 ? 'rgba(255,255,240,0.45)' : 'rgba(255,240,200,0.25)'); gg.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = gg; ell(x, fy, rx, ry); ctx.fill();
+    if (top > 0.4) { ctx.fillStyle = `rgba(90,45,15,${clamp((top - 0.4) * 0.5, 0, 0.25)})`; ell(x, fy, rx * 0.55, ry * 0.5); ctx.fill(); }
+  }
+  if (bubbles && ry > 4 && top < 0.2) {
+    const bottomD = visB ? dA : dB;
+    for (const b of bubbles) {
+      if (bottomD < b.t) continue;
+      const bx = x + b.u * rx, by = fy + b.v * ry, br = U * 0.011 * b.s;
+      if (b.popped) {
+        ctx.fillStyle = 'rgba(150,100,45,0.55)'; ell(bx, by, br, br * Math.abs(s) + 0.6); ctx.fill();
+        ctx.strokeStyle = 'rgba(255,245,215,0.7)'; ctx.lineWidth = 1; ell(bx, by - 0.5, br * 1.15, (br * Math.abs(s) + 0.6) * 1.15); ctx.stroke();
+      } else {
+        const grow = clamp((bottomD - b.t) / 0.12, 0.2, 1);
+        ctx.fillStyle = 'rgba(255,252,235,0.85)'; ell(bx, by - br * 0.3 * grow, br * grow, br * grow * 0.8); ctx.fill();
+        ctx.strokeStyle = 'rgba(200,160,90,0.5)'; ctx.lineWidth = 1; ctx.stroke();
+      }
+    }
+  }
+}
+function drawPancake() {
+  if (!pc || pc.mode === 'gone') return;
+  if (pc.mode === 'pour') {
+    const t = clamp(pc.pourT / 0.8, 0, 1);
+    const R = pc.R * (0.25 + 0.75 * Math.sqrt(t));
+    // batter stream
+    if (t < 0.85) {
+      ctx.strokeStyle = 'rgba(245,226,180,0.95)'; ctx.lineWidth = U * 0.022 * (1 - t * 0.6); ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(pc.x + Math.sin(tState * 9) * 2, -10); ctx.lineTo(pc.x, pc.y); ctx.stroke();
+    }
+    drawDisk(pc.x, pc.y, R, 0, pc.dA, pc.dB, thick * t, null, 0);
+    return;
+  }
+  if (pc.mode === 'air') {
+    // shadow on pan or counter
+    const sx = pc.x, sy = Math.abs(pc.x - pan.x) < panR ? pan.y : (Math.abs(pc.x - plate.x) < plate.r ? plate.y - stack.length * thick : H * 0.9);
+    const k = clamp(1 - (sy - pc.y) / (H * 0.5), 0.2, 1);
+    ctx.fillStyle = `rgba(0,0,0,${0.22 * k})`; ell(sx, sy, pc.R * k, pc.R * k * Math.sin(PHI)); ctx.fill();
+  }
+  drawDisk(pc.x, pc.y, pc.R, pc.th, pc.dA, pc.dB, thick, pc.mode !== 'air' ? pc.bubbles : null, pc.wob);
+}
+function drawParts() {
+  for (const p of parts) {
+    const a = 1 - p.t / p.life;
+    if (p.steam) { ctx.fillStyle = `rgba(255,255,255,${0.22 * a})`; ell(p.x, p.y, p.r * (1 + p.t), p.r * (1 + p.t)); ctx.fill(); }
+    else if (p.smoke) { ctx.fillStyle = `rgba(70,60,55,${0.35 * a})`; ell(p.x, p.y, p.r * (1 + p.t * 1.5), p.r * (1 + p.t * 1.5)); ctx.fill(); }
+    else if (p.crumb) { ctx.fillStyle = `rgba(240,210,150,${a})`; ell(p.x, p.y, p.r, p.r); ctx.fill(); }
+  }
+}
+function txt(s, x, y, size, col = '#fff', align = 'center', weight = '700', maxW = W * 0.92) {
+  ctx.font = `${weight} ${size}px ${FONT}`;
+  let w = ctx.measureText(s).width;
+  if (w > maxW) { size = Math.max(12, size * maxW / w); ctx.font = `${weight} ${size}px ${FONT}`; }
+  ctx.textAlign = align; ctx.textBaseline = 'middle';
+  ctx.lineWidth = Math.max(3, size * 0.18); ctx.strokeStyle = 'rgba(60,30,10,0.75)'; ctx.lineJoin = 'round';
+  ctx.strokeText(s, x, y); ctx.fillStyle = col; ctx.fillText(s, x, y);
+}
+function chip(x, y, label, d) {
+  const r = 13;
+  ctx.fillStyle = 'rgba(60,30,10,0.55)';
+  ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x - 4, y - r - 3, 118, r * 2 + 6, 10) : ctx.rect(x - 4, y - r - 3, 118, r * 2 + 6); ctx.fill();
+  ctx.fillStyle = dCol(d); ell(x + r, y, r, r); ctx.fill();
+  const gold = d >= 0.5 && d < 0.76;
+  ctx.strokeStyle = gold ? '#ffe066' : 'rgba(255,255,255,0.6)'; ctx.lineWidth = gold ? 3 : 1.5; ell(x + r, y, r, r); ctx.stroke();
+  txt(label, x + r, y, 13, '#fff', 'center', '800');
+  txt(dWord(d), x + r * 2 + 6, y, 14, gold ? '#ffe066' : '#fff', 'left', '700', 80);
+}
+function drawHUD() {
+  txt(`${T.score} ${score}`, 14, 24, 20, '#fff', 'left', '800', W * 0.45);
+  txt(T.sheet(Math.min(idx + 1, 5)), W - 14, 22, 17, '#fff', 'right', '800', W * 0.4);
+  txt(`${T.best} ${best}`, W - 14, 44, 14, '#ffeec8', 'right', '700', W * 0.4);
+  if (pc && pc.mode !== 'gone') {
+    const topK = bottomSide(pc.mode === 'settle' ? pc.sTo : pc.th) === 'A' ? 'dB' : 'dA';
+    const botK = topK === 'dA' ? 'dB' : 'dA';
+    chip(14, 62, T.top, pc[topK]);
+    chip(14, 96, T.bottom, pc[botK]);
+    if (plateHintSeen && pc.mode !== 'air' && pc.dA > 0.45 && pc.dB > 0.45) {
+      const a = 0.6 + 0.4 * Math.sin(tState * 6);
+      const ay = plate.y - plate.r * 0.9 - stack.length * thick;
+      ctx.globalAlpha = a;
+      txt('↓ ' + T.plate, plate.x, ay, 17, '#ffe066');
+      ctx.globalAlpha = 1;
+    }
+  }
+  for (let i = 0; i < 5; i++) {
+    const x = W / 2 - 40 + i * 20, y = 24;
+    ctx.fillStyle = i < results.length ? (results[i] > 0 ? '#f2b45a' : '#7a5a48') : i === idx ? '#fff3d6' : 'rgba(255,255,255,0.3)';
+    ell(x, y, 7, 7); ctx.fill();
+  }
+  if (hintT > 0) {
+    ctx.globalAlpha = clamp(hintT, 0, 1);
+    txt(T.hint, W / 2, H - 26, 15, '#fff', 'center', '700');
+    ctx.globalAlpha = 1;
+  }
+}
+function drawPopups() {
+  for (const p of popups) {
+    const a = clamp(1.4 - p.t, 0, 1) / 1;
+    ctx.globalAlpha = clamp(a * 1.5, 0, 1);
+    const sc = 1 + 0.25 * Math.max(0, 0.15 - p.t) / 0.15;
+    txt(p.text, clamp(p.x, W * 0.2, W * 0.8), p.y - p.t * 40, p.size * sc, p.col);
+  }
+  ctx.globalAlpha = 1;
+}
+function drawTitle() {
+  ctx.fillStyle = 'rgba(50,25,10,0.45)'; ctx.fillRect(0, 0, W, H);
+  txt(T.title, W / 2, H * 0.14, Math.min(40, W * 0.1), '#ffe9a8', 'center', '900');
+  txt(T.sub, W / 2, H * 0.2, 15, '#fff', 'center', '700');
+  // demo pancake
+  const th = (tState * 4.5) % (Math.PI * 2);
+  const hy = Math.abs(Math.sin(tState * 2.25));
+  drawDisk(W / 2, H * 0.4 - hy * H * 0.08, U * 0.15, th, 0.62, 0.3, thick, null, 0);
+  txt(T.how1, W / 2, H * 0.53, 16, '#fff');
+  txt(T.how2, W / 2, H * 0.53 + 26, 16, '#fff');
+  txt(T.how3, W / 2, H * 0.53 + 52, 16, '#ffe066');
+  ctx.globalAlpha = 0.6 + 0.4 * Math.sin(tState * 4);
+  txt(T.tap, W / 2, H * 0.75, 22, '#fff', 'center', '800');
+  ctx.globalAlpha = 1;
+  if (best > 0) txt(`${T.best} ${best}`, W / 2, H * 0.81, 15, '#ffeec8');
+}
+function drawResult() {
+  ctx.fillStyle = 'rgba(50,25,10,0.5)'; ctx.fillRect(0, 0, W, H * 0.58);
+  txt(T.done, W / 2, H * 0.1, 30, '#ffe9a8', 'center', '900');
+  txt(String(score), W / 2, H * 0.2, 54, '#fff', 'center', '900');
+  txt(newBest ? T.newBest : `${T.best} ${best}`, W / 2, H * 0.28, 18, newBest ? '#ffe066' : '#ffeec8');
+  const line = results.map((r) => r).join('  ·  ');
+  txt(line, W / 2, H * 0.35, 16, '#fff');
+  if (resultAt > 0.7) {
+    ctx.globalAlpha = 0.6 + 0.4 * Math.sin(tState * 4);
+    txt(T.again, W / 2, H * 0.47, 22, '#fff', 'center', '800');
+    ctx.globalAlpha = 1;
+  }
+}
+function draw() {
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  drawBG();
+  const heat = state === 'play' && pc && pc.mode !== 'gone' ? heatAt(pan.x) : heatAt(pan.x) * 0.6;
+  drawStove(heat);
+  drawPlate();
+  if (state !== 'title') drawPan();
+  drawPancake();
+  drawParts();
+  if (state === 'play') drawHUD();
+  drawPopups();
+  if (state === 'title') drawTitle();
+  if (state === 'result') drawResult();
+}
+
+let last = 0;
+function frame(ts) {
+  const dt = last ? Math.min(0.05, (ts - last) / 1000) : 0.016;
+  last = ts;
+  try { update(dt); draw(); } catch (e) { console.error(e); }
+  requestAnimationFrame(frame);
+}
+resize();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
