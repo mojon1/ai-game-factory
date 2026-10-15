@@ -1,0 +1,391 @@
+{
+  "id": "2026-10-15-gpt-2",
+  "status": "published",
+  "title": "夜汽車の連席係",
+  "genre": "経営",
+  "concept": "十六席の夜汽車に、人数と窓側希望が違う客を予約する。一組を入れると席は動かせず、大きな組を選ぶほど小さな隙間が残る。次の客の人数を見ながら、今の売上を取るか後の連席を残すか考える、八回だけの小さな座席経営。",
+  "howToPlay": "AかBの客を選び、連席の左端をタップ。窓希望は端の席が必要。入らないときは見送り、8回の売上を伸ばそう。",
+  "libraryDecision": "空席のつながりと客の条件を同時に読むことが核。Canvasの整列した座席が適し、3Dや物理の動きは条件を読みづらくするため使わない。",
+  "soundDecision": "予約成功を短い二音、入らない操作を低い音で知らせる。次の配置を落ち着いて考えられるようBGMは付けない。",
+  "planning": {
+    "genreDraw": {
+      "ja": "経営",
+      "en": "Management / tycoon",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "小さな夜汽車の連席を、人数と窓希望の異なる客へ予約する。次の人数を見て席の隙間を管理。",
+        "ideaEn": "Book a small night train for parties with different sizes and window requests; preview the next sizes to manage gaps.",
+        "fromDraw": true
+      },
+      {
+        "idea": "色の違う磁石で玉の軌道を曲げ、遠い穴へ届ける。",
+        "ideaEn": "Bend a ball’s trajectory with colored magnets to reach a distant pocket.",
+        "fromDraw": false
+      },
+      {
+        "idea": "水面を押し下げ、浮く蓮の高さをそろえて橋を作る。",
+        "ideaEn": "Press water down to align floating lotus pads into a bridge.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "limit",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Night Train Seat Keeper",
+      "concept": "Book sixteen train seats for parties with different sizes and window requests. Booked seats cannot move, and larger parties leave small gaps. Preview the next party sizes and choose between current revenue and preserving future contiguous seats over eight bookings.",
+      "howToPlay": "Choose party A or B, then tap its leftmost seat. Window requests need an edge seat. Pass if neither fits; maximize revenue across eight rounds.",
+      "libraryDecision": "Reading connected seats and party conditions together is the core. Aligned Canvas seats are clear; 3D or physics would make the conditions harder to read.",
+      "soundDecision": "A brief two-tone confirmation marks bookings; a low tone marks invalid placement. No music hurries planning."
+    }
+  },
+  "createdAt": "2026-10-15T12:12:00+09:00",
+  "specVersion": 8,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-15T12:12:00+09:00",
+    "metricsFrom": "2026-10-15T03:10:55.089Z",
+    "transcript": null,
+    "validationRuns": 1,
+    "finishedAt": "2026-10-15T12:20:22+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-15T12:13:30+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "6.0KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=73",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=81",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=60",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=45",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 6143,
+    "lines": 5
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "12手を画像で確認。7組を予約して15/16席・売上42になり、最後の2人組を見送って終了、再開で初期化された。窓条件の拒否、はみ出す連席の拒否、次の人数の予告も確認。2人ずつ入る場所を残す判断は楽しいが、客の人数列が固定で条件も窓だけなので戦略の幅は小さい。途中のPowerShell起動失敗では操作は記録されず、別シェルで同じプレイを継続した。",
+    "similar": [
+      {
+        "title": "Is This Seat Taken?",
+        "url": "https://store.steampowered.com/app/3035120/",
+        "similarity": "高",
+        "note": "客の希望に合う座席を選ぶ点が近い。本作は隣人の性格ではなく連席・窓・売上を扱い、予約を戻せない八回の選択に絞る。",
+        "note_en": "Both seat people according to preferences. This game focuses on contiguous groups, windows and revenue, with eight irreversible bookings rather than neighbor personalities."
+      },
+      {
+        "title": "Stink Train",
+        "url": "https://sushimouse.itch.io/stink-train",
+        "similarity": "中",
+        "note": "列車の客を条件に従って座らせる題材が共通。本作は臭い客の推理や記憶ではなく、人数による席の分割と売上を扱う。",
+        "note_en": "Both place train passengers under constraints. This game uses party size and revenue rather than deducing and remembering smelly passengers."
+      }
+    ],
+    "research": "2件のWeb検索後、Is This Seat Taken?の公式Steam紹介とStink Trainの開発者ページで座席条件のルールを確認した。Unrailedは線路建設が中心なので類似作から除外した。",
+    "i18n": {
+      "en": {
+        "comment": "Viewed twelve steps. Booked seven parties for fifteen of sixteen seats and forty-two revenue, passed the final pair, finished and restarted with reset state. Verified window and overflow rejection and next-size preview. Preserving future pairs creates decisions, but fixed party sizes and only one preference limit variety. PowerShell startup failures recorded no moves; continued the same play using another shell.",
+        "research": "Ran two web searches and checked the official Steam description of Is This Seat Taken? and the developer page for Stink Train. Excluded Unrailed because its core is building tracks."
+      }
+    },
+    "method": "スマホ縦画面で 12 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 12 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.90) 120ms",
+        "note": "客を選んで左端の席に置く説明を読み、予約を始める。",
+        "noteEn": "Read how to choose a party and tap its leftmost seat; start booking.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.27,0.83) 120ms → tap(0.17,0.37) 120ms",
+        "note": "Aは3人で売上10、Bは2人で5。まず高いAを左上から入れ、1席の隙間を残す。",
+        "noteEn": "A brings ten for three guests; B brings five for two. Book A at the upper-left, leaving one spare seat.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 300ms → tap(0.27,0.83) 120ms → tap(0.17,0.48) 120ms",
+        "note": "次の人数は1か2。Aの2人を二段目左に置き、右の2席を残す。",
+        "noteEn": "Book two on row two and preserve the other pair.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 300ms → tap(0.73,0.83) 120ms → tap(0.39,0.59) 120ms",
+        "note": "売上14。Bの2人は窓希望なので、三段目中央の二席を試して条件を確認する。",
+        "noteEn": "Revenue fourteen. Try the window pair in the two middle seats of row three to test the constraint.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.61,0.48) 120ms",
+        "note": "窓の席が必要と表示され、予約は進まなかった。二段目右の二席なら窓を含むのでそこへ置く。",
+        "noteEn": "The window warning leaves the booking unchanged. Place the pair in row two’s right seats, including the window.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 300ms → tap(0.27,0.83) 120ms → tap(0.17,0.59) 120ms",
+        "note": "窓の二席で売上20。Aの3人は8、Bの1人は4。三段目にAを入れる。",
+        "noteEn": "The window pair brings revenue to twenty. Book the three-person A on row three for eight.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 300ms → tap(0.27,0.83) 120ms → tap(0.17,0.71) 120ms",
+        "note": "売上28。次は1か2人なので、最後の空いた列は2人ずつ入る余地を残し、Aを左に予約する。",
+        "noteEn": "Revenue twenty-eight. Next parties have one or two guests; book A on the last row’s left, preserving another pair.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 300ms → tap(0.73,0.83) 120ms → tap(0.61,0.71) 120ms",
+        "note": "Bは2人窓希望で6。残しておいた四段目右側がぴったりなので予約する。",
+        "noteEn": "B’s window pair pays six and fits the preserved right side of the last row.",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 300ms → tap(0.73,0.83) 120ms → tap(0.83,0.37) 120ms",
+        "note": "残りは上段と三段目の右端に1席ずつ。3人は入らないので、Bの1人を上段の隙間へ入れる。",
+        "noteEn": "Only single seats remain at the upper and third rows’ right ends. Book B’s single in the top gap.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 300ms → tap(0.27,0.83) 120ms → tap(0.83,0.59) 120ms",
+        "note": "売上42、空席は一つだけ。最後の2人組をその席へ試し、はみ出す予約を拒否するか確かめる。",
+        "noteEn": "Revenue forty-two with one spare seat. Try the final pair there to verify an overflowing booking is rejected.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.50,0.94) 120ms",
+        "note": "連席がないと表示され売上は変わらない。どちらの2人組も入らないので見送る。",
+        "noteEn": "The unavailable-pair message leaves revenue unchanged. Neither party fits, so pass.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 42
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "wait 900ms → tap(0.50,0.85) 120ms",
+        "note": "売上42、15/16席で終了。少し待って再開し、空席と売上が初期化されるか見る。",
+        "noteEn": "Finished at forty-two revenue and fifteen seats. Wait and restart to check reset.",
+        "image": "ai-play/step-12.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 42
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-15T12:20:22+09:00"
+  },
+  "publishedAt": "2026-10-15T12:20:22+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 3206,
+    "outputTokens": 9224,
+    "contextTokens": 8462334,
+    "turns": 36,
+    "toolCalls": 36,
+    "webSearches": null,
+    "minutes": 9.9,
+    "from": "2026-10-15T03:10:55.089Z",
+    "to": "2026-10-15T03:20:48.250Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力から思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated Codex token_usage_record entries by unique response_id from planning through review. Input includes cached tokens; output excludes reasoning. Tools count top-level calls only.",
+    "recordedAt": "2026-10-15T12:20:48+09:00",
+    "validationRuns": 1,
+    "codeKB": 6,
+    "evidence": "metrics-evidence.json"
+  }
+}
