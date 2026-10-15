@@ -1,0 +1,337 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-15T03:13:56.237Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.9
+        ]
+      },
+      "desc": "tap(0.50,0.90) 120ms",
+      "note": "客を選んで左端の席に置く説明を読み、予約を始める。",
+      "noteEn": "Read how to choose a party and tap its leftmost seat; start booking.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": [
+        {
+          "tap": [
+            0.27,
+            0.83
+          ]
+        },
+        {
+          "tap": [
+            0.167,
+            0.369
+          ]
+        }
+      ],
+      "desc": "tap(0.27,0.83) 120ms → tap(0.17,0.37) 120ms",
+      "note": "Aは3人で売上10、Bは2人で5。まず高いAを左上から入れ、1席の隙間を残す。",
+      "noteEn": "A brings ten for three guests; B brings five for two. Book A at the upper-left, leaving one spare seat.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.27,
+            0.83
+          ]
+        },
+        {
+          "tap": [
+            0.167,
+            0.481
+          ]
+        }
+      ],
+      "desc": "wait 300ms → tap(0.27,0.83) 120ms → tap(0.17,0.48) 120ms",
+      "note": "次の人数は1か2。Aの2人を二段目左に置き、右の2席を残す。",
+      "noteEn": "Book two on row two and preserve the other pair.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.73,
+            0.83
+          ]
+        },
+        {
+          "tap": [
+            0.389,
+            0.594
+          ]
+        }
+      ],
+      "desc": "wait 300ms → tap(0.73,0.83) 120ms → tap(0.39,0.59) 120ms",
+      "note": "売上14。Bの2人は窓希望なので、三段目中央の二席を試して条件を確認する。",
+      "noteEn": "Revenue fourteen. Try the window pair in the two middle seats of row three to test the constraint.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": {
+        "tap": [
+          0.611,
+          0.481
+        ]
+      },
+      "desc": "tap(0.61,0.48) 120ms",
+      "note": "窓の席が必要と表示され、予約は進まなかった。二段目右の二席なら窓を含むのでそこへ置く。",
+      "noteEn": "The window warning leaves the booking unchanged. Place the pair in row two’s right seats, including the window.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.27,
+            0.83
+          ]
+        },
+        {
+          "tap": [
+            0.167,
+            0.594
+          ]
+        }
+      ],
+      "desc": "wait 300ms → tap(0.27,0.83) 120ms → tap(0.17,0.59) 120ms",
+      "note": "窓の二席で売上20。Aの3人は8、Bの1人は4。三段目にAを入れる。",
+      "noteEn": "The window pair brings revenue to twenty. Book the three-person A on row three for eight.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.27,
+            0.83
+          ]
+        },
+        {
+          "tap": [
+            0.167,
+            0.706
+          ]
+        }
+      ],
+      "desc": "wait 300ms → tap(0.27,0.83) 120ms → tap(0.17,0.71) 120ms",
+      "note": "売上28。次は1か2人なので、最後の空いた列は2人ずつ入る余地を残し、Aを左に予約する。",
+      "noteEn": "Revenue twenty-eight. Next parties have one or two guests; book A on the last row’s left, preserving another pair.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": [
+        {
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.73,
+            0.83
+          ]
+        },
+        {
+          "tap": [
+            0.611,
+            0.706
+          ]
+        }
+      ],
+      "desc": "wait 300ms → tap(0.73,0.83) 120ms → tap(0.61,0.71) 120ms",
+      "note": "Bは2人窓希望で6。残しておいた四段目右側がぴったりなので予約する。",
+      "noteEn": "B’s window pair pays six and fits the preserved right side of the last row.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": [
+        {
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.73,
+            0.83
+          ]
+        },
+        {
+          "tap": [
+            0.833,
+            0.369
+          ]
+        }
+      ],
+      "desc": "wait 300ms → tap(0.73,0.83) 120ms → tap(0.83,0.37) 120ms",
+      "note": "残りは上段と三段目の右端に1席ずつ。3人は入らないので、Bの1人を上段の隙間へ入れる。",
+      "noteEn": "Only single seats remain at the upper and third rows’ right ends. Book B’s single in the top gap.",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "action": [
+        {
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.27,
+            0.83
+          ]
+        },
+        {
+          "tap": [
+            0.833,
+            0.594
+          ]
+        }
+      ],
+      "desc": "wait 300ms → tap(0.27,0.83) 120ms → tap(0.83,0.59) 120ms",
+      "note": "売上42、空席は一つだけ。最後の2人組をその席へ試し、はみ出す予約を拒否するか確かめる。",
+      "noteEn": "Revenue forty-two with one spare seat. Try the final pair there to verify an overflowing booking is rejected.",
+      "image": "ai-play/step-10.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "action": {
+        "tap": [
+          0.5,
+          0.936
+        ]
+      },
+      "desc": "tap(0.50,0.94) 120ms",
+      "note": "連席がないと表示され売上は変わらない。どちらの2人組も入らないので見送る。",
+      "noteEn": "The unavailable-pair message leaves revenue unchanged. Neither party fits, so pass.",
+      "image": "ai-play/step-11.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 42
+        }
+      ]
+    },
+    {
+      "step": 12,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.85
+          ]
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.85) 120ms",
+      "note": "売上42、15/16席で終了。少し待って再開し、空席と売上が初期化されるか見る。",
+      "noteEn": "Finished at forty-two revenue and fifteen seats. Wait and restart to check reset.",
+      "image": "ai-play/step-12.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 42
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}
