@@ -1,0 +1,324 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-16T03:14:32.061Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.9
+        ]
+      },
+      "desc": "tap(0.50,0.90) 120ms",
+      "note": "正しい札3枚・嘘1枚という条件を読んで箱を開く。",
+      "noteEn": "Read the three-true/one-false rule and start.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": {
+        "tap": [
+          0.5,
+          0.86
+        ]
+      },
+      "desc": "tap(0.50,0.86) 120ms",
+      "note": "札1・2・4はC・B・Aの点灯、札3は全消灯。全消灯では嘘が三枚なので、まずその誤答の反応を試す。",
+      "noteEn": "Clues 1,2,4 require C,B,A on; clue 3 requires none lit. All off makes three lies. Test that wrong state first.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "tap": [
+            0.222,
+            0.68
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.68
+          ]
+        },
+        {
+          "tap": [
+            0.778,
+            0.68
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.86
+          ]
+        }
+      ],
+      "desc": "tap(0.22,0.68) 120ms → tap(0.50,0.68) 120ms → tap(0.78,0.68) 120ms → tap(0.50,0.86) 120ms",
+      "note": "誤答で試行1、全消灯が残った。三灯すべて点けると札3だけ嘘になるので開ける。",
+      "noteEn": "Wrong answer increments tries and preserves lamps. Light all three so only clue 3 is false, then open.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 2
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.86
+          ]
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.86) 120ms",
+      "note": "札3が嘘と示され解錠できた。次の箱へ進み、関係を読む。",
+      "noteEn": "Unlocked with clue 3 identified as the lie. Continue to read the next relationships.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 2
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": [
+        {
+          "tap": [
+            0.222,
+            0.68
+          ]
+        },
+        {
+          "tap": [
+            0.778,
+            0.68
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.86
+          ]
+        }
+      ],
+      "desc": "tap(0.22,0.68) 120ms → tap(0.78,0.68) 120ms → tap(0.50,0.86) 120ms",
+      "note": "A点灯・B消灯・C点灯なら四枚すべて正しい。嘘が一枚必要なので、全部正しい状態でも開かないことを試す。",
+      "noteEn": "A on, B off, C on makes all four clues true. Test that zero lies is rejected because exactly one is required.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 2
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "tap": [
+            0.222,
+            0.68
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.68
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.86
+          ]
+        }
+      ],
+      "desc": "tap(0.22,0.68) 120ms → tap(0.50,0.68) 120ms → tap(0.50,0.86) 120ms",
+      "note": "全て正しい状態は拒否された。Aを消しBを点けると、異なる状態・点灯2個・C点灯が真で、B消灯だけが嘘になる。",
+      "noteEn": "All-true was rejected. Switch A off and B on: different A/B, two lit and C on are true; only B off is false.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 2
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 4
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.86
+          ]
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.86) 120ms",
+      "note": "二箱目は札2が嘘で解錠できた。最後の箱へ進む。",
+      "noteEn": "The second box identifies clue 2 as the lie. Continue to the final box.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 2
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 4
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": {
+        "tap": [
+          0.5,
+          0.86
+        ]
+      },
+      "desc": "tap(0.50,0.86) 120ms",
+      "note": "B消灯・A消灯・点灯0個を真にすれば、AとBが違うだけが嘘になる。今の全消灯のまま開ける。",
+      "noteEn": "B off, A off and zero lit are true; only different A/B is false. Open with all lamps still off.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 2
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 4
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 5
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.86
+          ]
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.86) 120ms",
+      "note": "三箱を試行5回で解いた。結果に再開案内が見えるので、タップして新しい札と試行0に戻るか見る。",
+      "noteEn": "Solved three boxes in five attempts. Tap the visible restart prompt to check fresh clues and zero tries.",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 2
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 4
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 5
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}
