@@ -1,0 +1,514 @@
+{
+  "id": "2026-10-16-claude-1",
+  "status": "published",
+  "title": "ゆびけん玉",
+  "genre": "物理おもちゃ",
+  "concept": "指がそのまま「けん」になる。糸でつながった玉が本物らしく振られ、はね上げて落ちてくるところへ皿を差し出す。大皿・小皿・とめけんの6つのわざを順に決め、カコンと収まる手触りと、穴の向きを読んで刺す一瞬を核にした。",
+  "howToPlay": "画面をなぞってけんを動かし、玉をはね上げて皿やけん先で受けとめる。上に出たわざを6つ決めれば免許皆伝。",
+  "libraryDecision": "物理演算ライブラリ（matter-js）は使わない。けん玉の糸は「伸びないが、たるむ」ひもで、ばねで近似するより自前の距離制約のほうが本物らしく、皿の当たり判定や「上から来た玉だけ受ける」調整、穴の向きの判定も細かく作り込めるため、手触りを優先して自作した。",
+  "soundDecision": "BGMは付けず、木の「カコン」という打音を効果音の主役にした。大皿は低め、小皿は高め、とめけんは深い音で、当たりの強さで音量が変わるので、ぽんぽん続けると自分の手がリズムを刻む。わざが決まったときだけ短いチャイムを鳴らす。",
+  "planning": {
+    "genreDraw": {
+      "ja": "物理おもちゃ",
+      "en": "Physics toy",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "指で動かす「けん」と糸でつながった玉の物理けん玉。はね上げて皿で受け、穴を向けてけん先に刺すわざを順に決める。",
+        "ideaEn": "A physics kendama: your finger moves the ken, the ball swings on a string. Toss it, catch it in cups and stick its hole on the spike to clear tricks.",
+        "fromDraw": true
+      },
+      {
+        "idea": "テーブルクロス引き。素早くはじいて布だけ抜き、上の食器を残す。料理が豪華になるほど難しくなる。",
+        "ideaEn": "Tablecloth trick: yank the cloth out fast and leave the dishes standing; the table gets fancier each round.",
+        "fromDraw": false
+      },
+      {
+        "idea": "紙ひこうき。折り目をなぞって折り方を決め、投げて飛び方の違いを楽しみ、遠くの的を狙う。",
+        "ideaEn": "Paper planes: trace fold lines to decide the shape, then throw and see how each design flies toward distant targets.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "drag",
+      "swipe"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Finger Kendama",
+      "concept": "Your finger is the ken. The ball swings on a real-feeling string; toss it up and offer a cup where it falls. Clear six tricks — big cup, small cup, spike and combos — built around the satisfying clack of a catch and the moment you read the hole and stick it.",
+      "howToPlay": "Drag to move the ken, toss the ball up and catch it in a cup or on the spike. Clear the six tricks shown at the top.",
+      "libraryDecision": "No physics library (matter-js). A kendama string never stretches but can go slack; a hand-written distance constraint feels more real than a spring and lets me tune cup collisions, the catch-only-from-above rule and the hole-direction check for feel.",
+      "soundDecision": "No BGM: wooden clacks are the star. The big cup sounds low, the small cup high and the spike deep, with volume following impact strength, so repeated hops become a rhythm played by your hand. A short chime only when a trick is cleared."
+    }
+  },
+  "createdAt": "2026-10-16T09:07:42+09:00",
+  "specVersion": 8,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-16T09:07:42+09:00",
+    "metricsFrom": "2026-10-16T00:05:45.587Z",
+    "transcript": "c9377924-a70e-4dfb-a55c-7a57fa8d2b23.jsonl",
+    "validationRuns": 1,
+    "finishedAt": "2026-10-16T09:16:20+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-16T09:11:04+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "25.7KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=76",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=125",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=63",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=134",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 26301,
+    "lines": 612
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "指でけんを振り上げて皿を差し出すと、玉が本当に糸で引かれて飛び、カコンと大皿に収まった瞬間は気持ちよかった。大皿・小皿・大皿→小皿までは数回で決まり、けん玉らしい手触りは出ている。一方、とめけんは玉の揺れがなかなか収まらず、7回ほど試して一度も刺せなかった（穴が金色になる合図は分かりやすい）。けんを上へ動かすと上部のわざ名に重なる、成功の帯がけんを隠す、条件を満たした表示なのに次の着地まで判定されない、といった粗さもある。自己プレイは毎手で最初から再生し直す方式で、物理が少しずれて結果が変わることがあった。",
+    "similar": [
+      {
+        "title": "Spike It - Kendama",
+        "url": "https://apps.apple.com/jp/app/id6742020757",
+        "similarity": "高",
+        "note": "スマホでけん玉の技を練習するアプリ。こちらは2Dで指がそのまま「けん」になり、糸の物理だけで遊ぶ点が違う",
+        "note_en": "A phone app for practicing kendama tricks. Mine is 2D, the finger directly becomes the ken, and it is all string physics"
+      },
+      {
+        "title": "Bilboquet (iPhone)",
+        "url": "https://www.iclarified.com/11570/phenom-studios-announces-bilboquet-10",
+        "similarity": "中",
+        "note": "けん玉に近いビルボケを端末の傾きで操作する。こちらは傾きではなくドラッグで操作する",
+        "note_en": "A bilboquet game controlled by tilting the device; mine uses dragging instead"
+      },
+      {
+        "title": "DENDAMA",
+        "url": "https://techcrunch.com/2017/03/20/dendama/",
+        "similarity": "低",
+        "note": "センサー入りの本物のけん玉とスマホ連動。わざの判定・検定という点は似るが、画面の中だけで完結しない",
+        "note_en": "A sensor kendama linked to a phone; trick judging is similar, but it needs the physical toy"
+      },
+      {
+        "title": "kendama game (itch.io)",
+        "url": "https://philcrifo.itch.io/kendama-game",
+        "similarity": "中",
+        "note": "個人制作のけん玉ゲーム。けん玉を題材にした物理ゲームという点が共通",
+        "note_en": "An indie kendama game; shares the kendama-physics theme"
+      }
+    ],
+    "research": "WebSearchで英語「kendama mobile game physics touch」と日本語「けん玉 スマホ ゲーム アプリ」の2回検索した。",
+    "i18n": {
+      "en": {
+        "comment": "Flicking the ken up and offering a cup really feels like the ball is pulled by a string, and the clack as it settles in the big cup is satisfying. Big cup, small cup and big→small came within a few tries, so the kendama feel is there. But the spike was hard: the ball keeps swinging and I never stuck it in about seven tries (the gold-hole hint is clear though). Rough edges: moving the ken high overlaps the trick name, the success banner hides the ken, and the pips can look complete before the next landing is checked. Self-play replays from the start each step, and the physics drifted between replays.",
+        "research": "Two WebSearch queries: 'kendama mobile game physics touch' and the Japanese equivalent."
+      }
+    },
+    "method": "スマホ縦画面で 14 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 14 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "タイトル画面。けん玉の絵と遊び方3行。タップで開始",
+        "noteEn": "Title screen with the kendama and 3 lines of how-to. Tap to start.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "swipe(0.50,0.70→0.50,0.58) 90ms → swipe(0.50,0.58→0.67,0.60) 250ms → wait 600ms",
+        "note": "けんを素早く上に振り、すぐ右へずらして大皿を玉の下へ",
+        "noteEn": "Flick the ken up, then slide it right to put the big cup under the ball",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 800ms",
+        "note": "玉が大皿に入った！じっと待って乗ったか確かめる",
+        "noteEn": "The ball dropped into the big cup! Holding still to see if it counts",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "swipe(0.60,0.60→0.60,0.52) 80ms → swipe(0.60,0.52→0.26,0.54) 260ms → wait 1200ms",
+        "note": "大皿から玉をはね上げ、けんを左へ運んで小皿で受ける狙い",
+        "noteEn": "Pop the ball out of the big cup and carry the ken left to catch with the small cup",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "swipe(0.40,0.60→0.40,0.52) 80ms → swipe(0.40,0.52→0.74,0.54) 260ms → wait 1200ms",
+        "note": "小皿の玉をはね上げ、今度は右へ運んで大皿で受ける",
+        "noteEn": "Pop the ball from the small cup and move right to catch it in the big cup",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 800ms → swipe(0.60,0.60→0.60,0.62) 300ms → wait 600ms → swipe(0.60,0.62→0.60,0.50) 90ms → swipe(0.60,0.50→0.43,0.52) 250ms → wait 1200ms",
+        "note": "（再生し直すと物理が少しずれ、前の手の小皿成功が消えていた）揺れが収まるのを待ってから、もう一度小皿を狙う",
+        "noteEn": "(On replay the physics drifted and the earlier small-cup success did not happen.) Wait for the swing to settle, then try the small cup again",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "swipe(0.50,0.50→0.50,0.70) 400ms → wait 1500ms → swipe(0.50,0.70→0.50,0.58) 90ms → swipe(0.50,0.58→0.67,0.60) 250ms → wait 1200ms",
+        "note": "けんが上の文字に重なって見づらいので下へ戻し、揺れを待ってから大皿へ",
+        "noteEn": "The ken overlapped the text at the top, so I brought it down, waited, then aimed for the big cup",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 2500ms → swipe(0.60,0.70→0.60,0.60) 90ms → wait 1200ms",
+        "note": "とめけん。揺れが止まるのを待ってまっすぐ上に振り、けんは動かさずに待つ",
+        "noteEn": "Tomeken: wait for the swing to stop, flick straight up and keep the ken still",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "swipe(0.60,0.40→0.60,0.60) 900ms → wait 500ms → swipe(0.60,0.60→0.60,0.52) 80ms → swipe(0.60,0.52→0.26,0.54) 260ms → wait 1200ms",
+        "note": "（再生のたびに結果が少し変わる）玉が大皿にのっている。けんをゆっくり下ろしてから、はね上げて左へ運び小皿で受ける",
+        "noteEn": "(Results shift slightly on each replay.) The ball sits in the big cup. Lower the ken slowly, then pop it and carry left to the small cup",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 800ms → swipe(0.40,0.60→0.40,0.50) 80ms → swipe(0.40,0.50→0.57,0.50) 200ms → wait 1200ms",
+        "note": "小皿の玉をはね上げ、けん先を玉の真下へ。穴が金色に光れば刺さるはず",
+        "noteEn": "Pop the ball from the small cup and slide the spike right under it; a gold hole should stick",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "swipe(0.50,0.40→0.50,0.60) 700ms → wait 2500ms → swipe(0.50,0.70→0.50,0.60) 90ms → wait 1300ms",
+        "note": "外れた。下ろして揺れを止め、まっすぐ上に振って、けんは止めたまま待つ",
+        "noteEn": "Missed. Lower the ken, let the swing stop, flick straight up and hold still",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "wait 600ms → swipe(0.50,0.60→0.50,0.52) 80ms → swipe(0.50,0.52→0.33,0.52) 220ms → wait 1300ms",
+        "note": "大皿に入ってしまった。そこからはね上げ、けん先を玉の下へ左にずらす",
+        "noteEn": "It landed in the big cup instead. Pop it from there and shift the spike left under the ball",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "swipe(0.40,0.40→0.55,0.62) 800ms → wait 3500ms → swipe(0.50,0.70→0.50,0.62) 80ms → wait 1300ms",
+        "note": "けんを中央へ戻して長めに待ち、揺れを消してから小さく真上へ振る",
+        "noteEn": "Bring the ken back to center, wait longer for the swing to die, then a small straight flick",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "swipe(0.50,0.62→0.62,0.62) 400ms → wait 700ms → swipe(0.60,0.70→0.60,0.60) 80ms → wait 1300ms",
+        "note": "玉がまだ揺れている。けんを玉の側へ寄せて揺れを殺し、すぐ真上へ",
+        "noteEn": "The ball is still swinging. Move the ken toward it to kill the swing, then flick straight up",
+        "image": "ai-play/step-14.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-16T09:16:20+09:00"
+  },
+  "publishedAt": "2026-10-16T09:16:20+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 17471,
+    "outputTokens": 23391,
+    "contextTokens": 4985125,
+    "turns": 35,
+    "toolCalls": 39,
+    "webSearches": 0,
+    "minutes": 10.6,
+    "from": "2026-10-16T00:05:45.587Z",
+    "to": "2026-10-16T00:16:20.439Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-16T09:16:20+09:00",
+    "validationRuns": 1,
+    "codeKB": 25.7
+  }
+}

@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>ゆびけん玉 / Finger Kendama</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #efe3cc; }
+canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+const TXT = {
+  ja: {
+    title: 'ゆびけん玉', sub: '指が「けん」になる',
+    how1: '指を動かすと、けんが動く', how2: '玉をはね上げて、皿やけん先で受けとめよう', how3: '6つのわざで免許皆伝',
+    tap: 'タップでスタート', again: 'タップでもう一度',
+    hint: '指でけんを上へ振り上げ、落ちてくる玉の下へ',
+    trick: 'わざ', ok: '成功！', next: '次のわざ', clear: '免許皆伝！', time: 'タイム', best: 'ベスト', newBest: 'ベスト更新！',
+    hops: '回', holeHint: '穴が下を向いたら（金色）けん先へ',
+    names: ['大皿', '小皿', '大皿 → 小皿', 'とめけん', '小皿 → 大皿 → とめけん', 'ぽんぽん10回'],
+    descs: ['左の大きな皿に玉をのせる', '右の小さな皿に玉をのせる', '大皿にのせてから、はね上げて小皿へ', '玉の穴をけん先に刺す', '落とさずに3か所をめぐる', '落とさずに皿で10回受ける'],
+    parts: { big: '大皿', small: '小皿', spike: 'けん先' }, close: 'おしい！'
+  },
+  en: {
+    title: 'Finger Kendama', sub: 'Your finger is the ken',
+    how1: 'Move your finger to move the ken', how2: 'Toss the ball up and catch it in a cup or on the spike', how3: 'Master 6 tricks',
+    tap: 'Tap to start', again: 'Tap to play again',
+    hint: 'Swing the ken up, then get under the falling ball',
+    trick: 'Trick', ok: 'Nice!', next: 'Next trick', clear: 'Mastered!', time: 'Time', best: 'Best', newBest: 'New best!',
+    hops: '', holeHint: 'Hole facing down (gold)? Drop it on the spike',
+    names: ['Big cup', 'Small cup', 'Big → Small', 'Spike (Tomeken)', 'Small → Big → Spike', '10 hops'],
+    descs: ['Land the ball in the big left cup', 'Land the ball in the small right cup', 'Land on the big cup, then hop to the small one', 'Stick the ball\'s hole onto the spike', 'Visit all three without dropping', 'Catch it in the cups 10 times in a row'],
+    parts: { big: 'Big', small: 'Small', spike: 'Spike' }, close: 'So close!'
+  }
+}[LANG === 'ja' ? 'ja' : 'en'];
+
+const TRICKS = [
+  { seq: ['big'] }, { seq: ['small'] }, { seq: ['big', 'small'] }, { seq: ['spike'] },
+  { seq: ['small', 'big', 'spike'] }, { hops: 10 }
+];
+
+// ---------- canvas ----------
+const cv = document.getElementById('c');
+const cx = cv.getContext('2d');
+let W = 360, H = 640, DPR = 1, S = 1, WU = 360, HU = 640;
+function resize() {
+  W = Math.max(1, innerWidth || 360); H = Math.max(1, innerHeight || 640);
+  DPR = Math.min(2, devicePixelRatio || 1);
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+  S = Math.max(0.1, Math.min(W / 360, H / 640));
+  WU = W / S; HU = H / S;
+  clampKen();
+}
+addEventListener('resize', resize);
+
+// ---------- audio ----------
+let AC = null, master = null, lastKnock = 0;
+function initAudio() {
+  try {
+    if (!AC) {
+      AC = new (window.AudioContext || window.webkitAudioContext)();
+      master = AC.createGain(); master.gain.value = 0.55; master.connect(AC.destination);
+    }
+    if (AC.state === 'suspended') AC.resume();
+  } catch (e) { AC = null; }
+}
+let noiseBuf = null;
+function knock(freq, vol) {
+  if (!AC) return;
+  const now = AC.currentTime;
+  if (now - lastKnock < 0.035) return;
+  lastKnock = now;
+  try {
+    vol = Math.min(0.9, vol);
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = 'triangle';
+    o.frequency.setValueAtTime(freq * 1.25, now);
+    o.frequency.exponentialRampToValueAtTime(freq, now + 0.02);
+    g.gain.setValueAtTime(0.0001, now);
+    g.gain.exponentialRampToValueAtTime(vol * 0.6, now + 0.003);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.11);
+    o.connect(g); g.connect(master); o.start(now); o.stop(now + 0.13);
+    if (!noiseBuf) {
+      noiseBuf = AC.createBuffer(1, AC.sampleRate * 0.05, AC.sampleRate);
+      const d = noiseBuf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 3);
+    }
+    const n = AC.createBufferSource(), f = AC.createBiquadFilter(), ng = AC.createGain();
+    n.buffer = noiseBuf; f.type = 'bandpass'; f.frequency.value = freq * 2.6; f.Q.value = 3;
+    ng.gain.value = vol * 0.5;
+    n.connect(f); f.connect(ng); ng.connect(master); n.start(now);
+  } catch (e) {}
+}
+function tone(freq, t0, dur, vol, type) {
+  if (!AC) return;
+  try {
+    const now = AC.currentTime + t0;
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = type || 'sine'; o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, now);
+    g.gain.exponentialRampToValueAtTime(vol, now + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+    o.connect(g); g.connect(master); o.start(now); o.stop(now + dur + 0.02);
+  } catch (e) {}
+}
+function chime(big) {
+  const base = [523.25, 659.25, 783.99, 1046.5];
+  const ns = big ? base : base.slice(0, 2);
+  ns.forEach((f, i) => { tone(f, i * 0.09, 0.5, 0.16, 'sine'); tone(f * 2, i * 0.09, 0.25, 0.04, 'triangle'); });
+}
+function stringPing(v) { tone(180 + Math.random() * 20, 0, 0.06, Math.min(0.08, v / 8000), 'triangle'); }
+
+// ---------- ken geometry (local units, origin = center of cross piece) ----------
+const R_BALL = 20, L_STR = 165, TIE = { x: 0, y: 6 };
+const SPIKE_TIP = -70;
+function arcSegs(cx0, cy0, R, a, n, id) {
+  const pts = [];
+  for (let i = 0; i <= n; i++) {
+    const t = -a + (2 * a * i) / n;
+    pts.push({ x: cx0 + R * Math.sin(t), y: cy0 + R * Math.cos(t) });
+  }
+  const segs = [];
+  for (let i = 0; i < n; i++) segs.push({ a: pts[i], b: pts[i + 1], r: 3, id });
+  return segs;
+}
+const CUPS = {
+  big: { x: -62, R: 30, a: 75 * Math.PI / 180 },
+  small: { x: 62, R: 36, a: 55 * Math.PI / 180 }
+};
+const SEGS = [
+  ...arcSegs(CUPS.big.x, -CUPS.big.R, CUPS.big.R, CUPS.big.a, 10, 'big'),
+  ...arcSegs(CUPS.small.x, -CUPS.small.R, CUPS.small.R, CUPS.small.a, 10, 'small'),
+  { a: { x: 0, y: -50 }, b: { x: 0, y: SPIKE_TIP + 3 }, r: 4, id: 'spikeSide' }
+];
+for (const c of Object.values(CUPS)) { c.rimY = -c.R + c.R * Math.cos(c.a); c.restY = -c.R + (c.R - R_BALL); }
+
+// ---------- state ----------
+let state = 'title', stateT = 0, gameT = 0;
+const K = { x: 180, y: 270 }, KT = { x: 180, y: 270 }, KV = { x: 0, y: 0 };
+let prevKV = { x: 0, y: 0 };
+const ball = { x: 180, y: 440, vx: 0, vy: 0, ang: -Math.PI / 2, w: 0 };
+let solid = false, stuck = false, noStick = 0;
+const contact = { big: { last: 9, rest: 0, landed: false }, small: { last: 9, rest: 0, landed: false } };
+let chain = [], trickIdx = 0, banner = null, particles = [], popups = [], hintT = 0;
+let best = null, newBest = false, finalTime = 0, touchedThisAir = false;
+let drag = null;
+
+function resetBall() {
+  K.x = KT.x = WU / 2; K.y = KT.y = Math.min(HU * 0.42, HU - L_STR - 60);
+  KV.x = KV.y = 0; prevKV = { x: 0, y: 0 };
+  ball.x = K.x; ball.y = K.y + TIE.y + L_STR - 1; ball.vx = ball.vy = 0; ball.ang = -Math.PI / 2; ball.w = 0;
+  solid = false; stuck = false; chain = [];
+  for (const c of Object.values(contact)) { c.last = 9; c.rest = 0; c.landed = false; }
+}
+function clampKen() {
+  KT.x = Math.max(75, Math.min(WU - 75, KT.x));
+  KT.y = Math.max(110, Math.min(HU - 110, KT.y));
+}
+
+// ---------- save ----------
+addEventListener('message', (e) => {
+  if (e.data && e.data.agf === 'loaded' && e.data.data && typeof e.data.data.best === 'number') best = e.data.data.best;
+});
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+
+// ---------- input ----------
+function toWorld(e) { return { x: e.clientX / S, y: e.clientY / S }; }
+cv.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  initAudio();
+  if (state === 'title') { startGame(); return; }
+  if (state === 'clear') { if (stateT > 0.7) startGame(); return; }
+  if (state === 'play' && !drag) {
+    const p = toWorld(e);
+    drag = { id: e.pointerId, ox: KT.x - p.x, oy: KT.y - p.y };
+    try { cv.setPointerCapture(e.pointerId); } catch (er) {}
+  }
+}, { passive: false });
+cv.addEventListener('pointermove', (e) => {
+  if (!drag || e.pointerId !== drag.id) return;
+  const p = toWorld(e);
+  KT.x = p.x + drag.ox; KT.y = p.y + drag.oy; clampKen();
+}, { passive: false });
+const endDrag = (e) => { if (drag && e.pointerId === drag.id) drag = null; };
+cv.addEventListener('pointerup', endDrag);
+cv.addEventListener('pointercancel', endDrag);
+
+function startGame() {
+  state = 'play'; stateT = 0; gameT = 0; trickIdx = 0; banner = null; particles = []; popups = []; hintT = 4.5; newBest = false;
+  resetBall();
+  signal('start');
+}
+
+// ---------- physics ----------
+const G = 1500;
+function angDiff(a, b) { let d = a - b; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; return d; }
+function holeAligned() { return Math.abs(angDiff(ball.ang, Math.PI / 2)) < 40 * Math.PI / 180; }
+
+function landed(kind) {
+  if (state !== 'play') return;
+  chain.push(kind);
+  if (chain.length > 20) chain.shift();
+  const freq = kind === 'big' ? 640 : kind === 'small' ? 900 : 480;
+  tone(freq * 1.5, 0, 0.18, 0.07, 'sine');
+  addParticles(ball.x, ball.y + (kind === 'spike' ? 0 : R_BALL * 0.6), kind === 'spike' ? '#f2c14e' : '#fff3c4', 8);
+  checkTrick();
+}
+function checkTrick() {
+  const t = TRICKS[trickIdx];
+  if (!t) return;
+  let ok = false;
+  if (t.seq) {
+    const n = t.seq.length;
+    ok = chain.length >= n && t.seq.every((k, i) => chain[chain.length - n + i] === k);
+  } else if (t.hops) {
+    ok = cupHops() >= t.hops;
+  }
+  if (ok) {
+    const last = trickIdx === TRICKS.length - 1;
+    banner = { name: TXT.names[trickIdx], t: 0 };
+    chime(true);
+    addParticles(ball.x, ball.y, '#e94f37', 22);
+    addParticles(ball.x, ball.y, '#f2c14e', 22);
+    trickIdx++;
+    if (last) finish();
+  }
+}
+function cupHops() {
+  let n = 0;
+  for (let i = chain.length - 1; i >= 0; i--) { if (chain[i] === 'spike') break; n++; }
+  return n;
+}
+function finish() {
+  finalTime = gameT;
+  newBest = best == null || finalTime < best;
+  if (newBest) { best = finalTime; try { parent.postMessage({ agf: 'save', data: { best } }, '*'); } catch (e) {} }
+  state = 'clear'; stateT = 0; drag = null;
+  signal('end', { score: Math.round(finalTime) });
+}
+
+function chainReset() {
+  if (chain.length && state === 'play') {
+    popups.push({ x: ball.x, y: K.y - 40, t: 0, text: TXT.close });
+  }
+  chain = [];
+}
+
+function step(h, kx, ky, kvx, kvy) {
+  // ken pose for this substep
+  K.x = kx; K.y = ky; KV.x = kvx; KV.y = kvy;
+  if (noStick > 0) noStick -= h;
+  if (stuck) {
+    ball.x = K.x; ball.y = K.y + SPIKE_TIP - R_BALL + 13; ball.vx = KV.x; ball.vy = KV.y; ball.ang = Math.PI / 2; ball.w = 0;
+    return;
+  }
+  ball.vy += G * h;
+  ball.vx *= (1 - 0.08 * h); ball.vy *= (1 - 0.08 * h);
+  ball.x += ball.vx * h; ball.y += ball.vy * h;
+  let lx = ball.x - K.x, ly = ball.y - K.y;
+  // solid toggle: ken surfaces only catch a ball that came from above
+  if (!solid && ly + R_BALL < -27) { solid = true; touchedThisAir = false; }
+  if (solid && ly > 6) { solid = false; chainReset(); }
+  let touching = { big: false, small: false };
+  if (solid) {
+    // spike catch
+    if (noStick <= 0 && Math.abs(lx) < 12 && ly < SPIKE_TIP - R_BALL * 0.3 && ly > SPIKE_TIP - R_BALL - 6) {
+      const rvx = ball.vx - KV.x, rvy = ball.vy - KV.y;
+      if (rvy > -60 && Math.hypot(rvx, rvy) < 1300) {
+        if (holeAligned()) {
+          stuck = true; knock(420, 0.55); knock(300, 0.4);
+          landed('spike');
+          return;
+        }
+      }
+    }
+    for (const s of SEGS) {
+      const ax = s.a.x, ay = s.a.y, bx = s.b.x, by = s.b.y;
+      const dx = bx - ax, dy = by - ay;
+      let t = ((lx - ax) * dx + (ly - ay) * dy) / (dx * dx + dy * dy);
+      t = Math.max(0, Math.min(1, t));
+      const qx = ax + dx * t, qy = ay + dy * t;
+      let nx = lx - qx, ny = ly - qy;
+      const d = Math.hypot(nx, ny), md = R_BALL + s.r;
+      if (d < md && d > 1e-6) {
+        nx /= d; ny /= d;
+        lx += nx * (md - d); ly += ny * (md - d);
+        const rvx = ball.vx - KV.x, rvy = ball.vy - KV.y;
+        const vn = rvx * nx + rvy * ny;
+        if (vn < 0) {
+          const tx = rvx - nx * vn, ty = rvy - ny * vn;
+          const e = 0.32, fr = 0.12;
+          const nvx = tx * (1 - fr) - nx * vn * e, nvy = ty * (1 - fr) - ny * vn * e;
+          ball.vx = nvx + KV.x; ball.vy = nvy + KV.y;
+          if (-vn > 70) {
+            const f = s.id === 'big' ? 640 : s.id === 'small' ? 900 : 1300;
+            knock(f, -vn / 1100);
+            touchedThisAir = true;
+          }
+        }
+        if (s.id === 'big' || s.id === 'small') touching[s.id] = true;
+        ball.w *= 0.9;
+      }
+    }
+    ball.x = K.x + lx; ball.y = K.y + ly;
+  }
+  for (const id of ['big', 'small']) {
+    const c = contact[id];
+    if (touching[id]) {
+      c.last = 0;
+      const rv = Math.hypot(ball.vx - KV.x, ball.vy - KV.y);
+      if (rv < 140) c.rest += h; else c.rest = Math.max(0, c.rest - h * 2);
+      if (!c.landed && c.rest > 0.3) { c.landed = true; landed(id); }
+    } else {
+      c.last += h;
+      if (c.last > 0.12) { c.landed = false; c.rest = 0; }
+    }
+  }
+  // string
+  const tx = K.x + TIE.x, ty = K.y + TIE.y;
+  let sx = ball.x - tx, sy = ball.y - ty;
+  const sd = Math.hypot(sx, sy);
+  const target = Math.atan2(-sy, -sx);
+  if (sd > L_STR) {
+    sx /= sd; sy /= sd;
+    ball.x = tx + sx * L_STR; ball.y = ty + sy * L_STR;
+    const rvx = ball.vx - KV.x, rvy = ball.vy - KV.y;
+    const rad = rvx * sx + rvy * sy;
+    if (rad > 0) {
+      ball.vx -= sx * rad * 1.04; ball.vy -= sy * rad * 1.04;
+      if (rad > 350) stringPing(rad);
+    }
+    const na = target;
+    ball.w = ball.w * 0.8 + angDiff(na, ball.ang) / h * 0.2;
+    ball.ang = na;
+  } else {
+    ball.ang += ball.w * h;
+    ball.ang += angDiff(target, ball.ang) * Math.min(1, 2.2 * h);
+    ball.w *= (1 - 2 * h);
+  }
+  // floor & walls
+  if (ball.y > HU - 8 - R_BALL) { ball.y = HU - 8 - R_BALL; if (ball.vy > 0) { if (ball.vy > 120) knock(260, ball.vy / 2500); ball.vy *= -0.3; ball.vx *= 0.8; } }
+  if (ball.x < R_BALL) { ball.x = R_BALL; if (ball.vx < 0) ball.vx *= -0.4; }
+  if (ball.x > WU - R_BALL) { ball.x = WU - R_BALL; if (ball.vx > 0) ball.vx *= -0.4; }
+}
+
+function physics(dt) {
+  const k = 1 - Math.exp(-dt * 32);
+  const nx = K.x + (KT.x - K.x) * k, ny = K.y + (KT.y - K.y) * k;
+  const ox = K.x, oy = K.y;
+  const vx = (nx - ox) / dt, vy = (ny - oy) / dt;
+  // spike release: sudden deceleration / yank
+  if (stuck) {
+    const ay = (vy - prevKV.y) / dt, ax = (vx - prevKV.x) / dt;
+    if (ay > 6500 || Math.abs(ax) > 14000) {
+      stuck = false; noStick = 0.35;
+      ball.vx = prevKV.x; ball.vy = prevKV.y - 40;
+      ball.ang = Math.PI / 2; ball.w = (Math.random() - 0.5) * 2;
+      solid = true;
+    }
+  }
+  const n = Math.max(1, Math.ceil(dt / (1 / 480)));
+  const h = dt / n;
+  for (let i = 1; i <= n; i++) step(h, ox + (nx - ox) * i / n, oy + (ny - oy) * i / n, vx, vy);
+  prevKV = { x: vx, y: vy };
+}
+
+// ---------- particles ----------
+function addParticles(x, y, col, n) {
+  for (let i = 0; i < n; i++) {
+    const a = Math.random() * Math.PI * 2, sp = 80 + Math.random() * 260;
+    particles.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 120, t: 0, life: 0.6 + Math.random() * 0.5, col, s: 2 + Math.random() * 3 });
+  }
+}
+
+// ---------- drawing ----------
+function fitFont(text, size, maxW, weight) {
+  let s = size;
+  cx.font = `${weight || 700} ${s}px ${FONT}`;
+  while (s > 12 && cx.measureText(text).width > maxW) { s -= 1; cx.font = `${weight || 700} ${s}px ${FONT}`; }
+  return s;
+}
+function text(t, x, y, size, col, weight, maxW, align) {
+  fitFont(t, size, maxW || WU - 24, weight);
+  cx.fillStyle = col; cx.textAlign = align || 'center'; cx.textBaseline = 'middle';
+  cx.fillText(t, x, y);
+}
+function rr(x, y, w, h, r) { cx.beginPath(); cx.roundRect ? cx.roundRect(x, y, w, h, r) : cx.rect(x, y, w, h); }
+
+function drawBg() {
+  const g = cx.createLinearGradient(0, 0, 0, HU);
+  g.addColorStop(0, '#f6ecd8'); g.addColorStop(1, '#e8d6b4');
+  cx.fillStyle = g; cx.fillRect(0, 0, WU, HU);
+  // tatami lines
+  cx.strokeStyle = 'rgba(150,120,70,0.10)'; cx.lineWidth = 1;
+  for (let y = HU * 0.86; y < HU; y += 7) { cx.beginPath(); cx.moveTo(0, y); cx.lineTo(WU, y); cx.stroke(); }
+  cx.fillStyle = 'rgba(120,90,50,0.18)'; cx.fillRect(0, HU * 0.86 - 2, WU, 3);
+}
+
+function woodGrad(x0, y0, x1, y1) {
+  const g = cx.createLinearGradient(x0, y0, x1, y1);
+  g.addColorStop(0, '#e3b47a'); g.addColorStop(0.5, '#f2cf98'); g.addColorStop(1, '#c98f50');
+  return g;
+}
+function drawCup(c, glow) {
+  const cyc = -c.R;
+  cx.beginPath();
+  const n = 16;
+  for (let i = 0; i <= n; i++) { const t = -c.a + 2 * c.a * i / n; cx.lineTo(c.x + (c.R + 6) * Math.sin(t), cyc + (c.R + 6) * Math.cos(t)); }
+  for (let i = n; i >= 0; i--) { const t = -c.a + 2 * c.a * i / n; cx.lineTo(c.x + (c.R - 1) * Math.sin(t), cyc + (c.R - 1) * Math.cos(t)); }
+  cx.closePath();
+  cx.fillStyle = woodGrad(c.x - c.R, 0, c.x + c.R, 0); cx.fill();
+  cx.strokeStyle = '#8a5a2b'; cx.lineWidth = 1.5; cx.stroke();
+  // inner shadow
+  cx.beginPath();
+  cx.arc(c.x, cyc, c.R - 1, Math.PI / 2 - c.a, Math.PI / 2 + c.a);
+  cx.strokeStyle = 'rgba(110,70,30,0.35)'; cx.lineWidth = 3; cx.stroke();
+  if (glow) {
+    cx.beginPath(); cx.arc(c.x, cyc, c.R + 10, Math.PI / 2 - c.a - 0.1, Math.PI / 2 + c.a + 0.1);
+    cx.strokeStyle = `rgba(255,200,60,${glow})`; cx.lineWidth = 5; cx.stroke();
+  }
+}
+function drawKen(t) {
+  cx.save(); cx.translate(K.x, K.y);
+  const tr = TRICKS[trickIdx];
+  let want = null;
+  if (state === 'play' && tr && tr.seq) {
+    const n = tr.seq.length; let k = 0;
+    for (let j = Math.min(n - 1, chain.length); j > 0; j--) {
+      if (tr.seq.slice(0, j).every((v, i) => chain[chain.length - j + i] === v)) { k = j; break; }
+    }
+    want = tr.seq[k];
+  } else if (state === 'play' && tr && tr.hops) want = 'cups';
+  const pulse = 0.35 + 0.35 * Math.sin(t * 5);
+  // handle
+  rr(-9, 8, 18, 92, 8); cx.fillStyle = woodGrad(-9, 0, 9, 0); cx.fill(); cx.strokeStyle = '#8a5a2b'; cx.lineWidth = 1.5; cx.stroke();
+  // base cup (decor)
+  rr(-17, 96, 34, 12, 5); cx.fillStyle = woodGrad(-17, 0, 17, 0); cx.fill(); cx.stroke();
+  // cross piece
+  rr(-66, -8, 132, 18, 9); cx.fillStyle = woodGrad(0, -8, 0, 10); cx.fill(); cx.stroke();
+  drawCup(CUPS.big, want === 'big' || want === 'cups' ? pulse : 0);
+  drawCup(CUPS.small, want === 'small' || want === 'cups' ? pulse : 0);
+  // spike
+  cx.beginPath(); cx.moveTo(-9, -6); cx.lineTo(-5, -50); cx.quadraticCurveTo(0, SPIKE_TIP - 6, 5, -50); cx.lineTo(9, -6); cx.closePath();
+  cx.fillStyle = woodGrad(-9, 0, 9, 0); cx.fill(); cx.stroke();
+  if (want === 'spike') {
+    cx.beginPath(); cx.arc(0, SPIKE_TIP, 10, 0, Math.PI * 2);
+    cx.strokeStyle = `rgba(255,200,60,${pulse})`; cx.lineWidth = 4; cx.stroke();
+  }
+  cx.restore();
+}
+function drawString() {
+  const tx = K.x + TIE.x, ty = K.y + TIE.y;
+  const hx = ball.x + Math.cos(ball.ang) * R_BALL * 0.8, hy = ball.y + Math.sin(ball.ang) * R_BALL * 0.8;
+  const d = Math.hypot(hx - tx, hy - ty);
+  const slack = Math.max(0, L_STR - d);
+  cx.beginPath(); cx.moveTo(tx, ty);
+  if (slack < 1) cx.lineTo(hx, hy);
+  else {
+    const mx = (tx + hx) / 2, my = (ty + hy) / 2 + Math.min(120, slack * 0.7);
+    cx.quadraticCurveTo(mx, my, hx, hy);
+  }
+  cx.strokeStyle = '#f4f1ea'; cx.lineWidth = 2.2; cx.stroke();
+  cx.strokeStyle = 'rgba(80,60,40,0.35)'; cx.lineWidth = 0.8; cx.stroke();
+}
+function drawBall() {
+  cx.save(); cx.translate(ball.x, ball.y);
+  const g = cx.createRadialGradient(-6, -7, 2, 0, 0, R_BALL);
+  g.addColorStop(0, '#ff8a70'); g.addColorStop(0.55, '#e0372a'); g.addColorStop(1, '#9c1d17');
+  cx.beginPath(); cx.arc(0, 0, R_BALL, 0, Math.PI * 2); cx.fillStyle = g; cx.fill();
+  // hole
+  const above = ball.y < K.y - 30 && !stuck;
+  const aligned = holeAligned();
+  cx.rotate(ball.ang);
+  cx.beginPath(); cx.ellipse(R_BALL * 0.72, 0, 4.5, 7.5, 0, 0, Math.PI * 2);
+  cx.fillStyle = '#2a1410'; cx.fill();
+  if (above && aligned && !stuck) {
+    cx.beginPath(); cx.ellipse(R_BALL * 0.72, 0, 7, 10.5, 0, 0, Math.PI * 2);
+    cx.strokeStyle = '#ffcc33'; cx.lineWidth = 3; cx.stroke();
+  }
+  cx.restore();
+  // shine
+  cx.beginPath(); cx.ellipse(ball.x - 7, ball.y - 8, 6, 3.5, -0.6, 0, Math.PI * 2);
+  cx.fillStyle = 'rgba(255,255,255,0.55)'; cx.fill();
+}
+
+function drawHUD() {
+  text(`${TXT.trick} ${Math.min(trickIdx + 1, TRICKS.length)}/${TRICKS.length}`, 14, 24, 17, '#5a3a1a', 700, WU * 0.45, 'left');
+  const tm = gameT, mm = Math.floor(tm / 60), ss = Math.floor(tm % 60);
+  text(`${mm}:${String(ss).padStart(2, '0')}`, WU - 14, 24, 17, '#5a3a1a', 700, WU * 0.4, 'right');
+  const tr = TRICKS[trickIdx];
+  if (!tr) return;
+  text(TXT.names[trickIdx], WU / 2, 60, 26, '#3b240e', 800, WU - 30);
+  text(TXT.descs[trickIdx], WU / 2, 88, 14, '#7a5630', 500, WU - 30);
+  // progress pips
+  if (tr.seq && tr.seq.length > 1) {
+    const n = tr.seq.length; let k = 0;
+    for (let j = Math.min(n, chain.length); j > 0; j--) {
+      if (tr.seq.slice(0, j).every((v, i) => chain[chain.length - j + i] === v)) { k = j; break; }
+    }
+    const w = 78, x0 = WU / 2 - (n * w) / 2 + w / 2;
+    for (let i = 0; i < n; i++) {
+      const on = i < k;
+      rr(x0 + i * w - 33, 104, 66, 24, 12);
+      cx.fillStyle = on ? '#e0372a' : 'rgba(120,90,50,0.15)'; cx.fill();
+      text(TXT.parts[tr.seq[i]], x0 + i * w, 116, 14, on ? '#fff' : '#7a5630', 700, 62);
+    }
+  } else if (tr.hops) {
+    const h = cupHops();
+    text(`${h} / ${tr.hops}${TXT.hops}`, WU / 2, 116, 18, h ? '#e0372a' : '#7a5630', 800, WU - 30);
+  }
+  if (trickIdx === 3 || trickIdx === 4) {
+    if (ball.y < K.y - 20 && !stuck) text(TXT.holeHint, WU / 2, HU - 28, 14, '#8a5a2b', 600, WU - 24);
+  }
+}
+
+function drawTitle(t) {
+  cx.fillStyle = 'rgba(246,236,216,0.82)'; cx.fillRect(0, 0, WU, HU);
+  text(TXT.title, WU / 2, HU * 0.2, 44, '#3b240e', 900, WU - 30);
+  text(TXT.sub, WU / 2, HU * 0.2 + 42, 16, '#a0522d', 700, WU - 30);
+  text(TXT.how1, WU / 2, HU * 0.66, 15, '#5a3a1a', 600, WU - 30);
+  text(TXT.how2, WU / 2, HU * 0.66 + 26, 15, '#5a3a1a', 600, WU - 30);
+  text(TXT.how3, WU / 2, HU * 0.66 + 52, 15, '#5a3a1a', 600, WU - 30);
+  if (best != null) text(`${TXT.best} ${fmt(best)}`, WU / 2, HU * 0.66 + 80, 14, '#8a5a2b', 600);
+  const a = 0.55 + 0.45 * Math.sin(t * 4);
+  text(TXT.tap, WU / 2, HU * 0.88, 20, `rgba(224,55,42,${a})`, 800);
+}
+function fmt(s) { const m = Math.floor(s / 60); return `${m}:${(s % 60).toFixed(1).padStart(4, '0')}`; }
+function drawClear() {
+  cx.fillStyle = 'rgba(246,236,216,0.85)'; cx.fillRect(0, 0, WU, HU);
+  text(TXT.clear, WU / 2, HU * 0.3, 44, '#c0392b', 900, WU - 30);
+  text(`${TXT.time}  ${fmt(finalTime)}`, WU / 2, HU * 0.42, 30, '#3b240e', 800);
+  if (best != null) text(`${TXT.best}  ${fmt(best)}`, WU / 2, HU * 0.42 + 40, 18, '#7a5630', 700);
+  if (newBest) text(TXT.newBest, WU / 2, HU * 0.42 + 72, 18, '#e0372a', 800);
+  if (stateT > 0.7) text(TXT.again, WU / 2, HU * 0.8, 20, '#e0372a', 800);
+}
+
+// ---------- title demo motion ----------
+function titleDemo(t) {
+  KT.x = WU / 2 + Math.sin(t * 1.3) * 30;
+  KT.y = HU * 0.45 + Math.sin(t * 2.6) * 10;
+}
+
+// ---------- loop ----------
+let last = 0, clock = 0;
+function frame(ts) {
+  requestAnimationFrame(frame);
+  if (!last) last = ts;
+  let dt = (ts - last) / 1000; last = ts;
+  if (!(dt > 0)) dt = 0.016;
+  dt = Math.min(0.05, dt);
+  clock += dt; stateT += dt;
+  if (state === 'title') titleDemo(clock);
+  if (state === 'play') { gameT += dt; if (hintT > 0) hintT -= dt; }
+  physics(dt);
+  for (const p of particles) { p.t += dt; p.vy += 600 * dt; p.x += p.vx * dt; p.y += p.vy * dt; }
+  particles = particles.filter((p) => p.t < p.life);
+  for (const p of popups) p.t += dt;
+  popups = popups.filter((p) => p.t < 0.9);
+  if (banner) { banner.t += dt; if (banner.t > 1.6) banner = null; }
+
+  cx.setTransform(DPR * S, 0, 0, DPR * S, 0, 0);
+  drawBg();
+  drawKen(clock);
+  drawString();
+  drawBall();
+  for (const p of particles) {
+    cx.globalAlpha = Math.max(0, 1 - p.t / p.life);
+    cx.fillStyle = p.col; cx.beginPath(); cx.arc(p.x, p.y, p.s, 0, Math.PI * 2); cx.fill();
+  }
+  cx.globalAlpha = 1;
+  for (const p of popups) {
+    cx.globalAlpha = Math.max(0, 1 - p.t / 0.9);
+    text(p.text, p.x, p.y - p.t * 40, 16, '#8a5a2b', 800, 160);
+  }
+  cx.globalAlpha = 1;
+  if (state === 'play') {
+    drawHUD();
+    if (banner) {
+      const a = Math.min(1, (1.6 - banner.t) * 3);
+      const sc = 1 + Math.max(0, 0.25 - banner.t) * 1.6;
+      cx.globalAlpha = a;
+      cx.save(); cx.translate(WU / 2, HU * 0.22 + 60); cx.scale(sc, sc);
+      rr(-WU * 0.42, -34, WU * 0.84, 68, 18); cx.fillStyle = 'rgba(224,55,42,0.92)'; cx.fill();
+      text(`${banner.name}  ${TXT.ok}`, 0, -6, 24, '#fff', 900, WU * 0.78);
+      if (trickIdx < TRICKS.length) text(`${TXT.next}: ${TXT.names[trickIdx]}`, 0, 20, 14, '#ffe9c4', 700, WU * 0.78);
+      cx.restore(); cx.globalAlpha = 1;
+    }
+    if (hintT > 0) {
+      cx.globalAlpha = Math.min(1, hintT);
+      rr(12, HU - 60, WU - 24, 36, 12); cx.fillStyle = 'rgba(59,36,14,0.8)'; cx.fill();
+      text(TXT.hint, WU / 2, HU - 42, 14, '#fff', 700, WU - 40);
+      cx.globalAlpha = 1;
+    }
+  } else if (state === 'title') drawTitle(clock);
+  else if (state === 'clear') drawClear();
+}
+resize();
+resetBall();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

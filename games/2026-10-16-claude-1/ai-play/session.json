@@ -1,0 +1,621 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-16T00:11:10.652Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.5
+        ]
+      },
+      "desc": "tap(0.50,0.50) 120ms",
+      "note": "タイトル画面。けん玉の絵と遊び方3行。タップで開始",
+      "noteEn": "Title screen with the kendama and 3 lines of how-to. Tap to start.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": [
+        {
+          "swipe": [
+            0.5,
+            0.7,
+            0.5,
+            0.58
+          ],
+          "hold": 90
+        },
+        {
+          "swipe": [
+            0.5,
+            0.58,
+            0.67,
+            0.6
+          ],
+          "hold": 250
+        },
+        {
+          "wait": 600
+        }
+      ],
+      "desc": "swipe(0.50,0.70→0.50,0.58) 90ms → swipe(0.50,0.58→0.67,0.60) 250ms → wait 600ms",
+      "note": "けんを素早く上に振り、すぐ右へずらして大皿を玉の下へ",
+      "noteEn": "Flick the ken up, then slide it right to put the big cup under the ball",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": {
+        "wait": 800
+      },
+      "desc": "wait 800ms",
+      "note": "玉が大皿に入った！じっと待って乗ったか確かめる",
+      "noteEn": "The ball dropped into the big cup! Holding still to see if it counts",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "swipe": [
+            0.6,
+            0.6,
+            0.6,
+            0.52
+          ],
+          "hold": 80
+        },
+        {
+          "swipe": [
+            0.6,
+            0.52,
+            0.26,
+            0.54
+          ],
+          "hold": 260
+        },
+        {
+          "wait": 1200
+        }
+      ],
+      "desc": "swipe(0.60,0.60→0.60,0.52) 80ms → swipe(0.60,0.52→0.26,0.54) 260ms → wait 1200ms",
+      "note": "大皿から玉をはね上げ、けんを左へ運んで小皿で受ける狙い",
+      "noteEn": "Pop the ball out of the big cup and carry the ken left to catch with the small cup",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": [
+        {
+          "swipe": [
+            0.4,
+            0.6,
+            0.4,
+            0.52
+          ],
+          "hold": 80
+        },
+        {
+          "swipe": [
+            0.4,
+            0.52,
+            0.74,
+            0.54
+          ],
+          "hold": 260
+        },
+        {
+          "wait": 1200
+        }
+      ],
+      "desc": "swipe(0.40,0.60→0.40,0.52) 80ms → swipe(0.40,0.52→0.74,0.54) 260ms → wait 1200ms",
+      "note": "小皿の玉をはね上げ、今度は右へ運んで大皿で受ける",
+      "noteEn": "Pop the ball from the small cup and move right to catch it in the big cup",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "wait": 800
+        },
+        {
+          "swipe": [
+            0.6,
+            0.6,
+            0.6,
+            0.62
+          ],
+          "hold": 300
+        },
+        {
+          "wait": 600
+        },
+        {
+          "swipe": [
+            0.6,
+            0.62,
+            0.6,
+            0.5
+          ],
+          "hold": 90
+        },
+        {
+          "swipe": [
+            0.6,
+            0.5,
+            0.43,
+            0.52
+          ],
+          "hold": 250
+        },
+        {
+          "wait": 1200
+        }
+      ],
+      "desc": "wait 800ms → swipe(0.60,0.60→0.60,0.62) 300ms → wait 600ms → swipe(0.60,0.62→0.60,0.50) 90ms → swipe(0.60,0.50→0.43,0.52) 250ms → wait 1200ms",
+      "note": "（再生し直すと物理が少しずれ、前の手の小皿成功が消えていた）揺れが収まるのを待ってから、もう一度小皿を狙う",
+      "noteEn": "(On replay the physics drifted and the earlier small-cup success did not happen.) Wait for the swing to settle, then try the small cup again",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "swipe": [
+            0.5,
+            0.5,
+            0.5,
+            0.7
+          ],
+          "hold": 400
+        },
+        {
+          "wait": 1500
+        },
+        {
+          "swipe": [
+            0.5,
+            0.7,
+            0.5,
+            0.58
+          ],
+          "hold": 90
+        },
+        {
+          "swipe": [
+            0.5,
+            0.58,
+            0.67,
+            0.6
+          ],
+          "hold": 250
+        },
+        {
+          "wait": 1200
+        }
+      ],
+      "desc": "swipe(0.50,0.50→0.50,0.70) 400ms → wait 1500ms → swipe(0.50,0.70→0.50,0.58) 90ms → swipe(0.50,0.58→0.67,0.60) 250ms → wait 1200ms",
+      "note": "けんが上の文字に重なって見づらいので下へ戻し、揺れを待ってから大皿へ",
+      "noteEn": "The ken overlapped the text at the top, so I brought it down, waited, then aimed for the big cup",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": [
+        {
+          "wait": 2500
+        },
+        {
+          "swipe": [
+            0.6,
+            0.7,
+            0.6,
+            0.6
+          ],
+          "hold": 90
+        },
+        {
+          "wait": 1200
+        }
+      ],
+      "desc": "wait 2500ms → swipe(0.60,0.70→0.60,0.60) 90ms → wait 1200ms",
+      "note": "とめけん。揺れが止まるのを待ってまっすぐ上に振り、けんは動かさずに待つ",
+      "noteEn": "Tomeken: wait for the swing to stop, flick straight up and keep the ken still",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": [
+        {
+          "swipe": [
+            0.6,
+            0.4,
+            0.6,
+            0.6
+          ],
+          "hold": 900
+        },
+        {
+          "wait": 500
+        },
+        {
+          "swipe": [
+            0.6,
+            0.6,
+            0.6,
+            0.52
+          ],
+          "hold": 80
+        },
+        {
+          "swipe": [
+            0.6,
+            0.52,
+            0.26,
+            0.54
+          ],
+          "hold": 260
+        },
+        {
+          "wait": 1200
+        }
+      ],
+      "desc": "swipe(0.60,0.40→0.60,0.60) 900ms → wait 500ms → swipe(0.60,0.60→0.60,0.52) 80ms → swipe(0.60,0.52→0.26,0.54) 260ms → wait 1200ms",
+      "note": "（再生のたびに結果が少し変わる）玉が大皿にのっている。けんをゆっくり下ろしてから、はね上げて左へ運び小皿で受ける",
+      "noteEn": "(Results shift slightly on each replay.) The ball sits in the big cup. Lower the ken slowly, then pop it and carry left to the small cup",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "action": [
+        {
+          "wait": 800
+        },
+        {
+          "swipe": [
+            0.4,
+            0.6,
+            0.4,
+            0.5
+          ],
+          "hold": 80
+        },
+        {
+          "swipe": [
+            0.4,
+            0.5,
+            0.57,
+            0.5
+          ],
+          "hold": 200
+        },
+        {
+          "wait": 1200
+        }
+      ],
+      "desc": "wait 800ms → swipe(0.40,0.60→0.40,0.50) 80ms → swipe(0.40,0.50→0.57,0.50) 200ms → wait 1200ms",
+      "note": "小皿の玉をはね上げ、けん先を玉の真下へ。穴が金色に光れば刺さるはず",
+      "noteEn": "Pop the ball from the small cup and slide the spike right under it; a gold hole should stick",
+      "image": "ai-play/step-10.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "action": [
+        {
+          "swipe": [
+            0.5,
+            0.4,
+            0.5,
+            0.6
+          ],
+          "hold": 700
+        },
+        {
+          "wait": 2500
+        },
+        {
+          "swipe": [
+            0.5,
+            0.7,
+            0.5,
+            0.6
+          ],
+          "hold": 90
+        },
+        {
+          "wait": 1300
+        }
+      ],
+      "desc": "swipe(0.50,0.40→0.50,0.60) 700ms → wait 2500ms → swipe(0.50,0.70→0.50,0.60) 90ms → wait 1300ms",
+      "note": "外れた。下ろして揺れを止め、まっすぐ上に振って、けんは止めたまま待つ",
+      "noteEn": "Missed. Lower the ken, let the swing stop, flick straight up and hold still",
+      "image": "ai-play/step-11.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 12,
+      "action": [
+        {
+          "wait": 600
+        },
+        {
+          "swipe": [
+            0.5,
+            0.6,
+            0.5,
+            0.52
+          ],
+          "hold": 80
+        },
+        {
+          "swipe": [
+            0.5,
+            0.52,
+            0.33,
+            0.52
+          ],
+          "hold": 220
+        },
+        {
+          "wait": 1300
+        }
+      ],
+      "desc": "wait 600ms → swipe(0.50,0.60→0.50,0.52) 80ms → swipe(0.50,0.52→0.33,0.52) 220ms → wait 1300ms",
+      "note": "大皿に入ってしまった。そこからはね上げ、けん先を玉の下へ左にずらす",
+      "noteEn": "It landed in the big cup instead. Pop it from there and shift the spike left under the ball",
+      "image": "ai-play/step-12.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 13,
+      "action": [
+        {
+          "swipe": [
+            0.4,
+            0.4,
+            0.55,
+            0.62
+          ],
+          "hold": 800
+        },
+        {
+          "wait": 3500
+        },
+        {
+          "swipe": [
+            0.5,
+            0.7,
+            0.5,
+            0.62
+          ],
+          "hold": 80
+        },
+        {
+          "wait": 1300
+        }
+      ],
+      "desc": "swipe(0.40,0.40→0.55,0.62) 800ms → wait 3500ms → swipe(0.50,0.70→0.50,0.62) 80ms → wait 1300ms",
+      "note": "けんを中央へ戻して長めに待ち、揺れを消してから小さく真上へ振る",
+      "noteEn": "Bring the ken back to center, wait longer for the swing to die, then a small straight flick",
+      "image": "ai-play/step-13.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 14,
+      "action": [
+        {
+          "swipe": [
+            0.5,
+            0.62,
+            0.62,
+            0.62
+          ],
+          "hold": 400
+        },
+        {
+          "wait": 700
+        },
+        {
+          "swipe": [
+            0.6,
+            0.7,
+            0.6,
+            0.6
+          ],
+          "hold": 80
+        },
+        {
+          "wait": 1300
+        }
+      ],
+      "desc": "swipe(0.50,0.62→0.62,0.62) 400ms → wait 700ms → swipe(0.60,0.70→0.60,0.60) 80ms → wait 1300ms",
+      "note": "玉がまだ揺れている。けんを玉の側へ寄せて揺れを殺し、すぐ真上へ",
+      "noteEn": "The ball is still swinging. Move the ken toward it to kill the swing, then flick straight up",
+      "image": "ai-play/step-14.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}
