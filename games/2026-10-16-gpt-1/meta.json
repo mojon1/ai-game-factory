@@ -1,0 +1,381 @@
+{
+  "id": "2026-10-16-gpt-1",
+  "status": "published",
+  "title": "ふたりの星囲い",
+  "genre": "2人で遊ぶ（1台のスマホで）",
+  "concept": "二人で交互に点の間を結び、四辺が閉じた部屋の星を取る。部屋を取ると続けて線を引けるが、雲の部屋は二点失う。相手に三辺を渡すか、減点の雲を先に引き受けて連続で星を取るか、最後の一本を譲り合う駆け引きを核にした。",
+  "howToPlay": "二人で交互に点の間をタップ。四辺を閉じるとその部屋の点を獲得してもう一手。雲は−2点。全て囲んだら高得点の人が勝ち。",
+  "libraryDecision": "点・辺・部屋の関係を一目で見比べることが核。Canvasの平面描画が適し、物理や3Dの動きは囲みの判定を曖昧にするため使わない。",
+  "soundDecision": "手番ごとに高さの違う短音、星獲得は高音、雲は低音で結果を区別する。対話しながら考える二人の邪魔をしないようBGMは付けない。",
+  "planning": {
+    "genreDraw": {
+      "ja": "2人で遊ぶ（1台のスマホで）",
+      "en": "Two players on one phone",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "二人で交互に部屋を囲う。星で加点、雲で減点、囲うと連続手番になる陣取り。",
+        "ideaEn": "Two players enclose rooms: stars score, clouds cost points, and completed rooms grant another turn.",
+        "fromDraw": true
+      },
+      {
+        "idea": "磁石を置いて玉の軌道を曲げ、遠い穴へ届ける。",
+        "ideaEn": "Place magnets to bend a ball toward a distant pocket.",
+        "fromDraw": false
+      },
+      {
+        "idea": "水面を押して蓮の高さをそろえ、橋をつくる。",
+        "ideaEn": "Press water down to align lotus pads into a bridge.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "limit",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Stars for Two",
+      "concept": "Take turns joining dots and claim the stars inside a room when its fourth side closes. Claiming any room grants another turn, but cloud rooms cost two points. Decide whether to give away a third side or accept a cloud to continue into a chain of stars.",
+      "howToPlay": "Two players take turns tapping between dots. Close a room to gain its points and play again. Clouds cost two points. Higher score wins when all rooms are claimed.",
+      "libraryDecision": "Flat Canvas clearly shows dots, sides and rooms. Physics and depth would obscure enclosure decisions, so neither is used.",
+      "soundDecision": "Different brief tones mark each player, stars and clouds. No music competes with two players talking through their decisions."
+    }
+  },
+  "createdAt": "2026-10-16T12:03:14+09:00",
+  "specVersion": 8,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-16T12:03:14+09:00",
+    "metricsFrom": "2026-10-16T03:02:06.295Z",
+    "transcript": null,
+    "validationRuns": 1,
+    "finishedAt": "2026-10-16T12:10:37+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-16T12:04:46+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "5.6KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=32",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=85",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=17",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=74",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 5698,
+    "lines": 6
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 2,
+    "works": "buggy",
+    "comment": "両プレイヤーを自分で操作し11手を画像で確認。通常の交代、共有辺での部屋獲得、1点・2点・雲−2点、獲得後の連続手番、全室完了で3対2の勝敗、タップ再開を確認した。実際の人間二人の対戦は未検証。雲による逆転はあるが基本はDots and Boxesの小盤面。結果画面下部が白い空欄となり再開案内が見えない不具合がある。操作は動くため、手順の非致命的不具合として修正せず記録した。",
+    "similar": [
+      {
+        "title": "Dots-n-Boxes / Dots and Boxes",
+        "url": "https://cseweb.ucsd.edu/~ccalabro/dotsnboxes/",
+        "similarity": "高",
+        "note": "交互に辺を引き、最後の辺で部屋を取ると続けて手番という核が同じ。本作は1点・2点・−2点を混在させる小盤面で、AI対戦はない。",
+        "note_en": "Identical core: alternate edges, claim boxes on the fourth side and play again. This version uses a small mixed-value board with one, two and minus-two points and no AI opponent."
+      }
+    ],
+    "research": "Web検索を2件実施し、Chris CalabroのDots-n-Boxes作者ページで基本ルールを確認。負点変種の検索は確認不足だったため、雲の減点そのものを独自発明とは主張しない。",
+    "i18n": {
+      "en": {
+        "comment": "Controlled both players and viewed eleven steps. Verified turns, shared edges, one/two-point and minus-two cloud rooms, extra turns, a three-to-two final result and tap restart. No real two-person match was tested. Clouds permit reversals, but this is a small Dots and Boxes variant. The bottom result panel becomes blank and hides the restart instruction. Restart works; recorded the non-fatal display bug without a post-play fix, following the procedure.",
+        "research": "Ran two web searches and verified rules on Chris Calabro’s creator page. The search did not establish a specific negative-value variant, so no claim that cloud penalties are an original invention is made."
+      }
+    },
+    "method": "スマホ縦画面で 11 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 11 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.90) 120ms",
+        "note": "二人交互、囲うと連続手番、雲は減点という説明を読んで開始する。",
+        "noteEn": "Read the alternating turns, extra turns for rooms and cloud penalty, then start.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.28,0.34) 120ms → tap(0.17,0.41) 120ms → tap(0.28,0.47) 120ms",
+        "note": "左上は1点。交互に上・左・下の三辺を引き、囲む前の手番変化を見る。",
+        "noteEn": "The upper-left room is worth one. Alternate its top, left and bottom sides and inspect the next turn.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.39,0.41) 120ms",
+        "note": "三辺で2人目の番。右の最後の辺を閉じて星を取る。",
+        "noteEn": "Three sides leave player two to move. Close the right side to claim the star.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.50,0.34) 120ms → tap(0.50,0.47) 120ms → tap(0.61,0.41) 120ms",
+        "note": "2人目が1点取り連続手番。上中央の残る三辺を交互に閉じ、共有辺の部屋も取れるか見る。",
+        "noteEn": "Player two gains one and keeps the turn. Alternate the upper-middle room’s three remaining sides.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.72,0.34) 120ms → tap(0.83,0.41) 120ms → tap(0.72,0.47) 120ms",
+        "note": "上中央も2人目が獲得して2点。右上の1点の部屋を三辺で囲む。",
+        "noteEn": "Player two now has two. Alternate the three remaining sides of the upper-right one-point room.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.17,0.53) 120ms → tap(0.28,0.59) 120ms → tap(0.39,0.53) 120ms",
+        "note": "上段は2人目が3点。左中央の1点を囲み、残った中央と雲へ進む準備をする。",
+        "noteEn": "Player two has three. Close the middle-left one-point room before the center and cloud.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.50,0.59) 120ms → tap(0.61,0.53) 120ms",
+        "note": "中央は上と左が既にある。2人目が下を引き、1人目が右を閉じて初めて点を取る。",
+        "noteEn": "Center already has top and left sides. Player two draws below; player one closes the right for a first point.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.72,0.59) 120ms → tap(0.83,0.53) 120ms",
+        "note": "右中央は雲−2。1人目が下、2人目が右を閉じ、減点しても手番が続くか見る。",
+        "noteEn": "The middle-right cloud costs two. Player one draws below; player two closes right to check the penalty and extra turn.",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.17,0.66) 120ms → tap(0.28,0.72) 120ms → tap(0.39,0.66) 120ms",
+        "note": "2人目は4から2点に減り手番は続いた。左下の2点を囲み直して取り戻す。",
+        "noteEn": "Player two falls from four to two and retains the turn. Close the lower-left two-point room.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.50,0.72) 120ms → tap(0.61,0.66) 120ms → tap(0.72,0.72) 120ms → tap(0.83,0.66) 120ms",
+        "note": "残る2点と−2点の部屋には二辺ずつ残る。中央下は1人目が閉じ、右下は2人目が閉じる順で全盤面を終える。",
+        "noteEn": "Each remaining room needs two sides. Alternate to give the lower-middle two points to player one and the lower-right cloud to player two, completing the board.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 3,
+            "scores": [
+              3,
+              2
+            ]
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "wait 900ms → tap(0.50,0.85) 120ms",
+        "note": "最終得点3対2で1人目の勝ち。結果の下部が白い空欄で再開案内が見えない。待って画面をタップし再開できるか試す。",
+        "noteEn": "Player one wins three to two. The bottom result panel is blank and hides the restart instruction. Wait and tap to test restart.",
+        "image": "ai-play/step-11.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 3,
+            "scores": [
+              3,
+              2
+            ]
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-16T12:10:37+09:00"
+  },
+  "publishedAt": "2026-10-16T12:10:37+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 2913,
+    "outputTokens": 8802,
+    "contextTokens": 8458092,
+    "turns": 29,
+    "toolCalls": 29,
+    "webSearches": null,
+    "minutes": 9.1,
+    "from": "2026-10-16T03:02:06.295Z",
+    "to": "2026-10-16T03:11:13.292Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力から思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-10-16T12:11:13+09:00",
+    "validationRuns": 1,
+    "codeKB": 5.6,
+    "evidence": "metrics-evidence.json"
+  }
+}
