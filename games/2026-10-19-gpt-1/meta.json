@@ -1,0 +1,409 @@
+{
+  "id": "2026-10-19-gpt-1",
+  "status": "published",
+  "title": "ひと息つり糸",
+  "genre": "釣り",
+  "concept": "指を置くと糸を巻き、離すと張りがゆるむ。魚が引く波を見ながら巻き続けるか一度休むかを選ぶ。岸に近づくほどあと少しを欲張りたくなるが、張り切ると糸が切れる。三匹それぞれの引きの速さに合わせる、小さな釣りの呼吸が核。",
+  "howToPlay": "押して糸を巻き、離して張りを下げる。魚が強く引く間は休み、糸を切らずに3匹釣ろう。",
+  "libraryDecision": "張りと引き寄せの二つの変化を明瞭に読むことが核。Canvasで糸と魚を描き、物理演算の予測しづらい揺れは入れない。3Dや音楽ライブラリも判断を強めないため使わない。",
+  "soundDecision": "魚の強い引きは低い音、落ち着く切り替わりは高い音、釣り上げは短い高音で知らせる。水面と張りに集中できるようBGMは入れない。",
+  "planning": {
+    "genreDraw": {
+      "ja": "釣り",
+      "en": "Fishing",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "押して巻き、離して緩め、魚の引きに呼吸を合わせる釣り。",
+        "ideaEn": "Hold to reel and release to loosen, matching the fish’s pulling rhythm.",
+        "fromDraw": true
+      },
+      {
+        "idea": "石を水面へはじき、跳ねる間隔に合わせて次の波を選ぶ水切り。",
+        "ideaEn": "Skip a stone and choose waves according to the bounce intervals.",
+        "fromDraw": false
+      },
+      {
+        "idea": "鳥の短い鳴き声を並べ、自分の朝の合唱を作る遊び場。",
+        "ideaEn": "Arrange short bird calls into a personal dawn chorus.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "fail",
+    "input": [
+      "hold"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "A Breath on the Line",
+      "concept": "Hold to reel and release to loosen tension. Read the fish’s pulling rhythm and decide whether to keep reeling or rest. Near shore, one more pull is tempting, but excessive tension snaps the line. Adapt to three different pulling tempos.",
+      "howToPlay": "Hold to reel, release to reduce tension. Rest during strong pulls and land three fish without breaking the line.",
+      "libraryDecision": "Clear tension and progress changes are the core. Canvas draws the fish and line without unpredictable physics wobble. Depth and music libraries would not improve these decisions.",
+      "soundDecision": "Low and high tones distinguish strong pulls from calm phases; a brief high tone marks landing. No music competes with watching tension."
+    }
+  },
+  "createdAt": "2026-10-19T10:32:40+09:00",
+  "specVersion": 8,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-19T10:32:40+09:00",
+    "metricsFrom": "2026-10-19T01:32:13.366Z",
+    "transcript": null,
+    "validationRuns": 1,
+    "finishedAt": "2026-10-19T10:38:15+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-19T10:33:31+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "6.1KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=46",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=87",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=42",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=72",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 6275,
+    "lines": 12
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 1
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "12手を画像で確認。強い引きで張りが速く増え、休むと張りと引き寄せが下がること、赤い張りからの回復、1匹目の釣り上げ、次の魚、押し続けた糸切れと再開を確認した。あと少しの欲張りと緩める判断は分かりやすい。ただし周期が規則的で、慣れると同じ巻く・待つを繰り返しやすい。3匹全クリアには未到達。",
+    "similar": [
+      {
+        "title": "Stardew Valley — Fishing",
+        "url": "https://wiki.stardewvalley.net/Fishing",
+        "similarity": "中",
+        "note": "押す・離すを繰り返しメーターを読みながら釣る点が近い。Stardewは魚を可動バー内に保つ。本作は引きの予告を見て張りの上限を避ける。",
+        "note_en": "Both use press/release timing and meters while fishing. Stardew keeps a fish inside a movable bar; this game forecasts pulls and avoids a tension limit."
+      }
+    ],
+    "research": "Web検索を2件実施し、Stardew Valley Wikiの釣り操作説明を読んだ。Fishing Planet関連の検索結果は更新情報や掲示板が中心で、具体的な比較としては掲載しない。",
+    "i18n": {
+      "en": {
+        "comment": "Viewed twelve steps. Verified rapid tension during strong pulls, tension/progress loss while resting, recovery from red tension, first catch, next fish, a deliberately snapped line and restart. The temptation to reel a little more is clear. However, fixed rhythms encourage repeating the same reel-and-wait pattern. Did not land all three fish.",
+        "research": "Ran two web searches and read the fishing controls on Stardew Valley Wiki. Fishing Planet results mainly concerned updates or discussions, so no detailed comparison was included."
+      }
+    },
+    "method": "スマホ縦画面で 12 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 12 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.90) 120ms",
+        "note": "押して巻き、離して緩める説明を読んで釣りを始める。",
+        "noteEn": "Read the hold-to-reel and release-to-loosen instructions and start.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.50,0.86) 1000ms",
+        "note": "最初から強く引いている。まず1秒だけ巻いて張りの増え方を確かめる。",
+        "noteEn": "The fish is already pulling strongly. Reel for one second to see how quickly tension rises.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 1200ms",
+        "note": "1秒で引き寄せ6%に対し張り37%。まだ強いので指を離して待つ。",
+        "noteEn": "One second gained six percent progress but thirty-seven tension. Release and wait through the remaining strong pull.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.50,0.86) 2400ms",
+        "note": "張りが2%まで下がり魚も落ち着いた。下の予告はしばらく青緑なので、約2秒半巻く。",
+        "noteEn": "Tension fell to two and the fish is calm. The forecast stays teal for a while; reel for about two and a half seconds.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 2000ms",
+        "note": "41%まで近づき張り22%。強い引きが戻ったので、オレンジの予告が終わるまで待つ。",
+        "noteEn": "Reached forty-one percent with twenty-two tension. Strong pulling has returned; wait through the orange forecast.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.50,0.86) 2300ms",
+        "note": "張り0%、引き寄せ36%。また青緑の間が長いので巻き進める。",
+        "noteEn": "Zero tension and thirty-six percent progress. Reel through the long calm forecast.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.50,0.86) 1900ms",
+        "note": "73%まで来た。すぐ強い引きが来る予告だが、張り18%には余裕があるので少し欲張って巻く。",
+        "noteEn": "At seventy-three percent, a strong pull is near. Tension is only eighteen, so risk reeling a little longer.",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 2800ms",
+        "note": "89%まで近づいたが張り80%で赤い。切れる前に離し、十分に緩める。",
+        "noteEn": "Eighty-nine percent progress, but tension is red at eighty. Release before the line snaps and let it loosen fully.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.50,0.86) 2000ms",
+        "note": "張り0%、引き寄せ83%。短い穏やかな間から巻き始め、最初の魚を釣り上げたい。",
+        "noteEn": "Zero tension and eighty-three percent progress. Start during the short calm phase and try to land the first fish.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 900ms → tap(0.50,0.86) 120ms",
+        "note": "1匹釣れたと表示され次の魚への案内も見える。少し待って二匹目に進む。",
+        "noteEn": "One fish landed and the next-fish prompt is visible. Wait briefly and continue.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.50,0.86) 6500ms",
+        "note": "魚の色と引きの予告が変わった。失敗時の反応を確かめるため、今回は強い引きでも離さず巻き続ける。",
+        "noteEn": "Fish color and forecast changed. Deliberately keep reeling through strong pulls to inspect a snapped line.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "wait 900ms → tap(0.50,0.86) 120ms",
+        "note": "押し続けると糸が切れ、釣れた数1で終わった。再開して最初の魚へ戻るか見る。",
+        "noteEn": "Continuous reeling snapped the line and ended with one catch. Restart to check return to the first fish.",
+        "image": "ai-play/step-12.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-19T10:38:15+09:00"
+  },
+  "publishedAt": "2026-10-19T10:38:15+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 1806,
+    "outputTokens": 8342,
+    "contextTokens": 10851939,
+    "turns": 29,
+    "toolCalls": 29,
+    "webSearches": null,
+    "minutes": 6.3,
+    "from": "2026-10-19T01:32:13.366Z",
+    "to": "2026-10-19T01:38:32.517Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力から思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-10-19T10:38:32+09:00",
+    "validationRuns": 1,
+    "codeKB": 6.1,
+    "evidence": "metrics-evidence.json"
+  }
+}
