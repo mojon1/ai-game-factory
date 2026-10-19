@@ -1,0 +1,462 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>はんぶんこ</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #fdf3e4; }
+canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const T = {
+  ja: {
+    title: 'はんぶんこ', sub1: 'スッと指をすべらせて、おやつを切ろう。', sub2: 'ふたりが言った割合に、ぴったり分けて。', sub3: 'ずれが大きいと、けんかになる。',
+    tap: 'タップでスタート', again: 'タップでもう一度', hint: '指をスッとすべらせると、その線で切れる',
+    split: (a, b) => `${a} : ${b} にわけて`, perfect: 'ぴったり！', great: 'おみごと', good: 'まあまあ', close: 'ちょっとずれた', fight: 'けんか！',
+    miss: 'おやつを横切って切ろう', over: 'けんかでおしまい', best: 'ベスト', newBest: 'ベスト更新！', round: (n) => `${n}こめ`,
+    combo: (n) => `${n}れんぞく`, avg: (v) => `平均のずれ ${v}%`, perfects: (n) => `ぴったり ${n}回`,
+    snacks: ['ケーキ', 'ピザ', 'おにぎり', 'ほしクッキー', 'ハートチョコ', 'カステラ', 'ドーナツ', 'すいか', 'ふしぎパン', 'せんべい'],
+    spin: 'まわってる！', drift: 'うごいてる！'
+  },
+  en: {
+    title: 'Fair Share', sub1: 'Swipe across a snack to slice it.', sub2: 'Split it in exactly the ratio they ask.', sub3: 'Miss by too much and they fight.',
+    tap: 'Tap to start', again: 'Tap to play again', hint: 'Swipe your finger to slice along that line',
+    split: (a, b) => `Split ${a} : ${b}`, perfect: 'Perfect!', great: 'Great', good: 'Not bad', close: 'A bit off', fight: 'Fight!',
+    miss: 'Slice across the snack', over: 'They started fighting', best: 'Best', newBest: 'New best!', round: (n) => `#${n}`,
+    combo: (n) => `${n} combo`, avg: (v) => `Avg. error ${v}%`, perfects: (n) => `${n} perfect`,
+    snacks: ['Cake', 'Pizza', 'Rice ball', 'Star cookie', 'Heart choc', 'Sponge cake', 'Donut', 'Watermelon', 'Odd bread', 'Rice cracker'],
+    spin: 'Spinning!', drift: 'Moving!'
+  }
+}[LANG === 'ja' ? 'ja' : 'en'];
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+
+// ---------- save ----------
+let best = 0;
+addEventListener('message', (e) => { if (e.data && e.data.agf === 'loaded' && e.data.data) { best = Math.max(best, e.data.data.best || 0); } });
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+const persist = () => { try { parent.postMessage({ agf: 'save', data: { best } }, '*'); } catch (e) {} };
+
+// ---------- canvas ----------
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d');
+let W = 360, H = 640, DPR = 1;
+function resize() {
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = Math.max(1, cv.clientWidth || innerWidth || 360);
+  H = Math.max(1, cv.clientHeight || innerHeight || 640);
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+}
+addEventListener('resize', resize); resize();
+
+// ---------- audio ----------
+let AC = null, master = null;
+function audioInit() {
+  try {
+    if (!AC) { AC = new (window.AudioContext || window.webkitAudioContext)(); master = AC.createGain(); master.gain.value = 0.35; master.connect(AC.destination); }
+    if (AC.state === 'suspended') AC.resume();
+  } catch (e) { AC = null; }
+}
+function tone(freq, dur, type = 'sine', vol = 0.3, delay = 0, slide = 0) {
+  if (!AC) return;
+  try {
+    const t0 = AC.currentTime + delay;
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t0);
+    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(30, freq * slide), t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(master); o.start(t0); o.stop(t0 + dur + 0.05);
+  } catch (e) {}
+}
+function slash() {
+  if (!AC) return;
+  try {
+    const t0 = AC.currentTime, len = 0.18;
+    const buf = AC.createBuffer(1, Math.floor(AC.sampleRate * len), AC.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 2);
+    const s = AC.createBufferSource(); s.buffer = buf;
+    const f = AC.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 1.5;
+    f.frequency.setValueAtTime(5000, t0); f.frequency.exponentialRampToValueAtTime(1200, t0 + len);
+    const g = AC.createGain(); g.gain.value = 0.7;
+    s.connect(f); f.connect(g); g.connect(master); s.start(t0);
+  } catch (e) {}
+}
+function gradeSound(e) {
+  if (e <= 0.5) { [784, 988, 1175, 1568].forEach((f, i) => tone(f, 0.25, 'triangle', 0.22, i * 0.07)); }
+  else if (e <= 1.5) { [659, 880, 1047].forEach((f, i) => tone(f, 0.22, 'triangle', 0.2, i * 0.07)); }
+  else if (e <= 3) { [587, 740].forEach((f, i) => tone(f, 0.2, 'triangle', 0.18, i * 0.08)); }
+  else if (e <= 5) { tone(440, 0.25, 'triangle', 0.16); }
+  else { tone(220, 0.35, 'sawtooth', 0.12, 0, 0.6); tone(207, 0.35, 'square', 0.06, 0.12, 0.6); }
+}
+
+// ---------- geometry ----------
+function polyArea(p) { let a = 0; for (let i = 0, n = p.length; i < n; i++) { const [x1, y1] = p[i], [x2, y2] = p[(i + 1) % n]; a += x1 * y2 - x2 * y1; } return a / 2; }
+function polyCentroid(p) {
+  let a = 0, cx = 0, cy = 0;
+  for (let i = 0, n = p.length; i < n; i++) { const [x1, y1] = p[i], [x2, y2] = p[(i + 1) % n]; const k = x1 * y2 - x2 * y1; a += k; cx += (x1 + x2) * k; cy += (y1 + y2) * k; }
+  if (Math.abs(a) < 1e-9) { let sx = 0, sy = 0; for (const q of p) { sx += q[0]; sy += q[1]; } return [sx / (p.length || 1), sy / (p.length || 1)]; }
+  return [cx / (3 * a), cy / (3 * a)];
+}
+// keep the part of polygon where dot(pt - P, N) * side >= 0
+function clip(poly, P, N, side) {
+  const out = [], n = poly.length;
+  const f = (q) => ((q[0] - P[0]) * N[0] + (q[1] - P[1]) * N[1]) * side;
+  for (let i = 0; i < n; i++) {
+    const a = poly[i], b = poly[(i + 1) % n], fa = f(a), fb = f(b);
+    if (fa >= 0) out.push(a);
+    if ((fa >= 0) !== (fb >= 0)) { const t = fa / (fa - fb); out.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]); }
+  }
+  return out;
+}
+const circ = (r, n = 72, ox = 0, oy = 0) => Array.from({ length: n }, (_, i) => { const a = (i / n) * Math.PI * 2; return [ox + Math.cos(a) * r, oy + Math.sin(a) * r]; });
+
+// ---------- snacks ----------
+// each: outer polygon, holes, color, edge, deco(fn) - in local units, normalised later
+function rng(seed) { let s = seed >>> 0 || 1; return () => { s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
+function makeSnack(kind, seed) {
+  const R = rng(seed);
+  let outer, holes = [], fill, edge, deco = [], name = T.snacks[kind];
+  const dots = (n, r1, r2, colors, span = 1) => { for (let i = 0; i < n; i++) deco.push({ x: (R() * 2 - 1) * span, y: (R() * 2 - 1) * span, r: r1 + R() * (r2 - r1), c: colors[i % colors.length] }); };
+  switch (kind) {
+    case 0: outer = [[-1, -0.7], [1, -0.7], [1, 0.7], [-1, 0.7]]; fill = '#fbe9cf'; edge = '#d9a86c';
+      deco.push({ band: [-0.7, -0.45], c: '#fff8f0' }); deco.push({ band: [0.05, 0.15], c: '#f6b6b6' });
+      for (let i = 0; i < 4; i++) deco.push({ x: -0.72 + i * 0.48, y: -0.72, r: 0.13, c: '#e8364a' }); break;
+    case 1: outer = circ(1); fill = '#f3c25e'; edge = '#c9852f'; deco.push({ ring: 0.9, c: '#e46c2e' }); dots(9, 0.12, 0.16, ['#c0392b'], 0.7); dots(10, 0.03, 0.05, ['#3f8f3a'], 0.75); break;
+    case 2: outer = [[-1, 0.75], [1, 0.75], [-0.25, -1]]; fill = '#fbfbf6'; edge = '#b9b3a4';
+      deco.push({ rect: [-0.45, 0.25, 0.6, 0.6], c: '#1f2d24' }); dots(14, 0.02, 0.03, ['#e7e2d4'], 0.9); break;
+    case 3: { const p = []; for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 0.45 : 1; p.push([Math.cos(a) * r, Math.sin(a) * r]); } outer = p; fill = '#e5ae67'; edge = '#a96a2c'; dots(10, 0.05, 0.08, ['#5a3416'], 0.7); break; }
+    case 4: { const p = []; for (let i = 0; i < 80; i++) { const t = (i / 80) * Math.PI * 2; p.push([16 * Math.pow(Math.sin(t), 3) / 16, -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) / 16]); } outer = p; fill = '#7b3f22'; edge = '#4a2412'; dots(12, 0.02, 0.035, ['#f6d1e0', '#ffffff'], 0.8); break; }
+    case 5: outer = [[-0.9, -1], [0.05, -1], [0.05, 0.25], [0.9, 0.25], [0.9, 1], [-0.9, 1]]; fill = '#f7cf55'; edge = '#9a5a1f';
+      deco.push({ band: [-1.05, -0.82], c: '#8a4b1c' }); deco.push({ band: [0.25, 0.42], c: '#8a4b1c' }); dots(8, 0.015, 0.03, ['#e4b23a'], 0.9); break;
+    case 6: outer = circ(1); holes = [circ(0.4, 48, 0.28 * (R() < 0.5 ? 1 : -1), -0.12)]; fill = '#d9a066'; edge = '#9e6532';
+      deco.push({ ring: 0.78, w: 0.32, c: '#f29ac0' }); dots(20, 0.02, 0.035, ['#ffffff', '#6fd3f0', '#ffe066', '#7fd67f'], 0.85); break;
+    case 7: { const p = [[1, 0]]; for (let i = 1; i < 48; i++) { const a = (i / 48) * Math.PI; p.push([Math.cos(a), Math.sin(a) * 1.0]); } p.push([-1, 0]); outer = p.map(([x, y]) => [x, y - 0.4]); fill = '#ef4b55'; edge = '#2f8a3a';
+      deco.push({ ringOuter: true, c: '#3aa14a' }); for (let i = 0; i < 9; i++) { const a = 0.35 + R() * 2.4, r = 0.3 + R() * 0.45; deco.push({ x: Math.cos(a) * r, y: Math.sin(a) * r - 0.4, r: 0.035, c: '#222' }); } break; }
+    case 8: { const p = [], ph1 = R() * 6.28, ph2 = R() * 6.28, ph3 = R() * 6.28, a1 = 0.18 + R() * 0.12, a2 = 0.1 + R() * 0.12;
+      for (let i = 0; i < 90; i++) { const a = (i / 90) * Math.PI * 2; const r = 1 + a1 * Math.sin(2 * a + ph1) + a2 * Math.sin(3 * a + ph2) + 0.06 * Math.sin(5 * a + ph3); p.push([Math.cos(a) * r * 1.1, Math.sin(a) * r * 0.85]); }
+      outer = p; fill = '#e9b872'; edge = '#a7702f'; dots(7, 0.05, 0.09, ['#7a4a1f'], 0.8); dots(10, 0.015, 0.025, ['#fff3d6'], 0.8); break; }
+    case 9: { const p = [], n = 7 + Math.floor(R() * 3); for (let i = 0; i < n; i++) { const a = (i / n) * Math.PI * 2 + R() * 0.4; const r = 0.75 + R() * 0.35; p.push([Math.cos(a) * r, Math.sin(a) * r]); }
+      outer = p; fill = '#d79a4b'; edge = '#8d5a22'; deco.push({ rect: [-0.35, -0.3, 0.7, 0.6], c: '#20302a' }); dots(16, 0.015, 0.03, ['#b77a33'], 0.85); break; }
+  }
+  // normalise: centroid -> origin, max radius -> 1
+  let area = polyArea(outer); if (area < 0) { outer.reverse(); area = -area; }
+  let [cx, cy] = polyCentroid(outer); let ha = 0, hx = 0, hy = 0;
+  for (const h of holes) { const a = Math.abs(polyArea(h)); const [x, y] = polyCentroid(h); ha += a; hx += x * a; hy += y * a; }
+  if (ha) { cx = (cx * area - hx) / (area - ha); cy = (cy * area - hy) / (area - ha); }
+  let mr = 0; for (const [x, y] of outer) mr = Math.max(mr, Math.hypot(x - cx, y - cy));
+  const nm = ([x, y]) => [(x - cx) / mr, (y - cy) / mr];
+  outer = outer.map(nm); holes = holes.map((h) => h.map(nm));
+  deco = deco.map((d) => { const o = { ...d }; if (d.x !== undefined) { o.x = (d.x - cx) / mr; o.y = (d.y - cy) / mr; o.r = d.r / mr; } if (d.band) o.band = d.band.map((v) => (v - cy) / mr); if (d.rect) { o.rect = [(d.rect[0] - cx) / mr, (d.rect[1] - cy) / mr, d.rect[2] / mr, d.rect[3] / mr]; } if (d.ring) { o.ring = d.ring / mr; o.cx = -cx / mr; o.cy = -cy / mr; o.w = (d.w || 0.16) / mr; } return o; });
+  return { kind, name, outer, holes, fill, edge, deco };
+}
+
+// ---------- game state ----------
+let state = 'title'; // title | play | result | over
+let stateT = 0, score = 0, hearts = 3, round = 0, combo = 0, perfects = 0, errSum = 0, newBest = false, lastPts = 0;
+let snack = null, rot = 0, rotSpeed = 0, driftA = 0, driftAmp = 0, ratio = [1, 1], tick = 0;
+let cut = null; // {P, N, pieces:[{outer, holes, side, to, c}], e, share}
+let drag = null, missMsgT = 0, hintT = 0, shake = 0, particles = [];
+const ORDER = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+
+function layout() {
+  const S = Math.min(W * 0.36, H * 0.22);
+  return { S, cx: W / 2, cy: H * 0.43, kidY: H * 0.84, kidL: W * 0.27, kidR: W * 0.73 };
+}
+function nextRound() {
+  round++;
+  const kind = round <= ORDER.length ? ORDER[round - 1] : Math.floor(Math.random() * 10);
+  snack = makeSnack(kind, (Math.random() * 1e9) | 0);
+  rot = round <= 2 ? 0 : (Math.random() * 2 - 1) * Math.PI;
+  if (round === 1) rot = 0;
+  rotSpeed = 0; driftAmp = 0; driftA = Math.random() * 6.28;
+  ratio = [1, 1];
+  if (round >= 10) { const r = Math.random(); if (r < 0.35) ratio = [1, 2]; else if (r < 0.5 && round >= 14) ratio = [1, 3]; }
+  if (round >= 12) rotSpeed = (Math.random() < 0.5 ? -1 : 1) * Math.min(1.6, 0.35 + (round - 12) * 0.08);
+  if (round >= 17) driftAmp = Math.min(0.55, 0.2 + (round - 17) * 0.04);
+  cut = null; drag = null; state = 'play'; stateT = 0;
+}
+function startGame() {
+  score = 0; hearts = 3; round = 0; combo = 0; perfects = 0; errSum = 0; newBest = false; particles = [];
+  hintT = 4; signal('start'); nextRound();
+}
+function snackCenter() { const L = layout(); return [L.cx + Math.sin(driftA) * driftAmp * W * 0.5, L.cy]; }
+function worldPoly(p, c, S, a) { const cs = Math.cos(a), sn = Math.sin(a); return p.map(([x, y]) => [c[0] + (x * cs - y * sn) * S, c[1] + (x * sn + y * cs) * S]); }
+
+function doCut(a, b) {
+  const L = layout(), c = snackCenter();
+  const dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy);
+  if (len < 30) return false;
+  const N = [-dy / len, dx / len];
+  const outer = worldPoly(snack.outer, c, L.S, rot), holes = snack.holes.map((h) => worldPoly(h, c, L.S, rot));
+  const total = Math.abs(polyArea(outer)) - holes.reduce((s, h) => s + Math.abs(polyArea(h)), 0);
+  const pieces = [-1, 1].map((side) => {
+    const o = clip(outer, a, N, side), hs = holes.map((h) => clip(h, a, N, side)).filter((h) => h.length > 2);
+    const ar = (o.length > 2 ? Math.abs(polyArea(o)) : 0) - hs.reduce((s, h) => s + Math.abs(polyArea(h)), 0);
+    return { outer: o, holes: hs, side, area: ar, cen: o.length > 2 ? polyCentroid(o) : c };
+  });
+  if (pieces[0].area < total * 0.01 || pieces[1].area < total * 0.01) { missMsgT = 1.2; tone(300, 0.12, 'sine', 0.08); return false; }
+  const small = Math.min(pieces[0].area, pieces[1].area) / total;
+  const target = ratio[0] / (ratio[0] + ratio[1]);
+  const e = Math.abs(small - target) * 100;
+  // which kid: unequal -> bigger piece to right kid; equal -> by position
+  let leftPiece;
+  if (ratio[0] !== ratio[1]) leftPiece = pieces[0].area < pieces[1].area ? 0 : 1;
+  else leftPiece = pieces[0].cen[0] <= pieces[1].cen[0] ? 0 : 1;
+  pieces[leftPiece].to = 'L'; pieces[1 - leftPiece].to = 'R';
+  let pts, grade;
+  if (e <= 0.5) { grade = 'perfect'; pts = 150; perfects++; }
+  else { pts = Math.max(0, Math.round(100 - e * 14)); grade = e <= 1.5 ? 'great' : e <= 3 ? 'good' : e <= 5 ? 'close' : 'fight'; }
+  if (e <= 1.5) combo++; else combo = 0;
+  if (combo > 1) pts += (combo - 1) * 15;
+  if (ratio[0] !== ratio[1] && e <= 5) pts += 20;
+  if (rotSpeed && e <= 5) pts += 10;
+  if (e > 5) { hearts--; pts = 0; shake = 0.4; }
+  score += pts; lastPts = pts; errSum += e;
+  const shareL = pieces[leftPiece].area / total * 100;
+  cut = { a, b, N, c, pieces, e, grade, shareL, flash: 0.35, frozenRot: rot, S: L.S };
+  slash(); setTimeout(() => gradeSound(e), 120);
+  const col = grade === 'perfect' ? '#ffd23f' : grade === 'fight' ? '#888' : '#ffffff';
+  for (let i = 0; i < 18; i++) { const t = Math.random(); particles.push({ x: a[0] + dx * t, y: a[1] + dy * t, vx: (Math.random() - 0.5) * 160, vy: (Math.random() - 0.5) * 160, life: 0.5 + Math.random() * 0.4, c: col }); }
+  state = 'result'; stateT = 0;
+  return true;
+}
+function finishResult() {
+  signal('end', { score });
+  if (hearts <= 0) {
+    if (score > best) { best = score; newBest = true; persist(); }
+    state = 'over'; stateT = 0;
+    tone(330, 0.3, 'triangle', 0.15); tone(262, 0.5, 'triangle', 0.15, 0.25);
+  } else nextRound();
+}
+
+// ---------- input ----------
+const toXY = (e) => { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+cv.addEventListener('pointerdown', (e) => {
+  e.preventDefault(); audioInit();
+  try { cv.setPointerCapture(e.pointerId); } catch (er) {}
+  if (state === 'title') { startGame(); return; }
+  if (state === 'over') { if (stateT > 0.7) startGame(); return; }
+  if (state === 'play' && !drag) drag = { id: e.pointerId, a: toXY(e), b: toXY(e) };
+}, { passive: false });
+cv.addEventListener('pointermove', (e) => { if (drag && e.pointerId === drag.id) drag.b = toXY(e); });
+const up = (e) => {
+  if (!drag || e.pointerId !== drag.id) return;
+  drag.b = toXY(e);
+  const d = drag; drag = null;
+  if (state === 'play' && e.type === 'pointerup') doCut(d.a, d.b);
+};
+cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+
+// ---------- drawing ----------
+function pathOf(o, holes) { const p = new Path2D(); for (const poly of [o, ...holes]) { if (poly.length < 3) continue; p.moveTo(poly[0][0], poly[0][1]); for (let i = 1; i < poly.length; i++) p.lineTo(poly[i][0], poly[i][1]); p.closePath(); } return p; }
+function drawDeco(sn, c, S, a) {
+  const cs = Math.cos(a), s = Math.sin(a);
+  ctx.save(); ctx.translate(c[0], c[1]); ctx.transform(cs, s, -s, cs, 0, 0); ctx.scale(S, S);
+  for (const d of sn.deco) {
+    ctx.fillStyle = d.c; ctx.strokeStyle = d.c;
+    if (d.band) ctx.fillRect(-2, d.band[0], 4, d.band[1] - d.band[0]);
+    else if (d.rect) ctx.fillRect(d.rect[0], d.rect[1], d.rect[2], d.rect[3]);
+    else if (d.ring) { ctx.lineWidth = d.w; ctx.beginPath(); ctx.arc(d.cx, d.cy, d.ring, 0, Math.PI * 2); ctx.stroke(); }
+    else if (d.ringOuter) { ctx.lineWidth = 0.24; ctx.beginPath(); ctx.moveTo(sn.outer[0][0], sn.outer[0][1]); for (const q of sn.outer) ctx.lineTo(q[0], q[1]); ctx.closePath(); ctx.stroke(); }
+    else { ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2); ctx.fill(); }
+  }
+  ctx.restore();
+}
+function drawPiece(sn, o, holes, c, S, a, off = [0, 0], scale = 1, pivot = null) {
+  ctx.save();
+  if (pivot) { ctx.translate(pivot[0] + off[0], pivot[1] + off[1]); ctx.scale(scale, scale); ctx.translate(-pivot[0], -pivot[1]); }
+  else ctx.translate(off[0], off[1]);
+  const p = pathOf(o, holes);
+  ctx.save(); ctx.translate(0, 5); ctx.fillStyle = 'rgba(90,50,20,0.18)'; ctx.fill(p, 'evenodd'); ctx.restore();
+  ctx.fillStyle = sn.fill; ctx.fill(p, 'evenodd');
+  ctx.save(); ctx.clip(p, 'evenodd'); drawDeco(sn, c, S, a); ctx.restore();
+  ctx.lineWidth = 2.5; ctx.strokeStyle = sn.edge; ctx.lineJoin = 'round'; ctx.stroke(p);
+  ctx.restore();
+}
+function fitText(txt, size, maxW, weight = 700) { let s = size; ctx.font = `${weight} ${s}px ${FONT}`; while (s > 12 && ctx.measureText(txt).width > maxW) { s -= 1; ctx.font = `${weight} ${s}px ${FONT}`; } return s; }
+function text(txt, x, y, size, color, weight = 700, align = 'center', maxW = W - 32) { fitText(txt, size, maxW, weight); ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = 'middle'; ctx.fillText(txt, x, y); }
+function kid(x, y, r, color, mood, label, bob) {
+  y += Math.sin(tick * 3 + x) * 2 * bob;
+  ctx.save();
+  // plate
+  ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#e2d2bd'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.ellipse(x, y + r * 1.25, r * 1.5, r * 0.38, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  // head
+  ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x, y - r * 0.2, r, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#ffe2c6'; ctx.beginPath(); ctx.arc(x, y - r * 0.05, r * 0.8, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#3a2a20'; ctx.strokeStyle = '#3a2a20'; ctx.lineWidth = Math.max(2, r * 0.08); ctx.lineCap = 'round';
+  const ex = r * 0.3, ey = y - r * 0.15;
+  if (mood === 'happy' || mood === 'joy') { for (const s of [-1, 1]) { ctx.beginPath(); ctx.arc(x + s * ex, ey + 2, r * 0.12, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke(); } }
+  else if (mood === 'angry') { for (const s of [-1, 1]) { ctx.beginPath(); ctx.arc(x + s * ex, ey, r * 0.08, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.moveTo(x + s * ex * 1.6, ey - r * 0.25); ctx.lineTo(x + s * ex * 0.5, ey - r * 0.12); ctx.stroke(); } }
+  else { for (const s of [-1, 1]) { ctx.beginPath(); ctx.arc(x + s * ex, ey, r * 0.09, 0, Math.PI * 2); ctx.fill(); } }
+  ctx.beginPath();
+  if (mood === 'joy') { ctx.fillStyle = '#c0392b'; ctx.arc(x, y + r * 0.2, r * 0.25, 0, Math.PI); ctx.fill(); }
+  else if (mood === 'happy') { ctx.arc(x, y + r * 0.15, r * 0.2, 0.15 * Math.PI, 0.85 * Math.PI); ctx.stroke(); }
+  else if (mood === 'angry') { ctx.arc(x, y + r * 0.42, r * 0.2, 1.15 * Math.PI, 1.85 * Math.PI); ctx.stroke(); }
+  else { ctx.moveTo(x - r * 0.15, y + r * 0.25); ctx.lineTo(x + r * 0.15, y + r * 0.25); ctx.stroke(); }
+  if (mood === 'joy' || mood === 'happy') { ctx.fillStyle = 'rgba(255,120,120,0.45)'; for (const s of [-1, 1]) { ctx.beginPath(); ctx.arc(x + s * r * 0.5, y + r * 0.08, r * 0.12, 0, Math.PI * 2); ctx.fill(); } }
+  if (mood === 'angry') { ctx.fillStyle = '#e74c3c'; ctx.font = `900 ${r * 0.6}px ${FONT}`; ctx.textAlign = 'center'; ctx.fillText('💢', x + r * 0.85, y - r * 0.9); }
+  ctx.restore();
+  // ratio badge
+  ctx.fillStyle = '#5b3a29'; ctx.beginPath(); ctx.arc(x + r * 0.95, y + r * 0.6, Math.max(14, r * 0.38), 0, Math.PI * 2); ctx.fill();
+  text(label, x + r * 0.95, y + r * 0.62, Math.max(14, r * 0.42), '#fff', 800, 'center', 60);
+}
+function heart(x, y, s, on) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s / 16, s / 16);
+  ctx.beginPath(); ctx.moveTo(0, 5); ctx.bezierCurveTo(-8, -2, -6, -9, 0, -5); ctx.bezierCurveTo(6, -9, 8, -2, 0, 5); ctx.closePath();
+  ctx.fillStyle = on ? '#e8495c' : 'rgba(120,90,70,0.2)'; ctx.fill(); ctx.restore();
+}
+
+function render(dt) {
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.fillStyle = '#fdf3e4'; ctx.fillRect(0, 0, W, H);
+  // table cloth
+  const L = layout();
+  ctx.fillStyle = '#f6e3c8'; ctx.beginPath(); ctx.ellipse(L.cx, L.cy + L.S * 0.15, L.S * 1.55, L.S * 1.35, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#efd5b0'; ctx.fillRect(0, H * 0.74, W, H * 0.26);
+  ctx.save();
+  if (shake > 0) ctx.translate((Math.random() - 0.5) * 10 * shake, (Math.random() - 0.5) * 10 * shake);
+
+  if (state === 'title') {
+    const demo = snack || (snack = makeSnack(1, 7));
+    const c = [L.cx, L.cy];
+    const k = (tick * 0.6) % 4;
+    const ang = 0.6 + tick * 0.15;
+    const o = worldPoly(demo.outer, c, L.S * 0.9, 0);
+    if (k > 2) {
+      const N = [Math.cos(ang), Math.sin(ang)], sep = Math.min(1, (k - 2) * 3) * 10;
+      for (const side of [-1, 1]) drawPiece(demo, clip(o, c, N, side), [], c, L.S * 0.9, 0, [N[0] * sep * side, N[1] * sep * side]);
+    } else drawPiece(demo, o, [], c, L.S * 0.9, 0);
+    ctx.fillStyle = 'rgba(253,243,228,0.82)'; ctx.fillRect(0, H * 0.08, W, H * 0.2);
+    text(T.title, W / 2, H * 0.15, Math.min(56, W * 0.14), '#5b3a29', 900);
+    text(T.sub1, W / 2, H * 0.66, 16, '#6b4a36', 600);
+    text(T.sub2, W / 2, H * 0.66 + 24, 16, '#6b4a36', 600);
+    text(T.sub3, W / 2, H * 0.66 + 48, 14, '#9a7a62', 600);
+    kid(L.kidL, L.kidY + 8, Math.min(30, W * 0.075), '#f08aa0', 'happy', '1', 1);
+    kid(L.kidR, L.kidY + 8, Math.min(30, W * 0.075), '#6aa9e8', 'happy', '1', 1);
+    if (Math.sin(tick * 4) > -0.3) text(T.tap, W / 2, H * 0.955, 20, '#c0392b', 800);
+    if (best > 0) text(`${T.best} ${best}`, W / 2, H * 0.24, 15, '#9a7a62', 700);
+    ctx.restore(); return;
+  }
+
+  const c = (state === 'result' && cut) ? cut.c : snackCenter();
+  const kr = Math.min(32, W * 0.08);
+  // kids
+  let moodL = 'idle', moodR = 'idle';
+  if (state === 'result' && cut && stateT > 0.3) { const m = cut.e <= 0.5 ? 'joy' : cut.e <= 3 ? 'happy' : cut.e <= 5 ? 'idle' : 'angry'; moodL = moodR = m;
+    if (cut.e > 5) { const lMore = cut.shareL > (ratio[0] / (ratio[0] + ratio[1])) * 100; if (lMore) moodL = 'happy'; else moodR = 'happy'; } }
+  if (state === 'over') moodL = moodR = 'angry';
+  kid(L.kidL, L.kidY, kr, '#f08aa0', moodL, String(ratio[0]), 1);
+  kid(L.kidR, L.kidY, kr, '#6aa9e8', moodR, String(ratio[1]), 1);
+
+  if (state === 'play' && snack) {
+    drawPiece(snack, worldPoly(snack.outer, c, L.S, rot), snack.holes.map((h) => worldPoly(h, c, L.S, rot)), c, L.S, rot);
+    // drag preview line
+    if (drag) {
+      const dx = drag.b[0] - drag.a[0], dy = drag.b[1] - drag.a[1], len = Math.hypot(dx, dy);
+      if (len > 8) {
+        const ux = dx / len, uy = dy / len, ext = Math.hypot(W, H);
+        ctx.save(); ctx.setLineDash([8, 8]); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(91,58,41,0.45)';
+        ctx.beginPath(); ctx.moveTo(drag.a[0] - ux * ext, drag.a[1] - uy * ext); ctx.lineTo(drag.a[0] + ux * ext, drag.a[1] + uy * ext); ctx.stroke(); ctx.restore();
+        ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(drag.a[0], drag.a[1]); ctx.lineTo(drag.b[0], drag.b[1]); ctx.stroke();
+      }
+    }
+    text(T.split(ratio[0], ratio[1]), W / 2, H * 0.155, 22, '#5b3a29', 800);
+    let sub = snack.name; if (rotSpeed && driftAmp) sub += ' · ' + T.drift; else if (rotSpeed) sub += ' · ' + T.spin;
+    text(sub, W / 2, H * 0.205, 15, '#9a7a62', 700);
+    if (missMsgT > 0) text(T.miss, W / 2, H * 0.68, 16, '#c0392b', 700);
+    if (hintT > 0 && round === 1) { ctx.globalAlpha = Math.min(1, hintT); text(T.hint, W / 2, H * 0.965, 15, '#6b4a36', 700); ctx.globalAlpha = 1; }
+  }
+
+  if ((state === 'result' || state === 'over') && cut) {
+    const t = state === 'over' ? 2 : stateT;
+    const sep = Math.min(1, t / 0.25) * 14;
+    const fly = Math.max(0, Math.min(1, (t - 1.15) / 0.45));
+    const ease = fly * fly * (3 - 2 * fly);
+    for (const p of cut.pieces) {
+      const s = p.side; const off = [cut.N[0] * sep * s, cut.N[1] * sep * s];
+      const kx = p.to === 'L' ? L.kidL : L.kidR, ky = L.kidY + kr * 1.1;
+      const tx = (kx - p.cen[0]) * ease, ty = (ky - p.cen[1]) * ease;
+      if (state === 'over') continue;
+      drawPiece(snack, p.outer, p.holes, cut.c, cut.S, cut.frozenRot, [off[0] + tx, off[1] + ty], 1 - ease * 0.6, p.cen);
+    }
+    if (cut.flash > 0 && state === 'result') {
+      const dx = cut.b[0] - cut.a[0], dy = cut.b[1] - cut.a[1], len = Math.hypot(dx, dy) || 1, ext = Math.hypot(W, H);
+      ctx.globalAlpha = cut.flash / 0.35; ctx.lineWidth = 3; ctx.strokeStyle = '#fff';
+      ctx.beginPath(); ctx.moveTo(cut.a[0] - dx / len * ext, cut.a[1] - dy / len * ext); ctx.lineTo(cut.a[0] + dx / len * ext, cut.a[1] + dy / len * ext); ctx.stroke(); ctx.globalAlpha = 1;
+    }
+    if (state === 'result' && t > 0.2) {
+      const a = Math.min(1, (t - 0.2) / 0.15);
+      ctx.globalAlpha = a;
+      const sl = cut.shareL, sr = 100 - sl;
+      const big = Math.min(44, W * 0.11);
+      const pct = (v) => v.toFixed(1);
+      const pop = 1 + Math.max(0, 0.25 - (t - 0.2)) * 1.5;
+      ctx.save(); ctx.translate(W / 2, H * 0.155); ctx.scale(pop, pop);
+      text(`${pct(sl)} : ${pct(sr)}`, 0, 0, big, cut.grade === 'fight' ? '#c0392b' : '#5b3a29', 900);
+      ctx.restore();
+      const gl = { perfect: T.perfect, great: T.great, good: T.good, close: T.close, fight: T.fight }[cut.grade];
+      const gc = { perfect: '#e6a400', great: '#2e9e5b', good: '#3f7fbf', close: '#8a6a52', fight: '#c0392b' }[cut.grade];
+      text(gl, W / 2, H * 0.215, 24, gc, 900);
+      text(lastPts > 0 ? `+${lastPts}` : '±0', W / 2, H * 0.68, 20, gc, 800);
+      if (combo > 1) text(T.combo(combo), W / 2, H * 0.68 + 26, 15, '#b07a2a', 800);
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  // particles
+  for (const p of particles) { ctx.globalAlpha = Math.max(0, p.life * 1.6); ctx.fillStyle = p.c; ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, Math.PI * 2); ctx.fill(); }
+  ctx.globalAlpha = 1;
+
+  // HUD
+  if (state === 'play' || state === 'result') {
+    text(String(score), 16, 26, 26, '#5b3a29', 900, 'left', W * 0.35);
+    text(T.round(round), W / 2, 26, 15, '#9a7a62', 700, 'center', W * 0.25);
+    for (let i = 0; i < 3; i++) heart(W - 22 - i * 26, 26, 22, i < hearts);
+    text(`${T.best} ${Math.max(best, score)}`, W - 16, 52, 14, '#9a7a62', 700, 'right', W * 0.4);
+  }
+
+  if (state === 'over') {
+    ctx.fillStyle = 'rgba(253,243,228,0.9)'; ctx.fillRect(0, H * 0.1, W, H * 0.6);
+    text(T.over, W / 2, H * 0.17, 22, '#c0392b', 800);
+    text(String(score), W / 2, H * 0.3, Math.min(72, W * 0.2), '#5b3a29', 900);
+    if (newBest) text(T.newBest, W / 2, H * 0.4, 22, '#e6a400', 900);
+    else text(`${T.best} ${best}`, W / 2, H * 0.4, 18, '#9a7a62', 700);
+    const avg = round ? (errSum / round).toFixed(1) : '0';
+    text(`${T.round(round)} · ${T.avg(avg)}`, W / 2, H * 0.48, 15, '#6b4a36', 700);
+    text(T.perfects(perfects), W / 2, H * 0.53, 15, '#6b4a36', 700);
+    if (stateT > 0.7 && Math.sin(tick * 4) > -0.3) text(T.again, W / 2, H * 0.63, 20, '#c0392b', 800);
+  }
+  ctx.restore();
+}
+
+let last = performance.now();
+function loop(now) {
+  let dt = (now - last) / 1000; last = now; if (dt > 0.05) dt = 0.05; if (dt < 0) dt = 0;
+  tick += dt; stateT += dt;
+  if (W !== (cv.clientWidth || W) || H !== (cv.clientHeight || H)) resize();
+  if (state === 'play') { rot += rotSpeed * dt; driftA += dt * 0.9 * (driftAmp ? 1 : 0); }
+  if (missMsgT > 0) missMsgT -= dt;
+  if (hintT > 0) hintT -= dt;
+  if (shake > 0) shake -= dt;
+  if (cut && cut.flash > 0) cut.flash -= dt;
+  if (state === 'result' && stateT > 1.75) finishResult();
+  for (const p of particles) { p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= 0.94; p.vy *= 0.94; p.life -= dt; }
+  particles = particles.filter((p) => p.life > 0);
+  render(dt);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
