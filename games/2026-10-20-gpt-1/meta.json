@@ -1,0 +1,345 @@
+{
+  "id": "2026-10-20-gpt-1",
+  "status": "published",
+  "title": "ころころ毛玉の庭",
+  "genre": "生き物・ペット",
+  "concept": "ボールを転がすと毛玉が追いかけ、ぶつかるとまた別の方向へ転がる。捕まえて投げ直したり、追うのをやめて毛をなでたり、自分の速さで付き合う。最後はおひるねにして、小さなふれあいを一枚の場面として終える。",
+  "howToPlay": "ボールを指で運んで離すと転がる。毛玉をなでると喜ぶ。「おひるね」で区切りにできる。",
+  "libraryDecision": "Matter.jsで転がりと跳ね返りを作る。追いかける核を強めるため、毛玉に当たると毛玉がボールを押し返す遊びにした。物体は少数にし、3Dは触る場所を読みにくくするため使わない。",
+  "soundDecision": "ボールにじゃれた時は丸い短音、なでた時は高い柔らかい音を鳴らす。自分のペースで休む庭なのでBGMは付けず、触れた返事だけを静かに返す。",
+  "planning": {
+    "candidates": [
+      {
+        "idea": "転がるボールを毛玉が追う庭。なでると追うのをやめて喜び、好きな時におひるねにする。",
+        "ideaEn": "A fluff chases a rolling ball; stroking makes it pause and purr. End with a nap whenever ready.",
+        "fromDraw": true
+      },
+      {
+        "idea": "波を折り曲げて二隻の船に同時に追い風を届ける航海パズル。",
+        "ideaEn": "Bend waves to deliver a tailwind to two boats at once.",
+        "fromDraw": false
+      },
+      {
+        "idea": "音の高低だけで地下の水脈を探す、小さな音の探索。",
+        "ideaEn": "Find underground water by listening to changing pitches.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0,
+    "genreDraw": {
+      "ja": "生き物・ペット",
+      "en": "Creatures / pets",
+      "of": 57
+    }
+  },
+  "structure": {
+    "goal": "none",
+    "ending": "other",
+    "input": [
+      "drag",
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Fluffball Garden",
+      "concept": "A fluff chases a rolling ball and bops it in a new direction. Pick up and roll the ball again or pause to stroke the fluff, spending time at your own pace. Finish with a nap, turning a little interaction into a quiet final scene.",
+      "howToPlay": "Drag and release the ball to roll it. Stroke the fluff to make it purr. Choose Nap time when ready to finish.",
+      "libraryDecision": "Matter.js supplies rolling and rebounds. To strengthen chasing, the fluff bops the ball away on contact. Very few bodies keep this light; 3D would obscure touch targets.",
+      "soundDecision": "Round short tones answer ball bops, and a soft higher tone answers strokes. No music rushes this garden; quiet responses follow touch."
+    }
+  },
+  "createdAt": "2026-10-20T12:05:47+09:00",
+  "specVersion": 8,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-20T12:05:47+09:00",
+    "metricsFrom": "2026-10-20T03:05:11.159Z",
+    "transcript": null,
+    "validationRuns": 1,
+    "finishedAt": "2026-10-20T12:09:50+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-20T12:07:23+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "7.7KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=52",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=51",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=36",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=63",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 7857,
+    "lines": 30
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 1
+  },
+  "libraries": [
+    {
+      "name": "matter-js",
+      "version": "0.20.0",
+      "file": "matter-0.20.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "8手の画像で、ボールを投げると押し返すこと、待つ間の追跡、なでると閉じる目とハート、追跡への復帰、おひるねと再開を確認。転がりの返事と表情は心地よい。一方、待つだけでも回数が増え、反応は追う・喜ぶの二種類が中心なので、長く付き合う変化は少ない。",
+    "similar": [
+      {
+        "title": "ねこあつめ",
+        "url": "https://nekoatsume.com/games/neko/enjoy/enjoy_goods.html",
+        "similarity": "中",
+        "note": "庭のおもちゃと動物の様子を楽しむ題材が近い。本作は一匹へ直接ボールを転がし、指でなでる小さな遊び場で、放置による来訪や収集はない。",
+        "note_en": "Both enjoy animals and toys in a yard. This is a small space for rolling a ball directly to one creature and stroking it, without idle visits or collecting."
+      }
+    ],
+    "research": "ペットとおもちゃの遊びについて2件検索。ねこあつめ公式のグッズ説明を確認し、庭と動物の関係を比較した。Adopt Meの検索は非公式資料中心だったため詳細な比較には採用しなかった。",
+    "i18n": {
+      "en": {
+        "comment": "Eight pictured steps confirmed ball bops, autonomous chasing, closed eyes and hearts after strokes, resumed chasing, a nap and restart. Rolling responses and expressions feel pleasant. However, bops increase while waiting and the two main reactions offer little long-term variety.",
+        "research": "Ran two pet-and-toy searches and checked Neko Atsume's official goods page. Compared its yard-and-animal theme. Adopt Me results were mainly unofficial, so no detailed comparison was included."
+      }
+    },
+    "method": "スマホ縦画面で 8 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 8 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.85) 120ms",
+        "note": "毛玉とボールの絵、転がす・なでる説明が見える。庭を開く。",
+        "noteEn": "A fluff and ball accompany the rolling and stroking instructions. Open the garden.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "swipe(0.73,0.38→0.30,0.60) 700ms",
+        "note": "右上にボール、左下に毛玉がいる。ボールを毛玉の近くへ転がしてみる。",
+        "noteEn": "The ball is upper right and the fluff lower left. Roll the ball toward the fluff.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 1800ms",
+        "note": "ボールが左端へ跳ね、ころころが1になった。追いかける様子を少し待って見る。",
+        "noteEn": "The ball bounced left and Bops reached one. Wait briefly to watch the chase.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "path(0.18,0.68→0.24,0.66→0.12,0.69→0.24,0.68→0.15,0.70) 1000ms",
+        "note": "左下で毛玉がボールに触れ、ころころが2。頭のあたりを左右になでる。",
+        "noteEn": "The fluff reached the lower-left ball and Bops is two. Stroke back and forth over its head.",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.25,0.88) 120ms → wait 1200ms",
+        "note": "目を閉じてハートが出て、なでなで1になった。ボールを呼んで場所が戻るか見る。",
+        "noteEn": "Closed eyes and hearts show one successful stroke. Call the ball to check its reset position.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 4500ms",
+        "note": "呼び戻したボールが庭を横切った。目を閉じた毛玉が、時間が経つとまた追うか待つ。",
+        "noteEn": "The recalled ball crossed the garden. Wait to see the relaxed fluff resume chasing.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.75,0.88) 120ms",
+        "note": "目を開けて庭の上まで追い、ころころが5になった。おひるねで遊びを区切る。",
+        "noteEn": "The fluff opened its eyes and chased upward, reaching five bops. End this visit with a nap.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 900ms → tap(0.50,0.91) 120ms",
+        "note": "すやすやと眠り、5回と1回の記録が残る区切りになった。もう一度を試す。",
+        "noteEn": "The sleeping scene retains five bops and one stroke. Try another visit.",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-20T12:09:50+09:00"
+  },
+  "publishedAt": "2026-10-20T12:09:50+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 1194,
+    "outputTokens": 7712,
+    "contextTokens": 1440449,
+    "turns": 15,
+    "toolCalls": 15,
+    "webSearches": null,
+    "minutes": 4.7,
+    "from": "2026-10-20T03:05:11.159Z",
+    "to": "2026-10-20T03:09:51.747Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力から思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-10-20T12:09:51+09:00",
+    "validationRuns": 1,
+    "codeKB": 7.7,
+    "evidence": "metrics-evidence.json"
+  }
+}
