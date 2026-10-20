@@ -1,0 +1,471 @@
+{
+  "id": "2026-10-20-claude-1",
+  "status": "published",
+  "title": "ちゃぶ台おはじき",
+  "genre": "狙って打つ（ゴルフ・ビリヤードなど）",
+  "concept": "昔遊びのおはじきを、ちゃぶ台の上で。当てる前に2つの石のあいだへ指で線を引く「線引き」が核。狭いすき間を通せるか、どちらを撃てば他に触れずに当たるか、強すぎて台から落ちないか。ガラスがカチッと鳴って取れる瞬間を気持ちよさにした。",
+  "howToPlay": "2つの石のあいだに指で線を引き、光った片方を引っぱって離すとはじける。もう片方だけに当てれば取れる。ほかの石に当てる・台から落ちるとミス（3回で終わり）。",
+  "libraryDecision": "使わない。円いガラス石どうしの衝突と摩擦だけなので、自前の数十行の物理のほうが、すべり具合・止まり方・当たりの判定（どの石に触れたか）を細かく調整でき、手触りを作り込みやすいと判断した。",
+  "soundDecision": "BGMは付けず、ガラスどうしが当たる「カチッ」という澄んだ音を衝突の強さに合わせてWeb Audioで合成した。静かな部屋で石の音だけが響くほうが昔遊びの雰囲気が出て、当てた手応えが耳で分かる。取れたときは連続数に応じて音が上がる。",
+  "planning": {
+    "genreDraw": {
+      "ja": "狙って打つ（ゴルフ・ビリヤードなど）",
+      "en": "Aim and shoot (golf, billiards…)",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "ちゃぶ台おはじき：当てる前に2つの石のあいだに指で線を引く伝統ルールつきのおはじき。狙う相手と通り道を自分で宣言し、ほかの石に触れずに当てる。",
+        "ideaEn": "Ohajiki on a low table: the traditional rule of drawing a finger line between two chips before flicking. You declare your target and must hit it without touching any other chip.",
+        "fromDraw": true
+      },
+      {
+        "idea": "ねこじゃらし：指で羽根のおもちゃを揺らすと猫が本物らしく反応（隠れる・身構える・飛びかかる）。動かし方で猫を高く跳ばせる遊び。",
+        "ideaEn": "Cat teaser: wiggle a feather toy with your finger and a cat reacts realistically (hides, crouches, pounces). Make it leap high with the right motion.",
+        "fromDraw": false
+      },
+      {
+        "idea": "からくり反射玉突き：1打だけで台の玉を全部ポケットへ落とす詰めビリヤード。配置を読んで最初の1打を決める。",
+        "ideaEn": "One-shot trick billiards: pot every ball with a single shot by reading the layout.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "fail",
+    "input": [
+      "draw",
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Tabletop Ohajiki",
+      "concept": "The old Japanese game of ohajiki on a round low table. The core is the line rule: before flicking you must draw a finger line between two chips. Can you pass through the gap, which one should you flick so nothing else is touched, and will it fly off the table? The clear glass clink of a clean hit is the payoff.",
+      "howToPlay": "Draw a line between two chips, then pull one of the glowing chips and let go to flick it. Hit only the other one to take it. Touching another chip or falling off is a miss (3 misses ends the game).",
+      "libraryDecision": "No library. It is only round glass chips colliding with friction, so a few dozen lines of custom physics let me tune the slide, the stop and the hit detection (which chip touched which) more finely for the feel.",
+      "soundDecision": "No music. A clear glass clink synthesized with Web Audio, scaled by impact strength. Only the chips ringing in a quiet room gives the old-toy atmosphere and lets you hear a clean hit. Taking chips plays rising notes with the streak."
+    }
+  },
+  "createdAt": "2026-10-20T10:33:11+09:00",
+  "specVersion": 8,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-20T10:33:11+09:00",
+    "metricsFrom": "2026-10-20T01:32:02.980Z",
+    "transcript": "af8c1fe9-b8d8-40f5-8674-c7a2b497522f.jsonl",
+    "validationRuns": 1,
+    "finishedAt": "2026-10-20T10:40:41+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-20T10:36:23+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "27.0KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=179",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=242",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=158",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=210",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 27617,
+    "lines": 628
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "buggy",
+    "comment": "2つの石のあいだに指を通してから撃つ流れはすぐ分かり、細いすき間に線が通ったときと、ガラスがカチッと鳴って取れる瞬間は気持ちいい。ただ自己プレイでは第1局・第2局とも狙った石にほぼ当たり、6連続まで簡単に進んだ。不具合として、石をまく処理が狭い範囲に置ききれず、第1局は6個のはずが5個、第2局も7個のはずが5個しか出ず、局が進んでも石が増えない（難しくならない）。また「引っぱって」は後ろへ引くパチンコ式に読めるが、実際は飛ばしたい方へ引く操作で、最初は迷うかもしれない。手触りは良いが、緊張感の伸びが足りない。",
+    "similar": [
+      {
+        "title": "おはじき（伝統遊び）",
+        "url": "https://en.wikipedia.org/wiki/Ohajiki",
+        "similarity": "高",
+        "note": "ルーツそのもの。ばらまいた石を指ではじき、当てた石を取る。2つ以上に当たると取れないという決まりも同じ。違いは1人用で、ちゃぶ台から落ちるとミス、連続得点がある点。",
+        "note_en": "The direct root: flick scattered chips and take the one you hit; hitting two or more takes nothing. Differences: single player, falling off the table is a miss, and streak scoring."
+      },
+      {
+        "title": "おはじき - Ohajiki (Flattened marbles)",
+        "url": "https://japanese-culture.info/keywords/amusements/ohajiki",
+        "similarity": "高",
+        "note": "遊び方の解説。順番に相手の玉をねらってはじき、当たれば自分のものになる。テーブルから落ちたら交代という遊び方もある。",
+        "note_en": "A guide to the rules: take turns flicking at chips and keep what you hit; some versions switch turns when a chip falls off the table."
+      },
+      {
+        "title": "Carrom（キャロム）",
+        "url": "https://en.wikipedia.org/wiki/Carrom",
+        "similarity": "中",
+        "note": "指で円盤をはじいて他の円盤を動かす卓上ゲーム。キャロムはポケットへ落とすのが目的で、本作は特定の1枚だけに当てて取る点が違う。",
+        "note_en": "Tabletop game of flicking discs into other discs. Carrom aims to pocket pieces; here you must hit exactly one declared chip to take it."
+      }
+    ],
+    "research": "WebSearchで「おはじき 遊び方 ルール」「ohajiki flick game app browser」「Carrom flick striker」を検索。おはじきの伝統ルールとキャロムが近い。線を引いて的を宣言するルールを再現したブラウザ版は見つからなかった。",
+    "i18n": {
+      "en": {
+        "comment": "Drawing a line through the gap and then flicking is understood at once, and threading a narrow gap and hearing the glass clink as you take a chip feels good. But in self-play almost every shot hit in rounds 1 and 2, and a 6-streak came easily. Bug: the scatter cannot fit all chips in its small starting area, so round 1 had 5 chips instead of 6 and round 2 had 5 instead of 7; the chip count never grows, so rounds do not get harder. Also, \"pull\" may read as slingshot-style pulling back, while you actually drag toward where you want it to go. Nice feel, but the tension does not build.",
+        "research": "Searched the web for ohajiki rules, ohajiki browser games and carrom. Traditional ohajiki and carrom are the closest; no browser version reproducing the line-drawing declaration rule was found."
+      }
+    },
+    "method": "スマホ縦画面で 12 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 12 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 2500ms",
+        "note": "タイトルをタップ。ちゃぶ台に石がジャラッと散らばった",
+        "noteEn": "Tapped the title. Chips scattered across the table",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "path(0.56,0.39→0.63,0.39→0.70,0.39) 300ms",
+        "note": "近いピンクと黄色のあいだに横線を引く。2つが光って点線でつながった",
+        "noteEn": "Drew a short line between the close pink and yellow chips",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "path(0.63,0.45→0.63,0.42→0.63,0.38) 400ms → wait 3000ms",
+        "note": "黄色を上のピンクへ向けて中くらいの強さで引っぱって離す",
+        "noteEn": "Pulled the yellow chip up toward the pink one at medium power and let go",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "path(0.47,0.35→0.47,0.40→0.47,0.45) 300ms → path(0.31,0.42→0.38,0.41→0.47,0.40) 400ms → wait 3000ms",
+        "note": "緑と黄色のあいだに縦線を引き、緑を黄色へ向けてはじく",
+        "noteEn": "Drew a vertical line between green and yellow, then flicked green at yellow",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "path(0.47,0.54→0.54,0.54→0.61,0.54) 300ms → path(0.54,0.69→0.54,0.63→0.54,0.57) 400ms → wait 3500ms",
+        "note": "遠い組み合わせに挑戦。下の青と上の緑のあいだに線を引き、青を強めに上へ",
+        "noteEn": "Tried a long shot: line between the bottom blue and the top green, flicked blue upward harder",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "path(0.31,0.46→0.35,0.50→0.40,0.54) 300ms → path(0.55,0.43→0.48,0.46→0.41,0.48) 400ms → wait 3500ms",
+        "note": "青2つ。斜めに線を引いて、右の青を左下の青へ",
+        "noteEn": "Two blues left. Drew a diagonal line and flicked the right one at the lower-left one",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.50,0.85) 120ms → wait 2500ms",
+        "note": "第1局はノーミスで終わった。タップで第2局へ",
+        "noteEn": "Round 1 cleared with no misses. Tapped to start round 2",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "path(0.39,0.60→0.44,0.57→0.48,0.54) 300ms → path(0.38,0.54→0.41,0.56→0.46,0.58) 400ms → wait 3500ms",
+        "note": "ピンクと下の紫のあいだの細いすき間に斜め線。ピンクを弱めに右下へ",
+        "noteEn": "Diagonal line through the narrow gap between pink and the lower purple; flicked pink gently down-right",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "path(0.43,0.40→0.45,0.44→0.46,0.48) 300ms → path(0.27,0.41→0.40,0.44→0.53,0.47) 300ms → wait 3500ms",
+        "note": "あえて全力で。左の紫を右の紫へ思い切りはじいてみる",
+        "noteEn": "Going all out: flicked the left purple at the right purple at full power",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "path(0.30,0.47→0.42,0.47→0.52,0.47) 300ms → path(0.48,0.33→0.52,0.36→0.62,0.40) 300ms → wait 3500ms",
+        "note": "水色とピンクのあいだに線を引き、わざと狙いを右へそらしてはじく",
+        "noteEn": "Drew a line between cyan and pink, then deliberately aimed too far right",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "path(0.38,0.57→0.44,0.57→0.50,0.58) 300ms",
+        "note": "線がピンクの石をかすめるように引いてみる",
+        "noteEn": "Drew a line that grazes the pink chip",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "path(0.52,0.55→0.52,0.58→0.53,0.61) 300ms → path(0.60,0.59→0.56,0.58→0.50,0.58) 400ms → wait 3500ms",
+        "note": "ピンクと紫の細いすき間に縦線を通し、紫をピンクへ弱く",
+        "noteEn": "Threaded a vertical line through the narrow pink–purple gap and tapped purple into pink",
+        "image": "ai-play/step-12.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-20T10:40:41+09:00"
+  },
+  "publishedAt": "2026-10-20T10:40:41+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 11341,
+    "outputTokens": 23527,
+    "contextTokens": 4566490,
+    "turns": 32,
+    "toolCalls": 35,
+    "webSearches": 0,
+    "minutes": 8.6,
+    "from": "2026-10-20T01:32:02.980Z",
+    "to": "2026-10-20T01:40:41.426Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-20T10:40:41+09:00",
+    "validationRuns": 1,
+    "codeKB": 27
+  }
+}
