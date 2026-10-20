@@ -1,0 +1,227 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-20T03:12:01.485Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.89
+        ]
+      },
+      "desc": "tap(0.50,0.89) 120ms",
+      "note": "天候で水が増減し、一鉢だけ守る説明が読める。四回育てて収穫を目指す。",
+      "noteEn": "The instructions explain weather changes, sheltering one pot and four growth days to ripen. Start planting.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": {
+        "tap": [
+          0.5,
+          0.52
+        ]
+      },
+      "desc": "tap(0.50,0.52) 120ms",
+      "note": "今日は雨、明日は晴れ。中央は水2なので、増やさず育てたい。中央を選ぶ。",
+      "noteEn": "Rain today and sun tomorrow. Shelter the middle pot at water two so it can grow without getting wetter.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": {
+        "tap": [
+          0.5,
+          0.9
+        ]
+      },
+      "desc": "tap(0.50,0.90) 120ms",
+      "note": "中央に金の枠と傘が出た。選択が分かったので一日進める。",
+      "noteEn": "A gold border and umbrella mark the middle pot. Advance the day.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "tap": [
+            0.2,
+            0.5
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.9
+          ]
+        }
+      ],
+      "desc": "tap(0.20,0.50) 120ms → tap(0.50,0.90) 120ms",
+      "note": "左と中央が1回育ち、右は水4で止まった。晴れが続くので左の水2を守り、ほかは乾かす。",
+      "noteEn": "Left and middle grew once; the right is stuck at water four. With two sunny days ahead, shelter the left at two and let the others dry.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.9
+          ]
+        }
+      ],
+      "desc": "tap(0.50,0.50) 120ms → tap(0.50,0.90) 120ms",
+      "note": "左2・中央1・右3。中央を守れば左1・中央1・右2となり、三鉢とも育つはず。",
+      "noteEn": "Water is two, one and three. Shelter the middle so all three reach water one or two and grow.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "tap": [
+            0.79,
+            0.5
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.9
+          ]
+        }
+      ],
+      "desc": "tap(0.79,0.50) 120ms → tap(0.50,0.90) 120ms",
+      "note": "三鉢とも育ち、左と中央はあと1回。雨で水2の右だけを守れば、全部がよい水量を保つ。",
+      "noteEn": "All grew; left and middle need one more growth. Shelter the right at water two from rain so every pot stays balanced.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "tap": [
+            0.79,
+            0.5
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.9
+          ]
+        }
+      ],
+      "desc": "tap(0.79,0.50) 120ms → tap(0.50,0.90) 120ms",
+      "note": "左と中央が収穫できた。右は育ち2・水2なので、もう一度雨から守って育ち3へ進めたい。",
+      "noteEn": "Left and middle ripened. The right is growth two at water two; shelter it from rain again to reach growth three.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": {
+        "tap": [
+          0.5,
+          0.9
+        ]
+      },
+      "desc": "tap(0.50,0.90) 120ms",
+      "note": "最後は晴れ。右の水2は1に減っても育つので、どの鉢も守らず一日進める。",
+      "noteEn": "The last day is sunny. Water two on the right can fall to one and still grow, so advance without sheltering a pot.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 3
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.91
+          ]
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.91) 120ms",
+      "note": "六日間で3鉢すべて収穫できた。次の畑が初期の水量へ戻るか再開する。",
+      "noteEn": "All three pots ripened over six days. Restart to check the initial water levels return.",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 3
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}
