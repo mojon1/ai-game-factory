@@ -1,0 +1,358 @@
+{
+  "id": "2026-10-21-gpt-2",
+  "status": "published",
+  "title": "かすめて星花火",
+  "genre": "弾よけ",
+  "concept": "弾から遠く離れるだけでは花火は開かない。青い星を指で動かし、弾のそばをかすめて火花を集める。五つたまると花火が弾を消してひと息つけるが、次は少し密になる。安全な距離と、近づく欲張りの間を行き来する夜空。",
+  "howToPlay": "青い星を指で動かし、桃色の弾をかわす。近くをかすめると火花がたまり、5つで花火が弾を消す。2回ぶつかると終了。",
+  "libraryDecision": "弾との距離と予告された直線を読むことが核。共有棚を検討したが、物理の衝突応答や3Dは判断に不要なので、Canvasと一定速度の計算で明瞭に描く。",
+  "soundDecision": "かすめるたびに音程を上げ、花火は高い短音、被弾は低い音にする。避ける判断を邪魔せず火花の蓄積を感じられるよう、BGMは付けない。",
+  "planning": {
+    "candidates": [
+      {
+        "idea": "弾をかすめて火花をため、五つで花火が夜空の弾を消す。安全と欲張りの距離を選ぶ。",
+        "ideaEn": "Graze shots to gather five sparks, then clear the sky with a firework. Choose between safety and close calls.",
+        "fromDraw": true
+      },
+      {
+        "idea": "塔の影にだけ足場が現れる街を、太陽を動かして渡る。",
+        "ideaEn": "Move the sun to reveal footholds only inside tower shadows.",
+        "fromDraw": false
+      },
+      {
+        "idea": "海辺の小石を音で見分けて、同じ響きの組を集める。",
+        "ideaEn": "Match seaside pebbles by their sounds to collect pairs.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0,
+    "genreDraw": {
+      "ja": "弾よけ",
+      "en": "Bullet dodging",
+      "of": 57
+    }
+  },
+  "structure": {
+    "goal": "survive",
+    "ending": "fail",
+    "input": [
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Grazing Fireworks",
+      "concept": "Staying far from shots will not make fireworks bloom. Drag a blue star close to passing shots and gather sparks. Five sparks clear the bullets in a firework, offering a breath before a denser wave. Move between safe distance and the temptation to skim closer.",
+      "howToPlay": "Drag the blue star to dodge pink shots. Near misses gather sparks; five sparks make a firework clear the bullets. Two hits end the run.",
+      "libraryDecision": "Reading distance and forecast straight paths is the core. Physics collision responses and 3D would not improve those decisions, so Canvas and constant-speed motion keep them clear.",
+      "soundDecision": "Graze tones rise with sparks, a high short tone marks fireworks, and a low tone marks a hit. No music obscures dodging decisions or the sense of accumulating charge."
+    }
+  },
+  "createdAt": "2026-10-21T12:06:18+09:00",
+  "specVersion": 8,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-21T12:06:18+09:00",
+    "metricsFrom": "2026-10-21T03:05:24.777Z",
+    "transcript": null,
+    "validationRuns": 1,
+    "finishedAt": "2026-10-21T12:11:52+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-21T12:07:57+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "7.1KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=57",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=58",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=40",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=55",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 7226,
+    "lines": 25
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 2,
+    "works": "ok",
+    "comment": "9手の画像でドラッグ移動、弾道予告、かすめた弾の色変化と火花4/5、被弾で残りと火花が減ること、二度目の被弾による結果と再開を確認した。あと一つの欲張りは生まれるが、密集した弾の退路を読みづらく、二度とも退避中に当たり花火0で終わった。花火の発動・弾消しとその後の難度上昇は実プレイで未確認。",
+    "similar": [
+      {
+        "title": "Danmaku Unlimited 3",
+        "url": "https://www.doragongames.com/danmaku3/",
+        "similarity": "高",
+        "note": "弾をかすめる危険を報酬へ変えるGRAZEの考え方が近い。本作は自機の射撃やボスを持たず、火花5つで自動的に弾を消す小さな弾よけに絞っている。",
+        "note_en": "Both reward risky proximity to bullets through grazing. This game omits player shooting and bosses and focuses on five sparks automatically clearing the sky."
+      },
+      {
+        "title": "Ikaruga",
+        "url": "https://www.nintendo.com/en-ca/store/products/ikaruga-switch/",
+        "similarity": "低",
+        "note": "敵弾を単なる障害でなく利益の源にする題材が共通。本作は同色弾を吸収せず、距離で火花を集め、色の切替もない。",
+        "note_en": "Both make enemy bullets a potential benefit. This gathers sparks by distance rather than absorbing matching-color shots and has no polarity switching."
+      }
+    ],
+    "research": "2件検索し、開発元公式のDanmaku Unlimited 3と任天堂公式のIkaruga説明を確認。グレイズのリスクと報酬を主な類似点とし、吸収や自機射撃など本作にない要素も区別した。",
+    "i18n": {
+      "en": {
+        "comment": "Nine pictured steps confirmed dragging, shot warnings, grazed-shot color changes and charge four of five, hit penalties, game over after the second hit and restart. One-more-spark temptation exists, but dense retreat paths were hard to read and both escapes ended in hits, with zero fireworks. Did not verify a firework, bullet clearing or later difficulty through play.",
+        "research": "Ran two searches and checked the developer's Danmaku Unlimited 3 page and Nintendo's Ikaruga description. Compared graze risk and reward while distinguishing absorption and player shooting absent here."
+      }
+    },
+    "method": "スマホ縦画面で 9 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 9 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.90) 120ms",
+        "note": "弾をかすめて火花5つで花火、2回被弾で終了と読める。夜空へ入る。",
+        "noteEn": "The instructions say five grazes trigger a firework and two hits end the run. Enter the night sky.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "wait 3000ms",
+        "note": "星の周囲に輪があり、火花0/5、残り2。まず弾の向きと速さを観察する。",
+        "noteEn": "A ring surrounds the star; charge is zero and two lives remain. Watch the incoming directions and speed first.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.58,0.77) 200ms → wait 1800ms",
+        "note": "左上の弾が現在位置へ向かっている。右へ少しずらし、輪の端を通る距離で待つ。",
+        "noteEn": "The upper-left shot is aimed at my position. Shift slightly right and wait for it to pass near the ring edge.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 550ms",
+        "note": "最初の弾が金色になり火花1。左と上からの弾も近いので、もう少しだけ待ってかすめたい。",
+        "noteEn": "The first shot turned gold and charge reached one. Shots from the left and above are also close; wait a little longer for near misses.",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.50,0.84) 250ms → wait 1500ms",
+        "note": "火花4/5だが右上の弾が迫っている。左下へ一歩逃げ、次の弾の位置を見る。",
+        "noteEn": "Charge is four, but the upper-right shot is too close. Move down-left and watch the next incoming shot.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.58,0.84) 200ms → wait 2000ms",
+        "note": "移動中に当たり、残り1・火花0になった。左からの新しい弾を右に少しずれて待つ。",
+        "noteEn": "I was hit during the escape; one life remains and charge reset. Shift slightly right to skim the new shot from the left.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 1000ms",
+        "note": "左下と右上から二つの弾が近づいている。左の弾は星より左へ抜けそうなので少し待つ。",
+        "noteEn": "Shots approach from lower left and upper right. The left shot appears set to pass left of the star; wait briefly.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.50,0.89) 220ms → wait 1000ms",
+        "note": "火花1になったが、星のすぐ左上に弾が来ている。左下へ逃げて距離を取り直す。",
+        "noteEn": "Charge reached one, but a shot is immediately upper left. Escape down-left to regain space.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 900ms → tap(0.50,0.90) 120ms",
+        "note": "二度目の被弾で花火0の結果画面になった。再開して残り回数と火花が戻るか確認する。",
+        "noteEn": "The second hit ended the run with zero fireworks. Restart to check lives and charge reset.",
+        "image": "ai-play/step-09.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 0
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-21T12:11:52+09:00"
+  },
+  "publishedAt": "2026-10-21T12:11:52+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 3167,
+    "outputTokens": 7863,
+    "contextTokens": 2834273,
+    "turns": 14,
+    "toolCalls": 14,
+    "webSearches": null,
+    "minutes": 6.6,
+    "from": "2026-10-21T03:05:24.777Z",
+    "to": "2026-10-21T03:12:00.747Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-10-21T12:12:00+09:00",
+    "validationRuns": 1,
+    "codeKB": 7.1,
+    "evidence": "metrics-evidence.json"
+  }
+}

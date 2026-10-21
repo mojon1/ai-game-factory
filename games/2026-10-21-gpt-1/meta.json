@@ -1,0 +1,354 @@
+{
+  "id": "2026-10-21-gpt-1",
+  "status": "published",
+  "title": "灯り替えの地下室",
+  "genre": "ダンジョン探索",
+  "concept": "火と月の灯りを替えると、渡れる橋が入れ替わる。橋の上では灯りを替えられないので、鍵に向かうだけでなく白い床へ戻る道を考える。急がず三つの地下室を巡り、二つの鍵で出口を開く小さな探索。",
+  "howToPlay": "隣の床をタップして進む。白い床で灯りを替え、同じ色の橋を渡る。鍵を2つ集めて出口へ。",
+  "libraryDecision": "床と橋の接続を読み、色を替える場所を選ぶのが核。共有棚を確認したが、物理や3Dの揺れより明瞭な格子が判断を強めるためCanvasだけで描く。",
+  "soundDecision": "移動は小さい短音、鍵と出口は高い音、渡れない橋は低い音で返す。落ち着いて道を読むためBGMは付けない。",
+  "planning": {
+    "candidates": [
+      {
+        "idea": "灯りで渡れる橋が替わる地下室。白い床でだけ灯りを替え、二つの鍵で出口を開く。",
+        "ideaEn": "Explore cellars whose bridges depend on lantern light. Switch only on pale floors and find two keys.",
+        "fromDraw": true
+      },
+      {
+        "idea": "机をたたく強弱で紙の動物を跳ばし、離れた足場に乗せる。",
+        "ideaEn": "Tap a table with varying force to bounce paper animals onto distant platforms.",
+        "fromDraw": false
+      },
+      {
+        "idea": "街の窓に色を配り、通りから一枚の夕景を完成させる。",
+        "ideaEn": "Assign colors to city windows to complete an evening scene.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0,
+    "genreDraw": {
+      "ja": "ダンジョン探索",
+      "en": "Dungeon crawler",
+      "of": 57
+    }
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Lantern Cellars",
+      "concept": "Switch between ember and moon light to change which bridges are solid. Since switching is impossible on a bridge, plan a route back to pale floors as well as toward the keys. Explore three cellars at your own pace and open each exit with two keys.",
+      "howToPlay": "Tap adjacent tiles. Switch light on pale floors to cross matching bridges. Find two keys and reach the exit.",
+      "libraryDecision": "Reading connections and choosing switch locations are the core. After reviewing the shelf, a clear Canvas grid suits these decisions better than physics motion or 3D.",
+      "soundDecision": "Soft short tones mark movement, high tones mark keys and exits, and low tones mark blocked bridges. No music distracts from reading routes."
+    }
+  },
+  "createdAt": "2026-10-21T12:01:04+09:00",
+  "specVersion": 8,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-21T12:01:04+09:00",
+    "metricsFrom": "2026-10-21T02:59:51.256Z",
+    "transcript": null,
+    "validationRuns": 1,
+    "finishedAt": "2026-10-21T12:05:01+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-21T12:02:28+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "6.3KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=51",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=82",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=37",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=61",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 6474,
+    "lines": 21
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "8手の画像で橋上の切替拒否、白い床での切替、鍵2つの取得、鍵不足の出口、第一地下室の突破と第二地下室への継続を確認。戻る床を意識する小さな納得感はある。一方、分岐は少なく、進路はすぐ見通せるので探索の驚きは弱い。第二地下室は鍵1つまで、全三室のクリアと最終再開は未確認。",
+    "similar": [
+      {
+        "title": "Hue",
+        "url": "https://www.nintendo.com/en-gb/Games/Nintendo-Switch-download-software/Hue-1570082.html",
+        "similarity": "中",
+        "note": "色を切り替えることで通れる道が変わる核が近い。本作は二色の格子状の地下室で、橋上では切替不可。ジャンプや横スクロールはない。",
+        "note_en": "Both change routes through color switching. This uses two colors on a cellar grid, forbids switching on bridges, and has no jumping or side-scrolling."
+      },
+      {
+        "title": "Ittle Dew 2+",
+        "url": "https://www.nintendo.com/us/store/products/ittle-dew-2-plus-70010000027439-switch/",
+        "similarity": "低",
+        "note": "ダンジョンの仕掛けを読み、鍵や出口を目指す題材が共通。本作には戦闘や武器の使い分けはなく、二色の橋だけを扱う。",
+        "note_en": "Both explore dungeon puzzles toward keys or exits. This game has no combat or weapon tools and focuses only on two-color bridges."
+      }
+    ],
+    "research": "3件の検索で小さなダンジョン探索と色変更パズルを調査。任天堂公式のHueとIttle Dew 2+の紹介を比較し、色による通路変化と探索の共通点・違いを記録した。",
+    "i18n": {
+      "en": {
+        "comment": "Eight pictured steps confirmed switch rejection on a bridge, switching on pale floors, both keys, an exit rejecting insufficient keys, first-cellar completion and continuation to the second. Planning safe switch locations is satisfying, but few branches make routes obvious. Reached one key in cellar two; did not verify all three cellars or the final restart.",
+        "research": "Ran three searches about small dungeon exploration and color-switch puzzles. Compared official Nintendo descriptions of Hue and Ittle Dew 2+, noting similarities and differences in routes and exploration."
+      }
+    },
+    "method": "スマホ縦画面で 8 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 8 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.90) 120ms",
+        "note": "二色の床と鍵、白い床で灯りを替える説明が見える。地下室を探索する。",
+        "noteEn": "Two colored floors and a key illustrate the lantern-switching instructions. Enter the cellar.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.50,0.69) 120ms → tap(0.50,0.59) 120ms → tap(0.50,0.90) 120ms",
+        "note": "真上に火の橋、その先は左右の鍵へ分かれている。橋へ進み、橋上で灯りを替えられるか試す。",
+        "noteEn": "An ember bridge above branches toward both keys. Step onto it and try switching while on the bridge.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.33,0.59) 120ms → tap(0.33,0.50) 120ms → tap(0.33,0.41) 120ms",
+        "note": "白い床で替えようと表示され、火のままだった。左へ出て鍵を取り、その上の白い床へ進む。",
+        "noteEn": "The message says to switch on a pale floor and ember remains active. Go left, collect the key and move to the pale floor above it.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.50,0.41) 120ms → tap(0.50,0.90) 120ms → tap(0.50,0.41) 120ms → tap(0.50,0.31) 120ms",
+        "note": "鍵1/2で月の橋が暗い。まず渡れないことを確かめ、白い床で月に替えて出口を早めに試す。",
+        "noteEn": "One key is collected and the moon bridge is dark. Test the blocked bridge, switch to moon on pale ground, then try the exit early.",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.67,0.41) 120ms → tap(0.67,0.50) 120ms",
+        "note": "出口は鍵2つが必要。右上の白い床から右の鍵を取りに行く。",
+        "noteEn": "The exit requires both keys. Cross to the upper-right pale floor and collect the remaining key.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.67,0.41) 120ms → tap(0.50,0.41) 120ms → tap(0.50,0.31) 120ms",
+        "note": "鍵が2/2になった。来た道を戻り月の橋から出口へ進む。",
+        "noteEn": "Both keys are collected. Return across the moon bridge and enter the exit.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 900ms → tap(0.50,0.90) 120ms",
+        "note": "地下室1を抜けた表示と次への案内が見える。次の階を開く。",
+        "noteEn": "The first-cellar completion and continue prompt are visible. Open the next floor.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.50,0.69) 120ms → tap(0.50,0.59) 120ms → tap(0.67,0.59) 120ms",
+        "note": "二階では鍵が右下と左上、火の橋は右上にある。まず右下の鍵を取り、中央へ戻る道を残す。",
+        "noteEn": "Floor two has keys at lower right and upper left, with an ember bridge near the exit. Collect the lower-right key first while keeping the route back open.",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-21T12:05:01+09:00"
+  },
+  "publishedAt": "2026-10-21T12:05:01+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 2005,
+    "outputTokens": 8617,
+    "contextTokens": 2494241,
+    "turns": 14,
+    "toolCalls": 14,
+    "webSearches": null,
+    "minutes": 5.6,
+    "from": "2026-10-21T02:59:51.256Z",
+    "to": "2026-10-21T03:05:24.360Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-10-21T12:05:24+09:00",
+    "validationRuns": 1,
+    "codeKB": 6.3,
+    "evidence": "metrics-evidence.json"
+  }
+}
