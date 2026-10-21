@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>風よみヨットレース</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #236f9e; }
+canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script src="../../lib/zzfx-1.4.0.min.js"></script>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+
+const DICT = {
+  ja: {
+    title: '風よみヨットレース',
+    how: ['指をおいた方へヨットが進む', '風上へはまっすぐ進めない。ジグザグに！', 'ブイを回って、いちばん先にゴールへ'],
+    tap: 'タップでスタート',
+    races: ['予選 1', '予選 2', '決勝'],
+    hintStart: '指の方へ進む。光るブイをめざそう',
+    hintNoGo: '風に正面から向かうと止まる！ななめ45°でジグザグに',
+    hintGust: '濃い波は突風。通ると速くなる！',
+    hintFinish: 'ブイを回った！ゴールのラインへ',
+    pos: (n) => n + '位',
+    of: '/4',
+    best: 'ベスト',
+    newBest: 'ベスト更新！',
+    qualify: '予選通過！',
+    notQ: '2位以内で通過',
+    again: 'タップでもう一度',
+    next: 'タップで次へ',
+    champion: '優勝！',
+    newCup: 'タップで新しい大会へ',
+    wind: '風',
+    go: 'スタート！',
+    mark: 'ブイ',
+    goal: 'ゴール',
+    record: (s) => '決勝の最高: ' + s,
+    cups: (n) => '優勝 ' + n + '回',
+  },
+  en: {
+    title: 'Tacking Race',
+    how: ['Your boat sails toward your finger', "You can't sail straight into the wind. Zigzag!", 'Round the buoys and finish first'],
+    tap: 'Tap to start',
+    races: ['Heat 1', 'Heat 2', 'Final'],
+    hintStart: 'Sail toward your finger. Head for the glowing buoy',
+    hintNoGo: 'Straight into the wind = stopped! Zigzag at 45°',
+    hintGust: 'Dark water is a gust. Sail through it to speed up!',
+    hintFinish: 'Buoy rounded! Now cross the finish line',
+    pos: (n) => n + (['st', 'nd', 'rd', 'th'][n - 1] || 'th'),
+    of: '/4',
+    best: 'Best',
+    newBest: 'New best!',
+    qualify: 'Qualified!',
+    notQ: 'Top 2 to qualify',
+    again: 'Tap to play again',
+    next: 'Tap to continue',
+    champion: 'Champion!',
+    newCup: 'Tap for a new cup',
+    wind: 'WIND',
+    go: 'GO!',
+    mark: 'Buoy',
+    goal: 'Finish',
+    record: (s) => 'Best final: ' + s,
+    cups: (n) => 'Cups won: ' + n,
+  },
+};
+const T = DICT[LANG] || DICT.en;
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+
+const cv = document.getElementById('c');
+const cx = cv.getContext('2d');
+let W = 360, H = 640, DPR = 1, S = 1;
+function resize() {
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = Math.max(1, innerWidth); H = Math.max(1, innerHeight);
+  cv.width = Math.max(1, Math.round(W * DPR)); cv.height = Math.max(1, Math.round(H * DPR));
+}
+addEventListener('resize', resize); resize();
+
+// ---------- math ----------
+const wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const DEG = Math.PI / 180;
+// boat speed ratio by angle to the wind (0 = straight into the wind)
+function polar(a) {
+  const d = a / DEG;
+  if (d < 32) return 0.08;
+  if (d < 45) return 0.08 + (d - 32) / 13 * 0.62;
+  if (d < 90) return 0.7 + (d - 45) / 45 * 0.3;
+  if (d < 135) return 1.0 - (d - 90) / 45 * 0.05;
+  return 0.95 - (d - 135) / 45 * 0.25;
+}
+const NOGO = 38 * DEG;
+
+// ---------- world ----------
+const MAXV = 95, BX = 430, TOPY = -1320, BOTY = 170;
+const COLORS = ['#ff5a36', '#2f7de1', '#22b07a', '#9b59d0'];
+const RACES = [
+  { wind: 0, shift: 0, period: 30, gusts: 0, marks: [[0, -900]], island: null, skill: [0.78, 0.82, 0.85] },
+  { wind: 0.12, shift: 0.2, period: 26, gusts: 5, marks: [[-170, -880], [250, -430]], island: null, skill: [0.83, 0.86, 0.9] },
+  { wind: -0.08, shift: 0.3, period: 22, gusts: 8, marks: [[-60, -1160], [280, -620]], island: { x: 30, y: -580, r: 105 }, skill: [0.88, 0.91, 0.94] },
+];
+
+let save = { best: [0, 0, 0], bestFinal: 0, cups: 0 };
+addEventListener('message', (e) => {
+  if (e.data && e.data.agf === 'loaded' && e.data.data && typeof e.data.data === 'object') {
+    const d = e.data.data;
+    if (Array.isArray(d.best)) save.best = d.best.slice(0, 3).map((v) => +v || 0);
+    save.bestFinal = +d.bestFinal || 0; save.cups = +d.cups || 0;
+  }
+});
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+const persist = () => { try { parent.postMessage({ agf: 'save', data: save }, '*'); } catch (e) {} };
+
+let state = 'title', ri = 0, raceT = 0, cdT = 0, resT = 0, tNow = 0;
+let boats = [], player = null, gusts = [], R = RACES[0], wind = 0, finishOrder = [], finishDelay = -1, result = null;
+let camX = 0, camY = 0, windOffX = 0, windOffY = 0;
+let hint = '', hintT = 0, noGoT = 0, noGoShown = 0, gustShown = false, flash = 0;
+let ptr = null;
+const streaks = [];
+for (let i = 0; i < 150; i++) streaks.push({ x: Math.random() * 640, y: Math.random() * 640, l: 8 + Math.random() * 14 });
+
+// ---------- sound ----------
+let audioOn = false, water = null;
+function audioInit() {
+  if (audioOn) return;
+  try {
+    if (typeof ZZFX === 'undefined') return;
+    const ac = ZZFX.audioContext; if (!ac) return;
+    if (ac.resume) ac.resume();
+    audioOn = true;
+    const len = ac.sampleRate * 2, buf = ac.createBuffer(1, len, ac.sampleRate), d = buf.getChannelData(0);
+    let last = 0;
+    for (let i = 0; i < len; i++) { last = last * 0.97 + (Math.random() * 2 - 1) * 0.03; d[i] = last * 6; }
+    const src = ac.createBufferSource(); src.buffer = buf; src.loop = true;
+    const f = ac.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 700;
+    const g = ac.createGain(); g.gain.value = 0;
+    src.connect(f); f.connect(g); g.connect(ac.destination); src.start();
+    water = { g, f, ac };
+  } catch (e) { audioOn = false; }
+}
+function sfx(p) { if (!audioOn) return; try { zzfx(...p); } catch (e) {} }
+const SND = {
+  beep: [0.5, 0, 660, 0, 0.07, 0.12, 1],
+  horn: [0.6, 0, 233, 0.02, 0.55, 0.3, 2, 0.6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.8],
+  tack: [0.5, 0.05, 380, 0.04, 0.08, 0.28, 4, 1, -3],
+  flap: [0.22, 0.3, 140, 0, 0.02, 0.05, 4, 1],
+  chime: [0.5, 0, 880, 0, 0.05, 0.45, 0, 1, 0, 0, 440, 0.08],
+  gust: [0.3, 0.1, 160, 0.25, 0.25, 0.5, 4, 0, 1.5],
+  bump: [0.45, 0.1, 90, 0, 0.04, 0.12, 4, 1, -2],
+};
+function fanfare(good) {
+  const notes = good ? [523, 659, 784, 1046] : [392, 440, 494];
+  notes.forEach((n, i) => setTimeout(() => sfx([0.45, 0, n, 0.01, 0.1, 0.35, 1, 1]), i * 130));
+}
+
+// ---------- race setup ----------
+function windAt(t) {
+  return R.wind + R.shift * (Math.sin(2 * Math.PI * t / R.period) + 0.5 * Math.sin(2 * Math.PI * t / (R.period * 0.43) + 1)) / 1.5;
+}
+function spawnGust(init) {
+  gusts.push({ x: (Math.random() * 2 - 1) * (BX - 70), y: TOPY + 80 + Math.random() * (BOTY - TOPY - 200), r: 75 + Math.random() * 50, age: init ? Math.random() * 12 : 0, life: 18 + Math.random() * 8 });
+}
+function gustStr(g, x, y) {
+  const d = Math.hypot(x - g.x, y - g.y); if (d > g.r) return 0;
+  return Math.min(1, g.age / 2, (g.life - g.age) / 2) * (1 - (d / g.r) ** 2);
+}
+function gustAt(x, y) { let m = 0; for (const g of gusts) m = Math.max(m, gustStr(g, x, y)); return m; }
+
+function startRace(i) {
+  ri = i; R = RACES[i]; raceT = 0; cdT = 3.3; state = 'count';
+  wind = windAt(0); gusts = []; finishOrder = []; finishDelay = -1; result = null; flash = 0;
+  const xs = [-105, -35, 35, 105];
+  const ps = 1 + Math.floor(Math.random() * 2);
+  boats = []; let k = 0;
+  for (let j = 0; j < 4; j++) {
+    const you = j === ps;
+    boats.push({ x: xs[j], y: 60, h: wind + (j < 2 ? -0.8 : 0.8), v: 0, col: you ? COLORS[0] : COLORS[1 + k], you, ti: 0, done: false, finT: 0, skill: you ? 1 : R.skill[k], tack: j < 2 ? -1 : 1, err: (Math.random() - 0.5) * 0.1, wake: [], wt: 0, prevY: 60, lastRel: 0, flapT: 0, inGust: false });
+    if (!you) k++;
+  }
+  player = boats.find((b) => b.you);
+  camX = player.x; camY = player.y - 150;
+  for (let g = 0; g < R.gusts; g++) spawnGust(true);
+  noGoT = 0;
+  hint = T.hintStart; hintT = 4.5;
+  signal('start');
+}
+
+function targetOf(b) {
+  if (b.ti < R.marks.length) return { x: R.marks[b.ti][0], y: R.marks[b.ti][1] };
+  return { x: b.x * 0.3, y: 45 };
+}
+
+function aiDesired(b) {
+  const m = targetOf(b);
+  let bear = Math.atan2(m.x - b.x, -(m.y - b.y));
+  const isl = R.island;
+  if (isl) {
+    const dx = b.x - isl.x, dy = b.y - isl.y, d = Math.hypot(dx, dy);
+    if (d < isl.r + 110) {
+      const toI = Math.atan2(-dx, dy);
+      const off = wrap(bear - toI), half = Math.asin(Math.min(1, (isl.r + 35) / d));
+      if (Math.abs(off) < half && Math.hypot(m.x - b.x, m.y - b.y) > d) bear = toI + (off >= 0 ? half : -half);
+    }
+  }
+  const rel = wrap(bear - wind);
+  const lay = 46 * DEG + b.err;
+  if (Math.abs(rel) < lay) {
+    if ((b.x > BX - 60 && Math.sin(wind + b.tack * lay) > 0) || (b.x < -BX + 60 && Math.sin(wind + b.tack * lay) < 0)) b.tack *= -1;
+    return wind + b.tack * lay;
+  }
+  b.tack = rel > 0 ? 1 : -1;
+  return bear;
+}
+
+function stepBoat(b, dt, desired, canMove) {
+  if (desired !== null) {
+    let dh = wrap(desired - b.h); const mt = 2.4 * dt;
+    dh = clamp(dh, -mt, mt); b.h = wrap(b.h + dh);
+    if (canMove) b.v *= 1 - Math.abs(dh) * 0.12;
+  }
+  if (!canMove) return;
+  const rel = wrap(b.h - wind), a = Math.abs(rel);
+  const g = gustAt(b.x, b.y);
+  let tgt = MAXV * polar(a) * (1 + 0.38 * g) * b.skill;
+  if (b.done) tgt *= 0.3;
+  b.v += (tgt - b.v) * Math.min(1, dt * (tgt > b.v ? 0.9 : 0.6));
+  b.x += (Math.sin(b.h) * b.v - Math.sin(wind) * 6) * dt;
+  b.y += (-Math.cos(b.h) * b.v + Math.cos(wind) * 6) * dt;
+  // shores
+  let hit = false;
+  if (b.x < -BX + 14) { b.x = -BX + 14; hit = true; }
+  if (b.x > BX - 14) { b.x = BX - 14; hit = true; }
+  if (b.y < TOPY + 14) { b.y = TOPY + 14; hit = true; }
+  if (b.y > BOTY - 14) { b.y = BOTY - 14; hit = true; }
+  const isl = R.island;
+  if (isl) {
+    const dx = b.x - isl.x, dy = b.y - isl.y, d = Math.hypot(dx, dy) || 1;
+    if (d < isl.r + 12) { b.x = isl.x + dx / d * (isl.r + 12); b.y = isl.y + dy / d * (isl.r + 12); hit = true; }
+  }
+  if (hit) { if (b.you && b.v > 25) sfx(SND.bump); b.v *= Math.pow(0.15, dt); }
+  // wake
+  b.wt -= dt;
+  if (b.wt <= 0 && b.v > 8) { b.wt = 0.07; b.wake.push({ x: b.x - Math.sin(b.h) * 14, y: b.y + Math.cos(b.h) * 14, a: 0, v: b.v }); }
+  for (const w of b.wake) w.a += dt;
+  while (b.wake.length && b.wake[0].a > 1.6) b.wake.shift();
+  // player feedback
+  if (b.you) {
+    if (Math.sign(rel) !== Math.sign(b.lastRel) && a < 1.2 && b.lastRel !== 0) sfx(SND.tack);
+    b.flapT -= dt;
+    if (a < NOGO && b.flapT <= 0 && b.v > 2) { b.flapT = 0.22; sfx(SND.flap); }
+    const ig = g > 0.35;
+    if (ig && !b.inGust) sfx(SND.gust);
+    b.inGust = ig;
+  }
+  b.lastRel = rel;
+}
+
+function checkProgress(b) {
+  if (b.done) return;
+  if (b.ti < R.marks.length) {
+    const m = R.marks[b.ti];
+    if (Math.hypot(b.x - m[0], b.y - m[1]) < 52) {
+      b.ti++;
+      if (b.you) {
+        sfx(SND.chime); flash = 0.6;
+        if (b.ti === R.marks.length) { hint = T.hintFinish; hintT = 3; }
+      }
+    }
+  } else if (b.prevY < 0 && b.y >= 0 && Math.abs(b.x) < 150) {
+    b.done = true; b.finT = raceT; finishOrder.push(b);
+    if (b.you) { finishDelay = 1.5; fanfare(finishOrder.length <= (ri < 2 ? 2 : 1)); }
+  }
+  b.prevY = b.y;
+}
+
+function rankOf(b) {
+  if (b.done) return finishOrder.indexOf(b) + 1;
+  const score = (o) => o.done ? 1e9 - o.finT : o.ti * 1e5 - Math.hypot(targetOf(o).x - o.x, targetOf(o).y - o.y);
+  const s = score(b);
+  return 1 + boats.filter((o) => o !== b && score(o) > s).length;
+}
+
+function showResult() {
+  const pos = finishOrder.indexOf(player) + 1, time = player.finT;
+  const isBest = !save.best[ri] || time < save.best[ri];
+  if (isBest) save.best[ri] = Math.round(time * 10) / 10;
+  if (ri === 2) { if (!save.bestFinal || pos < save.bestFinal) save.bestFinal = pos; if (pos === 1) save.cups = (save.cups || 0) + 1; }
+  persist();
+  result = { pos, time, isBest, pass: ri < 2 ? pos <= 2 : pos === 1, champion: ri === 2 && pos === 1 };
+  state = 'result'; resT = tNow;
+  signal('end', { score: 5 - pos });
+}
+
+// ---------- input ----------
+cv.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  audioInit();
+  if (state === 'title') { startRace(0); return; }
+  if (state === 'result') {
+    if (tNow - resT < 0.7) return;
+    if (ri < 2) startRace(result.pass ? ri + 1 : ri);
+    else startRace(result.champion ? 0 : 2);
+    return;
+  }
+  ptr = { id: e.pointerId, x: e.clientX, y: e.clientY };
+  try { cv.setPointerCapture(e.pointerId); } catch (err) {}
+});
+cv.addEventListener('pointermove', (e) => { if (ptr && ptr.id === e.pointerId) { ptr.x = e.clientX; ptr.y = e.clientY; } });
+const up = (e) => { if (ptr && ptr.id === e.pointerId) ptr = null; };
+cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+
+const toS = (x, y) => ({ x: (x - camX) * S + W / 2, y: (y - camY) * S + H * 0.56 });
+function playerDesired() {
+  if (!ptr) return null;
+  const p = toS(player.x, player.y);
+  const dx = ptr.x - p.x, dy = ptr.y - p.y;
+  if (dx * dx + dy * dy < 18 * 18) return null;
+  return Math.atan2(dx, -dy);
+}
+
+// ---------- update ----------
+function update(dt) {
+  tNow += dt;
+  S = Math.min(W / 430, H / 720);
+  if (state === 'title') { wind = 0; windOffX += 0; windOffY += 40 * dt; return; }
+  const t = state === 'count' ? 0 : raceT;
+  wind = windAt(t);
+  windOffX += -Math.sin(wind) * 40 * dt; windOffY += Math.cos(wind) * 40 * dt;
+  for (const g of gusts) { g.age += dt; g.x += -Math.sin(wind) * 26 * dt; g.y += Math.cos(wind) * 26 * dt; }
+  for (let i = gusts.length - 1; i >= 0; i--) if (gusts[i].age > gusts[i].life) { gusts.splice(i, 1); spawnGust(false); }
+  hintT -= dt; flash = Math.max(0, flash - dt);
+
+  if (state === 'count') {
+    const prev = Math.ceil(cdT); cdT -= dt; const now = Math.ceil(cdT);
+    if (now !== prev && now > 0 && now <= 3) sfx(SND.beep);
+    stepBoat(player, dt, playerDesired(), false);
+    if (cdT <= 0) { state = 'race'; sfx(SND.horn); }
+  } else {
+    if (state === 'race' && !player.done) raceT += dt;
+    for (const b of boats) {
+      const des = b.you ? (state === 'race' && !b.done ? playerDesired() : null) : aiDesired(b);
+      stepBoat(b, dt, des, true);
+      checkProgress(b);
+    }
+    for (let i = 0; i < boats.length; i++) for (let j = i + 1; j < boats.length; j++) {
+      const a = boats[i], c = boats[j], dx = c.x - a.x, dy = c.y - a.y, d = Math.hypot(dx, dy);
+      if (d < 22 && d > 0.01) { const p = (22 - d) / 2; a.x -= dx / d * p; a.y -= dy / d * p; c.x += dx / d * p; c.y += dy / d * p; }
+    }
+    if (state === 'race') {
+      const a = Math.abs(wrap(player.h - wind));
+      if (a < NOGO + 4 * DEG && player.v < 30) noGoT += dt; else noGoT = Math.max(0, noGoT - dt * 2);
+      if (noGoT > 1.4 && noGoShown < 3 && hintT < 0) { hint = T.hintNoGo; hintT = 4.5; noGoShown++; noGoT = 0; }
+      if (!gustShown && R.gusts && player.inGust) { gustShown = true; hint = T.hintGust; hintT = 3.5; }
+      if (finishDelay > 0) { finishDelay -= dt; if (finishDelay <= 0) showResult(); }
+    }
+  }
+  const lead = 55;
+  const tx = player.x + Math.sin(player.h) * lead, ty = player.y - Math.cos(player.h) * lead - 20;
+  const k = 1 - Math.exp(-dt * 3);
+  camX += (tx - camX) * k; camY += (ty - camY) * k;
+  if (water) {
+    try {
+      const lv = state === 'title' ? 0.01 : 0.012 + player.v / MAXV * 0.05;
+      water.g.gain.setTargetAtTime(lv, water.ac.currentTime, 0.2);
+      water.f.frequency.setTargetAtTime(400 + player.v * 8, water.ac.currentTime, 0.2);
+    } catch (e) {}
+  }
+}
+
+// ---------- drawing ----------
+function setFont(size, weight) { cx.font = (weight || '') + ' ' + size + 'px ' + FONT; }
+function fitText(str, x, y, maxW, size, weight, color, align) {
+  let s = size; setFont(s, weight);
+  while (s > 12 && cx.measureText(str).width > maxW) { s -= 1; setFont(s, weight); }
+  cx.fillStyle = color; cx.textAlign = align || 'center'; cx.fillText(str, x, y);
+}
+function rrect(x, y, w, h, r) { cx.beginPath(); cx.roundRect ? cx.roundRect(x, y, w, h, r) : cx.rect(x, y, w, h); }
+const mod = (a, n) => ((a % n) + n) % n;
+
+function drawStreaks(bounded) {
+  const dx = -Math.sin(wind), dy = Math.cos(wind);
+  cx.strokeStyle = 'rgba(255,255,255,0.2)'; cx.lineWidth = Math.max(1, 1.4 * S); cx.lineCap = 'round';
+  cx.beginPath();
+  for (const s of streaks) {
+    const wx = mod(s.x + windOffX - camX + 320, 640) + camX - 320;
+    const wy = mod(s.y + windOffY - camY + 320, 640) + camY - 320;
+    if (bounded && (Math.abs(wx) > BX || wy < TOPY || wy > BOTY)) continue;
+    const p = toS(wx, wy);
+    cx.moveTo(p.x, p.y); cx.lineTo(p.x + dx * s.l * S, p.y + dy * s.l * S);
+  }
+  cx.stroke();
+}
+
+function drawBoat(b, scale) {
+  const p = toS(b.x, b.y);
+  const sc = (scale || 1) * S;
+  cx.save(); cx.translate(p.x, p.y); cx.rotate(b.h); cx.scale(sc, sc);
+  // hull
+  cx.beginPath(); cx.moveTo(0, -17); cx.quadraticCurveTo(9, -6, 6.5, 13); cx.lineTo(-6.5, 13); cx.quadraticCurveTo(-9, -6, 0, -17); cx.closePath();
+  cx.fillStyle = '#fbfaf5'; cx.fill(); cx.lineWidth = 2; cx.strokeStyle = b.col; cx.stroke();
+  // sail
+  const rel = wrap(wind - b.h), a = Math.abs(rel);
+  const side = rel > 0 ? -1 : 1;
+  const luff = a < NOGO;
+  let boom = luff ? Math.sin(tNow * 28 + b.x) * 0.18 : side * clamp((a - 0.45) * 0.72, 0.1, 1.4);
+  const L = 19, mx = 0, my = -6;
+  const ex = mx + Math.sin(boom) * L, ey = my + Math.cos(boom) * L;
+  const nx = -Math.cos(boom), ny = Math.sin(boom);
+  const bulge = luff ? Math.sin(tNow * 34 + b.y) * 3 : -side * 5;
+  cx.beginPath(); cx.moveTo(mx, my);
+  cx.quadraticCurveTo((mx + ex) / 2 + nx * bulge, (my + ey) / 2 + ny * bulge, ex, ey);
+  cx.closePath();
+  cx.fillStyle = luff ? 'rgba(255,255,255,0.75)' : b.col; cx.fill();
+  cx.lineWidth = 1.6; cx.strokeStyle = '#333'; cx.beginPath(); cx.moveTo(mx, my); cx.lineTo(ex, ey); cx.stroke();
+  cx.fillStyle = '#333'; cx.beginPath(); cx.arc(mx, my, 2, 0, Math.PI * 2); cx.fill();
+  cx.restore();
+}
+
+function drawWakes() {
+  for (const b of boats) {
+    for (const w of b.wake) {
+      const p = toS(w.x, w.y), al = (1 - w.a / 1.6) * 0.5 * Math.min(1, w.v / 60);
+      cx.strokeStyle = 'rgba(255,255,255,' + al + ')'; cx.lineWidth = 1.5 * S;
+      cx.beginPath(); cx.arc(p.x, p.y, (3 + w.a * 10) * S, 0, Math.PI * 2); cx.stroke();
+    }
+  }
+}
+
+function drawGuide() {
+  if (player.done) return;
+  const p = toS(player.x, player.y), a = Math.abs(wrap(player.h - wind));
+  const into = wind - Math.PI / 2; // canvas angle of the wind-from direction
+  const r = 78 * S;
+  cx.fillStyle = a < NOGO ? 'rgba(255,70,70,0.3)' : 'rgba(255,90,90,0.13)';
+  cx.beginPath(); cx.moveTo(p.x, p.y); cx.arc(p.x, p.y, r, into - NOGO, into + NOGO); cx.closePath(); cx.fill();
+  cx.setLineDash([4 * S, 5 * S]); cx.strokeStyle = 'rgba(255,255,255,0.45)'; cx.lineWidth = 1.5 * S;
+  for (const sd of [-1, 1]) {
+    const ang = into + sd * 46 * DEG;
+    cx.beginPath(); cx.moveTo(p.x, p.y); cx.lineTo(p.x + Math.cos(ang) * r * 1.35, p.y + Math.sin(ang) * r * 1.35); cx.stroke();
+  }
+  cx.setLineDash([]);
+}
+
+function drawCourse() {
+  // shore and sea
+  cx.fillStyle = '#e6d199'; cx.fillRect(0, 0, W, H);
+  const a = toS(-BX, TOPY), b = toS(BX, BOTY);
+  cx.fillStyle = '#7bb35a'; cx.fillRect(a.x - 400 * S, a.y - 400 * S, b.x - a.x + 800 * S, b.y - a.y + 800 * S);
+  cx.fillStyle = '#e6d199'; rrect(a.x - 26 * S, a.y - 26 * S, b.x - a.x + 52 * S, b.y - a.y + 52 * S, 30 * S); cx.fill();
+  const grd = cx.createLinearGradient(0, a.y, 0, b.y);
+  grd.addColorStop(0, '#1f6aa0'); grd.addColorStop(1, '#2d8cc0');
+  cx.fillStyle = grd; rrect(a.x, a.y, b.x - a.x, b.y - a.y, 18 * S); cx.fill();
+  // gusts
+  for (const g of gusts) {
+    const s = Math.min(1, g.age / 2, (g.life - g.age) / 2); if (s <= 0) continue;
+    const p = toS(g.x, g.y), r = g.r * S;
+    const rg = cx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
+    rg.addColorStop(0, 'rgba(8,30,80,' + 0.42 * s + ')'); rg.addColorStop(1, 'rgba(8,30,80,0)');
+    cx.fillStyle = rg; cx.beginPath(); cx.arc(p.x, p.y, r, 0, Math.PI * 2); cx.fill();
+  }
+  drawStreaks(true);
+  // island
+  if (R.island) {
+    const i = R.island, p = toS(i.x, i.y);
+    cx.fillStyle = 'rgba(255,255,255,0.35)'; cx.beginPath(); cx.arc(p.x, p.y, (i.r + 8 + Math.sin(tNow * 2) * 2) * S, 0, Math.PI * 2); cx.fill();
+    cx.fillStyle = '#e6d199'; cx.beginPath(); cx.arc(p.x, p.y, i.r * S, 0, Math.PI * 2); cx.fill();
+    cx.fillStyle = '#6aa84f'; cx.beginPath(); cx.arc(p.x - 10 * S, p.y - 8 * S, i.r * 0.68 * S, 0, Math.PI * 2); cx.fill();
+    cx.fillStyle = '#4f8a3a'; cx.beginPath(); cx.arc(p.x + 18 * S, p.y + 10 * S, i.r * 0.35 * S, 0, Math.PI * 2); cx.fill();
+  }
+  // start / finish line
+  const finishNext = player.ti >= R.marks.length;
+  const l = toS(-130, 0), r = toS(130, 0);
+  cx.lineWidth = 3 * S; cx.setLineDash([10 * S, 8 * S]);
+  cx.strokeStyle = finishNext ? (Math.sin(tNow * 6) > 0 ? '#ffe14d' : '#ffffff') : 'rgba(255,255,255,0.55)';
+  cx.beginPath(); cx.moveTo(l.x, l.y); cx.lineTo(r.x, r.y); cx.stroke(); cx.setLineDash([]);
+  for (const f of [l, r]) {
+    cx.fillStyle = '#fff'; cx.beginPath(); cx.arc(f.x, f.y, 6 * S, 0, Math.PI * 2); cx.fill();
+    cx.fillStyle = '#e84040'; cx.beginPath(); cx.moveTo(f.x, f.y - 6 * S); cx.lineTo(f.x, f.y - 26 * S); cx.lineTo(f.x + 14 * S, f.y - 20 * S); cx.lineTo(f.x, f.y - 15 * S); cx.fill();
+  }
+  // marks
+  R.marks.forEach((m, i) => {
+    const p = toS(m[0], m[1]), isNext = i === player.ti, done = i < player.ti;
+    if (isNext) {
+      const pr = (52 + Math.sin(tNow * 4) * 6) * S;
+      cx.strokeStyle = 'rgba(255,225,77,0.85)'; cx.lineWidth = 3 * S; cx.beginPath(); cx.arc(p.x, p.y, pr, 0, Math.PI * 2); cx.stroke();
+    }
+    cx.fillStyle = done ? '#9aa4ad' : '#ff8a1f';
+    cx.beginPath(); cx.arc(p.x, p.y, 13 * S, 0, Math.PI * 2); cx.fill();
+    cx.strokeStyle = '#fff'; cx.lineWidth = 2.5 * S; cx.stroke();
+    setFont(Math.max(12, 13 * S), 'bold'); cx.fillStyle = '#fff'; cx.textAlign = 'center'; cx.textBaseline = 'middle';
+    cx.fillText(String(i + 1), p.x, p.y + 1); cx.textBaseline = 'alphabetic';
+  });
+}
+
+function drawOffscreenArrow() {
+  if (player.done) return;
+  const m = targetOf(player), tgt = player.ti < R.marks.length ? m : { x: clamp(player.x, -120, 120), y: 0 };
+  const p = toS(tgt.x, tgt.y);
+  const top = 130, bot = H - 70, lft = 30, rgt = W - 30;
+  if (p.x > lft && p.x < rgt && p.y > top && p.y < bot) return;
+  const c = { x: W / 2, y: H * 0.56 };
+  const dx = p.x - c.x, dy = p.y - c.y;
+  let k = Infinity;
+  if (dx > 0) k = Math.min(k, (rgt - c.x) / dx); if (dx < 0) k = Math.min(k, (lft - c.x) / dx);
+  if (dy > 0) k = Math.min(k, (bot - c.y) / dy); if (dy < 0) k = Math.min(k, (top - c.y) / dy);
+  const ax = c.x + dx * k, ay = c.y + dy * k, ang = Math.atan2(dy, dx);
+  cx.save(); cx.translate(ax, ay); cx.rotate(ang);
+  cx.fillStyle = player.ti < R.marks.length ? '#ff8a1f' : '#ffe14d';
+  cx.beginPath(); cx.moveTo(16, 0); cx.lineTo(-8, -11); cx.lineTo(-3, 0); cx.lineTo(-8, 11); cx.closePath(); cx.fill();
+  cx.strokeStyle = '#fff'; cx.lineWidth = 2; cx.stroke();
+  cx.restore();
+  const label = player.ti < R.marks.length ? T.mark + ' ' + (player.ti + 1) : T.goal;
+  const dist = Math.round(Math.hypot(tgt.x - player.x, tgt.y - player.y) / 10);
+  const lx = clamp(ax - Math.cos(ang) * 34, 40, W - 40), ly = clamp(ay - Math.sin(ang) * 30, top - 6, bot);
+  setFont(13, 'bold'); cx.textAlign = 'center';
+  cx.lineWidth = 3; cx.strokeStyle = 'rgba(0,30,60,0.7)'; cx.strokeText(label + ' ' + dist + 'm', lx, ly);
+  cx.fillStyle = '#fff'; cx.fillText(label + ' ' + dist + 'm', lx, ly);
+}
+
+function drawHUD() {
+  cx.fillStyle = 'rgba(0,25,55,0.5)'; cx.fillRect(0, 0, W, 54);
+  const rank = rankOf(player);
+  setFont(28, 'bold'); cx.textAlign = 'left'; cx.fillStyle = rank === 1 ? '#ffe14d' : '#fff';
+  const pt = T.pos(rank); cx.fillText(pt, 12, 37);
+  const pw = cx.measureText(pt).width; setFont(15, ''); cx.fillStyle = '#cfe3f3'; cx.fillText(T.of, 16 + pw, 37);
+  const tm = raceT.toFixed(1) + 's';
+  fitText(T.races[ri], W / 2, 24, W * 0.36, 15, 'bold', '#fff');
+  fitText(tm, W / 2, 44, W * 0.36, 15, '', '#cfe3f3');
+  setFont(20, 'bold'); cx.textAlign = 'right'; cx.fillStyle = '#fff';
+  cx.fillText((player.v * 0.085).toFixed(1), W - 40, 37);
+  setFont(13, ''); cx.fillStyle = '#cfe3f3'; cx.fillText('kt', W - 14, 37);
+  // wind compass
+  const wx = 36, wy = 96;
+  cx.fillStyle = 'rgba(0,25,55,0.45)'; cx.beginPath(); cx.arc(wx, wy, 25, 0, Math.PI * 2); cx.fill();
+  cx.save(); cx.translate(wx, wy); cx.rotate(wind + Math.PI);
+  cx.strokeStyle = '#fff'; cx.fillStyle = '#fff'; cx.lineWidth = 3;
+  cx.beginPath(); cx.moveTo(0, 14); cx.lineTo(0, -10); cx.stroke();
+  cx.beginPath(); cx.moveTo(0, -17); cx.lineTo(-7, -7); cx.lineTo(7, -7); cx.closePath(); cx.fill();
+  cx.restore();
+  setFont(12, 'bold'); cx.textAlign = 'center'; cx.fillStyle = '#fff'; cx.fillText(T.wind, wx, wy + 40);
+  // minimap
+  const mw = 58, mh = 100, mx = W - mw - 10, my = 64;
+  cx.fillStyle = 'rgba(0,25,55,0.45)'; rrect(mx - 4, my - 4, mw + 8, mh + 8, 6); cx.fill();
+  const mp = (x, y) => ({ x: mx + (x + BX) / (2 * BX) * mw, y: my + (y - TOPY) / (BOTY - TOPY) * mh });
+  cx.fillStyle = 'rgba(45,140,192,0.9)'; cx.fillRect(mx, my, mw, mh);
+  if (R.island) { const p = mp(R.island.x, R.island.y); cx.fillStyle = '#e6d199'; cx.beginPath(); cx.arc(p.x, p.y, R.island.r / (2 * BX) * mw, 0, Math.PI * 2); cx.fill(); }
+  const fl = mp(-130, 0), fr = mp(130, 0); cx.strokeStyle = '#fff'; cx.lineWidth = 1.5; cx.beginPath(); cx.moveTo(fl.x, fl.y); cx.lineTo(fr.x, fr.y); cx.stroke();
+  R.marks.forEach((m, i) => { const p = mp(m[0], m[1]); cx.fillStyle = i === player.ti ? '#ffe14d' : i < player.ti ? '#9aa4ad' : '#ff8a1f'; cx.beginPath(); cx.arc(p.x, p.y, 3, 0, Math.PI * 2); cx.fill(); });
+  for (const b of boats) { const p = mp(b.x, b.y); cx.fillStyle = b.col; cx.beginPath(); cx.arc(p.x, p.y, b.you ? 3.5 : 2.5, 0, Math.PI * 2); cx.fill(); if (b.you) { cx.strokeStyle = '#fff'; cx.lineWidth = 1; cx.stroke(); } }
+}
+
+function drawHint() {
+  if (hintT <= 0 || !hint) return;
+  const al = Math.min(1, hintT / 0.5);
+  cx.globalAlpha = al;
+  setFont(14, 'bold');
+  const w = Math.min(W - 24, cx.measureText(hint).width + 28);
+  cx.fillStyle = 'rgba(0,25,55,0.72)'; rrect((W - w) / 2, H - 64, w, 38, 19); cx.fill();
+  fitText(hint, W / 2, H - 40, w - 20, 14, 'bold', '#fff');
+  cx.globalAlpha = 1;
+}
+
+function drawCountdown() {
+  const n = Math.ceil(cdT);
+  const p = toS(player.x, player.y);
+  setFont(13, 'bold'); cx.textAlign = 'center'; cx.fillStyle = '#fff';
+  cx.fillText(LANG === 'ja' ? 'あなた' : 'YOU', p.x, p.y - 34 * S - 6);
+  cx.beginPath(); cx.moveTo(p.x, p.y - 26 * S); cx.lineTo(p.x - 6, p.y - 26 * S - 8); cx.lineTo(p.x + 6, p.y - 26 * S - 8); cx.fill();
+  const str = n > 0 ? String(n) : T.go;
+  setFont(72, 'bold'); cx.lineWidth = 6; cx.strokeStyle = 'rgba(0,30,60,0.6)';
+  cx.strokeText(str, W / 2, H * 0.36); cx.fillStyle = '#fff'; cx.fillText(str, W / 2, H * 0.36);
+  fitText(T.races[ri], W / 2, H * 0.36 - 80, W - 40, 22, 'bold', '#ffe14d');
+}
+
+function drawResult() {
+  const age = tNow - resT, ap = Math.min(1, age / 0.35);
+  cx.fillStyle = 'rgba(0,20,45,' + 0.6 * ap + ')'; cx.fillRect(0, 0, W, H);
+  cx.globalAlpha = ap;
+  const r = result, cy = H * 0.3;
+  fitText(T.races[ri], W / 2, cy - 50, W - 40, 20, 'bold', '#cfe3f3');
+  if (r.champion) {
+    setFont(64, ''); cx.textAlign = 'center'; cx.fillText('🏆', W / 2, cy + 40);
+    fitText(T.champion, W / 2, cy + 110, W - 40, 44, 'bold', '#ffe14d');
+  } else {
+    fitText(T.pos(r.pos), W / 2, cy + 40, W - 40, 76, 'bold', r.pos === 1 ? '#ffe14d' : '#fff');
+    if (ri < 2) fitText(r.pass ? T.qualify : T.notQ, W / 2, cy + 100, W - 40, 26, 'bold', r.pass ? '#7fe08a' : '#ffb0a0');
+  }
+  fitText(r.time.toFixed(1) + 's', W / 2, cy + 150, W - 40, 22, '', '#fff');
+  fitText(r.isBest ? T.newBest : T.best + ' ' + save.best[ri].toFixed(1) + 's', W / 2, cy + 180, W - 40, 16, 'bold', r.isBest ? '#ffe14d' : '#cfe3f3');
+  if (age > 0.7) {
+    const msg = ri === 2 && r.champion ? T.newCup : (r.pass ? T.next : T.again);
+    cx.globalAlpha = 0.6 + 0.4 * Math.sin(tNow * 4);
+    fitText(msg, W / 2, H * 0.82, W - 40, 20, 'bold', '#fff');
+  }
+  cx.globalAlpha = 1;
+}
+
+const titleBoat = { x: 0, y: 0, h: 0.8, col: COLORS[0], v: 0 };
+function drawTitle() {
+  camX = 0; camY = 0;
+  const grd = cx.createLinearGradient(0, 0, 0, H);
+  grd.addColorStop(0, '#1f6aa0'); grd.addColorStop(1, '#2d8cc0');
+  cx.fillStyle = grd; cx.fillRect(0, 0, W, H);
+  drawStreaks(false);
+  // boats sailing in the background
+  for (let i = 0; i < 3; i++) {
+    const tt = tNow * 0.06 + i * 0.33, ph = (tt % 1);
+    const sd = i % 2 ? 1 : -1;
+    const b = { x: sd * (-200 + ph * 400), y: 150 - ph * 300 + i * 160 - 160, h: sd * 0.8, col: COLORS[1 + i] };
+    drawBoat(b, 1.2);
+  }
+  titleBoat.h = 0.8 + Math.sin(tNow * 0.8) * 0.06;
+  titleBoat.y = 60 / S;
+  const sc = 3;
+  drawBoat(titleBoat, sc);
+  fitText(T.title, W / 2, H * 0.2, W - 30, 36, 'bold', '#fff');
+  T.how.forEach((s, i) => fitText(s, W / 2, H * 0.2 + 40 + i * 24, W - 30, 15, '', '#e2f0fa'));
+  cx.globalAlpha = 0.6 + 0.4 * Math.sin(tNow * 4);
+  fitText(T.tap, W / 2, H * 0.84, W - 40, 22, 'bold', '#ffe14d');
+  cx.globalAlpha = 1;
+  const rec = [];
+  if (save.bestFinal) rec.push(T.record(T.pos(save.bestFinal)));
+  if (save.cups) rec.push(T.cups(save.cups));
+  if (rec.length) fitText(rec.join('  ·  '), W / 2, H * 0.84 + 32, W - 40, 14, '', '#cfe3f3');
+}
+
+function draw() {
+  cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  cx.textBaseline = 'alphabetic';
+  if (state === 'title') { drawTitle(); return; }
+  drawCourse();
+  drawWakes();
+  if (state !== 'result') drawGuide();
+  for (const b of boats) if (!b.you) drawBoat(b);
+  drawBoat(player);
+  if (flash > 0) { cx.fillStyle = 'rgba(255,240,150,' + flash * 0.25 + ')'; cx.fillRect(0, 0, W, H); }
+  drawOffscreenArrow();
+  drawHUD();
+  if (state === 'count') drawCountdown();
+  else if (state === 'race') drawHint();
+  else if (state === 'result') drawResult();
+}
+
+let last = performance.now();
+function loop(now) {
+  const dt = Math.min(0.05, Math.max(0, (now - last) / 1000)); last = now;
+  try { update(dt); draw(); } catch (e) { console.error(e); }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

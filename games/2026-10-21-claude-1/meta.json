@@ -1,0 +1,957 @@
+{
+  "id": "2026-10-21-claude-1",
+  "status": "published",
+  "title": "風よみヨットレース",
+  "genre": "レース",
+  "concept": "風上へはまっすぐ進めないヨットで、ライバルと競う。指の方へ進むだけの操作に「正面は止まる、ななめ45°でジグザグに上る」という帆走の発見を核にした。突風の濃い波や風向きの振れを読んで近道を見つけ、予選2つと決勝を勝ち抜く。",
+  "howToPlay": "指をおいた方へヨットが進む。風上のブイへはジグザグにのぼり、ブイを回ってゴールラインへ。2位以内で予選通過、決勝で1位なら優勝。",
+  "libraryDecision": "効果音のためにZzFXだけ使う。帆走の速さは「風との角度」で決まる単純な式で十分で、物理エンジンの衝突や重さは遊びの核に関係しないので matter-js は使わない。真上から見た海図の方が風向きと進路の関係が一目で分かるので3D描画も使わない。",
+  "soundDecision": "BGMは入れず、船の速さに合わせて大きく高くなる水音を鳴らし続ける。うまく風をつかむと水音がざあっと増え、風に向かいすぎると帆がバタバタ鳴るので、画面を見なくても角度の良し悪しが耳で分かる。スタートの秒読みと号砲、タック、突風、ブイ通過、ゴールにも短い音を付けた。",
+  "planning": {
+    "genreDraw": {
+      "ja": "レース",
+      "en": "Racing",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "風を読むヨットレース。指の方へ進むだけだが、風上へはまっすぐ進めないのでジグザグにのぼる。突風と風の振れを使ってライバルを抜く。",
+        "ideaEn": "A sailing race where you read the wind. The boat goes toward your finger, but it cannot sail straight upwind, so you zigzag; use gusts and wind shifts to pass rivals.",
+        "fromDraw": true
+      },
+      {
+        "idea": "雪の野原で雪玉を転がすと、通った跡の雪を巻き込んで大きくなる。大きい玉ほど曲がりにくい。胴と頭を作って雪だるまを完成させる。",
+        "ideaEn": "Roll a snowball across a field; it grows by picking up the snow it passes and gets harder to steer. Build a body and a head to finish a snowman.",
+        "fromDraw": false
+      },
+      {
+        "idea": "長押しでジョッキに注ぎ、泡があふれる前の線ぴったりで止める。泡は遅れて盛り上がるので、早めに離す読みが要る。",
+        "ideaEn": "Hold to pour into a mug and stop exactly at the line before the foam spills. The foam rises late, so you must let go early.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Tacking Race",
+      "concept": "Race rival yachts that cannot sail straight into the wind. The control is just \"sail toward your finger\"; the core is discovering that heading into the wind stops you and you must zigzag upwind at 45°. Read dark gusts and wind shifts for shortcuts, and win two heats and the final.",
+      "howToPlay": "Your boat sails toward your finger. Zigzag upwind to the buoy, round it, then cross the finish line. Top 2 qualifies; win the final to become champion.",
+      "libraryDecision": "Only ZzFX, for sound effects. Sailing speed is a simple function of the angle to the wind, and physics collisions or weight are not part of the fun, so no matter-js. A top-down chart shows wind and course at a glance, so no 3D.",
+      "soundDecision": "No music; a continuous water rush rises in volume and pitch with boat speed. Catching the wind well makes the water surge, and pointing too high makes the sail flap noisily, so you can hear whether your angle is good. Short sounds mark the countdown, start horn, tacks, gusts, buoys and the finish."
+    }
+  },
+  "createdAt": "2026-10-21T09:21:05+09:00",
+  "specVersion": 8,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-21T09:21:05+09:00",
+    "metricsFrom": "2026-10-21T00:17:48.487Z",
+    "transcript": "d0942b9b-0b0c-4f28-87d7-441a3a33d66f.jsonl",
+    "validationRuns": 1,
+    "finishedAt": "2026-10-21T09:34:23+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-21T09:23:54+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "30.2KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=134",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=152",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=113",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=142",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 30966,
+    "lines": 664
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 2
+  },
+  "libraries": [
+    {
+      "name": "ZzFX",
+      "version": "1.4.0",
+      "file": "zzfx-1.4.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "buggy",
+    "comment": "指の方へ進むだけで始められ、風に向かうと帆がバタついて止まり、ななめにすると水音がざあっと速くなる手触りは分かりやすい。予選1は1位、予選2は2位で通過したが、決勝は風の振れで止まったり、島に乗り上げたり、ブイを行き過ぎたりして4位のままだった。指を同じ場所に置いていても風が振れると赤い扇に入ってしまうので、風を読む楽しさと理不尽さが半々。ブイの通り過ぎが起きやすく、もどる手間が多い。画面外のブイを指す矢印と名前が、ミニマップ・風の表示・下のヒントと重なって読みにくい表示の不具合がある。",
+    "similar": [
+      {
+        "title": "Sailboat Championship",
+        "url": "https://apps.apple.com/app/id364580591",
+        "similarity": "中",
+        "note": "AIの船と競うヨットのレース。こちらは3Dでボートの強化もあり、本作は真上から見た小さなコースで風との角度だけに絞っている",
+        "note_en": "Yacht races against AI boats. It is 3D with boat upgrades; this game is a small top-down course focused only on the angle to the wind"
+      },
+      {
+        "title": "Sailing Tactics",
+        "url": "https://apps.apple.com/app/id802623106",
+        "similarity": "中",
+        "note": "風上へのタックと風の振れの判断を遊ぶ帆走シミュレーター。タップでタックする操作で、本作は指の方へ向ける操作と突風・島を加えた",
+        "note_en": "A sailing simulator about upwind tacking and wind-shift decisions, tapping to tack; this game steers toward your finger and adds gusts and an island"
+      },
+      {
+        "title": "Yacht Racing Game",
+        "url": "https://apps.apple.com/us/app/-/id1244722434",
+        "similarity": "中",
+        "note": "タップでタック、長押しで向きを変えるカジュアルなヨットレース。本作は赤い扇と45°の点線で風に向かえない範囲を見せる",
+        "note_en": "A casual yacht race with tap to tack and long-press to steer; this game shows the no-go zone with a red fan and 45° dotted guides"
+      }
+    ],
+    "research": "ウェブ検索で「sailing race game mobile tacking upwind」「Sailboat Championship game iOS」を調べ、実在を確認したヨット競技ゲームを挙げた",
+    "i18n": {
+      "en": {
+        "comment": "You start just by pointing, and the feel is clear: point into the wind and the sail flaps and you stall; bear away and the water rushes faster. I won Heat 1 and was 2nd in Heat 2, but in the final I stalled on wind shifts, ran aground on the island and overshot buoys, staying 4th. Even with my finger still, a wind shift can push you into the red fan, so reading the wind feels half fun, half unfair. Overshooting buoys is easy and costly. Display bug: the off-screen buoy arrow and its label overlap the minimap, wind compass and bottom hint.",
+        "research": "Web searched 'sailing race game mobile tacking upwind' and 'Sailboat Championship game iOS' and listed yacht-racing games confirmed to exist"
+      }
+    },
+    "method": "スマホ縦画面で 19 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 19 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 3600ms",
+        "note": "タイトルをタップ。秒読みのあとスタート",
+        "noteEn": "Tapped the title; countdown then start",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.85,0.42) 6000ms",
+        "note": "風は上から吹いている。真上のブイへは行けないので、右ななめ上に指をおいて走る",
+        "noteEn": "Wind blows from the top. Can't go straight to the buoy, so I hold my finger up-right",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.12,0.42) 9000ms",
+        "note": "右の岸が近いのでタックして左ななめ上へ。帆が反対側に返った",
+        "noteEn": "Near the right shore, so I tack to the upper left; the sail flips over",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.85,0.42) 8000ms",
+        "note": "行き過ぎて2位に落ちた。ミニマップを見るとブイは右上なので、もう一度タック",
+        "noteEn": "Overstood and dropped to 2nd. The minimap shows the buoy up-right, so I tack again",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.14,0.44) 3500ms",
+        "note": "ブイが左ななめ上ちょうど45°に見えた。タックしてそのまま届く",
+        "noteEn": "The buoy sits exactly 45° up-left; one tack should fetch it",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.50,0.93) 12000ms",
+        "note": "ブイを1位で回った。帰りは追い風なので真下のゴールへまっすぐ。矢印がヒントの帯に少し重なって見づらい",
+        "noteEn": "Rounded the buoy first. Downwind now, straight for the finish. The arrow overlaps the hint banner a bit",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.45,0.93) 4000ms → wait 2000ms",
+        "note": "ゴールラインが見えた。後ろの緑と紫が追い風で迫ってくる",
+        "noteEn": "Finish line in sight; green and purple close in behind on the run",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": [
+                40.7,
+                0,
+                0
+              ],
+              "bestFinal": 0,
+              "cups": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 4
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.50,0.50) 120ms → wait 3600ms → tap(0.12,0.42) 5000ms",
+        "note": "予選2。風が少し右から吹き、濃い波（突風）が見える。最初のブイは左上なので左ななめに出る",
+        "noteEn": "Heat 2. Wind slightly from the right, dark gust patches. First buoy is upper-left, so I start on the left tack",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": [
+                40.7,
+                0,
+                0
+              ],
+              "bestFinal": 0,
+              "cups": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 4
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.90,0.50) 5000ms",
+        "note": "左の岸が近い。右ななめ上の突風（濃い波）をかすめるようにタック",
+        "noteEn": "Left shore is close. Tacking right to brush the dark gust patch",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": [
+                40.7,
+                0,
+                0
+              ],
+              "bestFinal": 0,
+              "cups": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 4
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.10,0.30) 7000ms",
+        "note": "風が右に振れて、右へ進むとほぼ横向きになってしまった。左タックの方がブイへ近づく",
+        "noteEn": "The wind veered; on starboard I'm nearly sailing sideways. Port tack points closer to the buoy",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": [
+                40.7,
+                0,
+                0
+              ],
+              "bestFinal": 0,
+              "cups": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 4
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.92,0.40) 4500ms",
+        "note": "風が戻って、同じ指の位置のまま赤い扇の中に入り帆がバタついて止まった。右ななめに切り直す",
+        "noteEn": "The wind shifted back and, with my finger unchanged, I drifted into the red no-go fan and stalled. Bearing away to the right",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": [
+                40.7,
+                0,
+                0
+              ],
+              "bestFinal": 0,
+              "cups": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 4
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.04,0.42) 3500ms → tap(0.20,0.30) 1500ms",
+        "note": "紫と緑がうまく風上を取ってきた。左にタックしてブイへ",
+        "noteEn": "Purple and green gained upwind. Tacking left to the buoy",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": [
+                40.7,
+                0,
+                0
+              ],
+              "bestFinal": 0,
+              "cups": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 4
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "tap(0.85,0.64) 2500ms → tap(0.90,0.75) 6000ms",
+        "note": "ブイを行き過ぎて4位。戻ってブイに触れ、次のブイ2（右下）へ横風で走る",
+        "noteEn": "Overshot the buoy, now 4th. Back to touch it, then reach to buoy 2 at lower right",
+        "image": "ai-play/step-13.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": [
+                40.7,
+                0,
+                0
+              ],
+              "bestFinal": 0,
+              "cups": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 4
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "tap(0.33,0.75) 1500ms → tap(0.30,0.95) 11000ms",
+        "note": "またブイを少し行き過ぎた。ブイ2に触れて、追い風でゴールへ下る",
+        "noteEn": "Slightly past the buoy again; touch buoy 2 and run downwind to the finish",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": [
+                40.7,
+                0,
+                0
+              ],
+              "bestFinal": 0,
+              "cups": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 4
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": [
+                40.7,
+                42.8,
+                0
+              ],
+              "bestFinal": 0,
+              "cups": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "tap(0.50,0.50) 120ms → wait 3600ms → tap(0.12,0.42) 9000ms",
+        "note": "決勝。ライバルが速い。左ななめ上へ長く走る",
+        "noteEn": "The final; rivals are quicker. A long port tack up-left",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": [
+                40.7,
+                0,
+                0
+              ],
+              "bestFinal": 0,
+              "cups": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 4
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": [
+                40.7,
+                42.8,
+                0
+              ],
+              "bestFinal": 0,
+              "cups": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "tap(0.95,0.35) 10000ms",
+        "note": "岸にぶつかって減速した。右へタックしてブイ1へ。ブイ1の矢印がミニマップに重なって読みにくい",
+        "noteEn": "Bumped the shore and slowed. Tacking right toward buoy 1. Its arrow overlaps the minimap and is hard to read",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": [
+                40.7,
+                0,
+                0
+              ],
+              "bestFinal": 0,
+              "cups": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 4
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": [
+                40.7,
+                42.8,
+                0
+              ],
+              "bestFinal": 0,
+              "cups": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 17,
+        "action": "tap(0.05,0.40) 5000ms → tap(0.85,0.30) 8000ms",
+        "note": "島に乗り上げて止まった。左へ逃げてから、島の上を回ってブイへ",
+        "noteEn": "Ran aground on the island. Escape left, then go around the top toward the buoy",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": [
+                40.7,
+                0,
+                0
+              ],
+              "bestFinal": 0,
+              "cups": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 4
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": [
+                40.7,
+                42.8,
+                0
+              ],
+              "bestFinal": 0,
+              "cups": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 18,
+        "action": "tap(0.98,0.50) 5000ms → tap(0.60,0.20) 3000ms",
+        "note": "風が左に振れて赤い扇に入っていた。ヒントが出た。少し右へ落としてスピードを戻す",
+        "noteEn": "Wind backed and I was in the red fan; the hint appeared. Bearing away to regain speed",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": [
+                40.7,
+                0,
+                0
+              ],
+              "bestFinal": 0,
+              "cups": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 4
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": [
+                40.7,
+                42.8,
+                0
+              ],
+              "bestFinal": 0,
+              "cups": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 19,
+        "action": "tap(0.08,0.56) 4500ms → tap(0.90,0.85) 9000ms",
+        "note": "ブイの上まで行き過ぎて4位。左下のブイ1に触れてから、右下のブイ2へ",
+        "noteEn": "Sailed past above the buoy, now 4th. Touch buoy 1 down-left, then head to buoy 2 lower right",
+        "image": "ai-play/step-19.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": [
+                40.7,
+                0,
+                0
+              ],
+              "bestFinal": 0,
+              "cups": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 4
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": [
+                40.7,
+                42.8,
+                0
+              ],
+              "bestFinal": 0,
+              "cups": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-21T09:34:23+09:00"
+  },
+  "publishedAt": "2026-10-21T09:34:23+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 19965,
+    "outputTokens": 27833,
+    "contextTokens": 6088598,
+    "turns": 39,
+    "toolCalls": 50,
+    "webSearches": 0,
+    "minutes": 16.6,
+    "from": "2026-10-21T00:17:48.487Z",
+    "to": "2026-10-21T00:34:23.397Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-21T09:34:23+09:00",
+    "validationRuns": 1,
+    "codeKB": 30.2
+  }
+}
