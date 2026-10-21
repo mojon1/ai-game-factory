@@ -1,0 +1,210 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-21T03:08:05.516Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.9
+        ]
+      },
+      "desc": "tap(0.50,0.90) 120ms",
+      "note": "弾をかすめて火花5つで花火、2回被弾で終了と読める。夜空へ入る。",
+      "noteEn": "The instructions say five grazes trigger a firework and two hits end the run. Enter the night sky.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": {
+        "wait": 3000
+      },
+      "desc": "wait 3000ms",
+      "note": "星の周囲に輪があり、火花0/5、残り2。まず弾の向きと速さを観察する。",
+      "noteEn": "A ring surrounds the star; charge is zero and two lives remain. Watch the incoming directions and speed first.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "tap": [
+            0.583,
+            0.766
+          ],
+          "hold": 200
+        },
+        {
+          "wait": 1800
+        }
+      ],
+      "desc": "tap(0.58,0.77) 200ms → wait 1800ms",
+      "note": "左上の弾が現在位置へ向かっている。右へ少しずらし、輪の端を通る距離で待つ。",
+      "noteEn": "The upper-left shot is aimed at my position. Shift slightly right and wait for it to pass near the ring edge.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": {
+        "wait": 550
+      },
+      "desc": "wait 550ms",
+      "note": "最初の弾が金色になり火花1。左と上からの弾も近いので、もう少しだけ待ってかすめたい。",
+      "noteEn": "The first shot turned gold and charge reached one. Shots from the left and above are also close; wait a little longer for near misses.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.836
+          ],
+          "hold": 250
+        },
+        {
+          "wait": 1500
+        }
+      ],
+      "desc": "tap(0.50,0.84) 250ms → wait 1500ms",
+      "note": "火花4/5だが右上の弾が迫っている。左下へ一歩逃げ、次の弾の位置を見る。",
+      "noteEn": "Charge is four, but the upper-right shot is too close. Move down-left and watch the next incoming shot.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "tap": [
+            0.583,
+            0.836
+          ],
+          "hold": 200
+        },
+        {
+          "wait": 2000
+        }
+      ],
+      "desc": "tap(0.58,0.84) 200ms → wait 2000ms",
+      "note": "移動中に当たり、残り1・火花0になった。左からの新しい弾を右に少しずれて待つ。",
+      "noteEn": "I was hit during the escape; one life remains and charge reset. Shift slightly right to skim the new shot from the left.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": {
+        "wait": 1000
+      },
+      "desc": "wait 1000ms",
+      "note": "左下と右上から二つの弾が近づいている。左の弾は星より左へ抜けそうなので少し待つ。",
+      "noteEn": "Shots approach from lower left and upper right. The left shot appears set to pass left of the star; wait briefly.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.893
+          ],
+          "hold": 220
+        },
+        {
+          "wait": 1000
+        }
+      ],
+      "desc": "tap(0.50,0.89) 220ms → wait 1000ms",
+      "note": "火花1になったが、星のすぐ左上に弾が来ている。左下へ逃げて距離を取り直す。",
+      "noteEn": "Charge reached one, but a shot is immediately upper left. Escape down-left to regain space.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 0
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.9
+          ]
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.90) 120ms",
+      "note": "二度目の被弾で花火0の結果画面になった。再開して残り回数と火花が戻るか確認する。",
+      "noteEn": "The second hit ended the run with zero fireworks. Restart to check lives and charge reset.",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 0
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}

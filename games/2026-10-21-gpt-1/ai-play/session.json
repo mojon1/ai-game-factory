@@ -1,0 +1,267 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-21T03:02:36.510Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.9
+        ]
+      },
+      "desc": "tap(0.50,0.90) 120ms",
+      "note": "二色の床と鍵、白い床で灯りを替える説明が見える。地下室を探索する。",
+      "noteEn": "Two colored floors and a key illustrate the lantern-switching instructions. Enter the cellar.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.6875
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.594
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.9
+          ]
+        }
+      ],
+      "desc": "tap(0.50,0.69) 120ms → tap(0.50,0.59) 120ms → tap(0.50,0.90) 120ms",
+      "note": "真上に火の橋、その先は左右の鍵へ分かれている。橋へ進み、橋上で灯りを替えられるか試す。",
+      "noteEn": "An ember bridge above branches toward both keys. Step onto it and try switching while on the bridge.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "tap": [
+            0.333,
+            0.594
+          ]
+        },
+        {
+          "tap": [
+            0.333,
+            0.5
+          ]
+        },
+        {
+          "tap": [
+            0.333,
+            0.406
+          ]
+        }
+      ],
+      "desc": "tap(0.33,0.59) 120ms → tap(0.33,0.50) 120ms → tap(0.33,0.41) 120ms",
+      "note": "白い床で替えようと表示され、火のままだった。左へ出て鍵を取り、その上の白い床へ進む。",
+      "noteEn": "The message says to switch on a pale floor and ember remains active. Go left, collect the key and move to the pale floor above it.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.406
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.9
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.406
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.3125
+          ]
+        }
+      ],
+      "desc": "tap(0.50,0.41) 120ms → tap(0.50,0.90) 120ms → tap(0.50,0.41) 120ms → tap(0.50,0.31) 120ms",
+      "note": "鍵1/2で月の橋が暗い。まず渡れないことを確かめ、白い床で月に替えて出口を早めに試す。",
+      "noteEn": "One key is collected and the moon bridge is dark. Test the blocked bridge, switch to moon on pale ground, then try the exit early.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": [
+        {
+          "tap": [
+            0.667,
+            0.406
+          ]
+        },
+        {
+          "tap": [
+            0.667,
+            0.5
+          ]
+        }
+      ],
+      "desc": "tap(0.67,0.41) 120ms → tap(0.67,0.50) 120ms",
+      "note": "出口は鍵2つが必要。右上の白い床から右の鍵を取りに行く。",
+      "noteEn": "The exit requires both keys. Cross to the upper-right pale floor and collect the remaining key.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "tap": [
+            0.667,
+            0.406
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.406
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.3125
+          ]
+        }
+      ],
+      "desc": "tap(0.67,0.41) 120ms → tap(0.50,0.41) 120ms → tap(0.50,0.31) 120ms",
+      "note": "鍵が2/2になった。来た道を戻り月の橋から出口へ進む。",
+      "noteEn": "Both keys are collected. Return across the moon bridge and enter the exit.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.9
+          ]
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.90) 120ms",
+      "note": "地下室1を抜けた表示と次への案内が見える。次の階を開く。",
+      "noteEn": "The first-cellar completion and continue prompt are visible. Open the next floor.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.6875
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.594
+          ]
+        },
+        {
+          "tap": [
+            0.667,
+            0.594
+          ]
+        }
+      ],
+      "desc": "tap(0.50,0.69) 120ms → tap(0.50,0.59) 120ms → tap(0.67,0.59) 120ms",
+      "note": "二階では鍵が右下と左上、火の橋は右上にある。まず右下の鍵を取り、中央へ戻る道を残す。",
+      "noteEn": "Floor two has keys at lower right and upper left, with an ember bridge near the exit. Collect the lower-right key first while keeping the route back open.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}
