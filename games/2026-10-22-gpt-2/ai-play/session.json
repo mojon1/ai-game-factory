@@ -1,0 +1,622 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-22T03:08:00.557Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.9
+        ]
+      },
+      "desc": "tap(0.50,0.90) 120ms",
+      "note": "消灯前の部屋を覚え、変わった物を探す説明が見える。留守番を始める。",
+      "noteEn": "The instructions ask me to remember the room and identify a changed object. Begin the watch.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": {
+        "wait": 3000
+      },
+      "desc": "wait 3000ms",
+      "note": "椅子の背は右、ランプ青緑、絵は月、時計は右下、本3冊、葉2枚と覚えた。消灯を待つ。",
+      "noteEn": "Remembered: chair back right, teal lamp, moon picture, clock pointing down-right, three books and two leaves. Wait for blackout.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": {
+        "wait": 1000
+      },
+      "desc": "wait 1000ms",
+      "note": "部屋が暗くなり、下に小さな二つの点が見える。灯りが戻るのを待つ。",
+      "noteEn": "The room went dark with two tiny points near the bottom. Wait for the light to return.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": {
+        "tap": [
+          0.264,
+          0.328
+        ]
+      },
+      "desc": "tap(0.26,0.33) 120ms",
+      "note": "ランプが青緑から赤茶に変わっている。まず変わっていない椅子を選び、間違いの反応を一度確認する。",
+      "noteEn": "The lamp changed from teal to reddish brown. Deliberately choose the unchanged chair once to check mistake feedback.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": {
+        "tap": [
+          0.736,
+          0.328
+        ]
+      },
+      "desc": "tap(0.74,0.33) 120ms",
+      "note": "ミス1になり、左右の下端に影が出た。色が変わったランプを選ぶ。",
+      "noteEn": "Mistakes rose to one and shadows appeared at the lower edges. Select the lamp whose color changed.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.92
+          ]
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.92) 120ms",
+      "note": "ランプが正解の枠で囲まれ見つけた1。ただし直前の誤答文が残っている。次の部屋の記憶へ進む。",
+      "noteEn": "The lamp is highlighted as correct and Found is one, but the previous error text remains. Continue to memorize the next room.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": {
+        "wait": 4000
+      },
+      "desc": "wait 4000ms",
+      "note": "二回目は右向きの椅子、青緑ランプ、星の絵、右上向きの時計、本3冊、葉2枚。再点灯まで待つ。",
+      "noteEn": "Second room: chair back right, teal lamp, star picture, clock up-right, three books, two leaves. Wait through the blackout.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": {
+        "tap": [
+          0.736,
+          0.719
+        ]
+      },
+      "desc": "tap(0.74,0.72) 120ms",
+      "note": "鉢植えの葉が2枚から4枚に増えた。鉢植えを選ぶ。",
+      "noteEn": "The plant grew from two leaves to four. Select the plant.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 2
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.92
+          ]
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.92) 120ms",
+      "note": "葉の増加が正解で見つけた2。今度の正解画面には誤答文がなく、次の消灯へ進む。",
+      "noteEn": "The extra leaves were correct and Found reached two. This success screen has no stale error text. Continue.",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 2
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "action": {
+        "wait": 4000
+      },
+      "desc": "wait 4000ms",
+      "note": "三回目は椅子の背が左、青緑ランプ、月、時計右下、本3冊、葉4枚。違いを探す。",
+      "noteEn": "Third room: chair back left, teal lamp, moon, clock down-right, three books and four leaves. Watch for a change.",
+      "image": "ai-play/step-10.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 2
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "action": {
+        "tap": [
+          0.264,
+          0.523
+        ]
+      },
+      "desc": "tap(0.26,0.52) 120ms",
+      "note": "絵が月から星に変わった。他の家具は同じなので絵を選ぶ。",
+      "noteEn": "The picture changed from moon to star while the other furnishings stayed the same. Select the picture.",
+      "image": "ai-play/step-11.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 2
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 3
+        }
+      ]
+    },
+    {
+      "step": 12,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.92
+          ]
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.92) 120ms",
+      "note": "絵が正解で見つけた3。次の部屋も六つの物を見比べる。",
+      "noteEn": "The picture was correct and Found reached three. Study the next set of six objects.",
+      "image": "ai-play/step-12.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 2
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 3
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 13,
+      "action": {
+        "wait": 4000
+      },
+      "desc": "wait 4000ms",
+      "note": "四回目は右背の椅子、青緑ランプ、月、右上の時計、本3冊、葉4枚。暗転後を待つ。",
+      "noteEn": "Fourth room: chair back right, teal lamp, moon, clock up-right, three books and four leaves. Wait through the dark.",
+      "image": "ai-play/step-13.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 2
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 3
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 14,
+      "action": {
+        "tap": [
+          0.264,
+          0.523
+        ]
+      },
+      "desc": "tap(0.26,0.52) 120ms",
+      "note": "今回も絵が月から星に変わった。同じ変化が続いたので迷いは少なく、絵を選ぶ。",
+      "noteEn": "Again the picture changed from moon to star. Repeating the same change makes this one easy; select it.",
+      "image": "ai-play/step-14.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 2
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 3
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 4
+        }
+      ]
+    },
+    {
+      "step": 15,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.92
+          ]
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.92) 120ms",
+      "note": "見つけた4、ミス1。朝まであと一つなので、最後の部屋を覚える。",
+      "noteEn": "Found four with one mistake. One more find brings morning; memorize the last room.",
+      "image": "ai-play/step-15.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 2
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 3
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 4
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 16,
+      "action": {
+        "wait": 4000
+      },
+      "desc": "wait 4000ms",
+      "note": "最後は右背の椅子、青緑ランプ、月、右上の時計、本3冊、葉4枚。変化を待つ。",
+      "noteEn": "Last room: chair back right, teal lamp, moon, clock up-right, three books and four leaves. Wait for the change.",
+      "image": "ai-play/step-16.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 2
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 3
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 4
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 17,
+      "action": {
+        "tap": [
+          0.264,
+          0.523
+        ]
+      },
+      "desc": "tap(0.26,0.52) 120ms",
+      "note": "最後も月が星に変わった。繰り返しで易しくなったが、絵を選んで朝へ進みたい。",
+      "noteEn": "The moon again became a star. Repetition makes this easy; choose the picture to reach morning.",
+      "image": "ai-play/step-17.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 2
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 3
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 4
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 5
+        }
+      ]
+    },
+    {
+      "step": 18,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.92
+          ]
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.92) 120ms",
+      "note": "5/5で朝が来た。もう一度を押し、正解数とミスが初期値へ戻るか確認する。",
+      "noteEn": "Five finds brought morning. Restart to check the find and mistake counts reset.",
+      "image": "ai-play/step-18.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 2
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 3
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 4
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 5
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}

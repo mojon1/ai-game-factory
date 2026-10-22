@@ -1,0 +1,711 @@
+{
+  "id": "2026-10-22-gpt-2",
+  "status": "published",
+  "title": "留守番の影",
+  "genre": "ホラー",
+  "concept": "灯りが消える前に、六つの家具の形や色を覚える。短い闇のあと、一つだけ何かが変わっている。間違えるほど部屋の端から影が近づくので、確信を持って触れたい。驚かせる大音量より、見慣れた部屋への小さな疑いを核にした留守番。",
+  "howToPlay": "消灯前の部屋を覚え、再点灯で変わった物をタップする。5回見つけると朝、3回間違えると影が来る。",
+  "libraryDecision": "家具の小さな違いを覚えるのが核。棚の3Dや残像は差を曖昧にするため使わず、Canvasの明瞭な形と短い暗転で部屋の不安を表す。",
+  "soundDecision": "消灯は低い短音、正解は細い高音、間違いは少し長い低音で返す。見比べる集中を保つため連続BGMや大音量の驚かし音は入れない。",
+  "planning": {
+    "candidates": [
+      {
+        "idea": "消灯前後で一つ変わった家具を探す。間違えるほど部屋の端から影が近づく留守番。",
+        "ideaEn": "Find the furniture that changed across a blackout; mistakes bring a shadow closer.",
+        "fromDraw": true
+      },
+      {
+        "idea": "二羽の鳥の旋律を交互に重ね、季節の合唱を作る音の遊び場。",
+        "ideaEn": "Layer two birds' melodies into a seasonal chorus.",
+        "fromDraw": false
+      },
+      {
+        "idea": "荷物を左右の橋へ振り分け、揺れる吊り橋を同時に釣り合わせる。",
+        "ideaEn": "Distribute parcels between two swaying bridges to keep them balanced.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0,
+    "genreDraw": {
+      "ja": "ホラー",
+      "en": "Horror",
+      "of": 57
+    }
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "fail",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "A Shadow at Home",
+      "concept": "Remember the shapes and colors of six furnishings before the light goes out. After a short darkness, just one object has changed. Mistakes bring shadows closer from the room's edges, making each confident touch matter. Small doubts about a familiar room replace loud jump scares.",
+      "howToPlay": "Remember the room before blackout and tap what changed after the light returns. Five finds bring morning; three mistakes invite the shadow.",
+      "libraryDecision": "Remembering small furniture details is the core. Shelf 3D and afterimages would blur differences, so clear Canvas shapes and brief darkness convey unease.",
+      "soundDecision": "Low short tones mark blackout, a thin high tone marks a find, and a longer low tone marks a mistake. No continuous music or loud scare interrupts comparison."
+    }
+  },
+  "createdAt": "2026-10-22T12:05:26+09:00",
+  "specVersion": 8,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-22T12:05:26+09:00",
+    "metricsFrom": "2026-10-22T03:04:31.540Z",
+    "transcript": null,
+    "validationRuns": 1,
+    "finishedAt": "2026-10-22T12:14:35+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-22T12:07:42+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "7.5KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=38",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=69",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=26",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=53",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 7711,
+    "lines": 30
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 2,
+    "works": "buggy",
+    "comment": "18手の画像で消灯、ランプの色・葉の数・絵柄の変化、意図した一度の誤答で近づく影、5回正解での朝、再開を確認。静かな不安はあるが、月から星の変化が三回続き慣れが強かった。誤答直後に正答すると、正答画面にも誤答文が残る表示不具合がある。進行は可能なため修正しなかった。3ミスでの終了は実プレイ未確認。",
+    "similar": [
+      {
+        "title": "I'm on Observation Duty",
+        "url": "https://store.steampowered.com/app/1046820/Im_on_Observation_Duty/",
+        "similarity": "高",
+        "note": "部屋の物を観察し、記憶と違う異変を見つけるホラーの核が近い。本作は監視カメラの切替や報告分類を持たず、短い暗転ごとに六つの家具を直接選ぶ。",
+        "note_en": "Both build horror around remembering rooms and finding anomalies. This omits camera switching and report categories, using six directly tapped furnishings after brief blackouts."
+      },
+      {
+        "title": "The Exit 8",
+        "url": "https://store.steampowered.com/app/2653790/The_Exit_8/",
+        "similarity": "中",
+        "note": "見慣れた場所の異変を見落とさない観察と不安が共通。本作は通路を歩いたり引き返したりせず、消灯前後の小さな絵の違いを当てる。",
+        "note_en": "Both combine observation of familiar places with anxiety about anomalies. This has no corridor walking or turning back and instead compares small pictures across blackouts."
+      }
+    ],
+    "research": "2件の検索でSteamの公式作品説明を確認。I'm on Observation Dutyの室内異変の報告と、The Exit 8の異変を見て判断する構造を比較し、カメラ・移動・暗転ごとの直接選択の違いを書いた。",
+    "i18n": {
+      "en": {
+        "comment": "Eighteen pictured steps confirmed blackout, changes to lamp color, leaf count and picture, a deliberate mistake bringing shadows closer, morning after five finds and restart. Unease is mild; moon-to-star repeated three times. A display bug leaves the previous error text on the success screen after a quick correction. Progress remained possible, so it was not changed. Did not reach the three-mistake ending.",
+        "research": "Ran two searches and checked official Steam descriptions. Compared room-anomaly reporting in I'm on Observation Duty and observation decisions in The Exit 8, distinguishing cameras, movement and direct selection after blackouts."
+      }
+    },
+    "method": "スマホ縦画面で 18 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 18 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.90) 120ms",
+        "note": "消灯前の部屋を覚え、変わった物を探す説明が見える。留守番を始める。",
+        "noteEn": "The instructions ask me to remember the room and identify a changed object. Begin the watch.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "wait 3000ms",
+        "note": "椅子の背は右、ランプ青緑、絵は月、時計は右下、本3冊、葉2枚と覚えた。消灯を待つ。",
+        "noteEn": "Remembered: chair back right, teal lamp, moon picture, clock pointing down-right, three books and two leaves. Wait for blackout.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 1000ms",
+        "note": "部屋が暗くなり、下に小さな二つの点が見える。灯りが戻るのを待つ。",
+        "noteEn": "The room went dark with two tiny points near the bottom. Wait for the light to return.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.26,0.33) 120ms",
+        "note": "ランプが青緑から赤茶に変わっている。まず変わっていない椅子を選び、間違いの反応を一度確認する。",
+        "noteEn": "The lamp changed from teal to reddish brown. Deliberately choose the unchanged chair once to check mistake feedback.",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.74,0.33) 120ms",
+        "note": "ミス1になり、左右の下端に影が出た。色が変わったランプを選ぶ。",
+        "noteEn": "Mistakes rose to one and shadows appeared at the lower edges. Select the lamp whose color changed.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 900ms → tap(0.50,0.92) 120ms",
+        "note": "ランプが正解の枠で囲まれ見つけた1。ただし直前の誤答文が残っている。次の部屋の記憶へ進む。",
+        "noteEn": "The lamp is highlighted as correct and Found is one, but the previous error text remains. Continue to memorize the next room.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 4000ms",
+        "note": "二回目は右向きの椅子、青緑ランプ、星の絵、右上向きの時計、本3冊、葉2枚。再点灯まで待つ。",
+        "noteEn": "Second room: chair back right, teal lamp, star picture, clock up-right, three books, two leaves. Wait through the blackout.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.74,0.72) 120ms",
+        "note": "鉢植えの葉が2枚から4枚に増えた。鉢植えを選ぶ。",
+        "noteEn": "The plant grew from two leaves to four. Select the plant.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 2
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 900ms → tap(0.50,0.92) 120ms",
+        "note": "葉の増加が正解で見つけた2。今度の正解画面には誤答文がなく、次の消灯へ進む。",
+        "noteEn": "The extra leaves were correct and Found reached two. This success screen has no stale error text. Continue.",
+        "image": "ai-play/step-09.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 4000ms",
+        "note": "三回目は椅子の背が左、青緑ランプ、月、時計右下、本3冊、葉4枚。違いを探す。",
+        "noteEn": "Third room: chair back left, teal lamp, moon, clock down-right, three books and four leaves. Watch for a change.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.26,0.52) 120ms",
+        "note": "絵が月から星に変わった。他の家具は同じなので絵を選ぶ。",
+        "noteEn": "The picture changed from moon to star while the other furnishings stayed the same. Select the picture.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "wait 900ms → tap(0.50,0.92) 120ms",
+        "note": "絵が正解で見つけた3。次の部屋も六つの物を見比べる。",
+        "noteEn": "The picture was correct and Found reached three. Study the next set of six objects.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "wait 4000ms",
+        "note": "四回目は右背の椅子、青緑ランプ、月、右上の時計、本3冊、葉4枚。暗転後を待つ。",
+        "noteEn": "Fourth room: chair back right, teal lamp, moon, clock up-right, three books and four leaves. Wait through the dark.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "tap(0.26,0.52) 120ms",
+        "note": "今回も絵が月から星に変わった。同じ変化が続いたので迷いは少なく、絵を選ぶ。",
+        "noteEn": "Again the picture changed from moon to star. Repeating the same change makes this one easy; select it.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 4
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "wait 900ms → tap(0.50,0.92) 120ms",
+        "note": "見つけた4、ミス1。朝まであと一つなので、最後の部屋を覚える。",
+        "noteEn": "Found four with one mistake. One more find brings morning; memorize the last room.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 4
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "wait 4000ms",
+        "note": "最後は右背の椅子、青緑ランプ、月、右上の時計、本3冊、葉4枚。変化を待つ。",
+        "noteEn": "Last room: chair back right, teal lamp, moon, clock up-right, three books and four leaves. Wait for the change.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 4
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 17,
+        "action": "tap(0.26,0.52) 120ms",
+        "note": "最後も月が星に変わった。繰り返しで易しくなったが、絵を選んで朝へ進みたい。",
+        "noteEn": "The moon again became a star. Repetition makes this easy; choose the picture to reach morning.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 4
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 5
+          }
+        ]
+      },
+      {
+        "step": 18,
+        "action": "wait 900ms → tap(0.50,0.92) 120ms",
+        "note": "5/5で朝が来た。もう一度を押し、正解数とミスが初期値へ戻るか確認する。",
+        "noteEn": "Five finds brought morning. Restart to check the find and mistake counts reset.",
+        "image": "ai-play/step-18.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 4
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 5
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-22T12:14:35+09:00"
+  },
+  "publishedAt": "2026-10-22T12:14:35+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 2424,
+    "outputTokens": 10825,
+    "contextTokens": 6454796,
+    "turns": 23,
+    "toolCalls": 23,
+    "webSearches": null,
+    "minutes": 10.1,
+    "from": "2026-10-22T03:04:31.540Z",
+    "to": "2026-10-22T03:14:36.464Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-10-22T12:14:36+09:00",
+    "validationRuns": 1,
+    "codeKB": 7.5,
+    "evidence": "metrics-evidence.json"
+  }
+}

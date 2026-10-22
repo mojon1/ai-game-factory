@@ -1,0 +1,391 @@
+{
+  "id": "2026-10-22-gpt-1",
+  "status": "published",
+  "title": "風待ち郵便デッキ",
+  "genre": "デッキ構築",
+  "concept": "灯台へ向かう郵便屋が、進む札と風を防ぐ札を二枚ずつ使う。強い札を途中で加えても、捨札から混ざるまでは手元に来ない。先の風を見ながら、今の体力を残すか早く進むか、小さな山札の巡りを読む配達。",
+  "howToPlay": "手札を2枚まで使ってから風を受ける。守りで風を防ぎ、9手番以内に12歩進もう。休憩所では札を1枚デッキに加える。",
+  "libraryDecision": "手札と捨札の巡り、風の予告を読むのが核。棚を確認したが、物理や3Dより数値と札の状態が明確なCanvas表示が判断を強めるため、ライブラリは使わない。",
+  "soundDecision": "進む量で札の短音の高さを変え、新札の獲得と配達は高い音、旅の中断は低い音にする。考える間を急かすBGMは入れない。",
+  "planning": {
+    "candidates": [
+      {
+        "idea": "歩く札と防ぐ札で風の道を進み、休憩所で札を加える小さな配達デッキ。",
+        "ideaEn": "Travel a windy route using walking and cover cards, adding cards at rest stops.",
+        "fromDraw": true
+      },
+      {
+        "idea": "星の影を伸ばし、遠い足場へ渡す橋を作る空の散歩。",
+        "ideaEn": "Stretch star shadows into bridges between sky platforms.",
+        "fromDraw": false
+      },
+      {
+        "idea": "水滴の音の並びをまねして、雨宿りの生き物と会話する。",
+        "ideaEn": "Echo sequences of raindrop sounds to converse with sheltering creatures.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0,
+    "genreDraw": {
+      "ja": "デッキ構築",
+      "en": "Deck-building",
+      "of": 57
+    }
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "fail",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Windpost Deck",
+      "concept": "A courier walks toward a lighthouse, playing up to two movement or cover cards per turn. Strong new cards enter the discard pile and arrive only after reshuffling. Read the coming wind and deck cycle, deciding whether to preserve stamina or move faster.",
+      "howToPlay": "Play up to two cards, then face the wind. Cover reduces wind damage. Move twelve steps within nine turns and add a card at each rest stop.",
+      "libraryDecision": "Reading hand cycles, discard piles and forecast wind is the core. Clear card and number states on Canvas support those decisions better than shelf physics or 3D, so no library is used.",
+      "soundDecision": "Short card tones rise with movement, higher tones mark new cards and delivery, and a low tone marks interruption. No music rushes planning."
+    }
+  },
+  "createdAt": "2026-10-22T11:57:41+09:00",
+  "specVersion": 8,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-22T11:57:41+09:00",
+    "metricsFrom": "2026-10-22T02:56:41.502Z",
+    "transcript": null,
+    "validationRuns": 1,
+    "finishedAt": "2026-10-22T12:04:30+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-22T11:59:56+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "7.4KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=39",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=80",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=29",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=51",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 7585,
+    "lines": 23
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "12手の画像で二枚制限、札の前進と防御、風による体力減少、二度の札追加、追い風が山札から届いて働くことを確認。七手番目に体力4で配達し、再開も確認した。新札が来るまで待つ判断はよいが、札の種類と予報が少なく、道筋は毎回似やすい。失敗条件は今回の実プレイでは未到達。",
+    "similar": [
+      {
+        "title": "Dominion",
+        "url": "https://www.riograndegames.com/games/dominion/",
+        "similarity": "高",
+        "note": "獲得札を捨札へ入れ、山札が尽きると捨札を混ぜて次に引くデッキ構築の核が共通。本作は購入資金や対戦がなく、九手番の配達と防風に絞る。",
+        "note_en": "Both add gained cards to discard and reshuffle when the draw pile runs out. This omits purchase currency and competition, focusing on a nine-turn delivery and wind protection."
+      },
+      {
+        "title": "Slay the Spire",
+        "url": "https://www.megacrit.com/press-kits/slay-the-spire/",
+        "similarity": "中",
+        "note": "旅の途中で札を選び、手札の行動と防御を考える一人用の構造が近い。本作には敵や遺物、分岐した長い旅はなく、短い配達を扱う。",
+        "note_en": "Both select cards during a solo journey and balance actions with defense. This has no enemies, relics or long branching expedition and covers a short delivery."
+      }
+    ],
+    "research": "2件の検索で、Rio Grande Games公式のDominion紹介・ルールとMega Crit公式のSlay the Spire紹介を確認。捨札から山札への循環と、旅中の札追加を比較した。",
+    "i18n": {
+      "en": {
+        "comment": "Twelve pictured steps confirmed the two-card limit, movement and cover, wind damage, two additions and the added Tailwind arriving and working. Delivered on turn seven with four stamina and verified restart. Waiting for a new card is satisfying, but few card types and fixed forecasts limit variety. Did not reach a failure condition in this playthrough.",
+        "research": "Ran two searches and checked Rio Grande Games' Dominion page and rules plus Mega Crit's Slay the Spire description. Compared discard cycling and adding cards during a journey."
+      }
+    },
+    "method": "スマホ縦画面で 12 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 12 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.90) 120ms",
+        "note": "二枚の札と風、九手番で十二歩という説明が見える。配達を始める。",
+        "noteEn": "The title explains two cards per turn, wind and twelve steps in nine turns. Start the delivery.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.19,0.61) 120ms → tap(0.50,0.61) 120ms",
+        "note": "最初はそよ風とひと足二枚。そよ風とひと足で二歩進み、風2を一つだけ受けるつもりで使う。",
+        "noteEn": "The hand has Breeze and two Footsteps. Play Breeze and one Footstep for two steps and one cover against wind two.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.81,0.61) 120ms → tap(0.50,0.88) 120ms",
+        "note": "進み2・守り1・使える札0。三枚目を押して制限を確かめてから、風を受ける。",
+        "noteEn": "Progress is two, cover one and no plays remain. Test the third card's limit, then face the wind.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.19,0.61) 120ms → tap(0.50,0.61) 120ms → tap(0.50,0.88) 120ms",
+        "note": "体力が1だけ減り、二手番目はひと足と雨がさ二枚。ひと足と雨がさで一歩進み、風3の損失を1に抑える。",
+        "noteEn": "Only one stamina was lost. The second hand has Footstep and two Umbrellas. Play a Footstep and Umbrella to move once and limit wind-three damage to one.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.19,0.61) 120ms → tap(0.50,0.61) 120ms → tap(0.50,0.88) 120ms",
+        "note": "三手番目はそよ風を含む移動札。そよ風とひと足で進み5を目指し、次の強い風の前に休憩所へ進む。",
+        "noteEn": "The third hand has movement cards including Breeze. Play Breeze and Footstep to reach five steps before the next stronger wind and visit the rest stop.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.81,0.61) 120ms",
+        "note": "駆け足3、大きな傘4、追い風2＋守り1から選べる。両方に使える追い風をデッキへ加える。",
+        "noteEn": "Choose Dash for three movement, Big Canopy for four cover, or Tailwind for two movement and one cover. Add the versatile Tailwind.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.19,0.61) 120ms → tap(0.81,0.61) 120ms → tap(0.50,0.88) 120ms",
+        "note": "新札は捨札にあり、今の手札は傘二枚とひと足。体力を2使っても半分まで進みたいので、傘とひと足を使う。",
+        "noteEn": "The new card is in discard; the hand has two Umbrellas and a Footstep. Accept two damage to move halfway using cover and a step.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.19,0.61) 120ms → tap(0.50,0.61) 120ms → tap(0.50,0.88) 120ms",
+        "note": "進み6、体力7。そよ風とひと足で二歩進み、強い次の風までに新札を引きたい。",
+        "noteEn": "Six steps and seven stamina remain. Move twice with Breeze and Footstep, hoping to draw the new card before the stronger wind.",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.19,0.61) 120ms → tap(0.50,0.61) 120ms → tap(0.50,0.88) 120ms",
+        "note": "追い風が届いた。傘と合わせると二歩進み、風4への損失は1で済む。これで残り二歩にする。",
+        "noteEn": "Tailwind arrived. Pair it with Umbrella for two steps and only one damage against wind four, leaving two steps to delivery.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.19,0.61) 120ms",
+        "note": "残り二歩、体力4。次は一枚で届く駆け足を加え、早く引けることを期待する。",
+        "noteEn": "Two steps remain with four stamina. Add Dash, which can finish in one card, and hope to draw it soon.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.19,0.61) 120ms → tap(0.50,0.61) 120ms",
+        "note": "駆け足はまだ来なかったが、ひと足とそよ風で二歩進める。風を受ける前に灯台へ届けたい。",
+        "noteEn": "Dash has not arrived, but Footstep and Breeze supply the remaining two steps. Deliver before facing this wind.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 12
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "wait 900ms → tap(0.50,0.90) 120ms",
+        "note": "七手番目に配達できた。体力4が残る結果から、もう一度を押して初期状態に戻るか確認する。",
+        "noteEn": "Delivery succeeded on turn seven with four stamina. Restart from the result to check the initial state returns.",
+        "image": "ai-play/step-12.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 12
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-22T12:04:30+09:00"
+  },
+  "publishedAt": "2026-10-22T12:04:30+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 2014,
+    "outputTokens": 9844,
+    "contextTokens": 4097294,
+    "turns": 16,
+    "toolCalls": 16,
+    "webSearches": null,
+    "minutes": 7.8,
+    "from": "2026-10-22T02:56:41.502Z",
+    "to": "2026-10-22T03:04:30.950Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-10-22T12:04:31+09:00",
+    "validationRuns": 1,
+    "codeKB": 7.4,
+    "evidence": "metrics-evidence.json"
+  }
+}
