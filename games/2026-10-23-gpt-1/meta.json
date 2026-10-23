@@ -1,0 +1,391 @@
+{
+  "id": "2026-10-23-gpt-1",
+  "status": "published",
+  "title": "ぐるぐる夜洗い",
+  "genre": "経営",
+  "concept": "二台だけの洗濯機に、短いシャツや時間のかかる毛布を割り振る。高額な依頼を先に回すと、目の前の期限が近い仕事を逃す。次の来客を見ながら空ける一台を選び、八時間後の閉店までに売上を積む小さな洗濯店。",
+  "howToPlay": "待っている洗濯物を選び、空いた洗濯機をタップする。1時間進めると洗濯と期限が進む。閉店や期限までに仕上がらない依頼は未達になる。",
+  "libraryDecision": "二台の占有時間と期限を比べる判断が核。棚を確認したが、物理や3Dを加えるより札の数値と機械の状態が読みやすいCanvas表示を選ぶ。",
+  "soundDecision": "受付は短音、洗濯開始は少し高い音、仕上がりは高い音、機械内での期限切れは低い音で返す。手番を考える間を急かさないためBGMは付けない。",
+  "planning": {
+    "candidates": [
+      {
+        "idea": "二台の洗濯機に期限と所要時間の違う依頼を割り振り、八時間の売上を増やす。",
+        "ideaEn": "Assign jobs with different deadlines and durations to two washers, maximizing sales over eight hours.",
+        "fromDraw": true
+      },
+      {
+        "idea": "鏡の種を植え、反射する光で遠い花を咲かせる庭のパズル。",
+        "ideaEn": "Plant mirror seeds to reflect light into distant flowers.",
+        "fromDraw": false
+      },
+      {
+        "idea": "二人で別々の拍を担当して、一匹の鳥を空へ送り出すリズム遊び。",
+        "ideaEn": "Two players handle different beats to help one bird fly.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0,
+    "genreDraw": {
+      "ja": "経営",
+      "en": "Management / tycoon",
+      "of": 57
+    }
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "limit",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Night Wash",
+      "concept": "Assign quick shirts and slower blankets to just two washers. Prioritizing lucrative work can leave urgent jobs waiting too long. Preview the next arrivals and decide which machine to free, building sales before closing after eight hours.",
+      "howToPlay": "Select a waiting job and tap an empty washer. Advancing one hour progresses washing and deadlines. Jobs unfinished by closing or their deadline count as missed.",
+      "libraryDecision": "Comparing occupied time and deadlines is the core. After checking the shelf, clear Canvas cards and machine states serve that decision better than physics or 3D.",
+      "soundDecision": "Brief tones mark selection, higher tones mark starting and finishing, and a low tone marks an in-machine deadline miss. No music rushes turn planning."
+    }
+  },
+  "createdAt": "2026-10-23T11:57:56+09:00",
+  "specVersion": 8,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-23T11:57:56+09:00",
+    "metricsFrom": "2026-10-23T02:56:46.655Z",
+    "transcript": null,
+    "validationRuns": 1,
+    "finishedAt": "2026-10-23T12:05:17+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-23T12:00:06+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "6.6KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=58",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=75",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=58",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=62",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 6775,
+    "lines": 24
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "12手の画像で依頼の割当、使用中の機械の拒否、シャツ・コート・毛布の仕上がりと売上、待機中の期限切れ、閉店の未完了集計、再開を確認。売上37・完了8・未達3だった。短い仕事を間に挟む考えどころはあるが、来客と三種類の依頼が固定で、繰り返すと順番を覚える遊びになりやすい。待ち列満杯と機械内での期限切れは未確認。",
+    "similar": [
+      {
+        "title": "Laundry Store Simulator",
+        "url": "https://store.steampowered.com/app/3150440/Laundry_Store_Simulator/",
+        "similarity": "中",
+        "note": "洗濯店の仕事を処理し売上を増やす題材が共通。本作は二台の機械への手番制の割当と期限に絞り、店舗拡張・雇用・三次元空間の操作はない。",
+        "note_en": "Both run laundry work for revenue. This focuses on turn-based scheduling and deadlines for two washers, without store expansion, hiring or 3D interaction."
+      },
+      {
+        "title": "Good Pizza, Great Pizza",
+        "url": "https://tapblaze.com/app/good-pizza-great-pizza/",
+        "similarity": "低",
+        "note": "客の注文を処理して店の売上にする構造が近い。本作は料理の手作業ではなく、機械を何時間ふさぐかを考える洗濯の割当。",
+        "note_en": "Both fulfill customer orders for shop revenue. This replaces manual food preparation with choosing how long jobs occupy washers."
+      }
+    ],
+    "research": "2件検索し、Laundry Store Simulatorの公式Steam説明とTapBlazeのGood Pizza, Great Pizza公式紹介を確認。洗濯店の題材と注文処理を比較し、機械割当への絞り込みとの違いを書いた。",
+    "i18n": {
+      "en": {
+        "comment": "Twelve pictured steps confirmed assignments, busy-washer rejection, completion and sales for all three job types, waiting-job expiry, closing totals and restart. Finished with thirty-seven coins, eight completed and three missed. Fitting short jobs between long ones is satisfying, but fixed arrivals and three types encourage memorizing a schedule. Did not test a full queue or in-machine expiry.",
+        "research": "Ran two searches and checked Laundry Store Simulator's official Steam description and TapBlaze's official Good Pizza, Great Pizza page. Compared laundry and order fulfillment themes against this game's narrow scheduling focus."
+      }
+    },
+    "method": "スマホ縦画面で 12 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 12 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.90) 120ms",
+        "note": "二台の洗濯機と、依頼を選んで機械へ入れる説明が見える。夜の店番を始める。",
+        "noteEn": "Two washers accompany instructions to select a job and assign a machine. Start the night shift.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.25,0.58) 120ms → tap(0.25,0.36) 120ms → tap(0.75,0.58) 120ms → tap(0.75,0.36) 120ms",
+        "note": "シャツは1時間2枚、コートは2時間5枚。両方をそれぞれ空いた機械へ入れて始める。",
+        "noteEn": "Shirts take one hour for two coins; a coat takes two for five. Start both in separate empty washers.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.50,0.90) 120ms",
+        "note": "左右の機械にシャツとコートが入り、残り時間と期限が見える。一時間進めて仕上がりを確認する。",
+        "noteEn": "Both washers show their jobs, remaining wash time and deadlines. Advance one hour to check completion.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.25,0.58) 120ms → tap(0.75,0.36) 120ms",
+        "note": "シャツが仕上がり売上2。毛布を選び、使用中のコートの機械へは入れ替えられないか確かめる。",
+        "noteEn": "Shirts finished for two coins. Select the blanket and test whether a busy coat washer rejects reassignment.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.25,0.36) 120ms → tap(0.50,0.90) 120ms",
+        "note": "使用中と表示され、毛布は待ち列に残った。空いた左へ入れて三時間の仕事を始める。",
+        "noteEn": "The busy message left the blanket waiting. Put it in the empty left washer and begin its three-hour job.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.25,0.58) 120ms → tap(0.75,0.36) 120ms → tap(0.50,0.90) 120ms",
+        "note": "毛布はあと二時間、右が空いた。期限の短いシャツを先に済ませ、コートは一時間待たせる。",
+        "noteEn": "The blanket needs two more hours and the right washer is free. Finish the urgent shirts first and let the coat wait one hour.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.75,0.58) 120ms → tap(0.75,0.36) 120ms → tap(0.50,0.90) 120ms",
+        "note": "コートは期限2で洗濯2。今始めれば間に合うので右へ入れ、毛布の仕上がりも待つ。",
+        "noteEn": "The coat has two hours left and needs two to wash. Start it now in the right washer while the blanket finishes.",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.75,0.58) 120ms → tap(0.25,0.36) 120ms → tap(0.50,0.90) 120ms",
+        "note": "毛布が仕上がり売上17。次の毛布を優先すると、期限1のシャツは逃す。高額の毛布を左へ入れ、期限切れの表示も確かめる。",
+        "noteEn": "The blanket finished, bringing sales to seventeen. Prioritizing the new blanket will miss the shirts due in one hour. Start it on the left and observe the expiry.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.25,0.58) 120ms → tap(0.75,0.36) 120ms → tap(0.50,0.90) 120ms",
+        "note": "売上22・未達1。右に二時間のコートを入れ、閉店前に仕上げる。待つシャツは次の空きを待たせる。",
+        "noteEn": "Sales are twenty-two with one missed job. Start a two-hour coat on the right to finish before closing, leaving shirts to wait for space.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.50,0.90) 120ms",
+        "note": "二台とも残り1で埋まっている。期限1のシャツはもう入れられないので、一時間進めて二台を空ける。",
+        "noteEn": "Both washers have one hour left. There is no space for the shirts due now, so advance to free both machines.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.25,0.58) 120ms → tap(0.25,0.36) 120ms → tap(0.75,0.58) 120ms → tap(0.75,0.36) 120ms → tap(0.50,0.90) 120ms",
+        "note": "最後はシャツ1時間とコート2時間。両方入れるが、閉店まで一時間なのでコートは残るはず。集計を確かめる。",
+        "noteEn": "The final jobs are one-hour shirts and a two-hour coat. Start both; the coat should remain unfinished when closing in one hour. Check the totals.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 37
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "wait 900ms → tap(0.50,0.92) 120ms",
+        "note": "売上37、完了8、未達3で閉店した。再開して売上と依頼が初期状態へ戻るか確認する。",
+        "noteEn": "Closing totals are thirty-seven coins, eight completed jobs and three missed. Restart to check sales and jobs reset.",
+        "image": "ai-play/step-12.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 37
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-23T12:05:17+09:00"
+  },
+  "publishedAt": "2026-10-23T12:05:17+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 2237,
+    "outputTokens": 9668,
+    "contextTokens": 5325745,
+    "turns": 16,
+    "toolCalls": 16,
+    "webSearches": null,
+    "minutes": 8.5,
+    "from": "2026-10-23T02:56:46.655Z",
+    "to": "2026-10-23T03:05:18.003Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-10-23T12:05:18+09:00",
+    "validationRuns": 1,
+    "codeKB": 6.6,
+    "evidence": "metrics-evidence.json"
+  }
+}

@@ -1,0 +1,363 @@
+{
+  "id": "2026-10-23-gpt-2",
+  "status": "published",
+  "title": "ふた色の磁石庭",
+  "genre": "物理おもちゃ",
+  "concept": "二つの大きな磁石を動かすと、符号の違う粒が集まり、同じ粒は離れていく。極を替えるたびに塊がほどけ、押し合って別の輪郭になる。正解や得点を置かず、気に入る流れと形を見つけて一枚の標本にする庭。",
+  "howToPlay": "大きな磁石をドラッグし、短くタップすると極が替わる。粒は同符号から離れ異符号へ集まる。好きな形になったら標本ボタンで区切る。",
+  "libraryDecision": "Matter.jsを使い、粒同士が重ならず押し合う密度を加える。磁石の力だけでは一つの点に集まるため、衝突で塊の輪郭が生まれるよう核を強めた。36粒・二磁石に絞り、3Dは使わない。",
+  "soundDecision": "磁石をつかむ時は低い短音、極の切替は二つの高さ、標本の完成は高い音で返す。粒の細かな衝突音やBGMは鳴らさず、動きの観察を妨げない。",
+  "planning": {
+    "candidates": [
+      {
+        "idea": "霧の窓をぬぐい、現れた野鳥の姿を写真へ残す観察遊び。",
+        "ideaEn": "Wipe a fogged window and photograph the birds that emerge.",
+        "fromDraw": true
+      },
+      {
+        "idea": "二色の粒を磁石の位置と極で集めたり散らしたりし、動く模様を標本にする庭。",
+        "ideaEn": "Gather and scatter two-colored grains with movable poles, keeping a chosen pattern.",
+        "fromDraw": false
+      },
+      {
+        "idea": "左右で違う拍を返して、波の上の船を二人でこぐ。",
+        "ideaEn": "Two players echo different beats on each side to row over waves.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 1,
+    "genreDraw": {
+      "ja": "観察・写真",
+      "en": "Observation / photography",
+      "of": 57
+    }
+  },
+  "structure": {
+    "goal": "none",
+    "ending": "other",
+    "input": [
+      "drag",
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Two-Pole Garden",
+      "concept": "Move two large poles and opposite-signed grains gather while matching grains move away. Flip a pole to loosen a cluster and let collisions form a new outline. With no score or correct answer, find a pleasing flow and shape and keep it as a specimen.",
+      "howToPlay": "Drag a large magnet or tap briefly to flip its pole. Grains repel matching signs and gather at opposite signs. Keep a pattern with the bottom button when ready.",
+      "libraryDecision": "Matter.js adds non-overlapping grains that push against one another. Field forces alone gather them into points, so collision-shaped clusters strengthen the core. Thirty-six grains and two poles keep this light; no 3D is used.",
+      "soundDecision": "A low short tone marks grabbing, two pitches distinguish polarity flips, and a high tone marks keeping a pattern. No granular collision sounds or music interrupt watching."
+    }
+  },
+  "createdAt": "2026-10-23T12:07:12+09:00",
+  "specVersion": 8,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-23T12:07:12+09:00",
+    "metricsFrom": "2026-10-23T03:05:18.450Z",
+    "transcript": null,
+    "validationRuns": 1,
+    "finishedAt": "2026-10-23T12:13:58+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-23T12:09:01+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "6.9KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=56",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=76",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=41",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=65",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 7015,
+    "lines": 22
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "matter-js",
+      "version": "0.20.0",
+      "file": "matter-0.20.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "9手の画像で符号別の集まり、磁石を追う粒の塊、極を替えた反発、壁沿いから曲がる列、標本の停止と再開を確認。動かしている途中の流れは心地よいが、静止すると多くの粒が磁石の下に隠れて形を見にくい。課題や長期の変化はなく、標本もその画面内だけで永続保存はしない。",
+    "similar": [
+      {
+        "title": "Electric Field Hockey",
+        "url": "https://phet.colorado.edu/en/simulations/electric-hockey",
+        "similarity": "中",
+        "note": "符号を持つものの配置で動く粒の進路を変える考え方が近い。本作はゴールへ運ぶ課題ではなく、二つの極と多数の衝突する粒で形を作る遊び場。",
+        "note_en": "Both use signed objects to influence a moving particle's path. This is a pattern-making space with two poles and many colliding grains rather than a goal-directed hockey challenge."
+      },
+      {
+        "title": "Electric Field of Dreams",
+        "url": "https://phet.colorado.edu/en/simulations/efield",
+        "similarity": "中",
+        "note": "電荷や場と粒の運動を触って観察する点が近い。本作は物理量を学ぶ表示ではなく、符号の引力・反発を簡略化した色の粒と模様の標本に絞る。",
+        "note_en": "Both invite interactive observation of fields, charges and motion. This uses simplified signed attraction and repulsion for colored patterns rather than displays for studying physical quantities."
+      }
+    ],
+    "research": "2件検索し、PhET公式の電荷・場の教材とElectric Field Hockey、Electric Field of Dreamsの実在ページを確認。符号で動きを変えるルーツを比較した。Falstadの検索では具体的な作品説明を確認できず、比較には掲載しなかった。",
+    "i18n": {
+      "en": {
+        "comment": "Nine pictured steps confirmed signed gathering, clusters following a dragged magnet, repulsion after flipping, lines bending from a wall, a frozen specimen and restart. Moving streams feel pleasant, but many settled grains hide beneath magnets, obscuring patterns. There are no tasks or long-term changes; the specimen exists only in the current screen and is not saved permanently.",
+        "research": "Ran two searches and checked PhET's field-and-charge materials and the pages for Electric Field Hockey and Electric Field of Dreams. Compared signed-motion roots. The Falstad search did not confirm a specific work description, so it was omitted."
+      }
+    },
+    "method": "スマホ縦画面で 9 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 9 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.90) 120ms",
+        "note": "大きな磁石を動かし、短いタップで極を替える説明がある。粒の庭を開く。",
+        "noteEn": "The title explains dragging large magnets and tapping to flip their poles. Open the grain garden.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "wait 3000ms",
+        "note": "Aは＋、Bは−で、粒が格子に近く並んでいる。まず触らずに集まる動きを観察する。",
+        "noteEn": "A is positive and B negative, with grains initially near a grid. Wait without touching to watch them gather.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "swipe(0.28,0.36→0.78,0.35) 900ms",
+        "note": "寒色がAへ、暖色がBへ集まり、多くの粒が磁石の下に隠れた。Aを右へ動かし、塊が追うか見たい。",
+        "noteEn": "Cool grains gathered at A and warm grains at B, many hidden under the magnets. Drag A right to see its cluster follow.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.78,0.35) 120ms → wait 1500ms",
+        "note": "Aを動かすと寒色の塊が追ってきた。Aをタップして−に替え、同符号の粒が散るか確かめる。",
+        "noteEn": "The cool cluster followed A's movement. Tap A to make it negative and check that matching grains disperse.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "swipe(0.72,0.64→0.28,0.70) 900ms → tap(0.28,0.70) 120ms → wait 1600ms",
+        "note": "AもBも−になり、寒色の粒が上の壁へ押された。Bを左下へ動かして＋に替え、寒色を呼び戻す。",
+        "noteEn": "With both poles negative, cool grains were pushed against the upper wall. Move B lower-left and flip it positive to call them back.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "swipe(0.28,0.70→0.25,0.39) 1000ms",
+        "note": "符号は替わり、暖色が右上のAへ移ったが、寒色は壁沿いに残る。Bを寒色へ近づけ、反応を見たい。",
+        "noteEn": "The poles changed and warm grains moved to upper-right A, while cool grains stayed along the wall. Bring B closer to the cool grains and watch.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "swipe(0.25,0.39→0.48,0.59) 700ms",
+        "note": "Bを近づけると寒色の列が壁から曲がり始めた。中央へ引き、粒の流れが見える途中の形を作る。",
+        "noteEn": "Bringing B closer bent the cool-grain line away from the wall. Pull it toward the center to form a visible moving stream.",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.50,0.91) 120ms",
+        "note": "寒色の粒が斜めの列で中央のBを追っている。この途中の模様を標本にする。",
+        "noteEn": "Cool grains follow central B in a diagonal stream. Keep this in-between pattern as the specimen.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 900ms → tap(0.50,0.91) 120ms",
+        "note": "模様が止まり、あなたの磁石模様と再開案内が見える。もう一度で粒と磁石が戻るか確かめる。",
+        "noteEn": "The pattern is frozen with a result heading and restart prompt. Start again to check grains and magnets reset.",
+        "image": "ai-play/step-09.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-23T12:13:58+09:00"
+  },
+  "publishedAt": "2026-10-23T12:13:58+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 2837,
+    "outputTokens": 7953,
+    "contextTokens": 4973887,
+    "turns": 14,
+    "toolCalls": 14,
+    "webSearches": null,
+    "minutes": 8.7,
+    "from": "2026-10-23T03:05:18.450Z",
+    "to": "2026-10-23T03:13:59.067Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-10-23T12:13:59+09:00",
+    "validationRuns": 1,
+    "codeKB": 6.9,
+    "evidence": "metrics-evidence.json"
+  }
+}
