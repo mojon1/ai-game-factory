@@ -1,0 +1,407 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-24T03:15:53.549Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.83
+        ]
+      },
+      "desc": "tap(0.50,0.83) 120ms",
+      "note": "敵と剣の差が傷になるという説明を読んだ。まず扉の三択を見る。",
+      "noteEn": "The instructions explain damage as foe minus sword. Start to inspect the three doors.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": {
+        "tap": [
+          0.5,
+          0.5
+        ]
+      },
+      "desc": "tap(0.50,0.50) 120ms",
+      "note": "中央は傷2だが体力+3と宝9。回復で埋められそうなので選ぶ。",
+      "noteEn": "The middle costs 2 HP but heals 3 and offers 9 gold. Choose it to offset the damage.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": {
+        "tap": [
+          0.19,
+          0.5
+        ]
+      },
+      "desc": "tap(0.19,0.50) 120ms",
+      "note": "体力は満タン、剣は1に減った。左で剣を補充し、次の傷を抑えたい。",
+      "noteEn": "Health is full but the sword fell to 1. Take the left replacement to reduce future damage.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": {
+        "tap": [
+          0.5,
+          0.5
+        ]
+      },
+      "desc": "tap(0.50,0.50) 120ms",
+      "note": "補充後すぐに消耗するので剣は2。中央なら傷1で宝8と剣を保てる。",
+      "noteEn": "The replacement wears immediately, leaving sword 2. The middle offers 8 gold and another sword for 1 HP.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": {
+        "tap": [
+          0.8,
+          0.5
+        ]
+      },
+      "desc": "tap(0.80,0.50) 120ms",
+      "note": "体力8で三択とも傷0。次の回復を期待して、宝5の右へ進む。",
+      "noteEn": "At 8 HP all doors are harmless. Take the right door for 5 gold, hoping for later supplies.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": {
+        "tap": [
+          0.19,
+          0.5
+        ]
+      },
+      "desc": "tap(0.19,0.50) 120ms",
+      "note": "右より左が同じ宝5で傷0、剣も補充できる。左を選ぶ。",
+      "noteEn": "The left has the same 5 gold as the right, but no damage and a replacement sword. Choose left.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": {
+        "tap": [
+          0.8,
+          0.5
+        ]
+      },
+      "desc": "tap(0.80,0.50) 120ms",
+      "note": "宝30、体力8。右の傷3と引き換えに宝10を狙い、帰還判断の圧力を試す。",
+      "noteEn": "With 30 gold and 8 HP, risk the right door's 3 damage for 10 gold and test the pressure to retreat.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": {
+        "tap": [
+          0.5,
+          0.84
+        ]
+      },
+      "desc": "tap(0.50,0.84) 120ms",
+      "note": "宝40・体力5、次は傷4で宝10の誘惑がある。今回は40を確定して持ち帰る。",
+      "noteEn": "At 40 gold and 5 HP, a 10-gold door costs 4 HP. Bank the 40 instead of risking it.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 40
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": [
+        {
+          "wait": 850
+        },
+        {
+          "tap": [
+            0.5,
+            0.85
+          ]
+        }
+      ],
+      "desc": "wait 850ms → tap(0.50,0.85) 120ms",
+      "note": "6部屋で宝40を持ち帰れた。再開して別の洞窟の扉も見てみる。",
+      "noteEn": "Returned with 40 gold after six rooms. Restart to inspect the next cave's doors.",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 40
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "action": {
+        "tap": [
+          0.5,
+          0.5
+        ]
+      },
+      "desc": "tap(0.50,0.50) 120ms",
+      "note": "初手の扉は同じ配置。再び回復つきの宝9を取り、二部屋目の変化を見る。",
+      "noteEn": "The opening layout repeats. Take the healing 9-gold door again and inspect room two.",
+      "image": "ai-play/step-10.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 40
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "action": {
+        "tap": [
+          0.5,
+          0.5
+        ]
+      },
+      "desc": "tap(0.50,0.50) 120ms",
+      "note": "二部屋目は前回と違う。傷2を払って宝7と剣を拾い、今回は奥まで狙う。",
+      "noteEn": "Room two differs from the last run. Pay 2 HP for 7 gold and a sword, aiming deeper this time.",
+      "image": "ai-play/step-11.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 40
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 12,
+      "action": {
+        "tap": [
+          0.8,
+          0.5
+        ]
+      },
+      "desc": "tap(0.80,0.50) 120ms",
+      "note": "右は傷1で回復3と宝8。体力を戻せる有利な扉を選ぶ。",
+      "noteEn": "The right costs 1 HP but heals 3 and gives 8 gold. Take this favorable recovery door.",
+      "image": "ai-play/step-12.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 40
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 13,
+      "action": {
+        "tap": [
+          0.19,
+          0.5
+        ]
+      },
+      "desc": "tap(0.19,0.50) 120ms",
+      "note": "傷2でも左は宝8と剣補充がある。中央より得なので左へ。",
+      "noteEn": "The left costs 2 HP but offers 8 gold and a sword. It dominates the middle, so choose left.",
+      "image": "ai-play/step-13.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 40
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 14,
+      "action": {
+        "tap": [
+          0.19,
+          0.5
+        ]
+      },
+      "desc": "tap(0.19,0.50) 120ms",
+      "note": "左は傷0で回復3と宝7。補給が多く、危険を回避するのは難しくない。",
+      "noteEn": "The left offers healing and 7 gold without damage. Frequent supplies make avoiding danger fairly easy.",
+      "image": "ai-play/step-14.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 40
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 15,
+      "action": {
+        "tap": [
+          0.8,
+          0.5
+        ]
+      },
+      "desc": "tap(0.80,0.50) 120ms",
+      "note": "右は傷0で剣も戻る。深い部屋でも好条件が続くので進む。",
+      "noteEn": "The right has zero damage and a new sword. Favorable choices continue even in the depths.",
+      "image": "ai-play/step-15.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 40
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 16,
+      "action": {
+        "tap": [
+          0.19,
+          0.5
+        ]
+      },
+      "desc": "tap(0.19,0.50) 120ms",
+      "note": "左と中央は同じ宝8で剣補充。傷が少ない左を選ぶ。",
+      "noteEn": "Left and middle both offer 8 gold and a sword. Choose the left for less damage.",
+      "image": "ai-play/step-16.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 40
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 17,
+      "action": {
+        "tap": [
+          0.8,
+          0.5
+        ]
+      },
+      "desc": "tap(0.80,0.50) 120ms",
+      "note": "前の左は剣補充ではなく回復で、体力9・剣1になった。最後は傷5でも生き残れるので宝10を取る。",
+      "noteEn": "The previous left door healed rather than replacing the sword: now 9 HP and sword 1. The last door's 5 damage is survivable, so take 10 gold.",
+      "image": "ai-play/step-17.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 40
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 63
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}

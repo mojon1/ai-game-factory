@@ -1,0 +1,357 @@
+{
+  "id": "2026-10-24-gpt-1",
+  "status": "published",
+  "title": "水音グラス",
+  "genre": "音で遊ぶ・楽器",
+  "concept": "五つのグラスを上下になぞると水位と音の高さが変わる。短く触れて確かめ、自分の和音を探す。雨を流せばそれぞれ違う歩幅で鳴り、さっきの調律が小さな曲になる。正解を急がず、耳と水面で音を選ぶ楽器の遊び。",
+  "howToPlay": "グラスを上下になぞって音程を変え、短くタップして鳴らします。「雨を流す」で自動演奏し、気に入ったところで演奏をおえます。",
+  "libraryDecision": "共有棚を確認したが使用しない。水位と音程の対応を主役にし、物理挙動や3Dは加えない。倍音と余韻を直接制御するWeb Audioが、この柔らかなグラスの音に合う。",
+  "soundDecision": "水位で変わる五音音階のグラス音を、三つの正弦波の倍音で合成する。BGMは置かず、自分で作った響きと雨の重なりを聴く。音は最初のタッチで有効にする。",
+  "planning": {
+    "genreDraw": {
+      "ja": "音で遊ぶ・楽器",
+      "en": "Musical toy",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "水位で音の変わるグラスを調律し、雨の自動演奏で小さな響きを作る。",
+        "ideaEn": "Tune water glasses, then let rain play their changing pitches.",
+        "fromDraw": true
+      },
+      {
+        "idea": "切り離せない荷物列車を側線に押し込み、順番を並べ替える。",
+        "ideaEn": "Shunt an inseparable cargo train into sidings to reorder deliveries.",
+        "fromDraw": false
+      },
+      {
+        "idea": "薄氷の割れ目を読み、止まれないアザラシを島まで滑らせる。",
+        "ideaEn": "Read cracking ice to slide a seal to an island without stopping.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "none",
+    "ending": "other",
+    "input": [
+      "drag",
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Water Glasses",
+      "concept": "Slide five glasses to change their water and pitch. Tap to explore a chord, then let differently paced rain turn your tuning into a small piece. With no correct answer, listen and watch ripples to choose the next note.",
+      "howToPlay": "Slide a glass vertically to tune it and tap briefly to ring it. Let rain play automatically, then finish your concert whenever you like.",
+      "libraryDecision": "Reviewed the shared shelf and chose no libraries. Water-to-pitch correspondence is central; physics and 3D would distract. Direct Web Audio partials let each glass have a soft, controlled decay.",
+      "soundDecision": "Three sine partials synthesize glass notes on a pentatonic scale. There is no background music: your tuning and overlapping rain form the soundscape. Audio unlocks on the first touch."
+    }
+  },
+  "createdAt": "2026-10-24T12:09:35+09:00",
+  "specVersion": 8,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-24T12:09:35+09:00",
+    "metricsFrom": "2026-10-24T03:09:03.498Z",
+    "transcript": null,
+    "validationRuns": 1,
+    "finishedAt": "2026-10-24T12:13:42+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-24T12:11:10+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "6.9KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=98",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=134",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=62",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=131",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 7116,
+    "lines": 22
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "9手を画像で確認。上下の調律、手動打音、雨の開始と停止、32回・6音の結果、再開を体験した。水位と音名の変化は読みやすく、波紋が気持ちよい。一方、保存も曲の目標もなく、長く遊ぶ動機は弱い。画像中心の検証で実際の音の聴感は評価できていない。",
+    "similar": [
+      {
+        "title": "Chrome Music Lab",
+        "url": "https://musiclab.chromeexperiments.com/",
+        "similarity": "中",
+        "note": "正解を置かず触って音の関係を探る点が似る。本作は描画や音符の配置ではなく、五つの水位と雨の周期を組み合わせる。",
+        "note_en": "Both explore musical relationships through touch without a correct answer. This toy uses five water levels and rain periods instead of drawing or placing notes."
+      },
+      {
+        "title": "Do-It-Yourself Crystallophone",
+        "url": "https://www.ontariosciencecentre.ca/science-at-home/diy-science-fun/do-it-yourself-crystallophone",
+        "similarity": "高",
+        "note": "水量でグラスを調律する実物楽器が直接のルーツ。本作は五音音階に丸め、雨による自動演奏と視覚的な波紋を加えた。",
+        "note_en": "Tuning real glasses with water is the direct physical root. This version quantizes pitch to a pentatonic scale and adds automatic rain and visual ripples."
+      }
+    ],
+    "research": "水位で調律するグラス楽器と、Chrome Music Labの音楽実験を2件の検索クエリで調べた。科学館とGoogleの公開ページで実在を確認し、物理的なルーツと音楽玩具としての類似を分けた。",
+    "i18n": {
+      "en": {
+        "comment": "Viewed all 9 play steps: vertical tuning, manual strikes, starting and stopping rain, a 32-note/6-pitch summary, and restart. Water levels, pitch labels and ripples are readable and pleasant. Without saving or musical goals, sustained motivation is limited. This visual playthrough did not evaluate the actual listening experience.",
+        "research": "Used two search queries about water-glass tuning and Chrome Music Lab. Verified public science-centre and Google pages, distinguishing the physical root from musical-toy similarities."
+      }
+    },
+    "method": "スマホ縦画面で 9 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 9 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.83) 120ms",
+        "note": "五色のグラスと短い説明が見える。開始して調律を試す。",
+        "noteEn": "Five colored glasses and short instructions are visible. Start to try tuning.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.13,0.53) 120ms",
+        "note": "水の多い左のグラスはド。短く触れて反応を見る。",
+        "noteEn": "The full left glass is C. Tap briefly to see its response.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "swipe(0.13,0.40→0.13,0.58) 700ms",
+        "note": "左の水面が波打ち枠が光った。下へなぞって音程を上げてみる。",
+        "noteEn": "The left rim glows and its water ripples. Slide down to raise its pitch.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "swipe(0.87,0.61→0.87,0.43) 700ms",
+        "note": "左はド↑へ変化した。今度は右を上になぞり、低い音へ戻す。",
+        "noteEn": "The left glass changed to high C. Slide the right one upward to lower its pitch.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.50,0.78) 120ms → wait 2800ms",
+        "note": "右はレへ下がり、水位が上がった。雨で五つのグラスを同時に鳴らしてみる。",
+        "noteEn": "The right glass is now D with more water. Let rain ring all five glasses.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "swipe(0.50,0.57→0.50,0.43) 700ms",
+        "note": "雨粒と複数の波紋が見え、演奏中と分かる。中央を低くして響きの組合せを替える。",
+        "noteEn": "Raindrops and overlapping ripples show the concert running. Lower the middle pitch to change the combination.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.50,0.78) 120ms → wait 1400ms",
+        "note": "中央はドになった。雨を止め、余韻だけの静かな状態を確かめる。",
+        "noteEn": "The middle glass is now C. Stop the rain and let the visual echoes fade.",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.50,0.90) 120ms",
+        "note": "雨を止めると波紋が消えた。演奏をおえて記録を見る。",
+        "noteEn": "The ripples fade after stopping rain. Finish and see the concert summary.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 850ms → tap(0.50,0.83) 120ms",
+        "note": "32回・6種類の音と表示された。待ってから再開し、調律が初期化されるかを見る。",
+        "noteEn": "The summary shows 32 notes and 6 pitches. Wait, restart, and check the tuning resets.",
+        "image": "ai-play/step-09.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-24T12:13:42+09:00"
+  },
+  "publishedAt": "2026-10-24T12:13:42+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 589,
+    "outputTokens": 8625,
+    "contextTokens": 1218385,
+    "turns": 16,
+    "toolCalls": 16,
+    "webSearches": null,
+    "minutes": 4.7,
+    "from": "2026-10-24T03:09:03.498Z",
+    "to": "2026-10-24T03:13:42.524Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-10-24T12:13:42+09:00",
+    "validationRuns": 1,
+    "codeKB": 6.9,
+    "evidence": "metrics-evidence.json"
+  }
+}
