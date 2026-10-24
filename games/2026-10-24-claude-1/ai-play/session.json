@@ -1,0 +1,990 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-24T02:48:25.621Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.5
+        ]
+      },
+      "desc": "tap(0.50,0.50) 120ms",
+      "note": "タイトル画面。だるまの塔と遊び方3行。タップして開始する",
+      "noteEn": "Title screen with a daruma tower and three lines of instructions. Tap to start.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": [
+        {
+          "swipe": [
+            0.04,
+            0.75,
+            0.96,
+            0.75
+          ],
+          "hold": 90
+        },
+        {
+          "wait": 700
+        }
+      ],
+      "desc": "swipe(0.04,0.75→0.96,0.75) 90ms → wait 700ms",
+      "note": "一番下の赤ブロックを左から速く水平にはじく",
+      "noteEn": "Flick the bottom red block fast and level from the left.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "swipe": [
+            0.96,
+            0.76,
+            0.04,
+            0.76
+          ],
+          "hold": 90
+        },
+        {
+          "wait": 700
+        }
+      ],
+      "desc": "swipe(0.96,0.76→0.04,0.76) 90ms → wait 700ms",
+      "note": "スパーン！と抜けて上が少し右へ。次は右から打って戻す",
+      "noteEn": "Ka-KON! The stack shifted slightly right, so strike from the right to pull it back.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "swipe": [
+            0.04,
+            0.79,
+            0.96,
+            0.79
+          ],
+          "hold": 90
+        },
+        {
+          "wait": 900
+        }
+      ],
+      "desc": "swipe(0.04,0.79→0.96,0.79) 90ms → wait 900ms",
+      "note": "最後の緑を左からはじく",
+      "noteEn": "Flick the last green block from the left.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": [
+        {
+          "wait": 500
+        },
+        {
+          "tap": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "wait": 300
+        }
+      ],
+      "desc": "wait 500ms → tap(0.50,0.50) 120ms → wait 300ms",
+      "note": "ぴったりでクリア。次へ",
+      "noteEn": "Perfect clear. Continue.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "swipe": [
+            0.05,
+            0.76,
+            0.6,
+            0.76
+          ],
+          "hold": 450
+        },
+        {
+          "wait": 800
+        }
+      ],
+      "desc": "swipe(0.05,0.76→0.60,0.76) 450ms → wait 800ms",
+      "note": "わざと遅めにスワイプして、上がどうずれるか試す",
+      "noteEn": "Swipe slowly on purpose to see how the stack shifts.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "swipe": [
+            0.97,
+            0.75,
+            0.42,
+            0.75
+          ],
+          "hold": 450
+        },
+        {
+          "wait": 800
+        }
+      ],
+      "desc": "swipe(0.97,0.75→0.42,0.75) 450ms → wait 800ms",
+      "note": "遅いと塔ごと右へずれた（押しただけ）。右から同じ速さで押し戻す",
+      "noteEn": "Too slow: the whole stack slid right (just a push). Push it back from the right at the same speed.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": [
+        {
+          "swipe": [
+            0.04,
+            0.78,
+            0.96,
+            0.72
+          ],
+          "hold": 160
+        },
+        {
+          "wait": 800
+        }
+      ],
+      "desc": "swipe(0.04,0.78→0.96,0.72) 160ms → wait 800ms",
+      "note": "中央に戻った。今度はやや斜め・中くらいの速さで緑をはじく",
+      "noteEn": "Back in the middle. Now flick the green one at medium speed with a slight angle.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": [
+        {
+          "swipe": [
+            0.96,
+            0.75,
+            0.04,
+            0.75
+          ],
+          "hold": 90
+        },
+        {
+          "wait": 800
+        }
+      ],
+      "desc": "swipe(0.96,0.75→0.04,0.75) 90ms → wait 800ms",
+      "note": "斜めだとカコン、上が右に少しずれた。右から速く打って戻す",
+      "noteEn": "Angled gave a Klok and a slight right drift. Strike fast from the right to correct.",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "action": [
+        {
+          "swipe": [
+            0.96,
+            0.76,
+            0.04,
+            0.76
+          ],
+          "hold": 90
+        },
+        {
+          "wait": 800
+        }
+      ],
+      "desc": "swipe(0.96,0.76→0.04,0.76) 90ms → wait 800ms",
+      "note": "まだ少し右寄り。紫も右から",
+      "noteEn": "Still slightly right. Hit the purple one from the right too.",
+      "image": "ai-play/step-10.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "action": [
+        {
+          "swipe": [
+            0.04,
+            0.79,
+            0.96,
+            0.79
+          ],
+          "hold": 90
+        },
+        {
+          "wait": 1000
+        }
+      ],
+      "desc": "swipe(0.04,0.79→0.96,0.79) 90ms → wait 1000ms",
+      "note": "最後のオレンジを左から",
+      "noteEn": "Last orange block from the left.",
+      "image": "ai-play/step-11.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 12,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "wait": 400
+        }
+      ],
+      "desc": "tap(0.50,0.50) 120ms → wait 400ms",
+      "note": "いいかんじでクリア。ステージ3へ",
+      "noteEn": "Cleared with Nice. On to stage 3.",
+      "image": "ai-play/step-12.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 13,
+      "action": [
+        {
+          "swipe": [
+            0.98,
+            0.76,
+            0.4,
+            0.76
+          ],
+          "hold": 420
+        },
+        {
+          "wait": 800
+        }
+      ],
+      "desc": "swipe(0.98,0.76→0.40,0.76) 420ms → wait 800ms",
+      "note": "塔が右に傾いている。右からゆっくり押して上ごと左へ戻す",
+      "noteEn": "The tower leans right. Push slowly from the right to shift the whole stack back left.",
+      "image": "ai-play/step-13.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 14,
+      "action": [
+        {
+          "swipe": [
+            0.02,
+            0.75,
+            0.9,
+            0.75
+          ],
+          "hold": 90
+        },
+        {
+          "wait": 800
+        }
+      ],
+      "desc": "swipe(0.02,0.75→0.90,0.75) 90ms → wait 800ms",
+      "note": "中途半端な速さで紫が半分だけ左へ抜けた（おもい…）。はみ出た紫を左から速く抜く",
+      "noteEn": "A half-speed hit slid the purple block halfway out (Heavy…). Flick the sticking-out purple from the left, fast.",
+      "image": "ai-play/step-14.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 15,
+      "action": [
+        {
+          "swipe": [
+            0.98,
+            0.75,
+            0.05,
+            0.75
+          ],
+          "hold": 100
+        },
+        {
+          "wait": 800
+        }
+      ],
+      "desc": "swipe(0.98,0.75→0.05,0.75) 100ms → wait 800ms",
+      "note": "まだ右寄り。右から打って少しずつ左へ寄せる",
+      "noteEn": "Still leaning right. Strike from the right to nudge it left.",
+      "image": "ai-play/step-15.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 16,
+      "action": [
+        {
+          "swipe": [
+            0.98,
+            0.76,
+            0.05,
+            0.76
+          ],
+          "hold": 100
+        },
+        {
+          "wait": 800
+        }
+      ],
+      "desc": "swipe(0.98,0.76→0.05,0.76) 100ms → wait 800ms",
+      "note": "もう一度右から",
+      "noteEn": "From the right again.",
+      "image": "ai-play/step-16.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 17,
+      "action": [
+        {
+          "swipe": [
+            0.98,
+            0.75,
+            0.5,
+            0.75
+          ],
+          "hold": 420
+        },
+        {
+          "wait": 800
+        }
+      ],
+      "desc": "swipe(0.98,0.75→0.50,0.75) 420ms → wait 800ms",
+      "note": "速く打つと上はほとんど戻らない。最後の1段はゆっくり押して真ん中へ",
+      "noteEn": "Fast hits barely pull the stack back. Push the last block slowly toward the center.",
+      "image": "ai-play/step-17.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 18,
+      "action": [
+        {
+          "swipe": [
+            0.02,
+            0.79,
+            0.96,
+            0.79
+          ],
+          "hold": 90
+        },
+        {
+          "wait": 1100
+        }
+      ],
+      "desc": "swipe(0.02,0.79→0.96,0.79) 90ms → wait 1100ms",
+      "note": "ほぼ中央。左から速く抜く",
+      "noteEn": "Nearly centered. Flick it out fast from the left.",
+      "image": "ai-play/step-18.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 19,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "wait": 500
+        }
+      ],
+      "desc": "tap(0.50,0.50) 120ms → wait 500ms",
+      "note": "ステージ4へ",
+      "noteEn": "On to stage 4.",
+      "image": "ai-play/step-19.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 20,
+      "action": [
+        {
+          "swipe": [
+            0.02,
+            0.66,
+            0.94,
+            0.66
+          ],
+          "hold": 230
+        },
+        {
+          "wait": 900
+        }
+      ],
+      "desc": "swipe(0.02,0.66→0.94,0.66) 230ms → wait 900ms",
+      "note": "鉄ブロックを中くらいの速さで打ってみる",
+      "noteEn": "Try the iron block at medium speed.",
+      "image": "ai-play/step-20.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 21,
+      "action": [
+        {
+          "swipe": [
+            0.98,
+            0.79,
+            0.04,
+            0.79
+          ],
+          "hold": 90
+        },
+        {
+          "wait": 800
+        }
+      ],
+      "desc": "swipe(0.98,0.79→0.04,0.79) 90ms → wait 800ms",
+      "note": "鉄は抜けたが上が右へずれた。一番下の赤を右から",
+      "noteEn": "Iron came out but the stack moved right. Bottom red from the right.",
+      "image": "ai-play/step-21.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 22,
+      "action": [
+        {
+          "swipe": [
+            0.98,
+            0.8,
+            0.04,
+            0.74
+          ],
+          "hold": 170
+        },
+        {
+          "wait": 800
+        }
+      ],
+      "desc": "swipe(0.98,0.80→0.04,0.74) 170ms → wait 800ms",
+      "note": "緑を右から、わざと斜めに",
+      "noteEn": "Green from the right, angled on purpose.",
+      "image": "ai-play/step-22.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 23,
+      "action": [
+        {
+          "swipe": [
+            0.02,
+            0.79,
+            0.96,
+            0.79
+          ],
+          "hold": 90
+        },
+        {
+          "wait": 800
+        },
+        {
+          "swipe": [
+            0.02,
+            0.79,
+            0.96,
+            0.79
+          ],
+          "hold": 90
+        },
+        {
+          "wait": 1100
+        }
+      ],
+      "desc": "swipe(0.02,0.79→0.96,0.79) 90ms → wait 800ms → swipe(0.02,0.79→0.96,0.79) 90ms → wait 1100ms",
+      "note": "少し左寄りになったので、残り2段は左から続けて抜く",
+      "noteEn": "Now slightly left, so knock the last two out from the left.",
+      "image": "ai-play/step-23.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 24,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "wait": 500
+        }
+      ],
+      "desc": "tap(0.50,0.50) 120ms → wait 500ms",
+      "note": "左端に飛んだ緑ブロックが床で少し浮いて止まって見える（見た目だけ）。ステージ5へ",
+      "noteEn": "The green block that flew left seems to rest slightly above the floor at the edge (cosmetic). On to stage 5.",
+      "image": "ai-play/step-24.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 25,
+      "action": [
+        {
+          "swipe": [
+            0.02,
+            0.66,
+            0.96,
+            0.66
+          ],
+          "hold": 170
+        },
+        {
+          "wait": 900
+        }
+      ],
+      "desc": "swipe(0.02,0.66→0.96,0.66) 170ms → wait 900ms",
+      "note": "ゴムを左から中くらいの速さで",
+      "noteEn": "Rubber block from the left at medium speed.",
+      "image": "ai-play/step-25.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "best": 894
+          }
+        },
+        {
+          "agf": "end",
+          "score": 894
+        }
+      ]
+    },
+    {
+      "step": 26,
+      "action": {
+        "wait": 1500
+      },
+      "desc": "wait 1500ms",
+      "note": "ゴムが抜けきらず、ひっぱられた上の段が右へ倒れた。中くらいの速さではゴムは無理だった",
+      "noteEn": "The rubber block did not clear and dragged the stack over to the right. Medium speed is not enough for rubber.",
+      "image": "ai-play/step-26.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "best": 894
+          }
+        },
+        {
+          "agf": "end",
+          "score": 894
+        }
+      ]
+    },
+    {
+      "step": 27,
+      "action": [
+        {
+          "wait": 600
+        },
+        {
+          "tap": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "wait": 500
+        }
+      ],
+      "desc": "wait 600ms → tap(0.50,0.50) 120ms → wait 500ms",
+      "note": "くずれた…でスコア894、ベスト更新。倒れたゴムが床で斜めに立ったまま止まって見える（見た目の粗）。タップでもう一度",
+      "noteEn": "Toppled: 894 points, new best. The fallen rubber block looks propped up at an angle on the floor (visual glitch). Tap to play again.",
+      "image": "ai-play/step-27.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "best": 894
+          }
+        },
+        {
+          "agf": "end",
+          "score": 894
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 28,
+      "action": [
+        {
+          "swipe": [
+            0.02,
+            0.62,
+            0.96,
+            0.62
+          ],
+          "hold": 90
+        },
+        {
+          "wait": 900
+        }
+      ],
+      "desc": "swipe(0.02,0.62→0.96,0.62) 90ms → wait 900ms",
+      "note": "再スタートできた。ためしにだるまの頭を打ってみる",
+      "noteEn": "Restarted fine. Try hitting the daruma's head on purpose.",
+      "image": "ai-play/step-28.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "best": 894
+          }
+        },
+        {
+          "agf": "end",
+          "score": 894
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}

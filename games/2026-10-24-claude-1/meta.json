@@ -1,0 +1,811 @@
+{
+  "id": "2026-10-24-claude-1",
+  "status": "published",
+  "title": "カコーン！だるま落とし",
+  "genre": "物理おもちゃ",
+  "concept": "だるま落としの「打ち方で結果が変わる」手触りを核にした。速くまっすぐはじけばスパーンと抜けて上は動かず、遅いと摩擦で上がずれ、もっと遅いと上ごとずれる。同じ側ばかり打つとずれがたまるので、反対から打って戻す判断が生まれる。",
+  "howToPlay": "ブロックを横からすばやくスワイプしてはじき出す。ゆっくり押すと上ごとずらせる。だるまを倒さずに台までおろせばクリア（6ステージ）。",
+  "libraryDecision": "使わない。核は「はじく速さと角度で、上の段がどれだけずれるか」で、これは遊ぶ人が読めて狙える規則であってほしい。matter-js で積み木を積むと、打っていなくても塔が細かく揺れたり予想外に崩れたりして、上達の手応えがぼやけるため、摩擦と重心の判定を自前で書いた。崩れる瞬間の回転と散らばりだけは簡単な運動計算で見せている。",
+  "soundDecision": "BGMは付けず、木の音だけにした。きれいに抜けたときは高く澄んだ「カーン」、引きずったときは鈍い「コッ」、鉄は金属の響き、ゴムはこもった音になり、耳でも打ち方の良し悪しが分かる。上の段が落ちる「トン」、崩れそうなときのきしみ、ステージクリアの木琴風の音、最後にだるまの目が入るときの筆の音で区切りを付けた。",
+  "planning": {
+    "genreDraw": {
+      "ja": "物理おもちゃ",
+      "en": "Physics toy",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "だるま落とし。はじく速さと角度で上の段のずれ方が変わり、ゆっくり押せば上ごとずらせる。ずれを左右から打ち分けて、だるまを台までおろす。",
+        "ideaEn": "Daruma otoshi: how fast and level you flick decides how much the stack above shifts, and a slow push moves everything above. Alternate sides to cancel drift and lower the daruma to the base.",
+        "fromDraw": true
+      },
+      {
+        "idea": "雪玉ころがし。坂を転がす雪玉が雪を拾って大きくなり、岩をよけながら、ふもとで雪だるまの頭と胴の大きさをそろえる。",
+        "ideaEn": "Snowball roll: steer a snowball downhill so it grows by picking up snow, dodge rocks, and match head and body sizes for a snowman at the bottom.",
+        "fromDraw": false
+      },
+      {
+        "idea": "まねっこ合唱団。小鳥が歌う短いフレーズをタップで真似すると、少しずつ自分の旋律が森の合唱に混ざっていく。",
+        "ideaEn": "Copycat choir: tap back the short phrases the birds sing, and your own melody gradually blends into the forest chorus.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "fail",
+    "input": [
+      "swipe"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Ka-KON! Daruma Drop",
+      "concept": "The core is the daruma-otoshi feel that how you strike changes everything. Flick fast and level and the block shoots out with the stack untouched; slower and friction drags the stack; slower still and the whole stack shifts. Hitting from one side builds up drift, so you choose when to strike from the other side to pull it back.",
+      "howToPlay": "Swipe sideways across a block, fast, to knock it out. A slow push shifts everything above. Lower the daruma onto the base without toppling it (6 stages).",
+      "libraryDecision": "No libraries. The core is how much the stack shifts depending on flick speed and angle, and players should be able to read and aim for that rule. A matter-js stack jitters and sometimes collapses unpredictably, which would blur the sense of improving, so friction and balance are hand-written. Only the topple is shown with a simple motion calculation.",
+      "soundDecision": "No music, only wood sounds. A clean knock-out rings a bright ka-KON, a dragging hit gives a dull klok, iron clangs and rubber thuds, so your ear also tells you how good the strike was. The stack landing (thok), creaks when it is about to fall, a marimba-like jingle on stage clear and a brush stroke when the daruma gets its second eye mark the milestones."
+    }
+  },
+  "createdAt": "2026-10-24T11:45:09+09:00",
+  "specVersion": 8,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-24T11:45:09+09:00",
+    "metricsFrom": "2026-10-24T02:42:20.190Z",
+    "transcript": "689e7b6c-a98d-4b0d-aa6c-ad4628b6b829.jsonl",
+    "validationRuns": 1,
+    "finishedAt": "2026-10-24T11:57:38+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-24T11:48:21+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "32.1KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=230",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=202",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=210",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=187",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 32824,
+    "lines": 673
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "横からすばやくはじくと「スパーン！」と抜けて上が落ちる手応えは気持ちよく、ゆっくり押すと塔ごとずれる・中途半端だと半分だけ抜けて「おもい…」になる、という打ち方の差もすぐ分かった。かたむいた塔を押して直してから抜く場面は少し考えどころがある。ただ、速くまっすぐ打てばほぼ失敗しないので、序盤は単調。ステージ5のゴムは中くらいの速さだと抜けきらず塔がまるごと倒れ、急に難しく感じた（計測では約1000px/秒）。倒れたブロックが床の上で少し浮いたり斜めに立ったまま止まって見える見た目の粗がある。自己プレイは時間停止＋毎回再生なので、再生ごとにスコアが数点ぶれた。",
+    "similar": [
+      {
+        "title": "だるま落とし（日本の伝統的な木のおもちゃ）",
+        "url": "https://www.sg.emb-japan.go.jp/JCC/E-Magazine-Apr-2020-Traditional-Japanese-Toys.html",
+        "similarity": "高",
+        "note": "小槌で下の段を打ち抜き、だるまを倒さずに下ろす遊びそのもの。本作はスワイプの速さと角度で上のずれ方が決まる規則と、押して直す操作、鉄・ゴム・氷の段を加えた。",
+        "note_en": "The very toy: knock out the lower pieces with a mallet without toppling the daruma. This game adds a rule where swipe speed and angle decide how much the stack shifts, a slow push to correct it, and iron, rubber and ice pieces."
+      },
+      {
+        "title": "Daruma Otoshi（慣性の物理実験デモ）",
+        "url": "https://physicsdemos.site.wesleyan.edu/?p=4645",
+        "similarity": "中",
+        "note": "だるま落としは慣性の実験としても使われる。速く打つほど上の段に摩擦が伝わる時間が短くずれにくい、という本作の規則はこの原理を誇張したもの。",
+        "note_en": "Daruma otoshi is used as an inertia demo. The game rule that faster hits give friction less time to drag the stack is an exaggerated version of this principle."
+      },
+      {
+        "title": "ネコ落とし",
+        "url": "https://apps.apple.com/us/app/%E3%83%8D%E3%82%B3%E8%90%BD%E3%81%A8%E3%81%97/id6443913514",
+        "similarity": "中",
+        "note": "だるま落としを題材にしたスマホゲーム。上下に動くハンマーをタイミングよくタップする方式で、本作のように打つ速さ・向き・ずれの蓄積を扱うものではない。",
+        "note_en": "A phone game based on daruma otoshi where you tap in time with a moving hammer; it does not deal with strike speed, direction or accumulated drift like this game."
+      },
+      {
+        "title": "Jenga（NaturalMotion 公式アプリ）",
+        "url": "https://www.pocketgamer.com/jenga/review-4177/",
+        "similarity": "低",
+        "note": "積んだブロックを抜いて塔を崩さない物理ゲーム。指でつついて抜く手探りが中心で、横から一撃ではじく本作とは操作も判断も違う。",
+        "note_en": "A physics game of pulling blocks without toppling the tower, centred on probing blocks with a finger, unlike this game’s single sideways flick."
+      }
+    ],
+    "research": "WebSearchで「だるま落とし ゲーム アプリ」「Jenga mobile game physics block tower」「Daruma otoshi toy hammer game history」を検索し、元になった伝統玩具、慣性の物理デモ、既存のだるま落としアプリ、ジェンガのアプリを確認した。",
+    "i18n": {
+      "en": {
+        "comment": "Flicking sideways fast gives a satisfying Ka-KON as the block shoots out and the stack drops, and the differences between strikes read right away: a slow push shifts the whole stack, and a half-speed hit leaves the block half out (Heavy…). Straightening the leaning tower by pushing before knocking blocks out needs a little thought. But a fast, level flick almost never fails, so the early stages feel samey. In stage 5 the rubber block would not clear at medium speed (about 1000 px/s measured) and the whole stack toppled, which felt like a sudden spike. Fallen blocks sometimes look like they float slightly or stay propped at an angle on the floor. Self-play replays every step, so the score shifted by a few points between replays.",
+        "research": "Searched the web for daruma-otoshi game apps, Jenga mobile physics games and the history of the daruma otoshi toy, confirming the original toy, an inertia physics demo, an existing daruma-otoshi app and the Jenga app."
+      }
+    },
+    "method": "スマホ縦画面で 28 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 28 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "タイトル画面。だるまの塔と遊び方3行。タップして開始する",
+        "noteEn": "Title screen with a daruma tower and three lines of instructions. Tap to start.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "swipe(0.04,0.75→0.96,0.75) 90ms → wait 700ms",
+        "note": "一番下の赤ブロックを左から速く水平にはじく",
+        "noteEn": "Flick the bottom red block fast and level from the left.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "swipe(0.96,0.76→0.04,0.76) 90ms → wait 700ms",
+        "note": "スパーン！と抜けて上が少し右へ。次は右から打って戻す",
+        "noteEn": "Ka-KON! The stack shifted slightly right, so strike from the right to pull it back.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "swipe(0.04,0.79→0.96,0.79) 90ms → wait 900ms",
+        "note": "最後の緑を左からはじく",
+        "noteEn": "Flick the last green block from the left.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 500ms → tap(0.50,0.50) 120ms → wait 300ms",
+        "note": "ぴったりでクリア。次へ",
+        "noteEn": "Perfect clear. Continue.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "swipe(0.05,0.76→0.60,0.76) 450ms → wait 800ms",
+        "note": "わざと遅めにスワイプして、上がどうずれるか試す",
+        "noteEn": "Swipe slowly on purpose to see how the stack shifts.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "swipe(0.97,0.75→0.42,0.75) 450ms → wait 800ms",
+        "note": "遅いと塔ごと右へずれた（押しただけ）。右から同じ速さで押し戻す",
+        "noteEn": "Too slow: the whole stack slid right (just a push). Push it back from the right at the same speed.",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "swipe(0.04,0.78→0.96,0.72) 160ms → wait 800ms",
+        "note": "中央に戻った。今度はやや斜め・中くらいの速さで緑をはじく",
+        "noteEn": "Back in the middle. Now flick the green one at medium speed with a slight angle.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "swipe(0.96,0.75→0.04,0.75) 90ms → wait 800ms",
+        "note": "斜めだとカコン、上が右に少しずれた。右から速く打って戻す",
+        "noteEn": "Angled gave a Klok and a slight right drift. Strike fast from the right to correct.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "swipe(0.96,0.76→0.04,0.76) 90ms → wait 800ms",
+        "note": "まだ少し右寄り。紫も右から",
+        "noteEn": "Still slightly right. Hit the purple one from the right too.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "swipe(0.04,0.79→0.96,0.79) 90ms → wait 1000ms",
+        "note": "最後のオレンジを左から",
+        "noteEn": "Last orange block from the left.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.50,0.50) 120ms → wait 400ms",
+        "note": "いいかんじでクリア。ステージ3へ",
+        "noteEn": "Cleared with Nice. On to stage 3.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "swipe(0.98,0.76→0.40,0.76) 420ms → wait 800ms",
+        "note": "塔が右に傾いている。右からゆっくり押して上ごと左へ戻す",
+        "noteEn": "The tower leans right. Push slowly from the right to shift the whole stack back left.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "swipe(0.02,0.75→0.90,0.75) 90ms → wait 800ms",
+        "note": "中途半端な速さで紫が半分だけ左へ抜けた（おもい…）。はみ出た紫を左から速く抜く",
+        "noteEn": "A half-speed hit slid the purple block halfway out (Heavy…). Flick the sticking-out purple from the left, fast.",
+        "image": "ai-play/step-14.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "swipe(0.98,0.75→0.05,0.75) 100ms → wait 800ms",
+        "note": "まだ右寄り。右から打って少しずつ左へ寄せる",
+        "noteEn": "Still leaning right. Strike from the right to nudge it left.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "swipe(0.98,0.76→0.05,0.76) 100ms → wait 800ms",
+        "note": "もう一度右から",
+        "noteEn": "From the right again.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 17,
+        "action": "swipe(0.98,0.75→0.50,0.75) 420ms → wait 800ms",
+        "note": "速く打つと上はほとんど戻らない。最後の1段はゆっくり押して真ん中へ",
+        "noteEn": "Fast hits barely pull the stack back. Push the last block slowly toward the center.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 18,
+        "action": "swipe(0.02,0.79→0.96,0.79) 90ms → wait 1100ms",
+        "note": "ほぼ中央。左から速く抜く",
+        "noteEn": "Nearly centered. Flick it out fast from the left.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 19,
+        "action": "tap(0.50,0.50) 120ms → wait 500ms",
+        "note": "ステージ4へ",
+        "noteEn": "On to stage 4.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 20,
+        "action": "swipe(0.02,0.66→0.94,0.66) 230ms → wait 900ms",
+        "note": "鉄ブロックを中くらいの速さで打ってみる",
+        "noteEn": "Try the iron block at medium speed.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 21,
+        "action": "swipe(0.98,0.79→0.04,0.79) 90ms → wait 800ms",
+        "note": "鉄は抜けたが上が右へずれた。一番下の赤を右から",
+        "noteEn": "Iron came out but the stack moved right. Bottom red from the right.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 22,
+        "action": "swipe(0.98,0.80→0.04,0.74) 170ms → wait 800ms",
+        "note": "緑を右から、わざと斜めに",
+        "noteEn": "Green from the right, angled on purpose.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 23,
+        "action": "swipe(0.02,0.79→0.96,0.79) 90ms → wait 800ms → swipe(0.02,0.79→0.96,0.79) 90ms → wait 1100ms",
+        "note": "少し左寄りになったので、残り2段は左から続けて抜く",
+        "noteEn": "Now slightly left, so knock the last two out from the left.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 24,
+        "action": "tap(0.50,0.50) 120ms → wait 500ms",
+        "note": "左端に飛んだ緑ブロックが床で少し浮いて止まって見える（見た目だけ）。ステージ5へ",
+        "noteEn": "The green block that flew left seems to rest slightly above the floor at the edge (cosmetic). On to stage 5.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 25,
+        "action": "swipe(0.02,0.66→0.96,0.66) 170ms → wait 900ms",
+        "note": "ゴムを左から中くらいの速さで",
+        "noteEn": "Rubber block from the left at medium speed.",
+        "image": "ai-play/step-25.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 894
+            }
+          },
+          {
+            "agf": "end",
+            "score": 894
+          }
+        ]
+      },
+      {
+        "step": 26,
+        "action": "wait 1500ms",
+        "note": "ゴムが抜けきらず、ひっぱられた上の段が右へ倒れた。中くらいの速さではゴムは無理だった",
+        "noteEn": "The rubber block did not clear and dragged the stack over to the right. Medium speed is not enough for rubber.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 894
+            }
+          },
+          {
+            "agf": "end",
+            "score": 894
+          }
+        ]
+      },
+      {
+        "step": 27,
+        "action": "wait 600ms → tap(0.50,0.50) 120ms → wait 500ms",
+        "note": "くずれた…でスコア894、ベスト更新。倒れたゴムが床で斜めに立ったまま止まって見える（見た目の粗）。タップでもう一度",
+        "noteEn": "Toppled: 894 points, new best. The fallen rubber block looks propped up at an angle on the floor (visual glitch). Tap to play again.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 894
+            }
+          },
+          {
+            "agf": "end",
+            "score": 894
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 28,
+        "action": "swipe(0.02,0.62→0.96,0.62) 90ms → wait 900ms",
+        "note": "再スタートできた。ためしにだるまの頭を打ってみる",
+        "noteEn": "Restarted fine. Try hitting the daruma's head on purpose.",
+        "image": "ai-play/step-28.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 894
+            }
+          },
+          {
+            "agf": "end",
+            "score": 894
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-24T11:57:38+09:00"
+  },
+  "publishedAt": "2026-10-24T11:57:38+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 20158,
+    "outputTokens": 29442,
+    "contextTokens": 8977564,
+    "turns": 54,
+    "toolCalls": 59,
+    "webSearches": 0,
+    "minutes": 15.3,
+    "from": "2026-10-24T02:42:20.190Z",
+    "to": "2026-10-24T02:57:38.920Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-24T11:57:38+09:00",
+    "validationRuns": 1,
+    "codeKB": 32.1
+  }
+}
