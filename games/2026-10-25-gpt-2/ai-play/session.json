@@ -1,0 +1,276 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-25T03:14:12.473Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.85
+        ]
+      },
+      "desc": "tap(0.50,0.85) 120ms",
+      "note": "星と菱形で色が分かる。循環する行列を触り、相手の応答を見る。",
+      "noteEn": "Stars and diamonds distinguish colors. Start to test shifting and the opponent response.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": [
+        {
+          "tap": [
+            0.078,
+            0.645
+          ]
+        },
+        {
+          "wait": 1000
+        }
+      ],
+      "desc": "tap(0.08,0.65) 120ms → wait 1000ms",
+      "note": "下段に青が二つある。下段を左へ送り、斜めのつながりを作りたい。",
+      "noteEn": "Two blue stones are on the bottom row. Shift it left to work toward a diagonal.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "tap": [
+            0.922,
+            0.548
+          ]
+        },
+        {
+          "wait": 1000
+        }
+      ],
+      "desc": "tap(0.92,0.55) 120ms → wait 1000ms",
+      "note": "2手でこちらの番に戻った。下から二段目の青を右に送り、横の二連を作る。",
+      "noteEn": "After two moves it is my turn again. Shift the second row from bottom right to make an adjacent blue pair.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "tap": [
+            0.242,
+            0.263
+          ]
+        },
+        {
+          "wait": 1000
+        }
+      ],
+      "desc": "tap(0.24,0.26) 120ms → wait 1000ms",
+      "note": "相手が左へ戻し、青の二連を崩した。左列を上へ送り、橙が上段に増える危険も確かめる。",
+      "noteEn": "The opponent shifted back left and broke my pair. Try shifting the left column up, testing the danger of adding orange to the top.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": [
+        {
+          "wait": 850
+        },
+        {
+          "tap": [
+            0.5,
+            0.85
+          ]
+        }
+      ],
+      "desc": "wait 850ms → tap(0.50,0.85) 120ms",
+      "note": "橙を上段に増やすと相手が三つにそろえ、6手で負けた。再開して次の初期配置を試す。",
+      "noteEn": "Adding orange to the top let the opponent complete three; I lost in six moves. Restart with the next opening layout.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "tap": [
+            0.758,
+            0.263
+          ]
+        },
+        {
+          "wait": 1000
+        }
+      ],
+      "desc": "tap(0.76,0.26) 120ms → wait 1000ms",
+      "note": "右上の青を循環で右下へ運ぶ。下段の青が三つ近くなるため、相手の守り方を見る。",
+      "noteEn": "Cycle the top-right blue to the bottom-right, bringing three blues closer on the bottom row. Watch the defense.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "wait": 850
+        },
+        {
+          "tap": [
+            0.5,
+            0.85
+          ]
+        }
+      ],
+      "desc": "wait 850ms → tap(0.50,0.85) 120ms",
+      "note": "2局目は相手の列の三つ並びを許し、2手で負けた。3つ目の配置では橙の二連を意識する。",
+      "noteEn": "The second opening allowed an orange column and ended in two moves. On the third layout, watch orange pairs carefully.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": [
+        {
+          "tap": [
+            0.922,
+            0.452
+          ]
+        },
+        {
+          "wait": 1000
+        }
+      ],
+      "desc": "tap(0.92,0.45) 120ms → wait 1000ms",
+      "note": "上から二段目を右へ送り、青を分散させる。橙の同じ列三つを作らないように選んだ。",
+      "noteEn": "Shift the second row right to redistribute blue, trying not to give orange a three-stone column.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": [
+        {
+          "tap": [
+            0.242,
+            0.738
+          ]
+        },
+        {
+          "wait": 1000
+        }
+      ],
+      "desc": "tap(0.24,0.74) 120ms → wait 1000ms",
+      "note": "相手は上段を左へ動かした。左列を下に送り、中段へ青二つを集める。",
+      "noteEn": "The opponent shifted the top row left. Shift the left column down to gather two blues in the middle.",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}

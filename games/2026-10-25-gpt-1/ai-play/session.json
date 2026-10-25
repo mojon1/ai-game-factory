@@ -1,0 +1,429 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-25T03:07:54.452Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.85
+        ]
+      },
+      "desc": "tap(0.50,0.85) 120ms",
+      "note": "青と橙のネコが見える。逆向きの動きと壁の使い方を試す。",
+      "noteEn": "The two cats are visible. Start to try opposite movement and walls.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": {
+        "tap": [
+          0.5,
+          0.79
+        ]
+      },
+      "desc": "tap(0.50,0.79) 120ms",
+      "note": "2匹は下端にいる。上へ動かすと橙だけが下端で止まるはず。",
+      "noteEn": "Both cats are at the bottom. An upward move should stop orange at the edge.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": {
+        "tap": [
+          0.72,
+          0.16
+        ]
+      },
+      "desc": "tap(0.72,0.16) 120ms",
+      "note": "青だけが一歩上がった。一手戻すを押し、間違えても戻れるかを見る。",
+      "noteEn": "Only blue moved up. Test undo before planning a longer route.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "swipe": [
+            0.26,
+            0.62,
+            0.26,
+            0.48
+          ],
+          "hold": 200
+        },
+        {
+          "swipe": [
+            0.26,
+            0.62,
+            0.26,
+            0.48
+          ],
+          "hold": 200
+        },
+        {
+          "swipe": [
+            0.26,
+            0.62,
+            0.26,
+            0.48
+          ],
+          "hold": 200
+        },
+        {
+          "swipe": [
+            0.26,
+            0.62,
+            0.26,
+            0.48
+          ],
+          "hold": 200
+        },
+        {
+          "swipe": [
+            0.26,
+            0.62,
+            0.26,
+            0.48
+          ],
+          "hold": 200
+        }
+      ],
+      "desc": "swipe(0.26,0.62→0.26,0.48) 200ms → swipe(0.26,0.62→0.26,0.48) 200ms → swipe(0.26,0.62→0.26,0.48) 200ms → swipe(0.26,0.62→0.26,0.48) 200ms → swipe(0.26,0.62→0.26,0.48) 200ms",
+      "note": "戻しが効いた。左の縦道には壁がないので、上へ5歩進み青を上端へ運ぶ。",
+      "noteEn": "Undo worked. The left column is clear; swipe up five times to bring blue to the top.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": {
+        "wait": 450
+      },
+      "desc": "wait 450ms",
+      "note": "5手になった。移動のアニメーションが止まるまで待ち、位置を確認する。",
+      "noteEn": "The counter reads five. Let the movement animation settle before checking positions.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "tap": [
+            0.67,
+            0.89
+          ]
+        },
+        {
+          "tap": [
+            0.67,
+            0.89
+          ]
+        },
+        {
+          "wait": 400
+        }
+      ],
+      "desc": "tap(0.67,0.89) 120ms → tap(0.67,0.89) 120ms → wait 400ms",
+      "note": "上段から右へ2歩。青を壁の上に置き、橙を壁の右側へ寄せたい。",
+      "noteEn": "Move right twice along the top, placing blue above the wall and orange to its right.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.89
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.89
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.89
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.89
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.89
+          ]
+        },
+        {
+          "wait": 400
+        }
+      ],
+      "desc": "tap(0.50,0.89) 120ms → tap(0.50,0.89) 120ms → tap(0.50,0.89) 120ms → tap(0.50,0.89) 120ms → tap(0.50,0.89) 120ms → wait 400ms",
+      "note": "青の真下は壁、橙の上は開いている。下を5回押して青を止めながら橙を上へ運ぶ。",
+      "noteEn": "Blue has a wall directly below while orange has an open column above. Press down five times to raise only orange.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": [
+        {
+          "tap": [
+            0.67,
+            0.89
+          ]
+        },
+        {
+          "tap": [
+            0.67,
+            0.89
+          ]
+        },
+        {
+          "tap": [
+            0.67,
+            0.89
+          ]
+        },
+        {
+          "wait": 400
+        }
+      ],
+      "desc": "tap(0.67,0.89) 120ms → tap(0.67,0.89) 120ms → tap(0.67,0.89) 120ms → wait 400ms",
+      "note": "2匹が上段で並んだ。右へ3歩なら青は右の家、橙は左の家に同時に入れる。",
+      "noteEn": "Both cats are on the top row. Three right moves should bring blue home on the right and orange home on the left.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": [
+        {
+          "wait": 800
+        },
+        {
+          "tap": [
+            0.5,
+            0.84
+          ]
+        }
+      ],
+      "desc": "wait 800ms → tap(0.50,0.84) 120ms",
+      "note": "15手で帰宅できた。次の庭へ進み、壁と家の配置が変わるかを見る。",
+      "noteEn": "Both arrived in 15 moves. Continue to inspect the next garden layout.",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.79
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.79
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.79
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.79
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.79
+          ]
+        },
+        {
+          "wait": 400
+        }
+      ],
+      "desc": "tap(0.50,0.79) 120ms → tap(0.50,0.79) 120ms → tap(0.50,0.79) 120ms → tap(0.50,0.79) 120ms → tap(0.50,0.79) 120ms → wait 400ms",
+      "note": "両端の縦道が開いている。上5歩で青を左上、橙を右下へそろえる。",
+      "noteEn": "The outer columns are clear. Five up moves should align blue at top left and orange at bottom right.",
+      "image": "ai-play/step-10.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "action": [
+        {
+          "tap": [
+            0.67,
+            0.89
+          ]
+        },
+        {
+          "tap": [
+            0.67,
+            0.89
+          ]
+        },
+        {
+          "tap": [
+            0.67,
+            0.89
+          ]
+        },
+        {
+          "tap": [
+            0.67,
+            0.89
+          ]
+        },
+        {
+          "wait": 400
+        }
+      ],
+      "desc": "tap(0.67,0.89) 120ms → tap(0.67,0.89) 120ms → tap(0.67,0.89) 120ms → tap(0.67,0.89) 120ms → wait 400ms",
+      "note": "上下の横道にも障害はない。右へ4歩なら、青と橙がそれぞれの家へ入れそう。",
+      "noteEn": "The top and bottom rows are clear too. Four right moves should bring both cats home.",
+      "image": "ai-play/step-11.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    },
+    {
+      "step": 12,
+      "action": [
+        {
+          "wait": 800
+        },
+        {
+          "tap": [
+            0.5,
+            0.84
+          ]
+        }
+      ],
+      "desc": "wait 800ms → tap(0.50,0.84) 120ms",
+      "note": "2つ目は外周だけで9手クリア。最後の庭の配置も確認する。",
+      "noteEn": "The second garden took only nine outer-edge moves. Inspect the final garden.",
+      "image": "ai-play/step-12.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}

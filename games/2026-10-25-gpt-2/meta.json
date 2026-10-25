@@ -1,0 +1,404 @@
+{
+  "id": "2026-10-25-gpt-2",
+  "status": "published",
+  "title": "くるっと三つ星",
+  "genre": "ボードゲーム",
+  "concept": "行や列をひとつ送ると、青と橙の石が一緒にずれ、端から消えた石が反対側へ戻る。自分の三つ並びを作る一手が、相手の三つ並びも作りかねない。動かす石ではなく盤面の一列を選び、配置の変化を読み合う小さな対戦。",
+  "howToPlay": "盤の外の矢印で一行・一列をひとつ循環させます。青を縦・横・斜めに三つ並べると勝ち。橙も同時に並ぶと相打ち、24手で引き分けです。",
+  "libraryDecision": "棚を確認して使用しない。正確な循環配置を読むボードゲームなので、物理や3Dの揺れは加えない。盤の色と相手の直前の矢印で手の変化を伝える。",
+  "soundDecision": "自分と相手の手を高さの違う小さな三角波で区別し、決着だけ別の音にする。BGMを入れず、次の並びを静かに考えられるようにする。",
+  "planning": {
+    "genreDraw": {
+      "ja": "ボードゲーム",
+      "en": "Board game",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "行・列を循環させて自分と相手の石を同時に動かし、先に三つ並べる対戦。",
+        "ideaEn": "Cycle rows and columns to move both colors and race to align three.",
+        "fromDraw": true
+      },
+      {
+        "idea": "風向きを読んで枯葉の舟を岸へ寄せる、細い川の滑走。",
+        "ideaEn": "Read wind to steer a leaf boat toward banks along a narrow stream.",
+        "fromDraw": false
+      },
+      {
+        "idea": "指を離すと縮む綱で二つの鈴をつなぎ、弾ませながら運ぶ遊び。",
+        "ideaEn": "Link two bells with a shrinking rope and bounce them toward destinations.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "other",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Rolling Three",
+      "concept": "Shift a whole row or column: both colors move, and stones wrap across the edge. A move toward your own three-in-a-row may complete the opponent's line. Choose a strip rather than a stone and read the changing arrangement.",
+      "howToPlay": "Tap arrows around the board to cycle one row or column. Three blue stones in a straight or diagonal line win. Both colors completing a line is a tie; 24 moves also draw.",
+      "libraryDecision": "Reviewed the shelf and chose no libraries. Exact cyclic arrangements are central; physics and 3D motion would obscure them. Board colors and the opponent's last arrow convey each change.",
+      "soundDecision": "Small triangle tones distinguish your move from the opponent's, with a separate ending tone. No background music: think through the next arrangement quietly."
+    }
+  },
+  "createdAt": "2026-10-25T12:13:42+09:00",
+  "specVersion": 8,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-25T12:13:42+09:00",
+    "metricsFrom": "2026-10-25T03:11:37.653Z",
+    "transcript": null,
+    "validationRuns": 1,
+    "finishedAt": "2026-10-25T12:18:03+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-25T12:13:59+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "7.1KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=49",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=85",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=34",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=65",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 7238,
+    "lines": 18
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "9手を各画像で確認し、3種類の開始配置、行列の循環、相手の応答、6手・2手・4手の敗北、再開を体験した。相手の石も動くため、目の前の二連だけを追うと負ける手応えがある。一方、相手に直前の移動を戻される循環があり、初見では相手が強い。相手の決着手の直後に結果が重なるため、どこで負けたか振り返りにくい。勝利・同時成立・24手引き分けまでは自己プレイ未到達。",
+    "similar": [
+      {
+        "title": "Quixo",
+        "url": "https://en.gigamic.com/modern-classics/105-quixo.html",
+        "similarity": "高",
+        "note": "列を押して両者の印を動かし、一直線を作る駆け引きが近い。本作は石の追加や所有の変更をなくし、4×4上の循環移動だけで三つを狙う。",
+        "note_en": "Both shift lines containing both players' marks to form an alignment. This game removes adding or changing ownership and uses only cyclic shifts on a 4×4 board to align three."
+      },
+      {
+        "title": "Pentago",
+        "url": "https://zacatrus.es/media/instrucciones/Pentago_Reglas_zacatrus.pdf",
+        "similarity": "中",
+        "note": "自分と相手の石を一度に動かす盤面操作と、両者同時の列が引き分けになる点が近い。本作は区画の回転ではなく、行・列の一マス循環で、石を置く手番はない。",
+        "note_en": "Both manipulate both players' stones and tie when both lines form at once. Here a row or column cycles one space instead of rotating quadrants, and no stones are placed."
+      }
+    ],
+    "research": "行列を押すゲームと盤面を回すゲームを2クエリで検索。GigamicのQuixo公式説明とPentagoの製品ルールを確認し、全石を巻き込む手と同時成立の系譜を比較した。",
+    "i18n": {
+      "en": {
+        "comment": "Viewed all nine step images across three openings, row/column wraparound, opponent responses, defeats in six, two and four moves, and restarts. Moving the opponent's stones makes chasing just one pair risky. However, the opponent sometimes reverses the last move and feels strong for a newcomer. The immediate result overlay makes the losing line harder to review. Victory, simultaneous alignment and the 24-move draw were not reached.",
+        "research": "Used two queries for line-pushing and board-rotation games. Verified Gigamic's official Quixo description and the Pentago product rules, comparing shared-piece movement and simultaneous alignment."
+      }
+    },
+    "method": "スマホ縦画面で 9 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 9 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.85) 120ms",
+        "note": "星と菱形で色が分かる。循環する行列を触り、相手の応答を見る。",
+        "noteEn": "Stars and diamonds distinguish colors. Start to test shifting and the opponent response.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.08,0.65) 120ms → wait 1000ms",
+        "note": "下段に青が二つある。下段を左へ送り、斜めのつながりを作りたい。",
+        "noteEn": "Two blue stones are on the bottom row. Shift it left to work toward a diagonal.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.92,0.55) 120ms → wait 1000ms",
+        "note": "2手でこちらの番に戻った。下から二段目の青を右に送り、横の二連を作る。",
+        "noteEn": "After two moves it is my turn again. Shift the second row from bottom right to make an adjacent blue pair.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.24,0.26) 120ms → wait 1000ms",
+        "note": "相手が左へ戻し、青の二連を崩した。左列を上へ送り、橙が上段に増える危険も確かめる。",
+        "noteEn": "The opponent shifted back left and broke my pair. Try shifting the left column up, testing the danger of adding orange to the top.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 850ms → tap(0.50,0.85) 120ms",
+        "note": "橙を上段に増やすと相手が三つにそろえ、6手で負けた。再開して次の初期配置を試す。",
+        "noteEn": "Adding orange to the top let the opponent complete three; I lost in six moves. Restart with the next opening layout.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.76,0.26) 120ms → wait 1000ms",
+        "note": "右上の青を循環で右下へ運ぶ。下段の青が三つ近くなるため、相手の守り方を見る。",
+        "noteEn": "Cycle the top-right blue to the bottom-right, bringing three blues closer on the bottom row. Watch the defense.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 850ms → tap(0.50,0.85) 120ms",
+        "note": "2局目は相手の列の三つ並びを許し、2手で負けた。3つ目の配置では橙の二連を意識する。",
+        "noteEn": "The second opening allowed an orange column and ended in two moves. On the third layout, watch orange pairs carefully.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.92,0.45) 120ms → wait 1000ms",
+        "note": "上から二段目を右へ送り、青を分散させる。橙の同じ列三つを作らないように選んだ。",
+        "noteEn": "Shift the second row right to redistribute blue, trying not to give orange a three-stone column.",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.24,0.74) 120ms → wait 1000ms",
+        "note": "相手は上段を左へ動かした。左列を下に送り、中段へ青二つを集める。",
+        "noteEn": "The opponent shifted the top row left. Shift the left column down to gather two blues in the middle.",
+        "image": "ai-play/step-09.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-25T12:18:03+09:00"
+  },
+  "publishedAt": "2026-10-25T12:18:03+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 4766,
+    "outputTokens": 6970,
+    "contextTokens": 2616785,
+    "turns": 14,
+    "toolCalls": 14,
+    "webSearches": null,
+    "minutes": 6.5,
+    "from": "2026-10-25T03:11:37.653Z",
+    "to": "2026-10-25T03:18:09.358Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-10-25T12:18:09+09:00",
+    "validationRuns": 1,
+    "codeKB": 7.1,
+    "evidence": "metrics-evidence.json"
+  }
+}
