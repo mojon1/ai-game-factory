@@ -1,0 +1,707 @@
+{
+  "id": "2026-10-25-claude-1",
+  "status": "published",
+  "title": "月まわし",
+  "genre": "シューティング",
+  "concept": "弾がそのまま盾になるシューティング。指でなぞって投げた「月」は惑星の重力で曲がり、速さと向きがちょうどよければ軌道にのって回り続け、近づくいん石を勝手にはじく。周回を重ねた月ほど得点倍率が上がるので、きれいな軌道を一発で作る手触りが核。",
+  "howToPlay": "画面に指を置き、なぞった向きにはなすと月が飛ぶ。線が緑なら安定軌道。回り続ける月でいん石をはじき、惑星を守る。",
+  "libraryDecision": "使わない。核は「中心の惑星1つの重力で月が曲がり、軌道にのる」ことで、中心力だけの計算は自作の数行で正確に書ける。matter-js は中心へ引く重力を持たず、物体同士の押し合いも不要なので面白さが増えない。",
+  "soundDecision": "BGMは付けず、月が1周するたびに五音音階のチャイムが鳴るようにした。月が増えて軌道が安定するほど、回る月たちが勝手に音楽を奏でるので、うまく守れている手応えが耳でも分かる。投げる音・はじく音（倍率が高いほど高い音）・惑星への衝撃音は Web Audio で自作。",
+  "planning": {
+    "genreDraw": {
+      "ja": "シューティング",
+      "en": "Shooter",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "月を投げて惑星の周りを回らせる軌道シューター。弾が重力で曲がり、うまく軌道にのせた月はずっと回っていん石をはじく盾になる。",
+        "ideaEn": "An orbital shooter: throw moons that curve under the planet's gravity. A moon put into orbit keeps circling and smashes meteors as a living shield.",
+        "fromDraw": true
+      },
+      {
+        "idea": "流れてくる書類の枠にハンコを押す職人ゲーム。押す長さで朱肉のかすれ方が変わり、まっすぐ・濃く・枠内に押せたら高得点。",
+        "ideaEn": "A stamp-craftsman game: stamp documents flowing past. How long you press changes the ink, and straight, dark, in-frame stamps score highest.",
+        "fromDraw": false
+      },
+      {
+        "idea": "2本の指で糸電話の糸をピンと張り、相手に声の波を届ける。たるむと声が弱まり、張りすぎると切れる。",
+        "ideaEn": "Hold a string telephone taut with two fingers to carry a voice wave. Slack weakens the voice; too much tension snaps the string.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "fail",
+    "input": [
+      "swipe",
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Moon Sling",
+      "concept": "A shooter where your bullets become your shield. A moon you swipe out curves under the planet's gravity; with the right speed and angle it settles into orbit and keeps smashing incoming meteors on its own. Moons that have circled longer give higher score multipliers, so the core is the feel of setting up a clean orbit in one throw.",
+      "howToPlay": "Touch the screen and release in the direction you swipe to throw a moon. A green line means a stable orbit. Orbiting moons smash meteors to protect the planet.",
+      "libraryDecision": "None. The core is moons curving and settling into orbit under one central gravity source, which a few lines of custom code handle exactly. matter-js has no central gravity and no body-to-body pushing is needed, so it would not add fun.",
+      "soundDecision": "No BGM; instead every completed lap rings a pentatonic chime. The more moons in stable orbits, the more they play music by themselves, so you can hear that your defense is working. Throw, smash (higher pitch with higher multiplier) and planet-hit sounds are made with Web Audio."
+    }
+  },
+  "createdAt": "2026-10-25T10:56:44+09:00",
+  "specVersion": 8,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-25T10:56:44+09:00",
+    "metricsFrom": "2026-10-25T01:55:49.135Z",
+    "transcript": "48bcd70c-2f01-4c4a-989d-27415701bedb.jsonl",
+    "validationRuns": 1,
+    "finishedAt": "2026-10-25T11:04:24+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-25T10:59:19+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "25.8KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=101",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=117",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=75",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=131",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 26382,
+    "lines": 653
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "なぞった向きに投げた月が惑星の重力で曲がり、きれいな円を描いて回り始める瞬間は気持ちいい。周回数が月の上に出て色が白→黄→水色と変わり、1周ごとにチャイムが鳴るので「うまく回せた」が目と耳で分かる。いっぽうで、いん石が月の輪を横切るタイミングが合うかは運の要素が大きく、1回目は月を4つ回していても19秒で惑星が壊れた（スコア120、最長5周）。序盤から少し厳しく、守れている実感より「すり抜けられた」悔しさが先に来る。直接いん石に投げつける遊び方もできるが、軌道にのせる手触りと防衛の手応えがまだ十分にかみ合っていない、ふつうの出来。予測線の緑・赤の表示は自己プレイの画面では離したあとしか写らず確認できていない。",
+    "similar": [
+      {
+        "title": "Orbit - Playing with Gravity",
+        "url": "https://apps.apple.com/app/id991457817",
+        "similarity": "高",
+        "note": "星をはじいて重力の中心のまわりの安定軌道にのせ、周回を重ねる手触りはほぼ同じ。予測線を見て投げる点も共通。違いは、こちらは軌道にのせた月がいん石をはじく盾になる防衛シューティングで、周回数が得点倍率になること。",
+        "note_en": "Nearly the same feel of flicking a body into a stable orbit around a gravity source and racking up laps, with a predicted path. The difference: here orbiting moons are a shield in a defense shooter, and laps become a score multiplier."
+      },
+      {
+        "title": "Missile Command",
+        "url": "https://en.wikipedia.org/wiki/Missile_Command",
+        "similarity": "中",
+        "note": "降ってくる物から守る対象を守り、全部壊されたら終わる防衛シューティングの構造が共通。違いは、弾をその場で爆発させるのではなく、重力で回り続ける月を置いて自動で守らせること。",
+        "note_en": "Shares the defense-shooter structure: protect a target from incoming objects until it is destroyed. The difference is that instead of detonating shots, you place moons that keep orbiting and defend automatically."
+      },
+      {
+        "title": "Mission Defend Earth",
+        "url": "https://toucharcade.com/games/mission-defend-earth",
+        "similarity": "中",
+        "note": "惑星のまわりの盾でいん石をはじくスマホゲーム。盾を左右に回して操作するのに対し、こちらは盾（月）を投げて重力に任せ、投げたあとは操作できない。",
+        "note_en": "A phone game where a shield around the planet deflects asteroids. There you rotate the shield; here you throw the shields (moons) and leave them to gravity with no control afterwards."
+      },
+      {
+        "title": "Orbiter",
+        "url": "https://apps.apple.com/app/id6752026143",
+        "similarity": "中",
+        "note": "片指のスリングショットで重力を使って軌道にのせる物理パズル。軌道にのせる気持ちよさは近いが、防衛や得点の要素はない。",
+        "note_en": "A one-finger slingshot physics puzzle about curving into orbit using gravity. Similar satisfaction of hitting orbit, but no defense or scoring."
+      }
+    ],
+    "research": "ウェブ検索を3回（重力で軌道にのせて惑星を守るゲーム、Orbit - Playing with Gravity、軌道上の盾で守る防衛ゲーム）行い、実在を確認できたものだけを挙げた。軌道にのせる手触りは Orbit が明確な先行作。",
+    "i18n": {
+      "en": {
+        "comment": "The moment a swiped moon bends under gravity and settles into a clean circle feels great. Lap counts show above each moon, colors shift white to yellow to cyan, and every lap rings a chime, so you see and hear when you have done it well. However, whether a meteor crosses a moon's ring at the right moment feels largely like luck: in my first run the planet broke at 19s even with four moons orbiting (score 120, best moon 5 laps). It is a bit harsh early, and frustration at meteors slipping through comes before the sense of defending. You can also throw moons straight at meteors, but the orbit feel and the defense payoff do not quite mesh yet; an average result. The green/red prediction line was not visible in my self-play screenshots (only taken after release), so I could not confirm it.",
+        "research": "Ran 3 web searches (gravity orbit planet-defense games, Orbit - Playing with Gravity, orbital-shield defense games) and listed only titles confirmed in results. Orbit is a clear predecessor for the orbit-setting feel."
+      }
+    },
+    "method": "スマホ縦画面で 20 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 20 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.80) 120ms",
+        "note": "タイトルをタップして開始",
+        "noteEn": "Tap the title to start",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "swipe(0.50,0.37→0.66,0.37) 250ms",
+        "note": "惑星の真上に指を置き、右へなぞって月を投げる。円軌道になる速さを狙う",
+        "noteEn": "Touch right above the planet and swipe right to throw a moon, aiming for circular-orbit speed",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 1500ms",
+        "note": "月の動きを見る",
+        "noteEn": "Watch the moon",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "swipe(0.50,0.76→0.37,0.76) 250ms",
+        "note": "1つ目は軌道にのった。2つ目は外側の輪に、下から左向きに投げる",
+        "noteEn": "First moon is orbiting. Throw a second on the outer ring, from below going left",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 3000ms",
+        "note": "右からいん石が来ている。月が当たるか見る",
+        "noteEn": "A meteor approaches from the right; see if a moon hits it",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 2000ms",
+        "note": "右下のいん石が内側の月の通り道に入ってきた。当たるか",
+        "noteEn": "The lower-right meteor enters the inner moon's path. Will it hit?",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "swipe(0.25,0.53→0.25,0.39) 250ms",
+        "note": "左側から上向きに3つ目の月。いん石が多い左側を守りたい",
+        "noteEn": "Third moon from the left side going up, to guard the left where meteors gather",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "swipe(0.12,0.30→0.20,0.22) 200ms",
+        "note": "1つ当てられた。左上のいん石に向けて直接月を投げつける",
+        "noteEn": "Planet got hit once. Throw a moon straight at the upper-left meteor",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 2500ms",
+        "note": "当たったか確認",
+        "noteEn": "Check whether it hit",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "swipe(0.62,0.52→0.62,0.40) 200ms",
+        "note": "残り1。右から来るいん石の手前、惑星の右に上向きで月を置く",
+        "noteEn": "One life left. Place a moon right of the planet moving up, in front of the meteor from the right",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "wait 2000ms",
+        "note": "防げるか",
+        "noteEn": "Can it block?",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "swipe(0.50,0.68→0.36,0.68) 200ms",
+        "note": "1つはじけた（+10）。内側を回る小さな軌道の月が3周目。下側にも月を足す",
+        "noteEn": "Smashed one (+10). A tight inner moon is on lap 3. Add a moon on the lower side",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "wait 3000ms",
+        "note": "回る月にまかせて様子を見る",
+        "noteEn": "Let the orbiting moons work",
+        "image": "ai-play/step-13.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "wait 3000ms",
+        "note": "続けて見る",
+        "noteEn": "Keep watching",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 120
+            }
+          },
+          {
+            "agf": "end",
+            "score": 120
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "tap(0.50,0.80) 120ms",
+        "note": "19秒でほしがこわれた。スコア120、月は最大5周。タップでもう一度",
+        "noteEn": "Planet destroyed at 19s. Score 120, longest moon 5 laps. Tap to retry",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 120
+            }
+          },
+          {
+            "agf": "end",
+            "score": 120
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "swipe(0.50,0.25→0.62,0.25) 200ms",
+        "note": "2回目。外側の大きな輪から始めてみる",
+        "noteEn": "Second run: start with a wide outer orbit",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 120
+            }
+          },
+          {
+            "agf": "end",
+            "score": 120
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 17,
+        "action": "wait 2500ms",
+        "note": "外側の軌道の様子",
+        "noteEn": "Watch the outer orbit",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 120
+            }
+          },
+          {
+            "agf": "end",
+            "score": 120
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 18,
+        "action": "swipe(0.50,0.25→0.62,0.25) 200ms",
+        "note": "前の手はゲーム再開のタップとして使われていた（0.7秒の誤タップ防止のため）。改めて上の外側の輪へ投げる",
+        "noteEn": "The previous swipe acted as the restart tap (0.7s guard). Now throw onto the outer ring at the top",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 120
+            }
+          },
+          {
+            "agf": "end",
+            "score": 120
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 19,
+        "action": "swipe(0.50,0.72→0.35,0.72) 200ms",
+        "note": "下側の中くらいの輪にも1つ",
+        "noteEn": "One more on a middle ring below",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 120
+            }
+          },
+          {
+            "agf": "end",
+            "score": 120
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 20,
+        "action": "wait 3000ms",
+        "note": "2つの月が逆側を回って守る形",
+        "noteEn": "Two moons circling on opposite sides",
+        "image": "ai-play/step-20.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 120
+            }
+          },
+          {
+            "agf": "end",
+            "score": 120
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-25T11:04:24+09:00"
+  },
+  "publishedAt": "2026-10-25T11:04:24+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 6676,
+    "outputTokens": 24725,
+    "contextTokens": 3340223,
+    "turns": 24,
+    "toolCalls": 34,
+    "webSearches": 0,
+    "minutes": 8.6,
+    "from": "2026-10-25T01:55:49.135Z",
+    "to": "2026-10-25T02:04:25.059Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-25T11:04:25+09:00",
+    "validationRuns": 1,
+    "codeKB": 25.8
+  }
+}
