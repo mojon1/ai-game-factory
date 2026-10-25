@@ -1,0 +1,417 @@
+{
+  "id": "2026-10-25-gpt-1",
+  "status": "published",
+  "title": "逆むきネコの帰り道",
+  "genre": "パズル",
+  "concept": "青いネコは指の向き、橙のネコは逆向きに一歩進む。壁にぶつかる一匹を足止めして、二匹の位置のずれを作る。先に家へ着かせるだけではそろわないので、同じ操作が両方にどう効くかを考える、三つの小さな庭の帰り道。",
+  "howToPlay": "スワイプか矢印で青を動かすと、橙は逆向きに動きます。壁で片方を止めながら、二匹を同時に同じ色の家へ入れましょう。一手戻し・やり直しが使えます。",
+  "libraryDecision": "共有棚を確認し、使用しない。二匹の離散的な一歩と壁の関係を正確に読むことが核で、物理や奥行きは加えない。短い補間アニメーションで二匹の動きを追えるようにする。",
+  "soundDecision": "移動は方向で少し高さが違う短い正弦波、両方が動けない時は低い音、帰宅は高い音。BGMは入れず、急かさず位置関係を考えられるようにする。",
+  "planning": {
+    "genreDraw": {
+      "ja": "農業・栽培",
+      "en": "Farming",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "日陰をずらすと葉の向きが育ち、限られた枝を光へ伸ばす鉢植え。",
+        "ideaEn": "Shift shade to grow a limited set of branches toward sunlight.",
+        "fromDraw": true
+      },
+      {
+        "idea": "一つのスワイプで逆向きに動く二匹を、壁を使って二つの家へ帰す。",
+        "ideaEn": "Use walls to guide two oppositely controlled cats into their homes.",
+        "fromDraw": false
+      },
+      {
+        "idea": "飛び交う荷物を風船へ投げ渡し、空の配送リレーをつなぐ。",
+        "ideaEn": "Toss parcels between balloons to build an aerial delivery relay.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 1
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "swipe",
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Opposite Cats",
+      "concept": "Blue follows your swipe while orange takes the opposite step. Stop one cat at a wall to change their separation. Getting one home is not enough: consider both effects of every move through three compact gardens.",
+      "howToPlay": "Swipe or tap arrows to move blue; orange goes the opposite way. Use walls to stop one cat and bring both to their matching homes together. Undo and reset are available.",
+      "libraryDecision": "Reviewed the shared shelf and chose none. Precisely reading discrete steps and walls is central; physics and depth would obscure it. Short interpolation helps track both cats.",
+      "soundDecision": "Brief sine tones vary by direction, with a low blocked tone and high home tone. No background music: consider the spatial relationship without urgency."
+    }
+  },
+  "createdAt": "2026-10-25T12:06:10+09:00",
+  "specVersion": 8,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-25T12:06:10+09:00",
+    "metricsFrom": "2026-10-25T03:05:31.370Z",
+    "transcript": null,
+    "validationRuns": 1,
+    "finishedAt": "2026-10-25T12:11:36+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-25T12:07:49+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "6.9KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=69",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=72",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=44",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=61",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 7063,
+    "lines": 18
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "comment": "12手の各画像を見て、矢印とスワイプ、一手戻し、15手と9手のクリア、次の庭への遷移を確認した。壁で片方だけ止まる発見は分かりやすい。2面目は外周だけで解けて1面目より簡単になり、難度の伸びは弱い。最終庭は配置を見た段階で、全3庭の踏破や全クリア後の再開までは自己プレイしていない。",
+    "similar": [
+      {
+        "title": "Binary Land",
+        "url": "https://strategywiki.org/wiki/Binary_Land",
+        "similarity": "高",
+        "note": "二匹を同時操作し、壁で片方を止めて位置をそろえる仕組みが非常に近い。本作は左右だけでなく上下も逆向きで、敵や時間制限をなくし、一手戻しを加えた短い手順パズル。",
+        "note_en": "The shared control and stopping one character at walls are very close. Here both axes are reversed, enemies and time limits are removed, and undo supports compact move puzzles."
+      },
+      {
+        "title": "BOKURA",
+        "url": "https://creatorslab.kodansha.co.jp/en/products/1275/",
+        "similarity": "低",
+        "note": "二つの異なる立場を同時に考えて進む点が共通する。ただし本作は一人で同一盤面を操作し、別々の画面や会話による協力はない。",
+        "note_en": "Both ask players to consider two different perspectives. This game instead uses one player and one board, without separate views or conversational cooperation."
+      }
+    ],
+    "research": "二者操作のパズルを4クエリで調査。BOKURAの発売元説明とBinary Landの操作資料を確認。左右鏡映の古典に近い系譜を明記し、上下も反転すること、敵や制限時間がない違いを整理した。",
+    "i18n": {
+      "en": {
+        "comment": "Viewed all 12 step images, testing arrows, swipes, undo, 15- and 9-move clears, and stage transitions. Discovering how walls stop one cat is readable. The second garden is easier than the first and uses only the edges, weakening progression. Inspected the final layout but did not complete all three gardens or test the final restart.",
+        "research": "Researched dual-character puzzles with four queries. Verified BOKURA's publisher description and a Binary Land control reference. Acknowledged the close horizontal-mirroring lineage and distinguished inversion on both axes and the absence of enemies and time pressure."
+      }
+    },
+    "method": "スマホ縦画面で 12 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 12 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.85) 120ms",
+        "note": "青と橙のネコが見える。逆向きの動きと壁の使い方を試す。",
+        "noteEn": "The two cats are visible. Start to try opposite movement and walls.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.50,0.79) 120ms",
+        "note": "2匹は下端にいる。上へ動かすと橙だけが下端で止まるはず。",
+        "noteEn": "Both cats are at the bottom. An upward move should stop orange at the edge.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.72,0.16) 120ms",
+        "note": "青だけが一歩上がった。一手戻すを押し、間違えても戻れるかを見る。",
+        "noteEn": "Only blue moved up. Test undo before planning a longer route.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "swipe(0.26,0.62→0.26,0.48) 200ms → swipe(0.26,0.62→0.26,0.48) 200ms → swipe(0.26,0.62→0.26,0.48) 200ms → swipe(0.26,0.62→0.26,0.48) 200ms → swipe(0.26,0.62→0.26,0.48) 200ms",
+        "note": "戻しが効いた。左の縦道には壁がないので、上へ5歩進み青を上端へ運ぶ。",
+        "noteEn": "Undo worked. The left column is clear; swipe up five times to bring blue to the top.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 450ms",
+        "note": "5手になった。移動のアニメーションが止まるまで待ち、位置を確認する。",
+        "noteEn": "The counter reads five. Let the movement animation settle before checking positions.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.67,0.89) 120ms → tap(0.67,0.89) 120ms → wait 400ms",
+        "note": "上段から右へ2歩。青を壁の上に置き、橙を壁の右側へ寄せたい。",
+        "noteEn": "Move right twice along the top, placing blue above the wall and orange to its right.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.50,0.89) 120ms → tap(0.50,0.89) 120ms → tap(0.50,0.89) 120ms → tap(0.50,0.89) 120ms → tap(0.50,0.89) 120ms → wait 400ms",
+        "note": "青の真下は壁、橙の上は開いている。下を5回押して青を止めながら橙を上へ運ぶ。",
+        "noteEn": "Blue has a wall directly below while orange has an open column above. Press down five times to raise only orange.",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.67,0.89) 120ms → tap(0.67,0.89) 120ms → tap(0.67,0.89) 120ms → wait 400ms",
+        "note": "2匹が上段で並んだ。右へ3歩なら青は右の家、橙は左の家に同時に入れる。",
+        "noteEn": "Both cats are on the top row. Three right moves should bring blue home on the right and orange home on the left.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 800ms → tap(0.50,0.84) 120ms",
+        "note": "15手で帰宅できた。次の庭へ進み、壁と家の配置が変わるかを見る。",
+        "noteEn": "Both arrived in 15 moves. Continue to inspect the next garden layout.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.50,0.79) 120ms → tap(0.50,0.79) 120ms → tap(0.50,0.79) 120ms → tap(0.50,0.79) 120ms → tap(0.50,0.79) 120ms → wait 400ms",
+        "note": "両端の縦道が開いている。上5歩で青を左上、橙を右下へそろえる。",
+        "noteEn": "The outer columns are clear. Five up moves should align blue at top left and orange at bottom right.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.67,0.89) 120ms → tap(0.67,0.89) 120ms → tap(0.67,0.89) 120ms → tap(0.67,0.89) 120ms → wait 400ms",
+        "note": "上下の横道にも障害はない。右へ4歩なら、青と橙がそれぞれの家へ入れそう。",
+        "noteEn": "The top and bottom rows are clear too. Four right moves should bring both cats home.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "wait 800ms → tap(0.50,0.84) 120ms",
+        "note": "2つ目は外周だけで9手クリア。最後の庭の配置も確認する。",
+        "noteEn": "The second garden took only nine outer-edge moves. Inspect the final garden.",
+        "image": "ai-play/step-12.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-25T12:11:36+09:00"
+  },
+  "publishedAt": "2026-10-25T12:11:36+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 2265,
+    "outputTokens": 7444,
+    "contextTokens": 3220256,
+    "turns": 20,
+    "toolCalls": 20,
+    "webSearches": null,
+    "minutes": 6.1,
+    "from": "2026-10-25T03:05:31.370Z",
+    "to": "2026-10-25T03:11:37.187Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-10-25T12:11:37+09:00",
+    "validationRuns": 1,
+    "codeKB": 6.9,
+    "evidence": "metrics-evidence.json"
+  }
+}
