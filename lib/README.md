@@ -18,8 +18,11 @@
 | cannon-es 0.20.0 | 3Dの物理演算 | `cannon-es-0.20.0.min.js` | `CANNON` | 121KB（約35KB） |
 | ZzFX 1.4.0 | 効果音の生成 | `zzfx-1.4.0.min.js` | `zzfx` `ZZFX` `ZZFXSound` | 2KB |
 | ZzFXM 2.0.3 | 曲（BGM）の生成 | `zzfxm-2.0.3.min.js`（zzfx の後に読む） | `zzfxM` | 1KB |
+| PixiJS 8.22.0 | 2Dの高速・高品質な描画 | `pixi-8.22.0.min.js` | `PIXI` | 820KB（約231KB） |
+| pixi-filters 6.1.5 | PixiJS の画面効果（光・ぼかし・衝撃波など） | `pixi-filters-6.1.5.min.js`（pixi の後に読む） | `PIXI.filters` | 211KB（約43KB） |
+| anime.js 4.5.0 | なめらかな動き（トゥイーン） | `anime-4.5.0.min.js` | `anime` | 115KB（約39KB） |
 
-すべて 2026-10-07 に追加。ライセンスはすべて MIT（`*-LICENSE.txt`）。
+three.js〜ZzFXM は 2026-10-07、PixiJS・pixi-filters・anime.js は 2026-10-26 に追加。ライセンスはすべて MIT（`*-LICENSE.txt`）。
 
 ## 作り方（人間向けメモ）
 

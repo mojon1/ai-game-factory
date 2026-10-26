@@ -49,7 +49,7 @@ writeMeta(id, {
   structure: { goal: '', ending: '', input: [] },   // 作品の構造（GAME_SPEC.md「作品の構造」）
   i18n: { en: { title: '', concept: '', howToPlay: '', libraryDecision: '', soundDecision: '' } },
   createdAt: now.iso,
-  specVersion: 9,
+  specVersion: 10,
   maker: String(a.maker).toLowerCase(),
   credits: [{ role: 'main', name: a.name, vendor: a.vendor || '', model: a.model, via: a.via || '' }],
   generation: {

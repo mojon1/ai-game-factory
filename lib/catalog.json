@@ -21,14 +21,38 @@
       "version": "0.186.1",
       "file": "three-addons-0.186.1.min.js",
       "global": "THREE_ADDONS",
-      "requires": ["three-0.186.1.min.js"],
+      "requires": [
+        "three-0.186.1.min.js"
+      ],
       "license": "MIT (three-LICENSE.txt)",
       "sizeKB": 175,
       "gzipKB": 67,
       "addedAt": "2026-10-07",
       "purpose": "three.js の追加部品。画面効果（光のにじみ・残像・グリッチなど）、角丸の箱、ノイズ（地形づくり）、空、カメラ操作。",
       "purpose_en": "three.js add-ons: post-processing (bloom, afterimage, glitch, …), rounded boxes, noise (terrain), sky, camera controls.",
-      "contents": ["EffectComposer", "RenderPass", "ShaderPass", "UnrealBloomPass", "OutputPass", "SMAAPass", "AfterimagePass", "GlitchPass", "FilmPass", "OutlinePass", "BokehPass", "FXAAShader", "RGBShiftShader", "VignetteShader", "RoundedBoxGeometry", "ConvexGeometry", "SimplexNoise", "ImprovedNoise", "BufferGeometryUtils", "Sky", "OrbitControls"],
+      "contents": [
+        "EffectComposer",
+        "RenderPass",
+        "ShaderPass",
+        "UnrealBloomPass",
+        "OutputPass",
+        "SMAAPass",
+        "AfterimagePass",
+        "GlitchPass",
+        "FilmPass",
+        "OutlinePass",
+        "BokehPass",
+        "FXAAShader",
+        "RGBShiftShader",
+        "VignetteShader",
+        "RoundedBoxGeometry",
+        "ConvexGeometry",
+        "SimplexNoise",
+        "ImprovedNoise",
+        "BufferGeometryUtils",
+        "Sky",
+        "OrbitControls"
+      ],
       "usage": "three-0.186.1.min.js の後に <script src=\"../../lib/three-addons-0.186.1.min.js\"></script>。例: const { EffectComposer, RenderPass, UnrealBloomPass, OutputPass } = THREE_ADDONS; BufferGeometryUtils は THREE_ADDONS.BufferGeometryUtils.mergeGeometries(...) のように使う。",
       "usage_en": "Load after three-0.186.1.min.js. e.g. const { EffectComposer, RenderPass, UnrealBloomPass, OutputPass } = THREE_ADDONS; use THREE_ADDONS.BufferGeometryUtils.mergeGeometries(...) etc.",
       "source": "npm three@0.186.1 の examples/jsm から上記を esbuild で1ファイル（IIFE・minify）にまとめたもの。three 本体は window.THREE を参照する。中身は無改変。"
@@ -83,7 +107,9 @@
       "version": "2.0.3",
       "file": "zzfxm-2.0.3.min.js",
       "global": "zzfxM",
-      "requires": ["zzfx-1.4.0.min.js"],
+      "requires": [
+        "zzfx-1.4.0.min.js"
+      ],
       "license": "MIT (zzfxm-LICENSE.txt)",
       "sizeKB": 1,
       "gzipKB": 1,
@@ -93,6 +119,54 @@
       "usage": "zzfx-1.4.0.min.js の後に <script src=\"../../lib/zzfxm-2.0.3.min.js\"></script>。const song = zzfxM(楽器の配列, パターンの配列, 並び順, BPM); const node = ZZFX.playSamples(song, 音量, 1, 0, ループするなら true); 止めるときは node?.stop()。曲の生成は重いので、タイトル画面などで1回だけ行う。",
       "usage_en": "Load after zzfx-1.4.0.min.js. const song = zzfxM(instruments, patterns, sequence, bpm); const node = ZZFX.playSamples(song, volume, 1, 0, loop); stop with node?.stop(). Rendering a song is heavy, so do it once (e.g. on the title screen).",
       "source": "github.com/keithclark/ZzFXM の zzfxm.js（v2.0.3）を minify。AGF の修正: 元はグローバル変数 zzfxR / zzfxG を前提にしているため、ZZFX.sampleRate と ZZFX.buildSamples につないだ。"
+    },
+    {
+      "name": "PixiJS",
+      "version": "8.22.0",
+      "file": "pixi-8.22.0.min.js",
+      "global": "PIXI",
+      "license": "MIT (pixi-LICENSE.txt)",
+      "sizeKB": 820,
+      "gzipKB": 231,
+      "addedAt": "2026-10-26",
+      "purpose": "2Dの高速・高品質な描画（WebGL）。たくさんの物体、なめらかな拡大・回転、画面効果（pixi-filters と組み合わせて光・ぼかし・ゆがみなど）で、2Dの見た目を豊かにできる。",
+      "purpose_en": "Fast, high-quality 2D rendering (WebGL): many objects, smooth scaling/rotation, and screen effects (with pixi-filters: glow, blur, distortion…).",
+      "usage": "<script src=\"../../lib/pixi-8.22.0.min.js\"></script>。初期化は非同期: const app = new PIXI.Application(); await app.init({ resizeTo: window, background: '#000', antialias: true, preference: 'webgl' }); document.body.appendChild(app.canvas); 図形は new PIXI.Graphics().circle(0,0,10).fill(0xffffff)、文字は new PIXI.Text({ text, style })。毎フレームの処理は app.ticker.add((t) => { … t.deltaMS … })。",
+      "usage_en": "Async init: const app = new PIXI.Application(); await app.init({ resizeTo: window, background: '#000', antialias: true, preference: 'webgl' }); document.body.appendChild(app.canvas); shapes: new PIXI.Graphics().circle(0,0,10).fill(0xffffff); text: new PIXI.Text({ text, style }); per-frame: app.ticker.add((t) => { … t.deltaMS … }).",
+      "source": "npm pixi.js@8.22.0 の dist/pixi.min.js（無改変。先頭にライセンス表記の1行を追加し、末尾のソースマップ参照の1行を削除）。"
+    },
+    {
+      "name": "pixi-filters",
+      "version": "6.1.5",
+      "file": "pixi-filters-6.1.5.min.js",
+      "global": "PIXI.filters",
+      "requires": [
+        "pixi-8.22.0.min.js"
+      ],
+      "license": "MIT (pixi-filters-LICENSE.txt)",
+      "sizeKB": 211,
+      "gzipKB": 43,
+      "addedAt": "2026-10-26",
+      "purpose": "PixiJS 用の画面効果集（GlowFilter 光る縁、AdvancedBloomFilter 光のにじみ、ShockwaveFilter 衝撃波、GodrayFilter 光の筋、CRTFilter、PixelateFilter、DropShadowFilter など約50種）。",
+      "purpose_en": "Effect filters for PixiJS (GlowFilter, AdvancedBloomFilter, ShockwaveFilter, GodrayFilter, CRTFilter, PixelateFilter, DropShadowFilter… about 50).",
+      "usage": "pixi-8.22.0.min.js の後に <script src=\"../../lib/pixi-filters-6.1.5.min.js\"></script>。例: sprite.filters = [new PIXI.filters.GlowFilter({ distance: 15, outerStrength: 2, color: 0xffaa00 })]。効果は重くなりやすいので、使う数と範囲を推奨環境に合わせて調整する。",
+      "usage_en": "Load after pixi-8.22.0.min.js. e.g. sprite.filters = [new PIXI.filters.GlowFilter({ distance: 15, outerStrength: 2, color: 0xffaa00 })]. Filters can be heavy; tune their number and area for the target phone.",
+      "source": "npm pixi-filters@6.1.5 の dist/pixi-filters.js を esbuild で minify（中身は無改変）。"
+    },
+    {
+      "name": "anime.js",
+      "version": "4.5.0",
+      "file": "anime-4.5.0.min.js",
+      "global": "anime",
+      "license": "MIT (anime-LICENSE.txt)",
+      "sizeKB": 115,
+      "gzipKB": 39,
+      "addedAt": "2026-10-26",
+      "purpose": "なめらかな動き（トゥイーン）。弾む・伸び縮みする・ふわっと消える・順番に動く（タイムライン）など、手応えのある動きを短く書ける。DOM の要素にも、PixiJS や three.js の物体の数値（位置・大きさ・透明度など）にも使える。",
+      "purpose_en": "Smooth motion (tweening): bounces, squash and stretch, fades, sequences (timelines). Works on DOM elements and on plain object values (positions, scale, alpha of PixiJS / three.js objects).",
+      "usage": "<script src=\"../../lib/anime-4.5.0.min.js\"></script>。const { animate, createTimeline, stagger } = anime; animate(obj, { x: 100, alpha: 0, duration: 400, ease: 'outElastic(1, .6)' })。obj は DOM 要素でも、普通のオブジェクト（例: PixiJS の sprite.scale）でもよい。",
+      "usage_en": "const { animate, createTimeline, stagger } = anime; animate(obj, { x: 100, alpha: 0, duration: 400, ease: 'outElastic(1, .6)' }). obj can be a DOM element or a plain object (e.g. a PixiJS sprite.scale).",
+      "source": "npm animejs@4.5.0 の dist/bundles/anime.umd.min.js（無改変。末尾のソースマップ参照の1行を削除）。"
     }
   ]
 }
