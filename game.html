@@ -112,6 +112,7 @@
     <p class="yours" id="yours" hidden></p>
     ${ai ? `<h2>${t('result.ai')}</h2>
     <div class="ai-verdict">${aiN ? `${starIcons(aiN, 'big')}<b>★${aiN}</b><span>${t('stars.' + aiN)}</span>` : ''}<span class="muted">${t('works.' + ai.works)}</span></div>
+    ${ai.worst ? `<p class="ai-worst"><span class="muted">${t('result.worst')}</span> ${esc(EN && ai.i18n?.en?.worst ? ai.i18n.en.worst : ai.worst)}</p>` : ''}
     <p class="ai-comment">${esc(EN && ai.i18n?.en?.comment ? ai.i18n.en.comment : ai.comment)}</p>` : ''}
     <button type="button" class="linkish" id="change">${t('rate.change')}</button>
   </section>
@@ -147,6 +148,8 @@
     <p class="muted small">${t('m.note')}</p>` : ''}
     ${ai?.similar ? `<h3>${t('sec.similar')}</h3>
     ${ai.similar.length ? `<ul class="similar">${ai.similar.map((s) => `<li><span class="sim">${t('sim.' + s.similarity)}</span> <b>${s.url ? `<a href="${esc(s.url)}" target="_blank" rel="noopener nofollow">${esc(s.title)}</a>` : esc(s.title)}</b><br><span class="muted">${esc(EN && s.note_en ? s.note_en : s.note)}</span></li>`).join('')}</ul>` : `<p class="muted">${t('similar.none')}</p>`}` : ''}
+    ${meta.improvements?.length ? `<h3>${t('sec.improve')}</h3>
+    <ol class="improve">${meta.improvements.map((x) => `<li><span class="muted">${t('improve.found')}</span> ${esc(EN && x.foundEn ? x.foundEn : x.found)}<br><span class="muted">${t('improve.changed')}</span> ${esc(EN && x.changedEn ? x.changedEn : x.changed)}</li>`).join('')}</ol>` : ''}
     ${ai?.playLog?.length ? `<h3>${t('sec.playlog')}</h3>
     <div class="playlog">${ai.playLog.filter((s) => s.image).map((s) => `<figure><img src="games/${encodeURIComponent(meta.id)}/${esc(s.image)}" alt="" loading="lazy" width="240" height="427"><figcaption>${String(s.step).padStart(2, '0')} · ${esc(EN && s.noteEn ? s.noteEn : s.note || '')}</figcaption></figure>`).join('')}</div>` : ''}
   </details>`;

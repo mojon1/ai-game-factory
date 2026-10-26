@@ -254,3 +254,10 @@ export function checkPlanning(p, genre) {
   if (genre && !genres().some((g) => g.ja === genre)) err.push('genre は factory/genres.json の ja のいずれか');
   return err;
 }
+
+// 「遊んで直す」の記録（meta.json の improvements）が正しいか（問題があれば説明の配列を返す）
+export function checkImprovements(list) {
+  if (!Array.isArray(list) || list.length < 2) return ['improvements に「遊んで直す」の記録を2回分以上（制作手順 1-4）'];
+  const bad = list.filter((x) => !x?.found || !x?.changed || !x?.foundEn || !x?.changedEn).length;
+  return bad ? ['improvements の各回に found / changed / foundEn / changedEn を書く'] : [];
+}

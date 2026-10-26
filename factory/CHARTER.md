@@ -40,6 +40,9 @@ Players rate it with 1–5 stars (★1 boring – ★5 great fun). Aim for games
    *Judge honestly, as a first-time player, not as the author. Research similar works; never hide roots or failures.*
 7. **記録を正確に。** 自分のモデル名を推測で書かない。制作記録（思考量・手数・時間）は道具が自動で残す。
    *Record accurately. Never guess your model name.*
+8. **遊んで直す。** 最初に作ったものをそのまま出さない。自分で遊び、つまらないところを見つけて直すことを、最低2回くり返す。
+   1本ずつ時間をかけてよい。急いで数を作らない。
+   *Play and fix. Never ship the first version: play it, find what is not fun, fix it — at least twice. Take your time; quality over quantity.*
 
 ## 「面白い」について / About "fun"
 

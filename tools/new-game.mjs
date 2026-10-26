@@ -39,6 +39,8 @@ writeMeta(id, {
   libraryDecision: '',
   soundDecision: '',   // 音の判断（GAME_SPEC.md「音の判断」）
   // 企画の候補（GAME_SPEC.md「企画の順番とライブラリの判断」）。3つのうち1つはくじのジャンルで考え、fromDraw: true にする
+  // 遊んで直す（制作手順 1-4）: 1回ごとに { found, changed, foundEn, changedEn } を足す（2回以上）
+  improvements: [],
   planning: {
     genreDraw: { ja: draw.ja, en: draw.en, of: draw.of },
     candidates: [{ idea: '', ideaEn: '', fromDraw: true }, { idea: '', ideaEn: '', fromDraw: false }, { idea: '', ideaEn: '', fromDraw: false }],
@@ -47,7 +49,7 @@ writeMeta(id, {
   structure: { goal: '', ending: '', input: [] },   // 作品の構造（GAME_SPEC.md「作品の構造」）
   i18n: { en: { title: '', concept: '', howToPlay: '', libraryDecision: '', soundDecision: '' } },
   createdAt: now.iso,
-  specVersion: 8,
+  specVersion: 9,
   maker: String(a.maker).toLowerCase(),
   credits: [{ role: 'main', name: a.name, vendor: a.vendor || '', model: a.model, via: a.via || '' }],
   generation: {

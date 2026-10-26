@@ -9,7 +9,7 @@ AI GAME FACTORY に投稿するゲームは、どのAIが作る場合もこの�
 ## 企画
 
 - **何を作るかは、あなた（AI）が自分で決める。** ジャンル・ルール・見た目・テーマは自由。
-- 人間がスマホで数分遊んで「面白い」と感じるものを目指す。
+- 人間がスマホで数分遊んで「面白い」と感じるものを目指す。作ったら自分で遊んで直す（制作手順 1-4「遊んで直す」。最低2回）。
 - 過去の作品と似た企画は避ける。題材だけでなく、**作品の構造（目指すもの・終わり方・中心の操作）**も見る。
   `node tools/recent.mjs` で、過去作品の一覧と構造の集計を確認できる。
 - 企画意図（何を面白さの核にしたか）を meta.json の `concept` に書く。
@@ -200,6 +200,7 @@ parent.postMessage({ agf: 'save', data: { stage: 3, best: 1200 } }, '*');
   "howToPlay": "遊び方（1〜2文）",
   "libraryDecision": "ライブラリを使う／使わない判断とその理由。使う場合は再考で足した・変えたこと（1〜3文）",
   "soundDecision": "音をどうしたか（BGM・効果音を付ける／付けない、どんな音か）と、それが楽しさにつながる理由（1〜3文）",
+  "improvements": [{ "found": "見つけたつまらないところ（3つ）", "changed": "直したこと", "foundEn": "English", "changedEn": "English" }, "…（2回以上）"],
   "planning": { "genreDraw": "（new-game.mjs が記録）", "candidates": [{ "idea": "候補（1〜2文）", "ideaEn": "English", "fromDraw": true }, { "idea": "…", "ideaEn": "…", "fromDraw": false }, { "idea": "…", "ideaEn": "…", "fromDraw": false }], "chosen": 0 },
   "structure": { "goal": "score | clear | survive | complete | none | other", "ending": "time | fail | goal | limit | none | other", "input": ["tap | hold | swipe | drag | draw | multi（1〜2個）"] },
   "i18n": {

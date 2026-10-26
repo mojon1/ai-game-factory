@@ -1,5 +1,5 @@
 // AIの自己判定を記録し、画像を圧縮してゲームを公開状態にする
-//   node tools/review.mjs <id> --stars 1-5 --works ok|buggy|broken \
+//   node tools/review.mjs <id> --stars 1-5 --works ok|buggy|broken --worst "一番の欠点" --worst-en "English" \
 //        --comment "感想" --comment-en "English" \
 //        --similar '<類似作品JSON>' --research "どう調べたか" --research-en "English" \
 //        --thumb <サムネに使うステップ番号>
@@ -12,7 +12,7 @@
 // 実行すると、プレイ画像は数枚だけ WebP に縮小して残し、残りは削除する（操作ログ session.json は残る）。
 import fs from 'node:fs';
 import path from 'node:path';
-import { gameDir, readMeta, writeMeta, readJson, parseArgs, jstNow, settings, toWebp, dirSize, checkStructure, checkPlanning } from './lib.mjs';
+import { gameDir, readMeta, writeMeta, readJson, parseArgs, jstNow, settings, toWebp, dirSize, checkStructure, checkPlanning, checkImprovements } from './lib.mjs';
 
 const a = parseArgs();
 const id = a._[0];
@@ -29,6 +29,10 @@ if (!Number.isInteger(stars) || stars < 1 || stars > 5) fail('--stars は 1〜5 
 const works = pick('works', ['ok', 'buggy', 'broken']);
 const str = (k, min = 0) => { const v = a[k]; if (typeof v !== 'string' || v.length < min) fail(`--${k} を指定してください${min ? `（${min}文字以上）` : ''}`); return v; };
 const comment = str('comment', 10), commentEn = str('comment-en', 10);
+// 仕様9以降は、点を付ける前に一番の欠点を書く
+const needWorst = (meta.specVersion || 0) >= 9;
+const worst = needWorst ? str('worst', 4) : (typeof a.worst === 'string' ? a.worst : undefined);
+const worstEn = needWorst ? str('worst-en', 4) : (typeof a['worst-en'] === 'string' ? a['worst-en'] : undefined);
 
 // 類似作品リサーチ（必須）
 let similar;
@@ -77,8 +81,8 @@ if (fs.existsSync(playDir)) {
 const main = meta.credits?.find((c) => c.role === 'main') || {};
 meta.aiReview = {
   reviewer: { name: main.name, vendor: main.vendor, model: main.model },
-  stars, works, comment, similar, research: research || undefined,
-  i18n: { en: { comment: commentEn, research: typeof a['research-en'] === 'string' ? a['research-en'] : undefined } },
+  stars, works, worst, comment, similar, research: research || undefined,
+  i18n: { en: { worst: worstEn, comment: commentEn, research: typeof a['research-en'] === 'string' ? a['research-en'] : undefined } },
   method: n ? `スマホ縦画面で ${n} 手プレイ（時間を止めて1手ずつ操作）` : 'プレイなし',
   methodEn: n ? `Played ${n} moves on a portrait phone screen (time frozen between moves)` : 'Not played',
   playLog,
@@ -96,6 +100,8 @@ const missing = [
   ...((meta.specVersion || 0) >= 5 ? checkStructure(meta.structure) : []),
   // 仕様7以降は、企画の候補3つ（うち1つはくじのジャンル）と、選んだ候補も必須
   ...((meta.specVersion || 0) >= 7 ? checkPlanning(meta.planning, meta.genre) : []),
+  // 仕様9以降は、「遊んで直す」を2回以上
+  ...((meta.specVersion || 0) >= 9 ? checkImprovements(meta.improvements) : []),
 ];
 if (missing.length) console.warn(`⚠ meta.json の未記入項目: ${missing.join(', ')}（埋めてから再実行すると公開されます）`);
 if (!meta.autoTest?.passed) console.warn('⚠ 自動テストに合格していません（node tools/validate.mjs で確認）');
