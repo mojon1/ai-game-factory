@@ -1,0 +1,406 @@
+{
+  "id": "2026-10-26-gpt-1",
+  "status": "published",
+  "title": "にじいろ境界線",
+  "genre": "陣取り",
+  "concept": "五本の旗から近い土地が自分の色になる。花の高得点を囲うか、橙の旗の隙間へ割り込むか。一点の配置で境界が塗り替わる、距離の陣取り。",
+  "howToPlay": "空きマスに青い旗を置き、橙と交互に五本ずつ置きます。近い旗の色が土地を取り、花は3点。同距離は中立です。",
+  "libraryDecision": "棚を確認し使用しない。正確な距離と色の境界を読むことが核なので、平面のマスを明瞭に描く。",
+  "soundDecision": "自分と相手の旗を短い音の高低で区別し、BGMは付けない。",
+  "improvements": [
+    {
+      "found": "置く前の影響が読めない／相手の最新の旗を見失う／一度のタップで決定して試せない。",
+      "changed": "土地を選んで領地と得点を予告し、別ボタンで確定する。相手の最後の旗に輪を付け、予告の説明を置いた。",
+      "foundEn": "No placement forecast; latest opponent flag is hard to find; a tap commits too quickly.",
+      "changedEn": "Added territory/score preview and separate confirmation, a ring on the latest opponent flag, and a preview instruction."
+    },
+    {
+      "found": "予告42点が確定点に見える／結果が盤を隠し敗因を追えない／再挑戦で比べる目標がない。",
+      "changed": "予告を「相手の応答前」と明示。結果は盤の下に移して最終境界を残し、ベスト点をサイトの保存機構で保持する。",
+      "foundEn": "Preview 42 can look guaranteed; results obscure the final borders; replays lack a personal comparison.",
+      "changedEn": "Labeled preview as before the reply, kept the final board visible above results, and saved a personal best through the site."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "陣取り",
+      "en": "Territory control",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "距離で色がにじむ旗を五本置き、花の土地を取り合う。",
+        "ideaEn": "Place five flags to claim nearby flower plots.",
+        "fromDraw": true
+      },
+      {
+        "idea": "風の予告を読んで雲へ荷物を渡す配送。",
+        "ideaEn": "Read wind forecasts to relay cargo between clouds.",
+        "fromDraw": false
+      },
+      {
+        "idea": "踏むと薄くなる足場で帰路を残す跳躍。",
+        "ideaEn": "Jump across fading platforms while preserving a way back.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "limit",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Color Borders",
+      "concept": "Five flags claim nearby plots. Surround valuable flowers or slip between orange flags: one placement redraws the border.",
+      "howToPlay": "Place five blue flags, alternating with orange. The nearest flag owns each plot; flowers score 3 and equal distances remain neutral.",
+      "libraryDecision": "Reviewed the shelf and chose no libraries: clear flat plots best express exact distances and borders.",
+      "soundDecision": "Short high and low tones distinguish your flag and the opponent's; no background music."
+    }
+  },
+  "createdAt": "2026-10-26T12:03:51+09:00",
+  "specVersion": 9,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-26T12:03:51+09:00",
+    "metricsFrom": "2026-10-26T03:01:47.218Z",
+    "transcript": null,
+    "validationRuns": 4,
+    "finishedAt": "2026-10-26T12:12:52+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-26T12:11:01+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "6.6KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=30",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=116",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=17",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=75",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 6715,
+    "lines": 11
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "五本の短い対戦で、相手の反撃まで読む手掛かりが少なく、配置の違いを長く探る深さは限られる。",
+    "comment": "改善を2回行い、最終版は7手の画像で確認した。右の花を取り21対21へ戻す場面と、置き方を替えて最終20対21の接戦にする場面で、境界を取り返す判断が成立した。予告と確定、最終盤の表示、ベスト20の保存と再開を確認。勝利は未到達。",
+    "similar": [
+      {
+        "title": "Voronoi Game",
+        "url": "https://papers.otfried.org/2002-034.pdf",
+        "similarity": "高",
+        "note": "最寄りの拠点で領域を取る同じ系譜。本作は交互に五本ずつ置く6×6の花付き盤へ絞った。",
+        "note_en": "Same nearest-site territory lineage; this game uses alternating five-flag turns on a weighted 6×6 flower board."
+      }
+    ],
+    "research": "Voronoi gameと陣取りを2クエリで検索し、研究者の公開論文でルーツを確認した。",
+    "i18n": {
+      "en": {
+        "worst": "Five-flag matches are short, with little guidance for anticipating replies and limited long-term strategic variety.",
+        "comment": "Completed two improvement cycles and viewed seven final steps. Taking the right flower recovered a 21–21 tie; changing later placements produced a close 20–21 finish. Preview/confirm, final board visibility, best 20 saving and restart worked. No victory reached.",
+        "research": "Searched Voronoi and territory games with two queries and verified the research paper on the author's site."
+      }
+    },
+    "method": "スマホ縦画面で 7 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 7 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.84) 120ms → tap(0.43,0.38) 120ms → tap(0.50,0.81) 120ms → wait 1000ms",
+        "note": "修正後の一局を始め、中央左から置く。",
+        "noteEn": "Start a fresh round after the best-score fix, placing centrally to the left.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.71,0.54) 120ms → tap(0.50,0.81) 120ms → wait 1000ms",
+        "note": "青14。右の花を取って中央の境界を押し返す。",
+        "noteEn": "At blue 14, take the right flower to push the border back.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.29,0.69) 120ms → tap(0.50,0.81) 120ms → wait 1000ms",
+        "note": "21対21。左下へ広げる。花を直接取る以外の置き方も効く。",
+        "noteEn": "Tied at 21. Expand bottom left; direct flower placement is not the only useful move.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.29,0.38) 120ms",
+        "note": "今回は角でなく左上の花を予告。現在21対20からどう変わるか比較する。",
+        "noteEn": "Preview the upper-left flower instead of a corner and compare against the current 21–20.",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.50,0.81) 120ms → wait 1000ms",
+        "note": "予告は22対18。花の旗を確定し、相手の反撃を見る。",
+        "noteEn": "The forecast is 22–18. Confirm the flower and inspect the reply.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.71,0.38) 120ms → tap(0.50,0.81) 120ms → wait 1000ms",
+        "note": "19対22。最後は右上の内側に置き、結果とベスト点を確かめる。",
+        "noteEn": "At 19–22, place inside the upper-right area and check the result and best score.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 20
+            }
+          },
+          {
+            "agf": "end",
+            "score": 20
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 850ms → tap(0.50,0.95) 120ms",
+        "note": "20対21の接戦。最終盤面とベスト20が見える。再開してベストが残るか見る。",
+        "noteEn": "A close 20–21 loss. The final board and best 20 are visible. Restart to check the best persists.",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 20
+            }
+          },
+          {
+            "agf": "end",
+            "score": 20
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-26T12:12:52+09:00"
+  },
+  "publishedAt": "2026-10-26T12:12:52+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 2888,
+    "outputTokens": 9134,
+    "contextTokens": 8630418,
+    "turns": 36,
+    "toolCalls": 36,
+    "webSearches": null,
+    "minutes": 11.2,
+    "from": "2026-10-26T03:01:47.218Z",
+    "to": "2026-10-26T03:12:56.873Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-10-26T12:12:57+09:00",
+    "validationRuns": 4,
+    "codeKB": 6.6,
+    "evidence": "metrics-evidence.json"
+  }
+}
