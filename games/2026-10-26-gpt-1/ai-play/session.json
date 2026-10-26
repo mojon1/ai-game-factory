@@ -1,0 +1,273 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-26T03:11:15.795Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.84
+          ]
+        },
+        {
+          "tap": [
+            0.431,
+            0.383
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.813
+          ]
+        },
+        {
+          "wait": 1000
+        }
+      ],
+      "desc": "tap(0.50,0.84) 120ms → tap(0.43,0.38) 120ms → tap(0.50,0.81) 120ms → wait 1000ms",
+      "note": "修正後の一局を始め、中央左から置く。",
+      "noteEn": "Start a fresh round after the best-score fix, placing centrally to the left.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": [
+        {
+          "tap": [
+            0.708,
+            0.539
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.813
+          ]
+        },
+        {
+          "wait": 1000
+        }
+      ],
+      "desc": "tap(0.71,0.54) 120ms → tap(0.50,0.81) 120ms → wait 1000ms",
+      "note": "青14。右の花を取って中央の境界を押し返す。",
+      "noteEn": "At blue 14, take the right flower to push the border back.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "tap": [
+            0.292,
+            0.695
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.813
+          ]
+        },
+        {
+          "wait": 1000
+        }
+      ],
+      "desc": "tap(0.29,0.69) 120ms → tap(0.50,0.81) 120ms → wait 1000ms",
+      "note": "21対21。左下へ広げる。花を直接取る以外の置き方も効く。",
+      "noteEn": "Tied at 21. Expand bottom left; direct flower placement is not the only useful move.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": {
+        "tap": [
+          0.292,
+          0.383
+        ]
+      },
+      "desc": "tap(0.29,0.38) 120ms",
+      "note": "今回は角でなく左上の花を予告。現在21対20からどう変わるか比較する。",
+      "noteEn": "Preview the upper-left flower instead of a corner and compare against the current 21–20.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.813
+          ]
+        },
+        {
+          "wait": 1000
+        }
+      ],
+      "desc": "tap(0.50,0.81) 120ms → wait 1000ms",
+      "note": "予告は22対18。花の旗を確定し、相手の反撃を見る。",
+      "noteEn": "The forecast is 22–18. Confirm the flower and inspect the reply.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "tap": [
+            0.708,
+            0.383
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.813
+          ]
+        },
+        {
+          "wait": 1000
+        }
+      ],
+      "desc": "tap(0.71,0.38) 120ms → tap(0.50,0.81) 120ms → wait 1000ms",
+      "note": "19対22。最後は右上の内側に置き、結果とベスト点を確かめる。",
+      "noteEn": "At 19–22, place inside the upper-right area and check the result and best score.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "best": 20
+          }
+        },
+        {
+          "agf": "end",
+          "score": 20
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "wait": 850
+        },
+        {
+          "tap": [
+            0.5,
+            0.955
+          ]
+        }
+      ],
+      "desc": "wait 850ms → tap(0.50,0.95) 120ms",
+      "note": "20対21の接戦。最終盤面とベスト20が見える。再開してベストが残るか見る。",
+      "noteEn": "A close 20–21 loss. The final board and best 20 are visible. Restart to check the best persists.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "best": 20
+          }
+        },
+        {
+          "agf": "end",
+          "score": 20
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}

@@ -1,0 +1,435 @@
+{
+  "id": "2026-10-26-gpt-2",
+  "status": "published",
+  "title": "ふた糸の月あかり",
+  "genre": "物理パズル",
+  "concept": "二本の糸を切る順番で月の振り子が変わる。一本残して勢いをつけ、最後の糸を離すタイミングで遠いかごへ月を届ける。",
+  "howToPlay": "上の切断ボタンで糸を切り、月をかごへ落とします。「ゆっくり」でタイミングを調整し、下のボタンで同じ夜をやり直せます。",
+  "libraryDecision": "Matter.js 0.20.0を使う。糸の張りと切った後の慣性を物理演算で連続させ、振り子の勢いを読む核を強める。",
+  "soundDecision": "切る音と成功・失敗の短い音をWeb Audioで作り、BGMは付けない。",
+  "improvements": [
+    {
+      "found": "動く細い糸を押し損ねる／どちらが切れたか分かりづらい／月の進んだ方向を追いにくい。",
+      "changed": "支点に48pxの固定切断ボタンを置き、残り糸数と切断済み表示、月の軌跡を加えた。",
+      "foundEn": "Moving thin threads are easy to miss; cut status is unclear; the flight path is hard to follow.",
+      "changedEn": "Added fixed 48px cut buttons at the anchors, remaining-thread and cut-state indicators, and a moon trail."
+    },
+    {
+      "found": "初夜のかごが厳しく基本操作で失敗する／速い揺れに合わせにくい／結果が軌跡を隠し左右のずれが分からない。",
+      "changed": "初夜のかごを広げ、0.18倍速の切替を加えた。結果でも月の軌跡・かご・通過点を残し、失敗方向を示す。",
+      "foundEn": "The opening basket is unforgiving; fast swings are hard to time; the result hides the trajectory and miss direction.",
+      "changedEn": "Widened the opening basket, added a 0.18× slow-motion toggle, and kept the path, basket and crossing marker visible with a miss-direction label."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "物理パズル",
+      "en": "Physics puzzle",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "二本の糸を切る順番とタイミングで、揺れる月をかごへ届ける。",
+        "ideaEn": "Time two thread cuts to deliver a swinging moon into a basket.",
+        "fromDraw": true
+      },
+      {
+        "idea": "濡れた筆のにじみを重ね、色の小島を作る。",
+        "ideaEn": "Layer wet-brush blooms into colored islands.",
+        "fromDraw": false
+      },
+      {
+        "idea": "水温を切り替え、珊瑚の枝を光へ向けて育てる。",
+        "ideaEn": "Change water temperature to guide coral growth toward light.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "other",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Two Moon Threads",
+      "concept": "Cut order changes a suspended moon's swing. Leave one thread for momentum, then time the final release to reach a distant basket.",
+      "howToPlay": "Cut threads with the fixed buttons to drop the moon into the basket. Toggle slow motion for precise timing; retry the night with the bottom button.",
+      "libraryDecision": "Use Matter.js 0.20.0 to preserve thread tension and release momentum, strengthening the pendulum-reading core.",
+      "soundDecision": "Short Web Audio tones mark cuts and outcomes, without background music."
+    }
+  },
+  "createdAt": "2026-10-26T12:14:18+09:00",
+  "specVersion": 9,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-26T12:14:18+09:00",
+    "metricsFrom": "2026-10-26T03:12:57.278Z",
+    "transcript": null,
+    "validationRuns": 3,
+    "finishedAt": "2026-10-26T12:22:15+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-26T12:19:39+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "6.6KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=34",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=74",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=22",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=71",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 6751,
+    "lines": 9
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "matter-js",
+      "version": "0.20.0",
+      "file": "matter-0.20.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "三つの夜は左右対称の短い配置で、切るタイミングが分かると次の発見が少ない。",
+    "comment": "2回改善し最終版8手を画像で確認。初夜はゆっくり操作で成功し、右と左のかごでは振り子の慣性を使って届けられた。3夜クリアと初夜への再開、故意に左へ外した軌跡と「左に通過」の表示も確認。切る位置を狙う負担が減り、勢いを見て離す判断が遊びになった。ただし配置の種類は少ない。",
+    "similar": [
+      {
+        "title": "Cut the Rope",
+        "url": "https://www.zeptolab.com/games/cut-the-rope",
+        "similarity": "高",
+        "note": "糸を切り、重力と慣性で目標へ届ける直接の系譜。本作は二本の糸・三夜・ゆっくり切替に絞り、収集星や仕掛けの連鎖はない。",
+        "note_en": "Direct rope-cutting, gravity and momentum lineage. This version focuses on two threads, three nights and slow motion, without collectible stars or gadget chains."
+      }
+    ],
+    "research": "糸切り物理パズルを1クエリで検索し、ZeptoLab公式のCut the Ropeを確認した。",
+    "i18n": {
+      "en": {
+        "worst": "The three short, largely mirrored layouts offer little further discovery once release timing is understood.",
+        "comment": "After two improvement cycles, viewed eight final steps. Slow motion cleared the opening; momentum delivered the moon to both side baskets. Verified all-three completion, restart, and a deliberate left miss with its trajectory and direction label. Fixed cut buttons leave room to judge momentum rather than chase touch targets. Layout variety remains limited.",
+        "research": "Used one query for rope-cutting physics puzzles and verified ZeptoLab's official Cut the Rope page."
+      }
+    },
+    "method": "スマホ縦画面で 8 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 8 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.84) 120ms → tap(0.50,0.73) 120ms",
+        "note": "最終版を開始し、初夜でゆっくりをONにする。",
+        "noteEn": "Start the final revision and turn on slow motion for the opening.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.25,0.23) 120ms → tap(0.75,0.23) 120ms → tap(0.50,0.73) 120ms → wait 1300ms",
+        "note": "ゆっくり中に二本を切り、落下は通常速度へ戻して見る。",
+        "noteEn": "Cut both while slowed, then restore normal speed for the fall.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 850ms → tap(0.50,0.96) 120ms → tap(0.25,0.23) 120ms → wait 80ms",
+        "note": "初夜はゆっくりで届いた。次は右のかご。左を切って右向きの勢いを作る。",
+        "noteEn": "Slow motion made the opening succeed. On the right-basket night, cut left to build rightward momentum.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.75,0.23) 120ms → wait 1300ms",
+        "note": "月は右へ動き、まだかごより左。ここで切り、慣性で右へ届ける。",
+        "noteEn": "The moon is moving right, still left of the basket. Release now to carry it across.",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 850ms → tap(0.50,0.96) 120ms → tap(0.75,0.23) 120ms → wait 80ms",
+        "note": "右のかごに届いた。最後は逆に右糸を切り、左への勢いを作る。",
+        "noteEn": "The right basket succeeded. On the final night, cut right to build leftward momentum.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.25,0.23) 120ms → wait 1300ms",
+        "note": "月が左へ進んでいる。残る左糸を切って左のかごへ。",
+        "noteEn": "The moon is moving left. Cut the remaining left thread toward the left basket.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 850ms → tap(0.50,0.96) 120ms",
+        "note": "三つの夜をクリアできた。もう一度で初夜に戻るか確認する。",
+        "noteEn": "All three nights cleared. Verify restart returns to the first night.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.75,0.23) 120ms → wait 80ms → tap(0.25,0.23) 120ms → wait 1400ms",
+        "note": "再開後の初夜で左へ強く放して、外れた方向の表示を確認する。",
+        "noteEn": "After restarting, release strongly left on the central night to inspect miss-direction feedback.",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-26T12:22:15+09:00"
+  },
+  "publishedAt": "2026-10-26T12:22:15+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 4931,
+    "outputTokens": 8198,
+    "contextTokens": 7273568,
+    "turns": 27,
+    "toolCalls": 27,
+    "webSearches": null,
+    "minutes": 9.3,
+    "from": "2026-10-26T03:12:57.278Z",
+    "to": "2026-10-26T03:22:15.933Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-10-26T12:22:16+09:00",
+    "validationRuns": 3,
+    "codeKB": 6.6,
+    "evidence": "metrics-evidence.json"
+  }
+}
