@@ -3,18 +3,19 @@
 //   node tools/daily-check.mjs --release             … 制作が終わったらロックを外す
 //
 // 1行目に STATUS=make / done / skip / busy を出力する。
-//   done : 今日の自動制作（trigger=scheduled）が公開済み → 何もしない
+//   done : 今日の自動制作（trigger=scheduled）が、1日の本数（factory/settings.json の scheduledPerDay）だけ公開済み → 何もしない
 //   skip : 今日の自動制作が規定回数失敗した → 今日は見送る
 //   busy : 別の自動実行が制作中（ロックが新しい）→ 何もしない
-//   make : 今日の分を1本作る
+//   make : 今日の分をあと1本作る（1回の実行で作るのは1本。足りない分は次の実行で作る）
 // 数えるのは、同じ maker の「スケジュール実行で作った」作品だけ。他のAIの作品や、人に頼まれて作った作品は数えない。
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, GAMES_DIR, gameDir, listGameIds, readJson, writeJson, parseArgs, jstNow } from './lib.mjs';
+import { ROOT, GAMES_DIR, gameDir, listGameIds, readJson, writeJson, parseArgs, jstNow, settings } from './lib.mjs';
 
 const a = parseArgs();
 const LOCK = path.join(ROOT, '.daily-lock.json');
-const LOCK_HOURS = 3;
+const LOCK_HOURS = 5;   // 「遊んで直す」で1本に時間がかかるので、次の定期実行（3時間後）と重ならないよう長めに
+const PER_DAY = Math.max(1, Number(settings().scheduledPerDay) || 1);
 const MAX_ATTEMPTS = Number(a['max-attempts']) || 3;
 
 if (a.release) {
@@ -32,8 +33,8 @@ const published = ours.filter((x) => x.m.status === 'published');
 const failures = readJson(path.join(GAMES_DIR, '_failures.json'), [])
   .filter((f) => String(f.id || '').startsWith(prefix) && f.trigger === 'scheduled');
 
-if (published.length) {
-  console.log(`STATUS=done\n今日（${today}）の自動制作は公開済みです: ${published.map((x) => `${x.id}「${x.m.title}」`).join(', ')}`);
+if (published.length >= PER_DAY) {
+  console.log(`STATUS=done\n今日（${today}）の自動制作は ${PER_DAY} 本とも公開済みです:${published.map((x) => `${x.id}「${x.m.title}」`).join(', ')}`);
   process.exit(0);
 }
 
@@ -60,4 +61,4 @@ if (failures.length >= MAX_ATTEMPTS) {
 }
 
 writeJson(LOCK, { at: new Date().toISOString(), maker });
-console.log(`STATUS=make\n今日（${today}）の自動制作はまだです。1本制作してください（--trigger scheduled）。これまでの失敗: ${failures.length} 回`);
+console.log(`STATUS=make\n今日（${today}）の自動制作は ${published.length}/${PER_DAY} 本です。1本制作してください（--trigger scheduled）。これまでの失敗: ${failures.length} 回`);
