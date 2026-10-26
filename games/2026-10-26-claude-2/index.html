@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>夕なぎの水切り / Skipping at Dusk</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; }
+html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #1b1f3a; color: #fff;
+  font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif; }
+#gl, #ui { position: fixed; left: 0; top: 0; width: 100vw; height: 100dvh; display: block; }
+#ui { pointer-events: none; }
+.layer { position: fixed; left: 0; top: 0; width: 100vw; height: 100dvh; pointer-events: none; }
+#hud { display: none; }
+#hudL { position: absolute; left: 12px; top: 10px; font-size: 14px; line-height: 1.45; text-shadow: 0 0 3px rgba(0,0,0,.85), 0 1px 4px rgba(0,0,0,.7); max-width: 64vw; }
+#hudR { position: absolute; right: 12px; top: 10px; font-size: 14px; text-align: right; text-shadow: 0 0 3px rgba(0,0,0,.85), 0 1px 4px rgba(0,0,0,.7); }
+#hudL b { font-size: 16px; }
+#next { font-size: 15px; font-weight: 700; color: #ffe8b0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#count { position: absolute; left: 0; right: 0; top: 13%; text-align: center; font-size: 64px; font-weight: 800; text-shadow: 0 2px 10px rgba(0,0,0,.45); opacity: 0; transition: opacity .2s; }
+#count.pop { animation: pop .22s ease-out; }
+@keyframes pop { 0% { transform: scale(1.35); } 100% { transform: scale(1); } }
+#toast { position: absolute; left: 0; right: 0; top: 27%; text-align: center; font-size: 22px; font-weight: 800; text-shadow: 0 0 3px rgba(0,0,0,.9), 0 2px 10px rgba(0,0,0,.8); opacity: 0; transition: opacity .25s; }
+#hint { position: absolute; left: 0; right: 0; bottom: 4%; text-align: center; font-size: 15px; text-shadow: 0 1px 4px rgba(0,0,0,.8); opacity: 0; transition: opacity .6s; padding: 0 12px; }
+.panel { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: min(88vw, 380px); box-sizing: border-box;
+  background: rgba(16,18,44,.62); border-radius: 18px; padding: 20px 18px; text-align: center; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+#title h1 { margin: 0 0 12px; font-size: clamp(30px, 10.5vw, 44px); letter-spacing: .04em; text-shadow: 0 2px 12px rgba(255,160,90,.6); white-space: nowrap; }
+#title p { margin: 6px 0; font-size: 15px; line-height: 1.5; }
+.tap { margin-top: 14px; font-size: 16px; font-weight: 700; animation: blink 1.4s infinite; }
+@keyframes blink { 50% { opacity: .45; } }
+#result { display: none; }
+#result .panel { top: auto; bottom: 4%; transform: translateX(-50%); padding: 14px 16px; }
+#rMiss { font-size: 16px; margin-top: 8px; color: #ffd0b8; font-weight: 700; }
+#rBig { font-size: 64px; font-weight: 800; line-height: 1; }
+#rBig small { font-size: 22px; margin-left: 4px; }
+#rSub { font-size: 20px; margin-top: 6px; }
+#rTag { font-size: 16px; margin-top: 4px; color: #ffd27a; min-height: 0; }
+#rBest { font-size: 14px; margin-top: 8px; opacity: .9; }
+#rNew { font-size: 17px; margin-top: 10px; color: #ffe08a; font-weight: 800; }
+#rList { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(4, auto); grid-auto-flow: column; gap: 4px 10px; margin-top: 12px; text-align: left; font-size: 13px; }
+#rList div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: .6; }
+#rList div.ok { opacity: 1; color: #bff0c8; }
+#rList div.cur { opacity: 1; color: #fff; }
+#rList div.nw { opacity: 1; color: #ffe08a; font-weight: 800; }
+#rAll { font-size: 17px; margin-top: 10px; color: #cfe0ff; font-weight: 800; }
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<canvas id="ui"></canvas>
+<div class="layer" id="hud">
+  <div id="hudL"><b id="best"></b><div id="next"></div></div>
+  <div id="hudR"><span id="prog"></span></div>
+  <div id="count">0</div>
+  <div id="toast"></div>
+  <div id="hint"></div>
+</div>
+<div class="layer" id="title">
+  <div class="panel">
+    <h1 id="tName"></h1>
+    <p id="tHow1"></p>
+    <p id="tHow2"></p>
+    <div class="tap" id="tTap"></div>
+  </div>
+</div>
+<div class="layer" id="result">
+  <div class="panel">
+    <div id="rBig"></div>
+    <div id="rSub"></div>
+    <div id="rTag"></div>
+    <div id="rBest"></div>
+    <div id="rNew"></div>
+    <div id="rMiss"></div>
+    <div id="rAll"></div>
+    <div id="rList"></div>
+    <div class="tap" id="rTap"></div>
+  </div>
+</div>
+<script src="../../lib/three-0.186.1.min.js"></script>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const D = {
+  ja: {
+    name: '夕なぎの水切り',
+    how1: '石が<b>水平</b>になった瞬間に、指で<b>上へはじいて</b>投げる。',
+    how2: '跳ねるたびに音が上がる。湖のお題を8つ。',
+    tap: 'タップでスタート', again: 'タップでもう一度',
+    hint: '石が水平に光ったら、上へシュッとはじく',
+    hintSlow: 'もっと速く、上へはじいて',
+    best: (s, d) => `ベスト ${s}回 · ${d}m`, prog: (n) => `お題 ${n}/8`, next: 'お題: ', free: '自由に投げよう', miss: '惜しい！ ', why: { tilt: '石が傾いて沈んだ', slow: '勢いがつきた', steep: '角度が急で沈んだ', rock: '岩に当たった' }, left: (n) => `あと${n}回`, leftM: (m) => `あと${m}m`, offM: (m) => `${m}mずれた`,
+    times: '回', flat: 'ぴたっ！', good: 'いい角度', tilt: 'ななめ…',
+    sink: 'ぽちゃん', rock: 'カツン！', shore: '向こう岸に届いた！', ring: '浮き輪の中！', gap: '岩のあいだを抜けた！',
+    newBest: 'ベスト更新！', got: 'お題達成！ ', all: '湖のお題、ぜんぶ達成！ 夜の湖をどうぞ',
+    ch: ['3回はねる', '浮き輪の中ではねる', '25mとどく', '10回はねる', '岩のあいだを抜ける', '15回はねる', '向こう岸にとどく', '20回はねる'],
+  },
+  en: {
+    name: 'Skipping at Dusk',
+    how1: 'When the stone turns <b>level</b>, <b>flick up</b> to throw it.',
+    how2: 'Each skip rings higher. Clear the 8 lake challenges.',
+    tap: 'Tap to start', again: 'Tap to play again',
+    hint: 'When the stone glows level, flick up fast',
+    hintSlow: 'Flick up faster',
+    best: (s, d) => `Best ${s} skips · ${d}m`, prog: (n) => `Tasks ${n}/8`, next: 'Task: ', free: 'Throw freely', miss: 'So close! ', why: { tilt: 'The stone tilted and sank', slow: 'It ran out of speed', steep: 'Hit the water too steeply', rock: 'Hit a rock' }, left: (n) => `${n} more`, leftM: (m) => `${m}m short`, offM: (m) => `${m}m off`,
+    times: 'skips', flat: 'Perfectly flat!', good: 'Nice angle', tilt: 'Tilted…',
+    sink: 'Plop', rock: 'Clack!', shore: 'Reached the far shore!', ring: 'Inside the float!', gap: 'Through the rocks!',
+    newBest: 'New best!', got: 'Task done! ', all: 'All lake tasks done! Enjoy the night lake',
+    ch: ['Skip 3 times', 'Skip inside the float', 'Reach 25m', 'Skip 10 times', 'Pass between the rocks', 'Skip 15 times', 'Reach the far shore', 'Skip 20 times'],
+  },
+}[LANG === 'ja' ? 'ja' : 'en'];
+document.documentElement.lang = LANG === 'ja' ? 'ja' : 'en';
+
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+
+// ---------- 保存 ----------
+let save = { done: [], bestSkips: 0, bestDist: 0 };
+addEventListener('message', (e) => {
+  if (e.data && e.data.agf === 'loaded' && e.data.data) {
+    const d = e.data.data;
+    save = { done: Array.isArray(d.done) ? d.done.filter((x, i) => x === i && i < 8) : [], bestSkips: d.bestSkips | 0, bestDist: +d.bestDist || 0 };
+    tp = save.done.length; updateHud();
+  }
+});
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+const persist = () => { try { parent.postMessage({ agf: 'save', data: save }, '*'); } catch (e) {} };
+
+// ---------- 定数 ----------
+const SHORE_Z = 72;
+const RING = { x: 4.2, z: 17, r: 2.1 };
+const ROCKS = [{ x: -7.0, z: 34, r: 1.1 }, { x: -12.0, z: 34, r: 1.1 }];
+const GAP = { z: 34, x0: -10.9, x1: -8.1 };
+const HOME = { pos: new THREE.Vector3(0, 1.7, -1.6), look: new THREE.Vector3(0, 0, 14) };
+const rand = (a, b) => a + Math.random() * (b - a);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+
+// ---------- three.js ----------
+const glCanvas = document.getElementById('gl');
+const renderer = new THREE.WebGLRenderer({ canvas: glCanvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60, 9 / 16, 0.1, 700);
+camera.position.copy(HOME.pos); camera.lookAt(HOME.look);
+const camLook = HOME.look.clone();
+scene.fog = new THREE.Fog(0xffc890, 45, 230);
+
+const hemi = new THREE.HemisphereLight(0xffffff, 0x334466, 0.9); scene.add(hemi);
+const sunLight = new THREE.DirectionalLight(0xffe0b0, 1.6); scene.add(sunLight);
+
+// 空
+const skyU = { uTop: { value: new THREE.Color() }, uHor: { value: new THREE.Color() }, uSunDir: { value: new THREE.Vector3() }, uSunCol: { value: new THREE.Color() } };
+const sky = new THREE.Mesh(new THREE.SphereGeometry(300, 32, 16), new THREE.ShaderMaterial({
+  uniforms: skyU, side: THREE.BackSide, depthWrite: false, fog: false,
+  vertexShader: 'varying vec3 vD; void main(){ vD = position; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }',
+  fragmentShader: `uniform vec3 uTop,uHor,uSunDir,uSunCol; varying vec3 vD;
+    void main(){ vec3 d = normalize(vD); float h = max(d.y, 0.);
+      vec3 c = mix(uHor, uTop, pow(h, .5));
+      float s = max(dot(d, normalize(uSunDir)), 0.);
+      c += uSunCol * (pow(s, 900.) * 3. + pow(s, 14.) * .35 + pow(s, 3.) * .12) * smoothstep(-.12, .02, uSunDir.y);
+      gl_FragColor = vec4(c, 1.);
+      #include <tonemapping_fragment>
+      #include <colorspace_fragment>
+    }`,
+}));
+sky.renderOrder = -1; scene.add(sky);
+
+// 星と月
+const starGeo = new THREE.BufferGeometry();
+{ const a = []; for (let i = 0; i < 380; i++) { const az = rand(0, Math.PI * 2), el = Math.asin(rand(0.03, 1)); a.push(Math.cos(el) * Math.sin(az) * 280, Math.sin(el) * 280, Math.cos(el) * Math.cos(az) * 280); } starGeo.setAttribute('position', new THREE.Float32BufferAttribute(a, 3)); }
+const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 1.6, sizeAttenuation: false, transparent: true, opacity: 0, fog: false, depthWrite: false });
+const stars = new THREE.Points(starGeo, starMat); scene.add(stars);
+function discTex(inner, outer) {
+  const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d');
+  const r = g.createRadialGradient(64, 64, 0, 64, 64, 64); r.addColorStop(0, inner); r.addColorStop(0.42, inner); r.addColorStop(0.5, outer); r.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = r; g.fillRect(0, 0, 128, 128); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const moon = new THREE.Sprite(new THREE.SpriteMaterial({ map: discTex('#f4f2e4', 'rgba(220,230,255,.25)'), transparent: true, opacity: 0, fog: false, depthWrite: false }));
+const MOON_AZ = 0.3, MOON_EL = 0.2;
+moon.position.set(Math.sin(MOON_AZ) * 270 * Math.cos(MOON_EL), Math.sin(MOON_EL) * 270, Math.cos(MOON_AZ) * 270 * Math.cos(MOON_EL));
+moon.scale.set(18, 18, 1); scene.add(moon);
+
+// 水面
+const waterU = { uDeep: { value: new THREE.Color() }, uHor: { value: new THREE.Color() }, uGlint: { value: new THREE.Color() }, uT: { value: 0 }, uGX: { value: 0 }, uGA: { value: 1 }, uCam: { value: new THREE.Vector3() } };
+const water = new THREE.Mesh(new THREE.PlaneGeometry(500, 420, 1, 1), new THREE.ShaderMaterial({
+  uniforms: waterU, fog: false,
+  vertexShader: 'varying vec3 vW; void main(){ vec4 w = modelMatrix*vec4(position,1.); vW = w.xyz; gl_Position = projectionMatrix*viewMatrix*w; }',
+  fragmentShader: `uniform vec3 uDeep,uHor,uGlint,uCam; uniform float uT,uGX,uGA; varying vec3 vW;
+    float h(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+    float n(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f);
+      return mix(mix(h(i), h(i+vec2(1,0)), f.x), mix(h(i+vec2(0,1)), h(i+vec2(1,1)), f.x), f.y); }
+    void main(){
+      vec2 r = vW.xz - uCam.xz; float d = length(r);
+      float f = smoothstep(2., 150., d);
+      vec3 c = mix(uDeep, uHor, pow(f, .75));
+      float w = n(vW.xz*vec2(.45, 1.7) + vec2(0., uT*.45)) * .6 + n(vW.xz*vec2(1.3, 4.2) - vec2(uT*.25, uT*.7)) * .4;
+      c += (w - .5) * .09 * (1. - f*.8);
+      float off = r.x - uGX * r.y; float ww = .7 + max(r.y, 0.) * .085;
+      float m = exp(-off*off/(ww*ww)) * smoothstep(0., 6., r.y);
+      c += uGlint * m * (.18 + smoothstep(.55, .8, w) * 1.1) * uGA;
+      c += uGlint * smoothstep(.72, .86, w) * .05 * (1. - f) * uGA;
+      gl_FragColor = vec4(c, 1.);
+      #include <tonemapping_fragment>
+      #include <colorspace_fragment>
+    }`,
+}));
+water.rotation.x = -Math.PI / 2; water.position.set(0, 0, 210); scene.add(water);
+
+// 手前の岸
+const lam = (c, o = {}) => new THREE.MeshLambertMaterial({ color: c, ...o });
+const nearBeach = new THREE.Mesh(new THREE.PlaneGeometry(80, 14), lam(0x5d4c40));
+nearBeach.rotation.x = -Math.PI / 2; nearBeach.position.set(0, 0.02, -6.4); scene.add(nearBeach);
+const pebbleGeo = new THREE.SphereGeometry(1, 10, 6);
+for (let i = 0; i < 26; i++) {
+  const p = new THREE.Mesh(pebbleGeo, lam([0x7a7068, 0x8d8378, 0x5f574f, 0x9a8f80][i % 4]));
+  const s = rand(0.06, 0.2); p.scale.set(s * rand(1, 1.6), s * 0.45, s); p.position.set(rand(-3.2, 3.2), 0.02, rand(-1.4, 0.3)); p.rotation.y = rand(0, 3); scene.add(p);
+}
+
+// 向こう岸
+const hillMat = lam(0x3b3150);
+const hillGeo = new THREE.SphereGeometry(1, 20, 10);
+for (let i = 0; i < 16; i++) {
+  const r = rand(12, 28); const m = new THREE.Mesh(hillGeo, hillMat);
+  m.scale.set(r * rand(1, 1.6), r * rand(0.28, 0.45), r * 0.7); m.position.set(-140 + i * 18 + rand(-6, 6), -r * 0.08, rand(92, 112)); scene.add(m);
+}
+const farBeach = new THREE.Mesh(new THREE.PlaneGeometry(320, 26), lam(0x6d5a48));
+farBeach.rotation.x = -Math.PI / 2; farBeach.position.set(0, 0.04, SHORE_Z + 13); scene.add(farBeach);
+const treeMat = lam(0x24402f), trunkMat = lam(0x3a2a20);
+const treeGeo = new THREE.ConeGeometry(1.3, 4.5, 7), trunkGeo = new THREE.CylinderGeometry(0.18, 0.22, 1.2, 6);
+for (let i = 0; i < 34; i++) {
+  const x = rand(-70, 70); if (Math.abs(x - 6) < 4) continue; const z = rand(SHORE_Z + 7, SHORE_Z + 22), s = rand(0.7, 1.5);
+  const t = new THREE.Mesh(treeGeo, treeMat); t.scale.setScalar(s); t.position.set(x, 1.2 * s + 2.2 * s, z); scene.add(t);
+  const k = new THREE.Mesh(trunkGeo, trunkMat); k.scale.setScalar(s); k.position.set(x, 0.6 * s, z); scene.add(k);
+}
+const hut = new THREE.Group();
+{ const b = new THREE.Mesh(new THREE.BoxGeometry(3.2, 2.2, 2.6), lam(0x6a4c3a)); b.position.y = 1.1; hut.add(b);
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(2.7, 1.6, 4), lam(0x4a3040)); roof.position.y = 3; roof.rotation.y = Math.PI / 4; hut.add(roof); }
+const winMat = new THREE.MeshBasicMaterial({ color: 0x302a30, fog: true });
+const win = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 0.6), winMat); win.position.set(0, 1.25, -1.31); win.rotation.y = Math.PI; hut.add(win);
+hut.position.set(6, 0.04, SHORE_Z + 6); hut.rotation.y = Math.PI; scene.add(hut);
+const hutLight = new THREE.PointLight(0xffb060, 0, 14, 1.5); hutLight.position.set(6, 1.3, SHORE_Z + 4); scene.add(hutLight);
+
+// 距離の目印
+function labelTex(txt) {
+  const c = document.createElement('canvas'); c.width = 128; c.height = 64; const g = c.getContext('2d');
+  g.font = 'bold 40px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.lineWidth = 6; g.strokeStyle = 'rgba(0,0,0,.45)'; g.strokeText(txt, 64, 34); g.fillStyle = '#fff'; g.fillText(txt, 64, 34);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const poleGeo = new THREE.CylinderGeometry(0.07, 0.07, 1.6, 6), poleMat = lam(0xd8d0c0);
+for (let z = 10; z <= 60; z += 10) {
+  const p = new THREE.Mesh(poleGeo, poleMat); p.position.set(8.5, 0.5, z); scene.add(p);
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: labelTex(z + 'm'), transparent: true, depthWrite: false })); s.position.set(8.5, 1.85, z); s.scale.set(2.2, 1.1, 1); scene.add(s);
+}
+
+// 浮き輪と岩
+const ring = new THREE.Group();
+{ const segs = 8; for (let i = 0; i < segs; i++) {
+    const t = new THREE.Mesh(new THREE.TorusGeometry(RING.r, 0.2, 8, 10, Math.PI * 2 / segs), lam(i % 2 ? 0xffffff : 0xff6a3a));
+    t.rotation.z = i * Math.PI * 2 / segs; ring.add(t); } }
+ring.rotation.x = -Math.PI / 2; ring.position.set(RING.x, 0.06, RING.z); scene.add(ring);
+const rockMat = lam(0x5a5660, { flatShading: true });
+for (const r of ROCKS) {
+  const m = new THREE.Mesh(new THREE.IcosahedronGeometry(r.r, 0), rockMat); m.scale.set(1, 1.15, 1); m.position.set(r.x, 0.35, r.z); m.rotation.set(rand(0, 3), rand(0, 3), 0); scene.add(m);
+}
+
+// 石
+const stone = new THREE.Group();
+const stoneMesh = new THREE.Mesh(new THREE.SphereGeometry(0.17, 18, 10), lam(0x9a9aa2));
+stoneMesh.scale.set(1, 0.3, 0.86); stone.add(stoneMesh);
+const stoneMark = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.02, 0.03), lam(0x6a6a74)); stoneMark.position.y = 0.045; stone.add(stoneMark);
+stone.visible = false; scene.add(stone);
+
+// 波紋としぶき
+const ripples = [];
+const ripGeo = new THREE.RingGeometry(0.86, 1, 48);
+for (let i = 0; i < 40; i++) {
+  const m = new THREE.Mesh(ripGeo, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false, fog: true }));
+  m.rotation.x = -Math.PI / 2; m.visible = false; scene.add(m); ripples.push({ m, t: 9, life: 1, size: 1 });
+}
+let ripI = 0;
+function ripple(x, z, size, delay = 0) {
+  const r = ripples[ripI++ % ripples.length]; r.m.position.set(x, 0.03, z); r.t = -delay; r.life = 1.4 + size * 0.5; r.size = size; r.m.visible = true;
+}
+const SPN = 260;
+const spPos = new Float32Array(SPN * 3), spVel = new Float32Array(SPN * 3), spLife = new Float32Array(SPN);
+const spGeo = new THREE.BufferGeometry(); spGeo.setAttribute('position', new THREE.BufferAttribute(spPos, 3));
+const splashes = new THREE.Points(spGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.09, transparent: true, opacity: 0.85, depthWrite: false }));
+splashes.frustumCulled = false; scene.add(splashes);
+for (let i = 0; i < SPN; i++) spPos[i * 3 + 1] = -99;
+let spI = 0;
+function splash(x, z, n, power) {
+  for (let k = 0; k < n; k++) {
+    const i = spI++ % SPN; spPos[i * 3] = x; spPos[i * 3 + 1] = 0.03; spPos[i * 3 + 2] = z;
+    const a = rand(0, Math.PI * 2), s = rand(0.3, 1.2) * power;
+    spVel[i * 3] = Math.cos(a) * s; spVel[i * 3 + 1] = rand(1.2, 2.8) * power; spVel[i * 3 + 2] = Math.sin(a) * s; spLife[i] = rand(0.4, 0.8);
+  }
+}
+
+// ---------- 時間帯（お題を達成するほど日が暮れる） ----------
+const KEYS = [
+  { p: 0, top: '#5b8fd4', hor: '#ffd8a6', deep: '#2e5878', sun: '#fff0c8', el: 0.24, hill: '#4a4566', night: 0 },
+  { p: 3, top: '#4867b0', hor: '#ffb57c', deep: '#284468', sun: '#ffd088', el: 0.12, hill: '#3e3256', night: 0 },
+  { p: 5, top: '#373b84', hor: '#ff8a5a', deep: '#22325a', sun: '#ff9a50', el: 0.035, hill: '#30264a', night: 0.1 },
+  { p: 7, top: '#1b1f50', hor: '#9a5478', deep: '#141c38', sun: '#ff6a40', el: -0.05, hill: '#1f1a38', night: 0.65 },
+  { p: 8, top: '#0a0f2e', hor: '#33305e', deep: '#0b1228', sun: '#ff6a40', el: -0.14, hill: '#121228', night: 1 },
+];
+const SUN_AZ = -0.2;
+const cA = new THREE.Color(), cB = new THREE.Color();
+const mixCol = (out, a, b, t) => out.copy(cA.set(a)).lerp(cB.set(b), t);
+let tp = 0, tpShown = -1;
+function applyTime(p) {
+  let i = 0; while (i < KEYS.length - 2 && p > KEYS[i + 1].p) i++;
+  const A = KEYS[i], B = KEYS[i + 1], t = clamp((p - A.p) / (B.p - A.p), 0, 1);
+  mixCol(skyU.uTop.value, A.top, B.top, t); mixCol(skyU.uHor.value, A.hor, B.hor, t); mixCol(skyU.uSunCol.value, A.sun, B.sun, t);
+  const el = lerp(A.el, B.el, t), night = lerp(A.night, B.night, t);
+  skyU.uSunDir.value.set(Math.sin(SUN_AZ) * Math.cos(el), Math.sin(el), Math.cos(SUN_AZ) * Math.cos(el));
+  waterU.uDeep.value.copy(cA.set(A.deep).lerp(cB.set(B.deep), t)); waterU.uHor.value.copy(skyU.uHor.value).lerp(skyU.uTop.value, 0.12);
+  const gl = new THREE.Color().copy(skyU.uSunCol.value).multiplyScalar(clamp((el + 0.08) * 6, 0, 1)).lerp(new THREE.Color(0x9fb0e8), night * 0.9);
+  waterU.uGlint.value.copy(gl); waterU.uGX.value = lerp(Math.tan(SUN_AZ), Math.tan(MOON_AZ), night); waterU.uGA.value = lerp(1, 0.75, night);
+  scene.fog.color.copy(skyU.uHor.value);
+  mixCol(hillMat.color, A.hill, B.hill, t);
+  hemi.color.copy(skyU.uTop.value).lerp(new THREE.Color(0xffffff), 0.5); hemi.groundColor.copy(waterU.uDeep.value); hemi.intensity = lerp(1.0, 0.45, night);
+  sunLight.color.copy(skyU.uSunCol.value); sunLight.intensity = clamp((el + 0.08) * 8, 0.15, 1.6); sunLight.position.copy(skyU.uSunDir.value).multiplyScalar(50);
+  starMat.opacity = clamp(night * 1.2 - 0.15, 0, 1); moon.material.opacity = clamp(night * 1.4 - 0.1, 0, 1);
+  winMat.color.copy(cA.set(0x302a30).lerp(cB.set(0xffc060), clamp(night * 1.3, 0, 1))); hutLight.intensity = night * 4;
+}
+
+// ---------- 2D の UI キャンバス ----------
+const ui = document.getElementById('ui'), g = ui.getContext('2d');
+let W = 360, H = 640, DPR = 1;
+function resize() {
+  W = Math.max(1, innerWidth || document.documentElement.clientWidth || 360); H = Math.max(1, innerHeight || document.documentElement.clientHeight || 640);
+  DPR = Math.min(devicePixelRatio || 1, 2);
+  renderer.setSize(W, H, false); camera.aspect = W / H; camera.fov = W / H > 0.75 ? 50 : 60; camera.updateProjectionMatrix();
+  ui.width = Math.round(W * DPR); ui.height = Math.round(H * DPR);
+}
+addEventListener('resize', resize); resize();
+
+// ---------- 音 ----------
+let AC = null, master = null, noiseBuf = null, amb = null;
+function initAudio() {
+  try {
+    if (!AC) {
+      AC = new (window.AudioContext || window.webkitAudioContext)();
+      master = AC.createGain(); master.gain.value = 0.55; master.connect(AC.destination);
+      noiseBuf = AC.createBuffer(1, AC.sampleRate * 2, AC.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      startAmbient();
+    }
+    if (AC.state !== 'running') AC.resume();
+  } catch (e) {}
+}
+function noiseSrc() { const s = AC.createBufferSource(); s.buffer = noiseBuf; s.loop = true; return s; }
+function startAmbient() {
+  const s = noiseSrc(), f = AC.createBiquadFilter(), gn = AC.createGain(), lfo = AC.createOscillator(), lg = AC.createGain();
+  f.type = 'lowpass'; f.frequency.value = 380; gn.gain.value = 0.05; lfo.frequency.value = 0.13; lg.gain.value = 0.025;
+  lfo.connect(lg); lg.connect(gn.gain); s.connect(f); f.connect(gn); gn.connect(master); s.start(); lfo.start(); amb = gn;
+}
+function env(node, t, a, peak, dec) { node.gain.setValueAtTime(0.0001, t); node.gain.linearRampToValueAtTime(peak, t + a); node.gain.exponentialRampToValueAtTime(0.0001, t + a + dec); }
+const PENT = [0, 2, 4, 7, 9];
+function noteFreq(i) { const k = Math.min(i, 16); return 293.66 * Math.pow(2, (PENT[k % 5] + 12 * Math.floor(k / 5)) / 12); }
+function sndSkip(i, strength) {
+  if (!AC) return; const t = AC.currentTime;
+  const o = AC.createOscillator(), gn = AC.createGain(); o.type = 'sine';
+  o.frequency.setValueAtTime(1500, t); o.frequency.exponentialRampToValueAtTime(320, t + 0.06); env(gn, t, 0.003, 0.16 * strength, 0.08);
+  o.connect(gn); gn.connect(master); o.start(t); o.stop(t + 0.12);
+  const f = noteFreq(i), soft = clamp(1.25 - f / 2200, 0.45, 1);
+  for (const [mul, type, vol, dec] of [[1, 'triangle', 0.16, 0.7], [2, 'sine', 0.05, 0.4], [3.01, 'sine', 0.02, 0.25]]) {
+    const o2 = AC.createOscillator(), g2 = AC.createGain(); o2.type = type; o2.frequency.value = f * mul; env(g2, t + 0.004, 0.004, vol * soft, dec);
+    o2.connect(g2); g2.connect(master); o2.start(t); o2.stop(t + dec + 0.05);
+  }
+}
+function sndPlop(big) {
+  if (!AC) return; const t = AC.currentTime;
+  const s = noiseSrc(), f = AC.createBiquadFilter(), gn = AC.createGain(); f.type = 'lowpass'; f.frequency.setValueAtTime(1400, t); f.frequency.exponentialRampToValueAtTime(300, t + 0.3);
+  env(gn, t, 0.005, 0.25 * big, 0.32); s.connect(f); f.connect(gn); gn.connect(master); s.start(t); s.stop(t + 0.4);
+  const o = AC.createOscillator(), g2 = AC.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(260, t); o.frequency.exponentialRampToValueAtTime(70, t + 0.22);
+  env(g2, t, 0.004, 0.3 * big, 0.22); o.connect(g2); g2.connect(master); o.start(t); o.stop(t + 0.3);
+}
+function sndWhoosh(p) {
+  if (!AC) return; const t = AC.currentTime;
+  const s = noiseSrc(), f = AC.createBiquadFilter(), gn = AC.createGain(); f.type = 'bandpass'; f.Q.value = 1.2;
+  f.frequency.setValueAtTime(500, t); f.frequency.exponentialRampToValueAtTime(2400, t + 0.22); env(gn, t, 0.03, 0.12 * p, 0.2);
+  s.connect(f); f.connect(gn); gn.connect(master); s.start(t); s.stop(t + 0.3);
+}
+function sndClack() {
+  if (!AC) return; const t = AC.currentTime;
+  for (const fr of [1900, 2700]) { const o = AC.createOscillator(), gn = AC.createGain(); o.type = 'square'; o.frequency.value = fr; env(gn, t, 0.001, 0.06, 0.05); o.connect(gn); gn.connect(master); o.start(t); o.stop(t + 0.08); }
+}
+function sndChime(n = 4) {
+  if (!AC) return; const t0 = AC.currentTime + 0.05;
+  [0, 4, 7, 12, 16].slice(0, n).forEach((s, k) => {
+    const t = t0 + k * 0.09, o = AC.createOscillator(), gn = AC.createGain(); o.type = 'sine'; o.frequency.value = 587.33 * Math.pow(2, s / 12);
+    env(gn, t, 0.005, 0.12, 0.9); o.connect(gn); gn.connect(master); o.start(t); o.stop(t + 1);
+  });
+}
+function sndCricket() {
+  if (!AC) return; const t = AC.currentTime;
+  for (let k = 0; k < 3; k++) { const o = AC.createOscillator(), gn = AC.createGain(); o.type = 'sine'; o.frequency.value = 4300 + rand(-200, 200); env(gn, t + k * 0.07, 0.01, 0.012, 0.04); o.connect(gn); gn.connect(master); o.start(t + k * 0.07); o.stop(t + k * 0.07 + 0.08); }
+}
+
+// ---------- 表示 ----------
+const $ = (id) => document.getElementById(id);
+$('tName').textContent = D.name; $('tHow1').innerHTML = D.how1; $('tHow2').textContent = D.how2; $('tTap').textContent = D.tap; $('rTap').textContent = D.again;
+function updateHud() {
+  $('best').textContent = D.best(save.bestSkips, save.bestDist.toFixed(1));
+  $('prog').textContent = D.prog(save.done.length);
+  const cur = save.done.length;
+  $('next').textContent = cur < 8 ? D.next + D.ch[cur] : D.free;
+}
+let toastT = 0, hintT = 0;
+function toast(s, col = '#fff') { const el = $('toast'); el.textContent = s; el.style.color = col; el.style.opacity = 1; toastT = 1.3; }
+function hint(s, dur = 5) { const el = $('hint'); el.textContent = s; el.style.opacity = 1; hintT = dur; }
+function setCount(n, show) { const el = $('count'); el.textContent = n; el.style.opacity = show ? 1 : 0; el.classList.remove('pop'); void el.offsetWidth; if (show) el.classList.add('pop'); }
+
+// ---------- 状態 ----------
+let state = 'title';   // title / aim / fly / after / result
+let wob = rand(0, 10); // 手の中の石のゆれ
+const WOB_AMP = 28, WOB_PER = 1.6;
+const tiltNow = () => WOB_AMP * Math.sin(wob * Math.PI * 2 / WOB_PER);
+let hold = null;        // {id, x0, y0, s:[{t,x,y}]}
+let throwN = 0;
+const S = { pos: new THREE.Vector3(), vel: new THREE.Vector3(), tilt: 0, spin: 0, skips: 0, maxDist: 0, ring: false, gap: false, shore: false, endT: 0, sinkT: -1, sunk: false, prevZ: 0 };
+let resultShownAt = 0;
+
+function toAim() {
+  signal('start');
+  state = 'aim'; stone.visible = false; $('result').style.display = 'none'; $('hud').style.display = 'block'; setCount(0, false); updateHud();
+}
+function doThrow(v0, aim, tilt) {
+  state = 'fly'; throwN++;
+  const el = 7 * Math.PI / 180;
+  S.pos.set(-0.15, 0.95, 0.2); S.vel.set(-Math.sin(aim) * Math.cos(el) * v0, Math.sin(el) * v0, Math.cos(aim) * Math.cos(el) * v0);
+  S.tilt = tilt; S.v0 = v0; S.spin = 0; S.skips = 0; S.maxDist = 0; S.why = ''; S.ring = false; S.ringMin = 99; S.gapOff = -1; S.gap = false; S.shore = false; S.endT = 0; S.sinkT = -1; S.sunk = false; S.prevZ = S.pos.z;
+  stone.visible = true; stone.position.copy(S.pos);
+  const at = Math.abs(tilt);
+  if (at < 6) toast(D.flat, '#ffe08a'); else if (at < 13) toast(D.good, '#d8f0ff'); else toast(D.tilt, '#ff9a8a');
+  sndWhoosh(clamp(v0 / 14, 0.4, 1.3));
+  setCount(0, true);
+  $('hint').style.opacity = 0; hintT = 0;
+}
+function endFlight(delay) { state = 'after'; S.endT = delay; }
+function sink(big = 1) {
+  S.sunk = true; S.sinkT = 0; ripple(S.pos.x, S.pos.z, 1.3 * big); ripple(S.pos.x, S.pos.z, 0.8 * big, 0.25); splash(S.pos.x, S.pos.z, 18, 1.1 * big); sndPlop(big);
+  endFlight(1.5);
+}
+function contact() {
+  const vh = Math.hypot(S.vel.x, S.vel.z), inc = Math.atan2(-S.vel.y, vh) * 180 / Math.PI, at = Math.abs(S.tilt);
+  if (vh < 2.0 || at > 24 || inc > 33) { S.why = at > 24 ? 'tilt' : vh < 2.0 ? 'slow' : 'steep'; S.pos.y = 0; sink(vh < 2.0 ? 0.6 : 1); return; }
+  const retain = clamp(0.935 - 0.004 * at - Math.max(0, inc - 20) * 0.006, 0.6, 0.95);
+  S.vel.x *= retain; S.vel.z *= retain;
+  S.vel.y = vh * retain * rand(0.145, 0.165); S.pos.y = 0.001;
+  S.tilt += (S.tilt >= 0 ? 1 : -1) * rand(0.4, 1.3) * Math.pow(15 / S.v0, 1.2);  // 遅い投げほど回転が弱く、傾きが早くくずれる
+  S.skips++;
+  const sz = clamp(vh / 12, 0.35, 1.1);
+  ripple(S.pos.x, S.pos.z, sz); ripple(S.pos.x, S.pos.z, sz * 0.6, 0.18); splash(S.pos.x, S.pos.z, Math.round(4 + sz * 8), 0.5 + sz * 0.5);
+  sndSkip(S.skips - 1, clamp(sz * 1.3, 0.5, 1.2));
+  setCount(S.skips, true);
+  const rd = Math.hypot(S.pos.x - RING.x, S.pos.z - RING.z) - (RING.r - 0.1); S.ringMin = Math.min(S.ringMin, rd);
+  if (!S.ring && rd < 0) { S.ring = true; toast(D.ring, '#ffd0a0'); }
+}
+function stepFly(dt) {
+  const N = 6, h = dt / N;
+  for (let k = 0; k < N && state === 'fly'; k++) {
+    S.vel.y -= 9.8 * h; S.pos.addScaledVector(S.vel, h);
+    S.maxDist = Math.max(S.maxDist, Math.hypot(S.pos.x, S.pos.z));
+    if (S.prevZ < GAP.z && S.pos.z >= GAP.z) { S.gapOff = Math.max(0, GAP.x0 - S.pos.x, S.pos.x - GAP.x1); if (S.gapOff === 0 && S.pos.y < 2) { S.gap = true; toast(D.gap, '#c8f0d8'); } }
+    S.prevZ = S.pos.z;
+    for (const r of ROCKS) {
+      if (Math.hypot(S.pos.x - r.x, S.pos.y - 0.35, S.pos.z - r.z) < r.r + 0.12) {
+        sndClack(); toast(D.rock, '#ffc0b0'); S.why = 'rock'; S.vel.x *= -0.25; S.vel.z *= -0.25; S.vel.y = 1.5; state = 'after'; S.endT = 1.6; S.falling = true; return;
+      }
+    }
+    if (S.pos.z >= SHORE_Z && S.pos.y < 1.5) {
+      S.shore = true; S.pos.y = 0.1; S.vel.set(S.vel.x * 0.25, 0, S.vel.z * 0.25); toast(D.shore, '#ffe08a'); sndChime(3); endFlight(1.8); return;
+    }
+    if (S.pos.y <= 0 && S.vel.y < 0) contact();
+  }
+}
+
+function finishThrow() {
+  const r = { skips: S.skips, dist: S.maxDist };
+  // お題は1つずつ順番に挑む
+  // 1投でいまのお題を達成したら、続くお題も満たしている分だけまとめて達成
+  const cur = save.done.length;
+  const need = [3, 0, 0, 10, 0, 15, 0, 20][cur];
+  const checks = [r.skips >= 3, S.ring, r.dist >= 25, r.skips >= 10, S.gap, r.skips >= 15, S.shore, r.skips >= 20];
+  const newly = [];
+  let miss = '';
+  if (cur < 8) {
+    if (checks[cur]) { for (let i = cur; i < 8 && checks[i]; i++) { save.done.push(i); newly.push(i); } }
+    else if (need) miss = (need - r.skips <= 2 ? D.miss : '') + D.left(need - r.skips);
+    else if (cur === 1) { if (S.ringMin < 6) miss = (S.ringMin < 1.5 ? D.miss : '') + D.offM(S.ringMin.toFixed(1)); }
+    else if (cur === 2) miss = (25 - r.dist < 4 ? D.miss : '') + D.leftM((25 - r.dist).toFixed(1));
+    else if (cur === 4) { if (S.gapOff > 0 && S.gapOff < 3) miss = D.miss + D.offM(S.gapOff.toFixed(1)); else if (S.gapOff < 0 && GAP.z - S.pos.z < 8) miss = D.miss + D.leftM((GAP.z - S.pos.z).toFixed(1)); }
+    else if (cur === 6) miss = (SHORE_Z - r.dist < 8 ? D.miss : '') + D.leftM((SHORE_Z - r.dist).toFixed(1));
+  }
+  $('rMiss').textContent = miss;
+  const bestUp = r.skips > save.bestSkips || (r.dist > save.bestDist + 0.05 && r.skips >= save.bestSkips);
+  const prevBest = save.bestSkips;
+  save.bestSkips = Math.max(save.bestSkips, r.skips); save.bestDist = Math.max(save.bestDist, r.dist);
+  persist(); signal('end', { score: r.skips });
+  $('rBig').innerHTML = `${r.skips}<small>${D.times}</small>`;
+  $('rSub').textContent = `${r.dist.toFixed(1)} m`;
+  $('rTag').textContent = S.shore ? D.shore : (D.why[S.why] || '');
+  $('rTag').style.color = S.shore ? '#ffd27a' : '#c8d4ff';
+  $('rBest').textContent = (r.skips > prevBest && throwN > 0 ? D.newBest + '  ' : '') + D.best(save.bestSkips, save.bestDist.toFixed(1));
+  $('rBest').style.color = r.skips > prevBest ? '#ffe08a' : '';
+  $('rNew').textContent = newly.length ? D.got + newly.map((i) => D.ch[i]).join(' / ') : '';
+  $('rAll').textContent = newly.length && save.done.length === 8 ? D.all : '';
+  $('rList').innerHTML = D.ch.map((c, i) => `<div class="${newly.includes(i) ? 'nw' : save.done.includes(i) ? 'ok' : i === save.done.length ? 'cur' : ''}">${save.done.includes(i) ? '✓' : i === save.done.length ? '▶' : '○'} ${c}</div>`).join('');
+  $('result').style.display = 'block'; state = 'result'; setCount(0, false); resultShownAt = performance.now();
+  if (newly.length) sndChime(save.done.length === 8 ? 5 : 4);
+  updateHud();
+}
+
+// ---------- 入力 ----------
+const now = () => performance.now();
+addEventListener('pointerdown', (e) => {
+  e.preventDefault(); initAudio();
+  if (state === 'title') { $('title').style.display = 'none'; toAim(); hint(D.hint, 6); return; }
+  if (state === 'result') { if (now() - resultShownAt > 700) toAim(); return; }
+  if (state === 'aim' && !hold) hold = { id: e.pointerId, x0: e.clientX, y0: e.clientY, s: [{ t: now(), x: e.clientX, y: e.clientY }] };
+}, { passive: false });
+addEventListener('pointermove', (e) => {
+  if (!hold || e.pointerId !== hold.id) return;
+  hold.s.push({ t: now(), x: e.clientX, y: e.clientY }); if (hold.s.length > 40) hold.s.shift();
+});
+addEventListener('pointerup', (e) => {
+  if (!hold || e.pointerId !== hold.id) return;
+  const h = hold; hold = null; h.s.push({ t: now(), x: e.clientX, y: e.clientY });
+  if (state !== 'aim') return;
+  const last = h.s[h.s.length - 1];
+  let ref = h.s[0]; for (const p of h.s) { if (last.t - p.t <= 110) { ref = p; break; } }
+  const dt = Math.max(16, last.t - ref.t);
+  const up = (ref.y - last.y) / dt * 1000 / H;          // 画面の高さ／秒
+  const total = (h.y0 - last.y) / H;
+  if (up < 1.0 || total < 0.05) { if (total > 0.02 || up > 0.3) hint(D.hintSlow, 3); return; }
+  const aim = clamp(Math.atan2(last.x - ref.x, ref.y - last.y) * 0.75, -0.45, 0.45);
+  const v0 = clamp(5 + 3.0 * (up - 1.0), 5, 20);
+  doThrow(v0, aim, tiltNow());
+});
+addEventListener('pointercancel', (e) => { if (hold && e.pointerId === hold.id) hold = null; });
+
+// ---------- 2D 描画（手の中の石） ----------
+function drawUI() {
+  g.setTransform(DPR, 0, 0, DPR, 0, 0); g.clearRect(0, 0, W, H);
+  if (state !== 'aim') return;
+  const tilt = tiltNow(), flat = Math.abs(tilt) < 6;
+  let x = W / 2, y = H * 0.84;
+  if (hold) { const l = hold.s[hold.s.length - 1]; x = l.x; y = l.y;
+    // 狙いの線
+    const dx = l.x - hold.x0, dy = hold.y0 - l.y;
+    if (dy > 8) { const a = clamp(Math.atan2(dx, dy) * 0.75, -0.45, 0.45); g.save(); g.strokeStyle = 'rgba(255,255,255,.35)'; g.setLineDash([6, 8]); g.lineWidth = 2;
+      g.beginPath(); g.moveTo(W / 2, H * 0.74); g.lineTo(W / 2 + Math.sin(a) * H * 0.35, H * 0.74 - Math.cos(a) * H * 0.3); g.stroke(); g.restore(); }
+  }
+  // 水平の目安
+  g.save(); g.translate(x, y);
+  const R = Math.min(W * 0.16, 64);
+  g.strokeStyle = flat ? 'rgba(255,224,138,.95)' : 'rgba(255,255,255,.45)'; g.lineWidth = flat ? 4 : 2;
+  g.beginPath(); g.moveTo(-R * 1.9, 0); g.lineTo(-R * 1.3, 0); g.moveTo(R * 1.3, 0); g.lineTo(R * 1.9, 0); g.stroke();
+  // 石
+  // 少し前の角度を薄く残して、揺れの向きが分かるように
+  g.save(); g.rotate(WOB_AMP * Math.sin((wob - 0.09) * Math.PI * 2 / WOB_PER) * Math.PI / 180); g.globalAlpha = 0.22; g.fillStyle = '#d8d8e0';
+  g.beginPath(); g.ellipse(0, 0, R, R * 0.27, 0, 0, Math.PI * 2); g.fill(); g.restore();
+  g.rotate(tilt * Math.PI / 180);
+  if (flat) { g.shadowColor = 'rgba(255,220,120,.95)'; g.shadowBlur = 22; }
+  const gr = g.createLinearGradient(0, -R * 0.3, 0, R * 0.3); gr.addColorStop(0, '#c8c8d0'); gr.addColorStop(0.5, '#9a9aa4'); gr.addColorStop(1, '#5e5e68');
+  g.fillStyle = gr; g.beginPath(); g.ellipse(0, 0, R, R * 0.27, 0, 0, Math.PI * 2); g.fill();
+  g.shadowBlur = 0; g.fillStyle = 'rgba(255,255,255,.35)'; g.beginPath(); g.ellipse(-R * 0.2, -R * 0.08, R * 0.5, R * 0.07, 0, 0, Math.PI * 2); g.fill();
+  g.restore();
+  // 上へはじく矢印
+  if (!hold && throwN < 3) {
+    const a = 0.5 + 0.5 * Math.sin(now() / 250);
+    g.save(); g.globalAlpha = 0.35 + a * 0.4; g.fillStyle = '#fff'; g.translate(W / 2, H * 0.84 - R * 0.9 - a * 10);
+    g.beginPath(); g.moveTo(0, -16); g.lineTo(14, 2); g.lineTo(5, 2); g.lineTo(5, 14); g.lineTo(-5, 14); g.lineTo(-5, 2); g.lineTo(-14, 2); g.closePath(); g.fill(); g.restore();
+  }
+}
+
+// ---------- ループ ----------
+let last = 0, time = 0, cricketT = 0;
+const tmpV = new THREE.Vector3(), camTarget = new THREE.Vector3(), lookTarget = new THREE.Vector3();
+function frame(ts) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(0.05, last ? (ts - last) / 1000 : 0.016); last = ts; time += dt;
+  if (W < 2 || H < 2) resize();
+  // 時間帯
+  const target = save.done.length; tp += clamp(target - tp, -dt * 0.6, dt * 0.6);
+  if (Math.abs(tp - tpShown) > 0.002) { applyTime(tp); tpShown = tp; }
+  waterU.uT.value = time;
+  if (state === 'aim') wob += dt;
+  if (state === 'fly') stepFly(dt);
+  if (state === 'after') {
+    if (S.sunk) { S.sinkT += dt; S.pos.y = -S.sinkT * 0.5; stone.visible = S.sinkT < 0.5; }
+    else if (S.falling) { S.vel.y -= 9.8 * dt; S.pos.addScaledVector(S.vel, dt); if (S.pos.y <= 0) { S.falling = false; S.pos.y = 0; sink(0.8); } }
+    else if (S.shore) { S.pos.addScaledVector(S.vel, dt); S.vel.multiplyScalar(Math.exp(-dt * 3)); }
+    S.endT -= dt; if (S.endT <= 0 && state === 'after') finishThrow();
+  }
+  // 石の見た目
+  if (stone.visible) {
+    S.spin += dt * (state === 'fly' ? 26 : 4);
+    stone.position.copy(S.pos); stone.rotation.set(0, 0, 0); stone.rotateZ(S.tilt * Math.PI / 180); stone.rotateY(S.spin);
+    if (state === 'fly') stone.rotateX(-Math.atan2(S.vel.y, Math.hypot(S.vel.x, S.vel.z)) * 0.4);
+  }
+  // カメラ
+  if (state === 'fly' || state === 'after' || state === 'result') {
+    const z = Math.max(S.pos.z, 0);
+    camTarget.set(S.pos.x * 0.8, 1.9 + Math.min(z, 60) * 0.02, z - 7.5);
+    lookTarget.set(S.pos.x, 0.2, z + 9);
+  } else { camTarget.copy(HOME.pos); lookTarget.copy(HOME.look); }
+  const k = 1 - Math.exp(-dt * (state === 'fly' ? 2.6 : 2.2));
+  camera.position.lerp(camTarget, k); camLook.lerp(lookTarget, k); camera.lookAt(camLook);
+  sky.position.copy(camera.position); stars.position.copy(camera.position); waterU.uCam.value.copy(camera.position);
+  moon.position.set(camera.position.x + Math.sin(MOON_AZ) * 260, Math.sin(MOON_EL) * 270, camera.position.z + Math.cos(MOON_AZ) * 260);
+  // 浮き輪のゆれ
+  ring.position.y = 0.06 + Math.sin(time * 1.4) * 0.03; ring.rotation.z = Math.sin(time * 0.5) * 0.1;
+  // 波紋
+  for (const r of ripples) {
+    if (!r.m.visible) continue; r.t += dt;
+    if (r.t < 0) { r.m.material.opacity = 0; continue; }
+    const u = r.t / r.life; if (u >= 1) { r.m.visible = false; continue; }
+    const s = (0.25 + Math.sqrt(u) * 2.6) * r.size; r.m.scale.set(s, s, s); r.m.material.opacity = (1 - u) * 0.55;
+  }
+  // しぶき
+  for (let i = 0; i < SPN; i++) {
+    if (spLife[i] <= 0) continue; spLife[i] -= dt;
+    spVel[i * 3 + 1] -= 9.8 * dt; spPos[i * 3] += spVel[i * 3] * dt; spPos[i * 3 + 1] += spVel[i * 3 + 1] * dt; spPos[i * 3 + 2] += spVel[i * 3 + 2] * dt;
+    if (spLife[i] <= 0 || spPos[i * 3 + 1] < 0) { spLife[i] = 0; spPos[i * 3 + 1] = -99; }
+  }
+  spGeo.attributes.position.needsUpdate = true;
+  // 夜の虫
+  if (AC && tp > 6) { cricketT -= dt; if (cricketT <= 0) { sndCricket(); cricketT = rand(0.6, 2.2); } }
+  // 文字
+  if (toastT > 0) { toastT -= dt; if (toastT <= 0) $('toast').style.opacity = 0; }
+  if (hintT > 0) { hintT -= dt; if (hintT <= 0) $('hint').style.opacity = 0; }
+  drawUI();
+  renderer.render(scene, camera);
+}
+applyTime(0); tpShown = 0; updateHud();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

@@ -1,0 +1,1322 @@
+{
+  "id": "2026-10-26-claude-2",
+  "status": "published",
+  "title": "夕なぎの水切り",
+  "genre": "スポーツ",
+  "concept": "石が水平になった瞬間に指で上へはじく、水切りの手触りが核。跳ねるたびに音が一段ずつ上がり、うまく投げるほど小さな旋律になる。湖のお題を達成するほど日が暮れ、夕焼けから月夜へ変わっていく。",
+  "howToPlay": "手の中の石が水平に光った瞬間に、指で上へ速くはじいて投げる。はじく向きで狙いが変わる。",
+  "libraryDecision": "three.js を使う。水面すれすれを跳ねていく石をカメラが追い、遠ざかる波紋と夕日の照り返しを奥行きのまま見せることが、水切りの気持ちよさそのものだから。物理は跳ね方を調整しやすいよう自作した。",
+  "soundDecision": "Web Audio で自作。跳ねるたびに五音音階で一段ずつ高くなる音を鳴らし、跳ねた回数が耳で分かり長い投げほど旋律になるようにした。小さな水音の環境音と、沈むときの「ぽちゃん」、夜には虫の声。",
+  "improvements": [
+    {
+      "found": "1) ぴたっと投げた1投目で17回跳ね、お題が一度に4つ片付いて目標がすぐ無くなる 2) 傾きのずれがあまり効かず、雑に投げても数回は跳ねる 3) 「ななめ…」の文字が明るい夕空に溶けて読めず、結果画面の上に回数の数字が重なって残る",
+      "changed": "跳ね方を調整し、傾きが24°を超えると沈む・投げが遅いほど傾きが早くくずれるようにした（速さとタイミングの両方が効く）。お題を10回・20回に組み替え、強く投げすぎると向こう岸に着いて回数が止まる駆け引きを作った。文字に濃い縁取りを付け、結果画面では回数表示を消した。",
+      "foundEn": "1) A single perfect first throw skipped 17 times and cleared 4 tasks at once, so goals ran out fast 2) Tilt barely mattered; sloppy throws still skipped several times 3) \"Tilted…\" melted into the bright sky, and the skip counter stayed on top of the result panel",
+      "changedEn": "Retuned the bounces: the stone sinks past 24° of tilt and slow throws lose their balance faster, so both speed and timing matter. Re-set tasks to 10 and 20 skips, and throwing too hard now lands on the far shore and stops the count. Added dark outlines to text and hid the counter on the result screen."
+    },
+    {
+      "found": "1) 調整後もうまい1投で複数のお題が同時に片付き、日暮れの進み方が雑になる 2) 岩の手前で沈んだり浮き輪をかすめたりしても「惜しい」が伝わらず、次に何を変えればいいか分からない 3) 0回で沈んだとき、傾きのせいか勢い不足かが分からない。結果画面が湖を覆う",
+      "changed": "お題を1つずつ順番に挑む形にし（3回→浮き輪→25m→10回→岩のあいだ→15回→向こう岸→20回）、いまのお題を上に出した。結果に「あと2回」「1.3mずれた」などの残りと、沈んだ理由（傾いた／勢いがつきた／角度が急）を出す。結果画面を下に寄せ、湖の波紋が見えるようにした。",
+      "foundEn": "1) Even after tuning, one good throw cleared several tasks at once, so the sunset advanced in lumps 2) Sinking just short of the rocks or grazing the float gave no sense of \"so close\", nor what to change 3) A 0-skip throw did not say whether tilt or speed was the problem, and the result panel covered the lake",
+      "changedEn": "Tasks are now taken one at a time in order (3 skips → float → 25m → 10 → rocks → 15 → far shore → 20), with the current one shown at the top. Results show what is left (\"2 more\", \"1.3m off\") and why the stone sank (tilted / out of speed / too steep). The result panel moved down so the ripples stay visible."
+    },
+    {
+      "found": "1) 石の揺れが速く大きく、適当にはじくと半分近くが即「ぽちゃん」で初めての人に厳しい 2) 止まった一瞬の石を見ても、水平へ向かっているのか離れているのか分からない 3) 順番制にしたら、浮き輪のお題中に31m飛ばしても「25m」が数えられず損した気分になる",
+      "changed": "揺れを28°・1.6秒周期にゆるめ、ぴたっと投げられる時間を広げた。手の中の石に少し前の角度を薄く残し、揺れの向きが見えるようにした。いまのお題を達成した投げで、続くお題も満たしていればまとめて達成になるようにした（結果の一覧も上から順に読める並びに）。",
+      "foundEn": "1) The wobble was fast and wide; nearly half of random flicks plopped instantly, harsh for newcomers 2) Looking at the stone for an instant, you could not tell if it was heading toward level or away 3) With ordered tasks, throwing 31m during the float task did not count for \"25m\", which felt unfair",
+      "changedEn": "Softened the wobble to 28° over 1.6s so the perfect window is wider. The stone in hand leaves a faint trace of its previous angle so you can see which way it rocks. A throw that clears the current task also clears the following tasks it satisfies (and the result list now reads top to bottom)."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "探索・散歩",
+      "en": "Exploration",
+      "of": 57
+    },
+    "candidates": [
+      {
+        "idea": "霧の夜の町を提灯で散歩する3D探索。灯りの届く範囲だけが見え、寝ている猫や風鈴など12の小さな発見を探して歩く。",
+        "ideaEn": "A 3D lantern walk through a foggy night town; only what the light reaches is visible, and you look for 12 small discoveries like a sleeping cat or a wind chime.",
+        "fromDraw": true
+      },
+      {
+        "idea": "夕方の湖で水切り。手の中で揺れる石が水平になった瞬間に上へはじき、跳ねるたびに音階が上がる。3Dで石を追いかけ、湖のお題を集める。",
+        "ideaEn": "Stone skipping on an evening lake. Flick up the moment the wobbling stone is level; each skip rings a higher note. A 3D chase camera follows the stone as you clear lake challenges.",
+        "fromDraw": false
+      },
+      {
+        "idea": "花火職人。玉に色の火薬を順に詰めて打ち上げ、開いた形をお客さんの注文と見比べる2Dの花火づくり。",
+        "ideaEn": "Fireworks maker: pack colored powders into a shell in order, launch it, and compare the burst with the customer's order.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 1
+  },
+  "structure": {
+    "goal": "complete",
+    "ending": "other",
+    "input": [
+      "swipe"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Skipping at Dusk",
+      "concept": "The core is the feel of stone skipping: flick up the instant the stone is level. Each skip rings one note higher, so a good throw becomes a little melody. Clearing lake challenges turns the sunset into a moonlit night.",
+      "howToPlay": "When the stone in your hand glows level, flick up fast to throw. The flick direction aims the throw.",
+      "libraryDecision": "Uses three.js: a chase camera skimming the water after the stone, with ripples and the sunset glint receding in depth, is the pleasure of skipping itself. The physics is hand-written so the bounces are easy to tune.",
+      "soundDecision": "Hand-made Web Audio. Each skip plays the next note of a pentatonic scale, so you hear your count and a long throw becomes a melody. Soft water ambience, a plop when it sinks, crickets at night."
+    }
+  },
+  "createdAt": "2026-10-26T12:49:35+09:00",
+  "specVersion": 10,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-26T12:49:35+09:00",
+    "metricsFrom": "2026-10-26T03:48:08.709Z",
+    "transcript": "48066ba2-58f4-4db1-97ac-05ef45d5afd9.jsonl",
+    "validationRuns": 8,
+    "finishedAt": "2026-10-26T13:15:35+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-26T13:15:54+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "40.6KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=137",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=135",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=132",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=125",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 41588,
+    "lines": 645
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "うまい1投でお題が3〜4つまとめて片付き、湖のお題が数投で残り少なくなる。投げる操作は「揺れを見てはじく」だけなので、お題を終えたあとに続ける理由はベスト更新しかない。",
+    "comment": "画像を見ながら遊んだ。水平の瞬間にはじけたときの「ぴたっ！」と、波紋が点々と遠ざかって行く絵はとても気持ちいい。岩のあいだを10回目で抜けた場面、19回跳ねて向こう岸まであと5.5m・20回まであと1回で沈んだ場面では、すぐもう1回投げたくなった。速く投げすぎると岸に着いて回数が止まる駆け引きも効いている。音は検査環境では聞けていない。揺れの向きを読むのは静止画では難しく、実機の人の感覚とはずれがあるかもしれない。",
+    "similar": [
+      {
+        "title": "Skipping Stone (iPlay)",
+        "url": "https://www.pocketgamer.com/skipping-stone-iplay/review/",
+        "similarity": "中",
+        "note": "スマホの水切りゲーム。跳ねる瞬間にタイミングよくタップして跳ね続ける。こちらは投げる瞬間の傾きと強さだけで決まり、投げたあとは見守る。3Dの追いかけ視点とお題で日暮れが進むのが違い。",
+        "note_en": "A phone stone-skipping game where you tap in time with each bounce. Here everything is decided at release (tilt and power) and you then watch; the 3D chase view and tasks that advance the sunset are the differences."
+      },
+      {
+        "title": "SkipIt",
+        "url": "https://www.bluestacks.com/campaign/com.idletap.skipit/en",
+        "similarity": "低",
+        "note": "跳ねる石をタップでつなぎ、左右スワイプでレーンを変えるランナー型。題材は同じだが遊びの構造は別物。",
+        "note_en": "A runner where you tap to keep the stone bouncing and swipe to change lanes. Same subject, different structure."
+      }
+    ],
+    "research": "「stone skipping mobile game swipe」でウェブ検索し、スマホの水切りゲームを2件確認した。",
+    "i18n": {
+      "en": {
+        "worst": "One good throw clears three or four tasks at once, so the lake runs out of goals within a few throws. The only action is watching the wobble and flicking, so once the tasks are done, beating your best is the only reason to keep going.",
+        "comment": "Played by looking at the screenshots. Flicking at the level instant (\"Perfectly flat!\") and watching ripples recede in a dotted line feels great. Passing the rocks on skip 10, and sinking after 19 skips 5.5m short of the shore and one short of 20, made me want to throw again at once. The trade-off of throwing so hard that you land on the shore and stop counting also works. I could not hear the sound in the test environment. Reading the wobble from stills is hard, so my sense of the timing may differ from a real player's.",
+        "research": "Web-searched \"stone skipping mobile game swipe\" and checked two phone stone-skipping games."
+      }
+    },
+    "method": "スマホ縦画面で 19 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 19 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 300ms",
+        "note": "開始。お題は3回はねる",
+        "noteEn": "Start; task: skip 3 times",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "wait 100ms",
+        "note": "手元の石の残像で揺れの向きを見る",
+        "noteEn": "Read the rocking direction from the trace",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 400ms → swipe(0.50,0.85→0.29,0.50) 100ms → wait 1800ms",
+        "note": "水平に戻る瞬間を狙い、次のお題の浮き輪も一緒に狙って左上へ",
+        "noteEn": "Timed for level and aimed up-left at the float to chain the next task",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 4000ms",
+        "note": "結果",
+        "noteEn": "Result",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3
+              ],
+              "bestSkips": 17,
+              "bestDist": 30.053280265226327
+            }
+          },
+          {
+            "agf": "end",
+            "score": 17
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.50,0.30) 120ms → wait 300ms",
+        "note": "次は右奥の岩のあいだ",
+        "noteEn": "Next: between the rocks, far right",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3
+              ],
+              "bestSkips": 17,
+              "bestDist": 30.053280265226327
+            }
+          },
+          {
+            "agf": "end",
+            "score": 17
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 100ms",
+        "note": "揺れの向きを見る",
+        "noteEn": "Check rocking direction",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3
+              ],
+              "bestSkips": 17,
+              "bestDist": 30.053280265226327
+            }
+          },
+          {
+            "agf": "end",
+            "score": 17
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 50ms → swipe(0.50,0.90→0.80,0.45) 100ms → wait 2500ms",
+        "note": "水平に向かっているので、すぐ右上へ強めにはじいた",
+        "noteEn": "Heading to level; flicked hard up-right right away",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3
+              ],
+              "bestSkips": 17,
+              "bestDist": 30.053280265226327
+            }
+          },
+          {
+            "agf": "end",
+            "score": 17
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 800ms",
+        "note": "岩のあいだへ",
+        "noteEn": "Into the gap",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3
+              ],
+              "bestSkips": 17,
+              "bestDist": 30.053280265226327
+            }
+          },
+          {
+            "agf": "end",
+            "score": 17
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 5000ms",
+        "note": "結果",
+        "noteEn": "Result",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3
+              ],
+              "bestSkips": 17,
+              "bestDist": 30.053280265226327
+            }
+          },
+          {
+            "agf": "end",
+            "score": 17
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "bestSkips": 18,
+              "bestDist": 41.14667595794827
+            }
+          },
+          {
+            "agf": "end",
+            "score": 18
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.50,0.30) 120ms → wait 300ms",
+        "note": "次は向こう岸。全力で投げたい",
+        "noteEn": "Next: the far shore; need full power",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3
+              ],
+              "bestSkips": 17,
+              "bestDist": 30.053280265226327
+            }
+          },
+          {
+            "agf": "end",
+            "score": 17
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "bestSkips": 18,
+              "bestDist": 41.14667595794827
+            }
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "wait 100ms",
+        "note": "揺れの向きを見る",
+        "noteEn": "Check rocking direction",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3
+              ],
+              "bestSkips": 17,
+              "bestDist": 30.053280265226327
+            }
+          },
+          {
+            "agf": "end",
+            "score": 17
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "bestSkips": 18,
+              "bestDist": 41.14667595794827
+            }
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "wait 60ms → swipe(0.50,0.92→0.50,0.35) 90ms → wait 3000ms",
+        "note": "水平に向かう途中、まっすぐ全力ではじいた",
+        "noteEn": "Heading to level; flicked straight with full power",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3
+              ],
+              "bestSkips": 17,
+              "bestDist": 30.053280265226327
+            }
+          },
+          {
+            "agf": "end",
+            "score": 17
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "bestSkips": 18,
+              "bestDist": 41.14667595794827
+            }
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "wait 2500ms",
+        "note": "向こう岸に届くか",
+        "noteEn": "Will it reach the far shore?",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3
+              ],
+              "bestSkips": 17,
+              "bestDist": 30.053280265226327
+            }
+          },
+          {
+            "agf": "end",
+            "score": 17
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "bestSkips": 18,
+              "bestDist": 41.14667595794827
+            }
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "wait 4000ms",
+        "note": "結果",
+        "noteEn": "Result",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3
+              ],
+              "bestSkips": 17,
+              "bestDist": 30.053280265226327
+            }
+          },
+          {
+            "agf": "end",
+            "score": 17
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "bestSkips": 18,
+              "bestDist": 41.14667595794827
+            }
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "bestSkips": 19,
+              "bestDist": 66.4719105330285
+            }
+          },
+          {
+            "agf": "end",
+            "score": 19
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "tap(0.50,0.30) 120ms → wait 300ms",
+        "note": "あと5.5m。もう一度",
+        "noteEn": "5.5m short; again",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3
+              ],
+              "bestSkips": 17,
+              "bestDist": 30.053280265226327
+            }
+          },
+          {
+            "agf": "end",
+            "score": 17
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "bestSkips": 18,
+              "bestDist": 41.14667595794827
+            }
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "bestSkips": 19,
+              "bestDist": 66.4719105330285
+            }
+          },
+          {
+            "agf": "end",
+            "score": 19
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "wait 100ms",
+        "note": "揺れの向きを見る",
+        "noteEn": "Check rocking direction",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3
+              ],
+              "bestSkips": 17,
+              "bestDist": 30.053280265226327
+            }
+          },
+          {
+            "agf": "end",
+            "score": 17
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "bestSkips": 18,
+              "bestDist": 41.14667595794827
+            }
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "bestSkips": 19,
+              "bestDist": 66.4719105330285
+            }
+          },
+          {
+            "agf": "end",
+            "score": 19
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 17,
+        "action": "swipe(0.50,0.93→0.50,0.33) 90ms → wait 3000ms",
+        "note": "もうすぐ水平。すぐにまっすぐ全力で",
+        "noteEn": "Almost level; full-power flick at once",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3
+              ],
+              "bestSkips": 17,
+              "bestDist": 30.053280265226327
+            }
+          },
+          {
+            "agf": "end",
+            "score": 17
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "bestSkips": 18,
+              "bestDist": 41.14667595794827
+            }
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "bestSkips": 19,
+              "bestDist": 66.4719105330285
+            }
+          },
+          {
+            "agf": "end",
+            "score": 19
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 18,
+        "action": "wait 2500ms",
+        "note": "岸へ",
+        "noteEn": "Toward the shore",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3
+              ],
+              "bestSkips": 17,
+              "bestDist": 30.053280265226327
+            }
+          },
+          {
+            "agf": "end",
+            "score": 17
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "bestSkips": 18,
+              "bestDist": 41.14667595794827
+            }
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "bestSkips": 19,
+              "bestDist": 66.4719105330285
+            }
+          },
+          {
+            "agf": "end",
+            "score": 19
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 19,
+        "action": "wait 3500ms",
+        "note": "結果",
+        "noteEn": "Result",
+        "image": "ai-play/step-19.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3
+              ],
+              "bestSkips": 17,
+              "bestDist": 30.053280265226327
+            }
+          },
+          {
+            "agf": "end",
+            "score": 17
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "bestSkips": 18,
+              "bestDist": 41.14667595794827
+            }
+          },
+          {
+            "agf": "end",
+            "score": 18
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "bestSkips": 19,
+              "bestDist": 66.4719105330285
+            }
+          },
+          {
+            "agf": "end",
+            "score": 19
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "done": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "bestSkips": 19,
+              "bestDist": 72.00616943068665
+            }
+          },
+          {
+            "agf": "end",
+            "score": 13
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-26T13:15:35+09:00"
+  },
+  "publishedAt": "2026-10-26T13:15:35+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 29725,
+    "outputTokens": 47468,
+    "contextTokens": 14847890,
+    "turns": 77,
+    "toolCalls": 80,
+    "webSearches": 0,
+    "minutes": 27.4,
+    "from": "2026-10-26T03:48:08.709Z",
+    "to": "2026-10-26T04:15:35.687Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-26T13:15:35+09:00",
+    "validationRuns": 7,
+    "codeKB": 40.6
+  }
+}
