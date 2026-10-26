@@ -237,6 +237,8 @@ export function checkStructure(s) {
 // ジャンルの一覧（factory/genres.json）と、企画のくじ
 export const genres = () => readJson(path.join(ROOT, 'factory', 'genres.json'), { genres: [] }).genres;
 export const genreEn = (ja) => genres().find((g) => g.ja === ja)?.en || null;
+// くじと新しい作品のジャンルに使えるもの（retired の付いたジャンルは除く）
+export const activeGenres = () => genres().filter((g) => !g.retired);
 export const DRAW_FILE = path.join(ROOT, '.genre-draw.json');
 
 // 企画の記録（meta.json の planning）が正しいか（問題があれば説明の配列を返す）
@@ -251,7 +253,7 @@ export function checkPlanning(p, genre) {
     if (c.filter((x) => x?.fromDraw === true).length !== 1) err.push('planning.candidates のうち、くじのジャンルで考えた候補1つだけを fromDraw: true にする');
   }
   if (![0, 1, 2].includes(p?.chosen)) err.push('planning.chosen は作ることにした候補の番号（0〜2）');
-  if (genre && !genres().some((g) => g.ja === genre)) err.push('genre は factory/genres.json の ja のいずれか');
+  if (genre && !activeGenres().some((g) => g.ja === genre)) err.push('genre は factory/genres.json の ja のいずれか（retired の付いたものは使えない）');
   return err;
 }
 

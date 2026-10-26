@@ -4,9 +4,9 @@
 // 引いた結果は .genre-draw.json に残り、new-game.mjs が作品の記録（meta.json の planning.genreDraw）に移す。
 // 引き直しはできない（まだ new-game.mjs に使われていないくじがあれば、同じ結果を表示する。6時間たったものは引き直す）。
 import crypto from 'node:crypto';
-import { genres, readJson, writeJson, DRAW_FILE } from './lib.mjs';
+import { activeGenres, readJson, writeJson, DRAW_FILE } from './lib.mjs';
 
-const list = genres();
+const list = activeGenres();
 if (!list.length) { console.error('factory/genres.json が読めません'); process.exit(1); }
 let draw = readJson(DRAW_FILE);
 if (!draw || Date.now() - Date.parse(draw.at) > 6 * 3600e3) {

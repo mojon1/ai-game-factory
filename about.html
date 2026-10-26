@@ -79,6 +79,7 @@
     <li>2026-10-10: 実機で見つかった操作の問題に対応した（仕様8）。長押しで文字選択やメニューが出てプレイできない作品と、複数の指の操作がうまく効かない作品があったため、長押し・複数の指への備え（文字選択・長押しメニュー・ページの拡大を止める指定、指ごとの扱い方）を必須にし、自動テストで確かめるようにした。あわせて、サイトのプレイ画面でも、ページの拡大や文字選択がゲームの操作を横取りしないようにした。作品そのものは変更していない。</li>
     <li>2026-10-26: 作り方の手順を変更（仕様9）。62本の時点で人間の評価の平均が★1.7と低く、AIの自己判定はほぼすべて★3だった。原因として、手順が「作って終わり」になっていた（遊んでつまらない点を見つけても直さない決まりだった）ことを見直した。(A) 作ったら自分で遊び、つまらない点を3つ挙げて直すことを最低2回くり返し、その記録を作品ページに公開する。(B) 1回の制作で作るのは1本だけとし、時間をかけてよいとした。(C) 記録や類似作品の調査は短くし、時間を作り込みに回す。(D) 自己判定に星ごとの物差しを設け、点を付ける前に「一番の欠点」を書くようにした。お題や作品の中身は指定していない。</li>
     <li>2026-10-26: 共有ライブラリ棚に、2Dの描画と画面効果（PixiJS 8.22.0、pixi-filters 6.1.5）と、なめらかな動き（anime.js 4.5.0）を追加。あわせて企画の手順を変更（仕様10）。62本中3Dは1本だけで、AIの記録から「先に企画を決め、あとで3Dなどを足すか判断する」手順のため、2Dで考えた企画に3Dが合わず選ばれにくいことが分かった。候補を考える段階から「どう見せるか（2D・3D・見た目・動き）」も一緒に考え、表現のためのライブラリはそこで選んでよいことにした。3Dや特定の表現を求めるものではない。</li>
+    <li>2026-10-26: 作るゲームを、1人で遊べるものに限った（仕様11）。2人で交代して遊ぶ対戦の作品ができたため。コンピューターが相手の対戦はよい。ジャンルのくじから「2人で遊ぶ（1台のスマホで）」を外した（くじは56ジャンルになった）。</li>
   </ul>
 </div>
 
@@ -120,6 +121,7 @@
     <li>2026-10-10: Fixed touch problems found on real phones (spec version 8). In some games a long press selected text or opened a menu, and in another multi-finger input did not work well. Games must now include settings that block text selection, long-press menus and page zoom, and must track each finger separately; the automated test checks for these. The site's play screen also stops page zoom and text selection from taking over game input. The games themselves were not changed.</li>
     <li>2026-10-26: Changed the making process (spec version 9). At 62 games, the average human rating was ★1.7 and almost every AI self-rating was ★3. The process had been "make it and ship it" (problems found in play-testing were not to be fixed), so: (A) after building, the AI plays its game, lists three things that are not fun and fixes them, at least twice, and the log is shown on the game page; (B) one game per run, with no time pressure; (C) records and similar-work research are kept short so time goes into the game; (D) self-ratings use a defined scale for each star, and the AI must state the game's biggest flaw before rating. No topic or content is prescribed.</li>
     <li>2026-10-26: Added 2D rendering and effects (PixiJS 8.22.0, pixi-filters 6.1.5) and motion (anime.js 4.5.0) to the shared library shelf, and changed the planning process (spec version 10). Only 1 of 62 games was 3D; the AI's notes showed that because it first fixed the idea and only then asked whether to add 3D, ideas conceived in 2D never benefited from 3D. The AI now considers how to present each idea (2D, 3D, look, motion) while generating candidates, and may choose presentation libraries at that stage. 3D or any particular style is not required.</li>
+    <li>2026-10-26: Games are now limited to single-player (spec version 11), after a two-player pass-and-play game was made. Playing against the computer is fine. "Two players on one phone" was removed from the genre lot (56 genres now).</li>
   </ul>
 </div>
 </main>

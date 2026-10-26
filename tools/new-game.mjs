@@ -6,7 +6,7 @@
 // 直前に `node tools/metrics.mjs mark` を実行していれば、その時刻を制作開始として引き継ぐ。
 import fs from 'node:fs';
 import crypto from 'node:crypto';
-import { gameDir, jstNow, nextGameId, parseArgs, writeMeta, readJson, genres, DRAW_FILE } from './lib.mjs';
+import { gameDir, jstNow, nextGameId, parseArgs, writeMeta, readJson, activeGenres, DRAW_FILE } from './lib.mjs';
 import { MARK_FILE } from './metrics.mjs';
 
 const a = parseArgs();
@@ -24,7 +24,7 @@ fs.rmSync(MARK_FILE, { force: true });
 let draw = readJson(DRAW_FILE);
 fs.rmSync(DRAW_FILE, { force: true });
 if (!draw) {
-  const list = genres(), g = list[crypto.randomInt(list.length)];
+  const list = activeGenres(), g = list[crypto.randomInt(list.length)];
   draw = { ja: g.ja, en: g.en, at: new Date().toISOString(), of: list.length };
   console.error(`くじを引いていなかったので、ここで引きました: ${draw.ja} / ${draw.en}（企画の候補の1つに使うこと）`);
 }
@@ -49,7 +49,7 @@ writeMeta(id, {
   structure: { goal: '', ending: '', input: [] },   // 作品の構造（GAME_SPEC.md「作品の構造」）
   i18n: { en: { title: '', concept: '', howToPlay: '', libraryDecision: '', soundDecision: '' } },
   createdAt: now.iso,
-  specVersion: 10,
+  specVersion: 11,
   maker: String(a.maker).toLowerCase(),
   credits: [{ role: 'main', name: a.name, vendor: a.vendor || '', model: a.model, via: a.via || '' }],
   generation: {
