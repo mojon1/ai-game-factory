@@ -1,0 +1,458 @@
+{
+  "id": "2026-10-27-gpt-1",
+  "status": "published",
+  "title": "ころころ六面パン",
+  "genre": "料理",
+  "concept": "立方体のパンを回し、六つの面をきつね色に焼く。隠れた面を火へ向け直す立体の手触りと、あと少し焼くか次へ回すかの迷いを核にする。",
+  "howToPlay": "面番号で向きを変え、各面を55〜75%へ。火から外して確認できますが残り時間は進みます。50秒以内に盛りつけます。",
+  "libraryDecision": "three.js 0.186.1とaddonsのRoundedBoxGeometryを使用。隠れた焼き面を下へ回す立体感と、丸い角・パンの焼き色を核に加えた。",
+  "soundDecision": "面の切替と盛りつけに小さな音を鳴らし、BGMは付けない。",
+  "improvements": [
+    {
+      "found": "毎面同じ秒数を待つだけ／角張った形と強い光でパンらしくない／目標に入る瞬間が数値だけで分かりづらい。",
+      "changed": "面ごとに焼ける速さを変え、速さの表示と目標帯バー・到達音を追加。丸い角のパンにし、火の照明を抑えて焼き色を読みやすくした。",
+      "foundEn": "Identical waiting on each face; a sharp, overlit cube looks unlike bread; target entry relies only on numbers.",
+      "changedEn": "Varied face rates and added speed labels, target bars and entry tones. Rounded the loaf and reduced fire lighting to reveal browning."
+    },
+    {
+      "found": "確認中にも焼けて考えにくい／総点だけでは各面の失敗が見えない／再挑戦の比較が残らない。",
+      "changed": "火から外す操作を追加し、面ごとの薄い・食べごろ・焼きすぎを結果に表示。ベスト点を保存し、盛りつけ後も立体の焼き色を見られるようにした。",
+      "foundEn": "Heat keeps rising while inspecting; a total hides each face outcome; replay comparisons are lost.",
+      "changedEn": "Added lifting off the fire, face-by-face result labels, saved best scores, and an unobscured 3D loaf after plating."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "料理",
+      "en": "Cooking",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "3Dの立方体パンを火へ回し、焼き色と温かな炎で六面の調理を見せる。",
+        "ideaEn": "A 3D bread cube turns above warm flames, making six-face browning visible.",
+        "fromDraw": true
+      },
+      {
+        "idea": "立体迷路を傾け、透明な床越しに下の道を読んで進む。",
+        "ideaEn": "Tilt a 3D maze and read lower routes through translucent floors.",
+        "fromDraw": false
+      },
+      {
+        "idea": "水面の光を2Dの柔らかなにじみで集め、波を作って星へ届ける。",
+        "ideaEn": "Gather softly glowing 2D reflections and make waves to carry them to stars.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "other",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Six-Sided Toast",
+      "concept": "Turn a cube of bread to toast all six faces. Real spatial rotation reveals hidden sides while you decide whether to roast a little longer or switch.",
+      "howToPlay": "Turn numbered faces toward the fire and aim for 55–75%. Lift to inspect without heating, though time still passes. Plate within 50 seconds.",
+      "libraryDecision": "Use three.js 0.186.1 and RoundedBoxGeometry from its addons to turn hidden faces toward the fire, with rounded bread edges and readable browning.",
+      "soundDecision": "Quiet tones mark face changes and plating, without background music."
+    }
+  },
+  "createdAt": "2026-10-27T12:04:24+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-27T12:04:24+09:00",
+    "metricsFrom": "2026-10-27T03:01:40.664Z",
+    "transcript": null,
+    "validationRuns": 4,
+    "finishedAt": "2026-10-27T12:28:35+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-27T12:22:12+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "9.2KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=115",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=83",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=108",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=87",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 9446,
+    "lines": 12
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js"
+    },
+    {
+      "name": "three.js addons",
+      "version": "0.186.1",
+      "file": "three-addons-0.186.1.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "焼き面の数値を待ってそろえる比重が大きく、六面以外のレシピや新しい手順がない。",
+    "comment": "2回改善し、最終版8手を画像で確認。速い2面を短く、遅い3面を長く焼き、火を外して確認しながら六面を63〜68%へそろえて585点になった。全六面の食べごろ表示、再開、0点で盛った後もベスト585が残ることを確認。立体で隠れた面が現れる感覚は良いが、慣れると同じ待ち方を反復しやすい。",
+    "similar": [
+      {
+        "title": "I Am Bread",
+        "url": "https://iambreadgame.com/",
+        "similarity": "中",
+        "note": "パンを立体空間で動かしてトーストにする題材が近い。本作は移動・探索ではなく、六面の向きと焼き時間に絞った。",
+        "note_en": "Shares moving bread in 3D to make toast; this game focuses on six-face orientation and roast duration rather than traversal and exploration."
+      }
+    ],
+    "research": "パンをトーストにする3Dゲームを1クエリで検索し、Bossa StudiosのI Am Bread公式ページで実在を確認した。",
+    "i18n": {
+      "en": {
+        "worst": "Much of play is waiting and aligning doneness numbers; there are no recipes or procedures beyond the six faces.",
+        "comment": "Completed two improvement cycles and viewed eight final steps. Shorter roasting on fast face two and longer on slow face three, with lifting to inspect, brought all six to 63–68% and 585 points. Verified six ready-face labels, restart, and best 585 surviving a zero-score plate. Revealing hidden faces in 3D feels clear, though learned waits become repetitive.",
+        "research": "Used one query for 3D bread-to-toast games and verified Bossa Studios' official I Am Bread page."
+      }
+    },
+    "method": "スマホ縦画面で 8 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 8 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.86) 120ms → wait 5000ms → tap(0.50,0.62) 120ms",
+        "note": "位置調整後の最終版。1面を焼いて火から外す。",
+        "noteEn": "Final layout: toast face one, then lift it off the fire.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.50,0.70) 120ms → tap(0.50,0.62) 120ms → wait 3850ms → tap(0.50,0.62) 120ms",
+        "note": "火を外すと1面63%で止まっている。速い2面へ替えて短めに焼く。",
+        "noteEn": "Face one stays at 63% off the fire. Switch to fast face two and roast it briefly.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.78,0.70) 120ms → tap(0.50,0.62) 120ms → wait 6800ms → tap(0.50,0.62) 120ms",
+        "note": "2面65%にそろった。遅い3面は長めに焼き、同じ色へ近づける。",
+        "noteEn": "Face two is 65%. Give slow face three longer to approach the same doneness.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.22,0.80) 120ms → tap(0.50,0.62) 120ms → wait 4500ms → tap(0.50,0.62) 120ms",
+        "note": "3面63%。4面は速いので、少し短めに焼いて火から外す。",
+        "noteEn": "Face three is 63%. Roast fast face four a shorter time, then lift it.",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.50,0.80) 120ms → tap(0.50,0.62) 120ms → wait 6200ms → tap(0.50,0.62) 120ms",
+        "note": "4面65%。5面はじっくりなので長めに焼く。",
+        "noteEn": "Face four is 65%. Give slower face five a longer roast.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.78,0.80) 120ms → tap(0.50,0.62) 120ms → wait 4600ms → tap(0.50,0.62) 120ms → tap(0.50,0.91) 120ms",
+        "note": "5面68%。最後の6面を短めに焼いて、六面をそろえて盛りつける。",
+        "noteEn": "Face five is 68%. Finish face six with a shorter roast and plate all six.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 585
+            }
+          },
+          {
+            "agf": "end",
+            "score": 585
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 850ms → tap(0.50,0.91) 120ms → tap(0.50,0.62) 120ms",
+        "note": "585点・六面食べごろを確認した。再開し、ベストが残るかと火を外した初期状態を確認する。",
+        "noteEn": "Verified 585 and six ready faces. Restart and lift immediately to check the saved best and reset state.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 585
+            }
+          },
+          {
+            "agf": "end",
+            "score": 585
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.50,0.91) 120ms",
+        "note": "再開直後は一面3%で他は0%。低い点で盛り、585のベストが更新されず残るか見る。",
+        "noteEn": "The new round has one face at 3%, others at zero. Plate a low score and check best 585 remains.",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 585
+            }
+          },
+          {
+            "agf": "end",
+            "score": 585
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 585
+            }
+          },
+          {
+            "agf": "end",
+            "score": 0
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-27T12:28:35+09:00"
+  },
+  "publishedAt": "2026-10-27T12:28:35+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 12094,
+    "outputTokens": 11199,
+    "contextTokens": 15765394,
+    "turns": 43,
+    "toolCalls": 43,
+    "webSearches": null,
+    "minutes": 27,
+    "from": "2026-10-27T03:01:40.664Z",
+    "to": "2026-10-27T03:28:38.221Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-10-27T12:28:38+09:00",
+    "validationRuns": 4,
+    "codeKB": 9.2,
+    "evidence": "metrics-evidence.json"
+  }
+}
