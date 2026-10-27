@@ -1,0 +1,748 @@
+{
+  "id": "2026-10-27-claude-1",
+  "status": "published",
+  "title": "雪あと探偵",
+  "genre": "推理",
+  "concept": "雪に残った足あとだけを証拠にする推理。虫めがねで足の裏の模様を見くらべ、あとから踏んだ足あとが上に重なる・走ると大またになる・雪がふる間の足あとは埋もれる、という本物の雪の手がかりから犯人と来た順番を読み解く。指名すると、あの日の雪の上が再現される。",
+  "howToPlay": "雪の上をなぞると虫めがねで拡大できる。犯人だと思う人のカードを2回タップして指名する。",
+  "libraryDecision": "使わない。足あとは時刻順に描くだけで「重なり」が自然に生まれ、虫めがねもその場で描き直せば鮮明になるので、Canvas 2D で十分。three.js や PixiJS を足しても推理の手応えは増えないと判断した。",
+  "soundDecision": "BGMは入れず、ごく小さな冬の風だけを流す。虫めがねの中心が足あとの上を通ると「さく」と雪を踏む音が鳴り、再現では足あとが付くたびに左右から足音が聞こえる。静かな雪の庭で証拠を探す集中を邪魔しないため。",
+  "improvements": [
+    {
+      "found": "①「来た順番」の事件で、決め手になる足あとの重なりが目的地の前に固まり、ごちゃごちゃで読めない ②虫めがねの中でも足の裏の模様が小さい ③再現を見ても、いつ盗まれたのかが分からず盛り上がらない",
+      "changed": "事件3・7・8の道すじを作り直し、重なりが雪の広い所で直角に交わるようにした。足あとを1.25倍にし虫めがねの倍率を上げた。再現で犯人が立ち止まった瞬間に品物がふわっと消え、音が鳴るようにした。",
+      "foundEn": "(1) In the 'who came last' cases the decisive overlaps were bunched in front of the target and unreadable (2) sole patterns were small even in the magnifier (3) the replay never showed the moment of theft, so it felt flat",
+      "changedEn": "Rerouted cases 3, 7 and 8 so the key overlaps cross at right angles in open snow. Made prints 1.25x larger and raised the magnification. In the replay the item now floats away with a chime the moment the culprit stops."
+    },
+    {
+      "found": "①虫めがねが指の上の別の場所を映すので、狙った足あとに合わせにくい ②判定のパネルが証拠の場所を隠し、まちがえた人がなぜかを学べない ③判定画面で、盗まれたはずの品物がふきだしに戻っている",
+      "changed": "本物の虫めがねのように、レンズの下にある雪がそのまま拡大され、指は柄を持つ形にした（離しても置いたまま見られる）。判定時に証拠の場所へ赤い印を付け、パネルの右上に証拠の拡大図を出した。判定画面のふきだしを直した。",
+      "foundEn": "(1) The magnifier showed a spot away from the finger, so aiming at a print was awkward (2) the verdict panel covered the evidence, so a wrong guess taught nothing (3) the stolen item reappeared in the bubble on the verdict screen",
+      "changedEn": "Made it work like a real magnifier: the glass enlarges the snow right beneath it and the finger holds the handle (it stays put when released). The verdict now marks the evidence in red and shows a magnified clue above the panel. Fixed the bubble."
+    },
+    {
+      "found": "①ソリの2本線が引いた人の足あとに重なり、波模様を長ぐつと見まちがえた（実際に1件まちがえた） ②小さなレンズだと子どもの靴（点）とスニーカー（波）が見分けにくい ③結果画面の○×の文字が崩れて見え、どの事件を落としたか分かりにくい",
+      "changed": "ソリの線を足あとの外側へ離した。虫めがねを大きくし、倍率をさらに上げた。結果画面は各事件の品物アイコンを並べ、解けた事件は緑、落とした事件は赤の斜線にした。",
+      "foundEn": "(1) The sled runners covered the puller's prints and I misread wavy soles as boots (I actually missed that case) (2) in a small lens, the kid's dotted soles and the sneaker's waves were hard to tell apart (3) the circle/cross glyphs on the result screen rendered oddly and did not say which case was missed",
+      "changedEn": "Moved the sled runners outside the footprints. Enlarged the magnifier and raised its zoom again. The result screen now lists each case's item icon, green when solved and struck through in red when missed."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "推理",
+      "en": "Detective",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "雪の足あと推理：虫めがねで足の裏の模様と重なり・歩はば・うすさを調べ、犯人と来た順番をあてる。2D真上視点の雪の庭。",
+        "ideaEn": "Snow footprint detective: use a magnifier to read sole patterns, overlaps, strides and faintness to name the culprit and the order of visits. A top-down 2D snowy yard.",
+        "fromDraw": true
+      },
+      {
+        "idea": "吹きガラス工房（3D）：長押しで息を吹きこみ、なぞって回しながら注文どおりの形の花びんにふくらませる。",
+        "ideaEn": "Glassblowing studio (3D): hold to blow, drag to turn, and swell the glass into the vase shape the customer ordered.",
+        "fromDraw": false
+      },
+      {
+        "idea": "嵐の灯台守：長押しで灯台の光を回し、波間の小舟を岩のすき間へ導く。光が当たった所だけ海が見える。",
+        "ideaEn": "Storm lighthouse keeper: hold to sweep the beam and guide small boats between rocks; only the lit sea is visible.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "drag",
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Snowprint Detective",
+      "concept": "A mystery where footprints in the snow are the only evidence. Compare sole patterns through a magnifier and use real snow clues: later prints lie on top of earlier ones, running stretches the stride, prints made while it snowed are half buried. Accuse someone and the snowy yard replays what happened.",
+      "howToPlay": "Drag on the snow to look through the magnifier. Tap a suspect card twice to accuse them.",
+      "libraryDecision": "None. Drawing prints in time order naturally creates the overlaps, and redrawing inside the magnifier keeps it sharp, so Canvas 2D is enough. three.js or PixiJS would not add to the deduction.",
+      "soundDecision": "No music, just a very soft winter wind. When the magnifier passes over a print you hear a soft crunch, and in the replay footsteps crunch from left and right as prints appear. It keeps the quiet focus of searching a snowy yard."
+    }
+  },
+  "createdAt": "2026-10-27T09:09:50+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-27T09:09:50+09:00",
+    "metricsFrom": "2026-10-27T00:05:22.582Z",
+    "transcript": "6bbde221-0f6b-48b1-88c1-ddf63a4d72fe.jsonl",
+    "validationRuns": 4,
+    "finishedAt": "2026-10-27T09:39:11+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-27T09:38:23+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "59.7KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=131",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=214",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=104",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=213",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 61161,
+    "lines": 984
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "事件は全8件の決まった筋書きで、人物と左右の反転が毎回変わるだけ。一度解くと推理の驚きは薄れる。また足の裏の模様を見分けるのは小さな画面では少し目をこらす作業になる",
+    "comment": "事件3で、横に伸びるげたの線の上を肉球が踏んでいるのを虫めがねで見つけ「ポチがあとだ」と分かった瞬間は気持ちよかった。事件8でゲンの証言と重なりを組み合わせて先に来たポチを当てたのも推理らしい手応えがあった。指名後の再現で、犯人が立ち止まった瞬間に品物が消えるのも分かりやすい。一方、ソリの事件では波模様を長ぐつと見まちがえて1件落とした（その後ソリの線を離して直した）。最初の2件はやさしすぎる。自己プレイは画像を見ながら行った。",
+    "similar": [
+      {
+        "title": "シャーロック・ホームズ『緋色の研究』",
+        "url": "https://en.wikipedia.org/wiki/Footprint",
+        "similarity": "中",
+        "note": "あとの足あとが前の足あとを消す、という重なりから順番を読む推理の古典的なルーツ。こちらはそれを虫めがねで自分で確かめる遊びにした",
+        "note_en": "Classic root of reading order from footprints overwriting earlier ones. This game turns it into checking with your own magnifier."
+      },
+      {
+        "title": "Return of the Obra Dinn",
+        "url": "https://en.wikipedia.org/wiki/Return_of_the_Obra_Dinn",
+        "similarity": "低",
+        "note": "観察と論理で人物を特定し、その場面を再現で見る点が近い。こちらは雪の足あとだけを証拠にした短い事件集",
+        "note_en": "Similar in identifying people through observation and logic and replaying scenes; this is a short casebook using only snow prints as evidence."
+      }
+    ],
+    "research": "WebSearch で「雪の足あと 重なり 順番 推理」と、観察型推理ゲームを2回検索した",
+    "i18n": {
+      "en": {
+        "worst": "The 8 cases are fixed scenarios; only the cast and mirroring change each run, so the surprise fades once solved. Telling sole patterns apart on a small screen also takes some squinting",
+        "comment": "In case 3, spotting paw prints stepping on the geta line through the magnifier and realizing 'Pochi came later' felt great. In case 8, combining Gen's testimony with the overlap to name Pochi, who came first, felt like real deduction. The replay makes the theft clear as the item vanishes when the culprit stops. But I misread wavy soles as boots in the sled case and missed it (I then moved the sled lines away). The first two cases are too easy. I played while viewing the screenshots.",
+        "research": "Two WebSearch queries: footprint overlap order deduction in snow, and observation-based detective games"
+      }
+    },
+    "method": "スマホ縦画面で 26 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 26 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "開始。雪の庭と3人のカード、消えたにんじんのふきだし",
+        "noteEn": "Start: snowy yard, three suspect cards, missing carrot bubble",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "path(0.66,0.64→0.60,0.56) 500ms",
+        "note": "雪だるまへ続く足あとを拡大。波模様のスニーカー",
+        "noteEn": "Magnify the tracks leading to the snowman: wavy sneaker soles",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.83,0.88) 120ms → tap(0.83,0.88) 120ms → wait 2600ms",
+        "note": "ミナを指名。再現でミナが雪だるまに立ち寄った瞬間、にんじんがふわっと消えた",
+        "noteEn": "Accuse Mina. In the replay the carrot floats away the moment Mina stops at the snowman",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 5000ms → tap(0.50,0.50) 120ms → wait 400ms",
+        "note": "正解。次の事件（ベンチのお弁当）へ",
+        "noteEn": "Solved. On to case 2 (the bench lunch)",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "path(0.30,0.70→0.33,0.63) 500ms",
+        "note": "虫めがねをベンチの前へ。立ち止まった足あとが見える",
+        "noteEn": "Move the magnifier over the bench front: the stopped prints show",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.83,0.88) 120ms → tap(0.83,0.88) 120ms → wait 1000ms → tap(0.50,0.50) 120ms → wait 300ms → tap(0.50,0.50) 120ms → wait 400ms",
+        "note": "げたの2本線＝ゲンを指名。正解して事件3へ",
+        "noteEn": "Two geta bars = Gen. Solved; on to case 3",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.50,0.50) 120ms → wait 400ms",
+        "note": "事件3: 最後に雪だるまに来たのは？",
+        "noteEn": "Case 3: who came to the snowman last?",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "path(0.60,0.75→0.68,0.70) 500ms",
+        "note": "横に伸びる線と縦の線が交わる所を拡大",
+        "noteEn": "Magnify where the horizontal and vertical tracks cross",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.50,0.88) 120ms → tap(0.50,0.88) 120ms → wait 7500ms",
+        "note": "犬の足あとが長ぐつの上に重なっている＝ポチがあと。ポチを指名。判定で証拠の拡大図が出る",
+        "noteEn": "Paws on top of boots: Pochi came later. Accuse Pochi; the verdict shows a magnified clue",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.50,0.50) 120ms → wait 400ms",
+        "note": "事件4: 走って逃げた犯人",
+        "noteEn": "Case 4: the thief who ran",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "path(0.70,0.60→0.76,0.55) 500ms",
+        "note": "窓辺から右へのびる、間のあいた足あとを拡大",
+        "noteEn": "Magnify the widely spaced tracks heading right from the window",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.83,0.88) 120ms → tap(0.83,0.88) 120ms → wait 7800ms",
+        "note": "大またで雪をけちらした肉球のあと＝ポチが走って逃げた",
+        "noteEn": "Long strides with kicked-up snow and paw toes: Pochi ran away",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "tap(0.50,0.50) 120ms → wait 400ms",
+        "note": "事件5: 雪がやんだあとに届いた手紙",
+        "noteEn": "Case 5: the letter that came after the snow stopped",
+        "image": "ai-play/step-13.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "path(0.36,0.60→0.40,0.57) 500ms",
+        "note": "郵便受けに向かうくっきりした足あとを拡大",
+        "noteEn": "Magnify the crisp tracks heading to the mailbox",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "tap(0.50,0.88) 120ms → tap(0.50,0.88) 120ms → wait 3500ms",
+        "note": "くっきりした肉球＝雪がやんだあと。ポチを指名。再現では雪がふる中を下から誰かが来る",
+        "noteEn": "Crisp paws = after the snow. Accuse Pochi; the replay shows someone arriving while it still snows",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "wait 4500ms → tap(0.50,0.50) 120ms → wait 400ms",
+        "note": "正解。事件6: 小屋のソリ",
+        "noteEn": "Solved. Case 6: the sled in the shed",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 17,
+        "action": "path(0.72,0.64→0.78,0.61) 500ms",
+        "note": "ソリの2本の線と、その間の足あとを拡大",
+        "noteEn": "Magnify the two sled lines and the prints between them",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 18,
+        "action": "tap(0.83,0.88) 120ms → tap(0.83,0.88) 120ms → wait 8000ms",
+        "note": "ソリの線の間に横じまの長ぐつ＝タケを指名",
+        "noteEn": "Striped boots between the sled lines: accuse Take",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 19,
+        "action": "tap(0.50,0.50) 120ms → wait 400ms",
+        "note": "まちがえた。拡大図でソリの線の間にあったのは波模様（ミナ）だった。事件7へ",
+        "noteEn": "Wrong: the clue shows wavy soles (Mina) between the sled lines. On to case 7",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 20,
+        "action": "path(0.30,0.77→0.39,0.79) 500ms",
+        "note": "左下の交差点を拡大。どちらが上に重なっているか",
+        "noteEn": "Magnify the lower-left crossing: which prints are on top?",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 21,
+        "action": "path(0.60,0.52→0.68,0.48) 500ms",
+        "note": "下ではミナ（波）がゲン（げた）の上。次に右上の交差点を拡大",
+        "noteEn": "Below, Mina (wavy) lies over Gen (geta). Now the upper-right crossing",
+        "image": "ai-play/step-21.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 22,
+        "action": "tap(0.13,0.88) 120ms → tap(0.13,0.88) 120ms → wait 8000ms",
+        "note": "ゲン→ミナ→ルルの順と推理。ルルを指名",
+        "noteEn": "Order Gen → Mina → Lulu. Accuse Lulu",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 23,
+        "action": "tap(0.50,0.50) 120ms → wait 400ms",
+        "note": "正解（真ん中はソラだった）。最後の事件8へ",
+        "noteEn": "Solved (the middle visitor was Sora). Final case 8",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 24,
+        "action": "path(0.36,0.75→0.42,0.77) 500ms",
+        "note": "ゲンのげたの線と、テーブルから下へのびる線の交差点を拡大",
+        "noteEn": "Magnify where Gen's geta line crosses the line running down from the table",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 25,
+        "action": "tap(0.37,0.88) 120ms → tap(0.37,0.88) 120ms → wait 8000ms",
+        "note": "げたが肉球の上に重なる＝ポチが先。くっきりしているので雪がやんだあと。ポチを指名",
+        "noteEn": "Geta lies over the paws, so Pochi came first, and the crisp prints mean after the snow. Accuse Pochi",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 26,
+        "action": "tap(0.50,0.50) 120ms → wait 600ms",
+        "note": "全8件の結果",
+        "noteEn": "Results of all 8 cases",
+        "image": "ai-play/step-26.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 7
+            }
+          },
+          {
+            "agf": "end",
+            "score": 7
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-27T09:39:11+09:00"
+  },
+  "publishedAt": "2026-10-27T09:39:11+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 63137,
+    "outputTokens": 61006,
+    "contextTokens": 21735643,
+    "turns": 89,
+    "toolCalls": 102,
+    "webSearches": 0,
+    "minutes": 33.8,
+    "from": "2026-10-27T00:05:22.582Z",
+    "to": "2026-10-27T00:39:11.365Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-27T09:39:11+09:00",
+    "validationRuns": 4,
+    "codeKB": 59.7
+  }
+}
