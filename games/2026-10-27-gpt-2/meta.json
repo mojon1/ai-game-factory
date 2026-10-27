@@ -1,0 +1,529 @@
+{
+  "id": "2026-10-27-gpt-2",
+  "status": "published",
+  "title": "午前零時の返却窓",
+  "genre": "物語・ノベル",
+  "concept": "終電後の忘れもの窓口に三人が来るが、返却印は二つしかない。返すことも預かることも別の別れ方になり、最後は窓口係自身の名前を台帳へ残すか選ぶ。",
+  "howToPlay": "文章を読み、返却印を使うかここで預かるかを選びます。最後の台帳の選択まで進むと結末になり、もう一度で違う選択を読めます。",
+  "libraryDecision": "anime.js 4.5.0を使い、返却印と紙が動く短い間を作る。3Dの奥行きより文章と紙芝居を近く感じる2Dの窓口を選び、選択の余韻を強める。",
+  "soundDecision": "ページの移りに静かな単音を鳴らす。BGMは付けず、雨の窓と読書の間を急かさない。",
+  "improvements": [
+    {
+      "found": "句点だけが次行に出る／前の返事を読み返せない／最初の二人の選択が結末で薄い。",
+      "changed": "句読点の禁則を加え、台帳で各人への返事を読み返せるようにした。選択に応じて内容が違う二通の後日談を追加した。",
+      "foundEn": "Punctuation can sit alone on a line; earlier replies cannot be reread; the first two choices feel absent from the ending.",
+      "changedEn": "Added punctuation-aware wrapping, a rereadable return ledger, and two follow-up letters whose contents reflect those earlier decisions."
+    },
+    {
+      "found": "読後に選んだ夜が残らない／印を使う意味や0枚時の進行説明が薄い／見送り後も人物が立ち続け、区切りが弱い。",
+      "changed": "選択した夜の記録を保存し、結末に返した物・預かった物を表示。印の説明と、服装の違う人物が帰る動きを加え、文章の短い末尾行も整えた。",
+      "foundEn": "Read nights leave no record; stamp costs and zero-stamp progress need clarity; visitors linger visually after farewell.",
+      "changedEn": "Saved route records, listed returned and held items at the ending, explained stamp costs, animated distinct visitors leaving, and balanced short final text lines."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "物語・ノベル",
+      "en": "Story / visual novel",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "2Dの雨の窓口で返却印を二つ使い、三人の物語を選ぶ。紙の開きと印の余韻を描く。",
+        "ideaEn": "Choose three visitors' stories with two stamps at a 2D rainy counter, with opening paper and lingering seals.",
+        "fromDraw": true
+      },
+      {
+        "idea": "列車の窓の映り込みを2.5Dで重ね、通り過ぎる星の位置を合わせる。",
+        "ideaEn": "Align passing stars through layered 2.5D train-window reflections.",
+        "fromDraw": false
+      },
+      {
+        "idea": "3Dの凍った鐘を回し、音が届く方角で氷の通路を探す。",
+        "ideaEn": "Rotate frozen 3D bells and find ice passages by the direction of their sound.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "other",
+    "ending": "goal",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "The Midnight Return Window",
+      "concept": "Three visitors arrive at the station after the last train, but only two return stamps remain. Returning and holding lead to different farewells, then the keeper decides whether to leave a name in the ledger.",
+      "howToPlay": "Read and choose whether to use a return stamp or hold each item. The final ledger choice leads to an ending; replay to read other decisions.",
+      "libraryDecision": "Use anime.js 4.5.0 for brief paper and stamp motion. A close 2D paper-theatre counter keeps reading intimate rather than adding 3D depth, giving choices room to linger.",
+      "soundDecision": "Quiet single notes mark page changes. No background music rushes the rainy-window reading."
+    }
+  },
+  "createdAt": "2026-10-27T12:35:50+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-27T12:35:50+09:00",
+    "metricsFrom": "2026-10-27T03:28:40.422Z",
+    "transcript": null,
+    "validationRuns": 3,
+    "finishedAt": "2026-10-27T12:59:28+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-27T12:53:17+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "16.8KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=36",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=87",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=24",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=72",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 17212,
+    "lines": 11
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "anime.js",
+      "version": "4.5.0",
+      "file": "anime-4.5.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "三人だけの短い物語で、選択後も穏やかな着地点が多く、大きく展開が変わる分岐は少ない。",
+    "comment": "2回改善し、最終版13手を画像で確認。鈴を返し、切符を預かり、傘を返す夜を最後まで読んだ。選択に応じた駅員と旅人の後日談、台帳の切替と復帰、結末の品物一覧、夜の記録1の保存合図、印2枚での再開を確認。前の試読では別の返却・預かりと名前を残さない結末も読み、同じ客への異なる応答を比べられた。短編として数分読めるが、分岐の広さは限られる。",
+    "similar": [
+      {
+        "title": "Coffee Talk",
+        "url": "https://www.togeproductions.com/project/coffee-talk/",
+        "similarity": "中",
+        "note": "雨の夜に窓口越しの相手の話を聴き、接し方で続きが変わる点が近い。本作は飲み物作りでなく二つの返却印を三人へ割り当てる短編。",
+        "note_en": "Shares rainy-night counter conversations affected by how visitors are treated; this short story allocates two return stamps among three people instead of making drinks."
+      },
+      {
+        "title": "Papers, Please",
+        "url": "https://papersplea.se/presskit/",
+        "similarity": "低",
+        "note": "窓口の係として印を使い、来訪者の行く先に関わる構図が近い。本作には書類の照合や処罰がなく、忘れものを巡る穏やかな選択に絞る。",
+        "note_en": "Shares the window-keeper and stamp-decision framing; there is no document verification or punishment, only gentle choices about lost things."
+      }
+    ],
+    "research": "窓口で来訪者の話を聴くゲームを2クエリで調べ、Toge ProductionsとLucas Popeの公式紹介を確認した。",
+    "i18n": {
+      "en": {
+        "worst": "Only three short visitor stories are present, and most choices lead to gentle outcomes rather than substantially different dramatic developments.",
+        "comment": "After two improvement cycles, viewed 13 final steps through returning the bell, holding the ticket and returning the umbrella. Verified responsive follow-up letters, ledger tabs and return, the ending item list, the save signal for one recorded night, and restart with two stamps. Earlier readings explored different return/hold choices and the unsigned ending. Comparing different replies gives a few minutes of short-fiction play, but branching breadth is limited.",
+        "research": "Used two queries for counter-based visitor narratives and verified official pages from Toge Productions and Lucas Pope."
+      }
+    },
+    "method": "スマホ縦画面で 13 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 13 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.86) 120ms → wait 200ms → tap(0.50,0.83) 120ms → wait 500ms",
+        "note": "最終版で窓口を開く。鈴を返し、切符を預かる別の読み方を試す。",
+        "noteEn": "Open the final revision and try returning the bell while holding the ticket.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.50,0.83) 120ms → wait 700ms",
+        "note": "印を使うと一枚減る説明が見える。鈴を返して見送りの動きを確かめる。",
+        "noteEn": "The cost explanation is visible. Return the bell and inspect the farewell animation.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.50,0.83) 120ms → wait 500ms",
+        "note": "駅員は窓から去った。かばんを持つ次の人物を迎える。",
+        "noteEn": "The worker has left the window. Meet the traveler with a suitcase.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.50,0.93) 120ms → wait 700ms",
+        "note": "切符は預かる。自分で行き先を書く側の返事を読む。",
+        "noteEn": "Hold the ticket and read the reply where the traveler chooses a destination.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.50,0.83) 120ms → wait 500ms",
+        "note": "自分で町を書いた旅人を見送った。残り一枚で最後の客へ進む。",
+        "noteEn": "The traveler wrote a town and left. Continue to the last visitor with one stamp.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.50,0.83) 120ms → wait 700ms",
+        "note": "残した印を傘に使う。三人の返し方が分かれた夜になる。",
+        "noteEn": "Use the saved stamp on the umbrella, making a mixed route through the three visitors.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.50,0.05) 120ms",
+        "note": "三人への返事がそろった。台帳で選択の記録を確認する。",
+        "noteEn": "All three replies are recorded. Open the ledger to review them.",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.50,0.35) 120ms",
+        "note": "傘は返したと台帳に残っている。切符の欄へ切り替える。",
+        "noteEn": "The ledger marks the umbrella returned. Switch to the ticket entry.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.50,0.93) 120ms → tap(0.50,0.83) 120ms → wait 500ms",
+        "note": "切符を預かった返事を読み返せた。物語に戻り、台帳の最後の行へ。",
+        "noteEn": "Reread the held-ticket reply. Return to the story and the final ledger line.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.50,0.83) 120ms → wait 700ms",
+        "note": "この夜は名前を書く。返した鈴の後日談を読む。",
+        "noteEn": "Write a name on this route and read the returned-bell follow-up.",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.50,0.83) 120ms → wait 600ms",
+        "note": "鈴を返した選択が、駅員の次の見送りにつながった。預かった切符の手紙も読む。",
+        "noteEn": "The returned bell led to another farewell. Read the held-ticket follow-up next.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.50,0.83) 120ms → wait 700ms",
+        "note": "旅人が自分で選んだ町へ着いた手紙を読んだ。結末と返した物の一覧を見る。",
+        "noteEn": "The traveler reached a self-chosen town. Inspect the ending and returned-item summary.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "nights": [
+                11
+              ]
+            }
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "wait 850ms → tap(0.50,0.89) 120ms → wait 500ms",
+        "note": "返した物と預かった物、夜の記録1を確認した。もう一度で印2枚の最初へ戻る。",
+        "noteEn": "Verified the item summary and one recorded night. Restart to the opening with two stamps.",
+        "image": "ai-play/step-13.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "nights": [
+                11
+              ]
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-27T12:59:28+09:00"
+  },
+  "publishedAt": "2026-10-27T12:59:28+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 18195,
+    "outputTokens": 16319,
+    "contextTokens": 18397711,
+    "turns": 44,
+    "toolCalls": 44,
+    "webSearches": null,
+    "minutes": 30.8,
+    "from": "2026-10-27T03:28:40.422Z",
+    "to": "2026-10-27T03:59:31.347Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-10-27T12:59:31+09:00",
+    "validationRuns": 3,
+    "codeKB": 16.8,
+    "evidence": "metrics-evidence.json"
+  }
+}
