@@ -1,0 +1,570 @@
+{
+  "id": "2026-10-27-claude-2",
+  "status": "published",
+  "title": "まぜまぜ絵の具",
+  "genre": "落ち物パズル",
+  "concept": "落とした絵の具のしずくが下の色とまざる落ち物パズル。消えるのは「まぜてできた色」（橙・緑・紫）だけなので、赤＋黄のように二手で一色を作る段取りが核。消えた上のしずくが落ちてまた混ざり、思わぬ連鎖が起きる。消した色は紙にしみとして残る。",
+  "howToPlay": "指を左右に動かして列を選び、はなすとしずくが落ちる。まぜてできた同じ色を3つつなげると消える。",
+  "libraryDecision": "使わない。Canvas 2D の水彩風の描画と自作の音で、混ざる手応えは十分に出せた。3Dや物理演算は、マス目で色の反応を読む遊びをかえって見えにくくすると判断した。",
+  "soundDecision": "効果音だけを Web Audio で自作。混ざると二つの音が寄り添うように上がり、消えると五音音階の和音、連鎖するほど音が高くなる。考える時間をじゃましないよう BGM は入れず、残り時間が少ないときだけ小さく刻む。",
+  "improvements": [
+    {
+      "found": "①同じ原色を3つ縦に積むだけで消せるので、まぜる理由がない ②盤が高くてすかすかで緊張感がない ③最初の数手は何も起きない",
+      "changed": "消えるのを「まぜてできた色」だけにし、盤を10段→9段に。最初から下に絵の具を並べた。下から絵の具がしみだす仕組み（数手ごと）を加えた",
+      "foundEn": "(1) Stacking three of one primary cleared them, so there was no reason to mix (2) The tall, empty board had no tension (3) Nothing happened in the first few drops",
+      "changedEn": "Only mixed colors clear now; board cut from 10 to 9 rows; paint starts on the bottom; paint seeps up from below every few drops"
+    },
+    {
+      "found": "①しみだしが一部の列だけだと横のつながりが崩れて理不尽 ②消えた上のしずくが落ちて混ざる連鎖が、何が起きたか分からない ③消したときの手応えが薄い",
+      "changed": "しみだしを1段まるごとに。落ちたしずくが着いた瞬間に色が変わり「まざった！」と波紋が出るようにした。消した色は紙に水彩のしみとして残り、連鎖では画面が揺れ、得点表示も大きくした。画面が極端に小さいときの例外も直した",
+      "foundEn": "(1) Seeping into only some columns broke horizontal groups unfairly (2) Chains where falling drops mix were impossible to read (3) Clears felt weak",
+      "changedEn": "Seep now lifts a whole row; a falling drop changes color only when it lands, with a ripple and \"Mixed!\"; cleared colors leave watercolor stains on the paper, chains shake the screen, bigger score text; fixed a crash on tiny screens"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "落ち物パズル",
+      "en": "Falling-block puzzle",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "落ちてくる絵の具のしずくが下の色とまざる落ち物パズル。まぜてできた色だけが消える。",
+        "ideaEn": "A falling-drop puzzle where paint mixes with the color below; only mixed colors clear.",
+        "fromDraw": true
+      },
+      {
+        "idea": "霧の海で霧笛を鳴らし、こだまの返り方から岩の位置を推理して船を港へ導く。",
+        "ideaEn": "Sound a foghorn in thick fog and guide a ship to port by reading the echoes off hidden rocks.",
+        "fromDraw": false
+      },
+      {
+        "idea": "3Dの小物を回して、壁に映る影をお題の形に合わせる。",
+        "ideaEn": "Rotate a 3D object until its shadow on the wall matches a target silhouette.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "fail",
+    "input": [
+      "drag",
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Paint Drops",
+      "concept": "A falling-drop puzzle where each paint drop mixes with the color below. Only mixed colors (orange, green, purple) clear, so the core is planning two-step mixes like red then yellow. Drops above a clear fall and mix again for surprise chains, and cleared colors stain the paper.",
+      "howToPlay": "Slide left/right to pick a column and let go to drop. Connect 3 of the same mixed color to clear them.",
+      "libraryDecision": "None. Canvas 2D watercolor drawing and hand-made sound give mixing enough feel; 3D or physics would make reading color reactions on a grid harder.",
+      "soundDecision": "Sound effects only, made with Web Audio: mixing glides two tones together, clears play pentatonic chords that rise with chains. No BGM so players can think; a soft tick only when time is short."
+    }
+  },
+  "createdAt": "2026-10-27T16:07:55+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-27T16:07:55+09:00",
+    "metricsFrom": "2026-10-27T07:07:05.515Z",
+    "transcript": "133ffc13-c60f-4546-b060-26dccfd82d1b.jsonl",
+    "validationRuns": 6,
+    "finishedAt": "2026-10-27T16:22:59+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-27T16:22:09+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "32.6KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=135",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=231",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=131",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=211",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 33350,
+    "lines": 724
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 19374,
+    "outputTokens": 41178,
+    "contextTokens": 13191290,
+    "turns": 74,
+    "toolCalls": 81,
+    "webSearches": 0,
+    "minutes": 15.9,
+    "from": "2026-10-27T07:07:05.515Z",
+    "to": "2026-10-27T07:22:59.876Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-27T16:22:59+09:00",
+    "validationRuns": 6,
+    "codeKB": 32.6
+  },
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "ほしい色（たとえば赤）が来るまで待つ時間が長く、狙った3つ目がなかなか作れないもどかしさがある。連鎖も狙って組むのは難しい",
+    "comment": "赤を黄に落として橙が生まれる瞬間と、紫を横に2つつないで3つ目を作りに行く段取りは気持ちいい。4つの紫がまとめて消えて紙に紫のしみが残った場面は良かった。混ぜる・にごる・しみだしで考えることは多いが、引きの運に左右される時間も長い。",
+    "similar": [
+      {
+        "title": "Blend - Block Eliminate",
+        "url": "https://appgoblin.info/apps/1015346461",
+        "similarity": "中",
+        "note": "三原色のブロックを重ねて混ぜ、目標の色になると消える。こちらは落ち物で、混ぜた色どうしを3つつなげて消し、落下中にも混ざって連鎖する",
+        "note_en": "Primary-color blocks stack and blend, clearing when they hit a target color. Mine is a falling-drop game where mixed colors clear in groups of three and falling drops mix again into chains"
+      },
+      {
+        "title": "Mixt",
+        "url": "https://toucharcade.com/2009/08/28/mixt-and-stay-two-games-worth-a-look/",
+        "similarity": "中",
+        "note": "落ちる色の玉がぶつかると混ざる。こちらはマス目に積み、混ぜた色だけが消える段取りのパズル",
+        "note_en": "Falling color blobs mix on collision. Mine stacks on a grid and only mixed colors clear, making it a planning puzzle"
+      }
+    ],
+    "research": "WebSearch で「falling block puzzle color mixing primary colors」を検索",
+    "i18n": {
+      "en": {
+        "worst": "You often wait a long time for the color you need (e.g. red), so the third piece of a group is frustratingly slow; chains are hard to set up on purpose",
+        "comment": "The moment red lands on yellow and becomes orange, and setting up the third purple after linking two, feel good. Four purples clearing at once and leaving a purple stain on the paper was a nice scene. Mixing, mud and seeping give plenty to think about, but a lot depends on the luck of the draw.",
+        "research": "Searched the web for 'falling block puzzle color mixing primary colors'"
+      }
+    },
+    "method": "スマホ縦画面で 17 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 17 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "開始",
+        "noteEn": "Start",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.30,0.50) 120ms → wait 900ms",
+        "note": "青を赤へ→紫",
+        "noteEn": "Blue on red -> purple",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.70,0.50) 120ms → wait 900ms",
+        "note": "青を赤へ→紫",
+        "noteEn": "Blue on red -> purple",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.43,0.50) 120ms → wait 900ms",
+        "note": "赤を青へ→紫",
+        "noteEn": "Red on blue -> purple",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.83,0.50) 120ms → wait 900ms",
+        "note": "黄を赤へ→橙",
+        "noteEn": "Yellow on red -> orange",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.57,0.50) 120ms → wait 900ms",
+        "note": "赤を青へ→紫が2つつながる",
+        "noteEn": "Red on blue: two purples link",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.17,0.50) 120ms → wait 900ms",
+        "note": "黄を青へ→緑",
+        "noteEn": "Yellow on blue -> green",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.70,0.50) 120ms → wait 900ms",
+        "note": "青を紫の上に置く",
+        "noteEn": "Blue parked on purple",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.83,0.50) 120ms → wait 1600ms",
+        "note": "黄を橙の上へ。しみだしで1段上がる",
+        "noteEn": "Yellow on orange; seep lifts a row",
+        "image": "ai-play/step-09.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.70,0.50) 120ms → wait 900ms",
+        "note": "黄を青へ→緑",
+        "noteEn": "Yellow on blue -> green",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.30,0.50) 120ms → wait 900ms",
+        "note": "青を紫の上へ",
+        "noteEn": "Blue on purple",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.30,0.50) 120ms → wait 450ms",
+        "note": "赤を青へ→紫4つが消える。紙に紫のしみが残る",
+        "noteEn": "Red on blue: four purples clear, leaving a purple stain on the paper",
+        "image": "ai-play/step-12.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "wait 700ms",
+        "note": "消えたあと",
+        "noteEn": "After the clear",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "tap(0.30,0.50) 120ms → wait 900ms",
+        "note": "赤を黄へ→橙",
+        "noteEn": "Red on yellow -> orange",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "tap(0.43,0.50) 120ms → wait 900ms",
+        "note": "黄を赤へ→橙",
+        "noteEn": "Yellow on red -> orange",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "tap(0.57,0.50) 120ms → wait 900ms",
+        "note": "黄を赤へ→橙が横に2つ",
+        "noteEn": "Yellow on red -> two oranges side by side",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 17,
+        "action": "wait 10000ms → wait 10000ms → wait 10000ms → wait 10000ms",
+        "note": "何もしないと時間切れで同じ列に落ち続け、あふれる",
+        "noteEn": "Doing nothing, drops auto-fall into one column until it overflows",
+        "image": "ai-play/step-17.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-27T16:22:59+09:00"
+  },
+  "publishedAt": "2026-10-27T16:22:59+09:00"
+}
