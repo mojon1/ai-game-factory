@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>てっぺん取り</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; }
+html, body { margin: 0; padding: 0; width: 100vw; height: 100dvh; overflow: hidden; background: #2a2018; color: #fff;
+  font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif; }
+#c { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+#hud { position: absolute; left: 0; right: 0; top: 0; padding: 10px 14px 0; display: flex; justify-content: space-between; align-items: flex-start; pointer-events: none; }
+.side { display: flex; flex-direction: column; min-width: 92px; }
+.side.r { align-items: flex-end; text-align: right; }
+.who { font-size: 14px; opacity: .85; display: flex; align-items: center; gap: 6px; }
+.dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; box-shadow: 0 1px 2px rgba(0,0,0,.5); }
+.num { font-size: 34px; font-weight: 800; line-height: 1.05; letter-spacing: .02em; transition: transform .15s; }
+#mid { text-align: center; padding-top: 2px; }
+#left { font-size: 15px; font-weight: 700; }
+#stage { font-size: 13px; opacity: .75; margin-top: 2px; }
+#turn { position: absolute; left: 0; right: 0; top: 78px; text-align: center; font-size: 16px; font-weight: 700; pointer-events: none; text-shadow: 0 1px 3px rgba(0,0,0,.7); transition: opacity .2s; }
+#hint { position: absolute; left: 12px; right: 12px; bottom: 22px; text-align: center; font-size: 15px; pointer-events: none; text-shadow: 0 1px 3px rgba(0,0,0,.8); transition: opacity .6s; }
+.ov { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: rgba(30,20,12,.62); padding: 24px; box-sizing: border-box; transition: opacity .3s; }
+.ov.hide { opacity: 0; pointer-events: none; }
+.ov h1 { font-size: 46px; margin: 0 0 6px; letter-spacing: .06em; text-shadow: 0 3px 0 #6b3d1a, 0 6px 14px rgba(0,0,0,.5); white-space: nowrap; }
+.ov .sub { font-size: 15px; opacity: .85; margin-bottom: 22px; }
+.ov p { font-size: 15px; line-height: 1.7; margin: 4px 0; max-width: 330px; }
+.ov .tap { margin-top: 26px; font-size: 18px; font-weight: 700; animation: blink 1.4s infinite; }
+.ov .big { font-size: 44px; font-weight: 800; margin: 4px 0; white-space: nowrap; }
+.ov .res { font-size: 30px; font-weight: 800; margin: 6px 0; }
+.ov .best { font-size: 16px; opacity: .9; margin-top: 6px; }
+@keyframes blink { 50% { opacity: .35; } }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud" style="display:none">
+  <div class="side"><div class="who"><span class="dot" style="background:#f6e7c6"></span><span id="youL"></span></div><div class="num" id="youS">0</div></div>
+  <div id="mid"><div id="left"></div><div id="stage"></div></div>
+  <div class="side r"><div class="who"><span id="cpuL"></span><span class="dot" style="background:#34467a"></span></div><div class="num" id="cpuS">0</div></div>
+</div>
+<div id="turn"></div>
+<div id="hint"></div>
+<div class="ov" id="title"></div>
+<div class="ov hide" id="result"></div>
+<script src="../../lib/three-0.186.1.min.js"></script>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+
+const T = {
+  ja: {
+    title: 'てっぺん取り', sub: 'つみかさね陣取り',
+    how: ['自分の色が<b>てっぺん</b>の塔を、指で押して<b>スワイプ</b>。', '長く引くほど上から多く持ち上げ、1まいずつ置いていく。', '<b>てっぺんを取った塔は、下の段ごと全部あなたの点。</b>'],
+    tap: 'タップでスタート', you: 'あなた', left: (n) => `のこり ${n} 手`, stage: (i, n) => `${i} / ${n} 人目`,
+    yourTurn: 'あなたの番', lastMove: '最後の一手！', thinking: (n) => `${n}が考え中…`,
+    hint: '白がてっぺんの塔を押して、動かしたい方へ引く',
+    hint2: '引く長さ＝持ち上げるまい数。いちばん遠くに、てっぺんの1まいが乗る',
+    danger: '赤い輪＝次に取られそうな塔。引いている間は、動かした後の輪が見える',
+    win: '勝ち！', lose: '負け…', draw: '引き分け',
+    tapNext: 'タップで次の相手へ', tapAgain: 'タップでもう一度', tapNew: 'タップで最初から',
+    allClear: 'ぜんぶ勝った！', allClearSub: '3人の相手に勝ちました', best: (n) => `最大の差 ${n}`, newBest: 'ベスト更新！',
+    noMove: (n) => `${n}は動かせる塔がない`, vs: 'VS',
+    names: ['こだぬき', 'きつね', 'ふくろう'],
+    taunts: ['のんびり指すよ', 'すきを見のがさないよ', 'ぜんぶ読んでいるよ'],
+    steal: (n) => `${n}段まるごと！`,
+  },
+  en: {
+    title: 'Top Taker', sub: 'a stacking capture game',
+    how: ['Press a tower with <b>your color on top</b> and <b>swipe</b>.', 'Longer swipe lifts more discs; they drop one per square.', '<b>Own the top of a tower and every disc in it is yours.</b>'],
+    tap: 'Tap to start', you: 'You', left: (n) => `${n} moves left`, stage: (i, n) => `Opponent ${i} / ${n}`,
+    yourTurn: 'Your turn', lastMove: 'Your final move!', thinking: (n) => `${n} is thinking…`,
+    hint: 'Press a white-topped tower and pull toward where it goes',
+    hint2: 'Pull length = discs lifted. The top disc lands farthest',
+    danger: 'Red ring = a tower that may be taken next. While pulling, rings show the outcome',
+    win: 'You win!', lose: 'You lose…', draw: 'Draw',
+    tapNext: 'Tap to face the next one', tapAgain: 'Tap to play again', tapNew: 'Tap to start over',
+    allClear: 'Beat them all!', allClearSub: 'You defeated all 3 opponents', best: (n) => `Best margin ${n}`, newBest: 'New best!',
+    noMove: (n) => `${n} has no tower to move`, vs: 'VS',
+    names: ['Raccoon pup', 'Fox', 'Owl'],
+    taunts: ['I play slowly', 'I never miss a chance', 'I read everything'],
+    steal: (n) => `All ${n} discs!`,
+  },
+}[LANG === 'ja' ? 'ja' : 'en'];
+
+// ---------- rules ----------
+const N = 5, DIRS = [[0, -1], [1, 0], [0, 1], [-1, 0]]; // [dc, dr]: up, right, down, left (screen)
+const TURNS = 10, PLIES = TURNS * 2 - 1;
+const topOf = (s) => (s.length ? s[s.length - 1] : -1);
+function legalMoves(b, p) {
+  const out = [];
+  for (let i = 0; i < N * N; i++) {
+    const s = b[i];
+    if (topOf(s) !== p) continue;
+    const r = (i / N) | 0, c = i % N;
+    for (let d = 0; d < 4; d++) {
+      const [dc, dr] = DIRS[d];
+      for (let k = 1; k <= s.length; k++) {
+        // drop the move if every disc would fall off
+        const nc = c + dc, nr = r + dr;
+        if (nc < 0 || nr < 0 || nc >= N || nr >= N) break;
+        out.push({ i, d, k });
+      }
+    }
+  }
+  return out;
+}
+function applyMove(b, m) {
+  const nb = b.map((s) => s.slice());
+  const s = nb[m.i], take = s.splice(s.length - m.k, m.k);
+  const r = (m.i / N) | 0, c = m.i % N, [dc, dr] = DIRS[m.d];
+  for (let j = 0; j < take.length; j++) {
+    const nc = c + dc * (j + 1), nr = r + dr * (j + 1);
+    if (nc >= 0 && nr >= 0 && nc < N && nr < N) nb[nr * N + nc].push(take[j]);
+  }
+  return nb;
+}
+function scoreOf(b, p) { let t = 0; for (const s of b) if (topOf(s) === p) t += s.length; return t; }
+// evaluation from p's point of view
+function evalB(b, p) {
+  let v = 0;
+  for (let i = 0; i < N * N; i++) {
+    const s = b[i]; if (!s.length) continue;
+    const t = topOf(s), w = s.length;
+    v += t === p ? w : -w;
+  }
+  return v;
+}
+
+// ---------- CPU ----------
+// change of evalB (from p's view) caused by move m, without copying the board
+function delta(b, m, p) {
+  const s = b[m.i], h = s.length, rem = h - m.k, sg = (c) => (c === p ? 1 : -1);
+  let d = -sg(s[h - 1]) * h;
+  if (rem > 0) d += sg(s[rem - 1]) * rem;
+  const r = (m.i / N) | 0, c = m.i % N, [dc, dr] = DIRS[m.d];
+  for (let j = 0; j < m.k; j++) {
+    const nc = c + dc * (j + 1), nr = r + dr * (j + 1);
+    if (nc < 0 || nr < 0 || nc >= N || nr >= N) continue;
+    const t = b[nr * N + nc];
+    if (t.length) d -= sg(t[t.length - 1]) * t.length;
+    d += sg(s[rem + j]) * (t.length + 1);
+  }
+  return d;
+}
+function negamax(b, p, depth, alpha, beta, movesLeft, width) {
+  if (depth === 0 || movesLeft <= 0) return evalB(b, p);
+  let ms = legalMoves(b, p);
+  if (!ms.length) return evalB(b, p);
+  if (depth === 1) { let bd = -1e9; for (const m of ms) { const d = delta(b, m, p); if (d > bd) bd = d; } return evalB(b, p) + bd; }
+  if (width && ms.length > width) {
+    ms = ms.map((m) => ({ m, v: delta(b, m, p) })).sort((a, z) => z.v - a.v).slice(0, width).map((o) => o.m);
+  }
+  let best = -1e9;
+  for (const m of ms) {
+    const v = -negamax(applyMove(b, m), 1 - p, depth - 1, -beta, -alpha, movesLeft - 1, width);
+    if (v > best) best = v;
+    if (v > alpha) alpha = v;
+    if (alpha >= beta) break;
+  }
+  return best;
+}
+function cpuChoose(b, level, movesLeft) {
+  const ms = legalMoves(b, 1);
+  if (!ms.length) return null;
+  const depth = [1, 2, 3][level], width = [0, 0, 16][level], noise = [6, 0.8, 0][level];
+  let best = null, bv = -1e9;
+  for (const m of ms) {
+    let v = -negamax(applyMove(b, m), 0, depth - 1, -1e9, 1e9, movesLeft - 1, width);
+    v += (Math.random() - 0.5) * noise * 2;
+    if (v > bv) { bv = v; best = m; }
+  }
+  return best;
+}
+
+// ---------- layouts ----------
+function layout(stage) {
+  // 180° point symmetric with colours swapped; centre empty
+  const half = [
+    [[0], [1, 0], [0], [0, 1], [1], [1], [0], [1, 1, 0], [0], [1, 0], [0, 0], [1]],
+    [[1, 0], [0], [1], [0, 1, 0], [1], [0], [1, 0], [], [0, 1], [1], [0, 0], [1, 1, 0]],
+    [[0, 1, 0], [1], [], [1, 0], [0, 0], [1], [0, 1], [1, 1, 0], [0], [1, 0], [], [0, 1, 0]],
+  ][stage];
+  const b = Array.from({ length: N * N }, () => []);
+  for (let j = 0; j < 12; j++) {
+    const i = 24 - j; // bottom rows belong to the player side
+    b[i] = half[j].slice();
+    b[j] = half[j].map((x) => 1 - x);
+  }
+  return b;
+}
+
+// ---------- audio ----------
+let AC = null, master = null;
+function initAudio() {
+  try {
+    if (!AC) { AC = new (window.AudioContext || window.webkitAudioContext)(); master = AC.createGain(); master.gain.value = 0.55; master.connect(AC.destination); }
+    if (AC.state === 'suspended') AC.resume();
+  } catch (e) { AC = null; }
+}
+let noiseBuf = null;
+function clack(pitch = 1, vol = 0.5) {
+  if (!AC) return;
+  try {
+    const t = AC.currentTime;
+    if (!noiseBuf) { noiseBuf = AC.createBuffer(1, AC.sampleRate * 0.08, AC.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 3); }
+    const n = AC.createBufferSource(); n.buffer = noiseBuf;
+    const f = AC.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 1800 * pitch; f.Q.value = 3;
+    const g = AC.createGain(); g.gain.setValueAtTime(vol * 0.9, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+    n.connect(f); f.connect(g); g.connect(master); n.start(t);
+    const o = AC.createOscillator(); o.type = 'sine'; o.frequency.setValueAtTime(620 * pitch, t); o.frequency.exponentialRampToValueAtTime(420 * pitch, t + 0.09);
+    const g2 = AC.createGain(); g2.gain.setValueAtTime(vol * 0.45, t); g2.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+    o.connect(g2); g2.connect(master); o.start(t); o.stop(t + 0.14);
+  } catch (e) {}
+}
+function tone(freq, dur, type = 'triangle', vol = 0.18, when = 0) {
+  if (!AC) return;
+  try {
+    const t = AC.currentTime + when;
+    const o = AC.createOscillator(); o.type = type; o.frequency.value = freq;
+    const g = AC.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.015); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.05);
+  } catch (e) {}
+}
+const lift = () => { tone(330, 0.12, 'sine', 0.1); tone(495, 0.14, 'sine', 0.07, 0.03); };
+function stealSound(h) { const base = 392; for (let j = 0; j < Math.min(h, 6); j++) tone(base * Math.pow(2, [0, 4, 7, 12, 16, 19][j] / 12), 0.22, 'triangle', 0.13, j * 0.05); }
+function lostSound() { tone(300, 0.25, 'sine', 0.12); tone(220, 0.3, 'sine', 0.1, 0.08); }
+function jingle(win) {
+  const seq = win ? [523, 659, 784, 1047] : [440, 392, 349, 294];
+  seq.forEach((f, j) => tone(f, 0.32, 'triangle', 0.16, j * 0.13));
+}
+
+// ---------- three.js scene ----------
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x2a2018);
+const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+scene.add(new THREE.HemisphereLight(0xfff1dc, 0x3a2a1c, 1.25));
+const sun = new THREE.DirectionalLight(0xfff0d8, 2.0);
+sun.position.set(-3.5, 9, 4.5); sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024);
+Object.assign(sun.shadow.camera, { left: -4.5, right: 4.5, top: 4.5, bottom: -4.5, near: 1, far: 25 });
+sun.shadow.bias = -0.0015;
+scene.add(sun);
+
+// board
+function woodTex(base, dark) {
+  const cv = document.createElement('canvas'); cv.width = 256; cv.height = 256;
+  const g = cv.getContext('2d'); g.fillStyle = base; g.fillRect(0, 0, 256, 256);
+  for (let i = 0; i < 70; i++) {
+    g.strokeStyle = dark; g.globalAlpha = 0.05 + Math.random() * 0.1; g.lineWidth = 1 + Math.random() * 3;
+    const y = Math.random() * 256; g.beginPath(); g.moveTo(0, y);
+    for (let x = 0; x <= 256; x += 16) g.lineTo(x, y + Math.sin(x * 0.03 + i) * 4);
+    g.stroke();
+  }
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; return t;
+}
+const boardMat = new THREE.MeshStandardMaterial({ map: woodTex('#a8723f', '#4a2a10'), roughness: 0.75 });
+const board = new THREE.Mesh(new THREE.BoxGeometry(5.7, 0.4, 5.7), boardMat);
+board.position.y = -0.2; board.receiveShadow = true; scene.add(board);
+const table = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.MeshStandardMaterial({ color: 0x3b2b1e, roughness: 1 }));
+table.rotation.x = -Math.PI / 2; table.position.y = -0.41; table.receiveShadow = true; scene.add(table);
+const cellX = (i) => (i % N) - 2, cellZ = (i) => ((i / N) | 0) - 2;
+const tiles = [];
+const tileGeo = new THREE.BoxGeometry(0.92, 0.04, 0.92);
+const TILE_N = new THREE.Color(0xd9b583), TILE_P = new THREE.Color(0xf3d9a8), TILE_C = new THREE.Color(0x8f9fc2);
+for (let i = 0; i < N * N; i++) {
+  const m = new THREE.Mesh(tileGeo, new THREE.MeshStandardMaterial({ color: TILE_N.clone(), roughness: 0.8, map: woodTex('#ffffff', '#8a6a4a') }));
+  m.position.set(cellX(i), 0.0, cellZ(i)); m.receiveShadow = true; scene.add(m); tiles.push(m);
+}
+// discs
+const R = 0.4, H = 0.16;
+const prof = [[0, H], [0.24, H], [0.25, H - 0.018], [0.29, H - 0.018], [0.3, H], [R - 0.035, H], [R - 0.008, H - 0.02], [R, H - 0.05], [R, 0.04], [R - 0.012, 0.01], [R - 0.04, 0], [0, 0]].map(([x, y]) => new THREE.Vector2(x, y)).reverse();
+const discGeo = new THREE.LatheGeometry(prof, 40);
+discGeo.computeVertexNormals();
+const COL = [0xf6e7c6, 0x34467a];
+const discMats = COL.map((c) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.42, metalness: 0.0 }));
+const ghostMats = COL.map((c) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.5, transparent: true, opacity: 0.42, depthWrite: false }));
+function makeDisc(color) {
+  const m = new THREE.Mesh(discGeo, discMats[color].clone());
+  m.castShadow = true; m.receiveShadow = true; m.userData.color = color; scene.add(m); return m;
+}
+const BASE_Y = 0.02;
+const stackY = (k) => BASE_Y + k * H;
+// height labels
+const labelTex = {};
+function getLabelTex(n, owner) {
+  const key = n + '_' + owner; if (labelTex[key]) return labelTex[key];
+  const cv = document.createElement('canvas'); cv.width = 128; cv.height = 128; const g = cv.getContext('2d');
+  g.fillStyle = owner === 0 ? '#fff6e2' : '#2c3b6a'; g.beginPath(); g.arc(64, 64, 50, 0, 7); g.fill();
+  g.lineWidth = 8; g.strokeStyle = owner === 0 ? '#b0763c' : '#c9d4f2'; g.stroke();
+  g.fillStyle = owner === 0 ? '#5b3415' : '#ffffff'; g.font = 'bold 72px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(String(n), 64, 70);
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return (labelTex[key] = t);
+}
+const labels = [];
+for (let i = 0; i < N * N; i++) {
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: getLabelTex(1, 0), depthTest: false, transparent: true }));
+  sp.scale.set(0.42, 0.42, 1); sp.visible = false; sp.renderOrder = 10; scene.add(sp); labels.push(sp);
+}
+// target markers
+const markGeo = new THREE.RingGeometry(0.2, 0.3, 32);
+const markers = [];
+for (let i = 0; i < 16; i++) {
+  const m = new THREE.Mesh(markGeo, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.7, depthWrite: false }));
+  m.rotation.x = -Math.PI / 2; m.visible = false; m.renderOrder = 5; scene.add(m); markers.push(m);
+}
+const dangerGeo = new THREE.RingGeometry(0.41, 0.5, 40);
+const dangers = [];
+for (let i = 0; i < N * N; i++) {
+  const m = new THREE.Mesh(dangerGeo, new THREE.MeshBasicMaterial({ color: 0xff2a1a, transparent: true, opacity: 0.9, depthWrite: false }));
+  m.rotation.x = -Math.PI / 2; m.position.set(cellX(i), 0.045, cellZ(i)); m.visible = false; m.renderOrder = 4; scene.add(m); dangers.push(m);
+}
+// cells whose top (now yours) the CPU could take on its next move
+function threats(b) {
+  const out = new Set();
+  for (const m of legalMoves(b, 1)) {
+    const nb = applyMove(b, m);
+    for (let i = 0; i < N * N; i++) if (b[i].length >= 2 && topOf(b[i]) === 0 && topOf(nb[i]) === 1) out.add(i);
+  }
+  return out;
+}
+function showDanger(b) {
+  const th = b ? threats(b) : new Set();
+  dangers.forEach((d, i) => (d.visible = th.has(i)));
+}
+const ghosts = [];
+function setGhosts(list) { // list of {x,z,y,color}
+  while (ghosts.length < list.length) { const g = new THREE.Mesh(discGeo, ghostMats[0]); g.renderOrder = 6; scene.add(g); ghosts.push(g); }
+  ghosts.forEach((g, j) => {
+    const o = list[j]; g.visible = !!o; if (!o) return;
+    g.material = ghostMats[o.color]; g.position.set(o.x, o.y, o.z);
+  });
+}
+
+// ---------- state ----------
+let state = 'title'; // title, play, anim, cpu, result
+let stage = 0, boardS = null, vis = null, turnNo = 0, toMove = 0, bestMargin = 0, cleared = false;
+let anims = [];
+let selected = -1, drag = null, hintTimer = 0, hintStage = 0, popups = [];
+const $ = (id) => document.getElementById(id);
+
+function resize() {
+  const w = Math.max(1, innerWidth), h = Math.max(1, innerHeight);
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  // fit 5.9 wide board (plus tower height) into view
+  const vf = THREE.MathUtils.degToRad(camera.fov);
+  const hf = 2 * Math.atan(Math.tan(vf / 2) * camera.aspect);
+  const needW = 5.95, needH = 7.2;
+  const dist = Math.max((needW / 2) / Math.tan(hf / 2), (needH / 2) / Math.tan(vf / 2));
+  const ang = THREE.MathUtils.degToRad(62);
+  camera.position.set(0, Math.sin(ang) * dist, Math.cos(ang) * dist + 0.2);
+  camera.lookAt(0, 0.1, 0.35);
+  camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize);
+resize();
+
+function buildVisual() {
+  if (vis) for (const s of vis) for (const m of s) scene.remove(m);
+  vis = boardS.map((s, i) => s.map((c, k) => { const m = makeDisc(c); m.position.set(cellX(i), stackY(k), cellZ(i)); return m; }));
+  refreshMarks();
+}
+function refreshMarks() {
+  for (let i = 0; i < N * N; i++) {
+    const s = boardS[i], t = topOf(s);
+    tiles[i].material.color.copy(t === 0 ? TILE_P : t === 1 ? TILE_C : TILE_N);
+    const sp = labels[i];
+    if (s.length >= 2) { sp.visible = true; sp.material.map = getLabelTex(s.length, t); sp.material.needsUpdate = true; sp.position.set(cellX(i) + 0.34, stackY(s.length) + 0.28, cellZ(i) + 0.1); }
+    else sp.visible = false;
+  }
+  showDanger(state === 'title' ? null : boardS);
+  $('youS').textContent = scoreOf(boardS, 0);
+  $('cpuS').textContent = scoreOf(boardS, 1);
+}
+function updateHud() {
+  const left = Math.max(0, TURNS - ((turnNo + 1) >> 1));
+  $('left').textContent = T.left(left);
+  $('stage').textContent = T.stage(stage + 1, 3);
+  $('youL').textContent = T.you; $('cpuL').textContent = T.names[stage];
+  $('turn').textContent = state === 'cpu' || (state === 'anim' && toMove === 1) ? T.thinking(T.names[stage]) : (state === 'play' ? (left === 1 ? T.lastMove : T.yourTurn) : $('turn').textContent);
+  $('turn').style.color = toMove === 0 ? '#fff3d6' : '#c9d6ff';
+}
+function bump(id) { const e = $(id); e.style.transform = 'scale(1.3)'; setTimeout(() => (e.style.transform = ''), 160); }
+
+function startRound() {
+  boardS = layout(stage);
+  turnNo = 0; toMove = 0; selected = -1; drag = null; anims = [];
+  state = 'play';
+  buildVisual();
+  $('hud').style.display = 'flex';
+  $('result').classList.add('hide'); $('title').classList.add('hide');
+  updateHud();
+  if (stage === 0) { hintStage = 0; showHint(T.hint, 6000); }
+  else showHint(`${T.names[stage]}：「${T.taunts[stage]}」`, 2600);
+  signal('start');
+}
+function showHint(txt, ms) { $('hint').textContent = txt; $('hint').style.opacity = 1; hintTimer = ms; }
+
+// ---------- move animation ----------
+let simT = 0; // game clock in ms
+function animateMove(m, who, done) {
+  const src = vis[m.i];
+  const group = src.splice(src.length - m.k, m.k);
+  const r = (m.i / N) | 0, c = m.i % N, [dc, dr] = DIRS[m.d];
+  const before = boardS;
+  const after = applyMove(boardS, m);
+  const t0 = simT;
+  const LIFT = 180, STEP = 190;
+  // lift
+  group.forEach((g, j) => {
+    const y0 = g.position.y;
+    anims.push({ t0, dur: LIFT, f: (u) => { g.position.y = y0 + 0.45 * easeOut(u); } });
+  });
+  lift();
+  const gain = [];
+  group.forEach((g, j) => {
+    const nc = c + dc * (j + 1), nr = r + dr * (j + 1);
+    const on = nc >= 0 && nr >= 0 && nc < N && nr < N;
+    const ti = nr * N + nc;
+    const ts = t0 + LIFT + j * STEP;
+    anims.push({
+      t0: ts, dur: STEP + 40, start() { this.sx = g.position.x; this.sz = g.position.z; this.sy = g.position.y; },
+      f(u) {
+        if (this.sx === undefined) this.start();
+        const tx = cellX(m.i) + dc * (j + 1), tz = cellZ(m.i) + dr * (j + 1);
+        const e = easeInOut(u);
+        g.position.x = this.sx + (tx - this.sx) * e;
+        g.position.z = this.sz + (tz - this.sz) * e;
+        const ty = on ? stackY(vis[ti].length) : -1.6;
+        if (on) g.position.y = this.sy + (ty - this.sy) * e + Math.sin(u * Math.PI) * 0.35;
+        else g.position.y = this.sy + Math.sin(u * Math.PI) * 0.3 - (u > 0.5 ? (u - 0.5) * 4 : 0);
+        g.rotation.z = on ? 0 : u * 1.2 * dc; g.rotation.x = on ? 0 : u * 1.2 * dr;
+      },
+      end() {
+        if (on) {
+          const owner0 = topOf(vis[ti].map((x) => x.userData.color));
+          vis[ti].push(g); g.position.set(cellX(ti), stackY(vis[ti].length - 1), cellZ(ti));
+          clack(1 + j * 0.12, 0.55);
+          const h = vis[ti].length;
+          if (owner0 !== -1 && owner0 !== g.userData.color && h >= 3) gain.push({ ti, h, c: g.userData.color });
+          squash(g);
+        } else { scene.remove(g); lostSound(); }
+      },
+    });
+    // the remaining discs that rode on top keep moving: handled by sequential pick-up (each disc goes from lifted spot)
+    // discs that have not dropped yet glide along with the carrier
+    for (let q = j + 1; q < group.length; q++) {
+      const gq = group[q];
+      anims.push({
+        t0: ts, dur: STEP, start() { this.sx = gq.position.x; this.sz = gq.position.z; this.sy = gq.position.y; },
+        f(u) {
+          if (this.sx === undefined) this.start();
+          const e = easeInOut(u);
+          gq.position.x = this.sx + dc * e; gq.position.z = this.sz + dr * e;
+          gq.position.y = this.sy - H * e;
+        },
+      });
+    }
+  });
+  const total = LIFT + group.length * STEP + 90;
+  anims.push({
+    t0: t0 + total, dur: 1, f() {}, end() {
+      boardS = after;
+      // keep vis consistent with logic (colour order)
+      refreshMarks();
+      const ps = scoreOf(after, 0) - scoreOf(before, 0), cs = scoreOf(after, 1) - scoreOf(before, 1);
+      if (ps) bump('youS'); if (cs) bump('cpuS');
+      for (const gg of gain) { stealSound(gg.h); popup(gg.ti, T.steal(gg.h), gg.c); }
+      done();
+    },
+  });
+}
+function squash(g) {
+  const t0 = simT;
+  anims.push({ t0, dur: 160, f: (u) => { const s = 1 - Math.sin(u * Math.PI) * 0.18; g.scale.set(1 + (1 - s) * 0.6, s, 1 + (1 - s) * 0.6); }, end() { g.scale.set(1, 1, 1); } });
+}
+const easeOut = (u) => 1 - (1 - u) * (1 - u);
+const easeInOut = (u) => (u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2);
+const popEl = [];
+function popup(ti, txt, color) {
+  const d = document.createElement('div');
+  d.textContent = txt;
+  Object.assign(d.style, { position: 'absolute', fontSize: '22px', fontWeight: '800', pointerEvents: 'none', whiteSpace: 'nowrap', transform: 'translate(-50%,-50%)', color: color === 0 ? '#fff3cf' : '#cfdcff', textShadow: '0 2px 0 rgba(0,0,0,.5), 0 0 12px rgba(0,0,0,.6)' });
+  document.body.appendChild(d);
+  popups.push({ d, ti, t: 0 });
+}
+
+// ---------- turn flow ----------
+function afterMove() {
+  turnNo++;
+  toMove = 1 - toMove;
+  if (turnNo >= PLIES) return finish();
+  const ms = legalMoves(boardS, toMove);
+  if (!ms.length) {
+    showHint(T.noMove(toMove === 0 ? T.you : T.names[stage]), 2500);
+    return finish();
+  }
+  if (toMove === 1) { state = 'cpu'; cpuWait = 650; }
+  else {
+    state = 'play';
+    if (!dangerHinted && dangers.some((d) => d.visible)) { dangerHinted = true; showHint(T.danger, 4000); }
+  }
+  updateHud();
+}
+let cpuWait = 0, dangerHinted = false, pendingTap = null;
+function cpuAct() {
+  const left = PLIES - turnNo;
+  const m = cpuChoose(boardS, stage, left);
+  if (!m) return finish();
+  state = 'anim';
+  showSel(m.i, true);
+  setTimeout(() => {}, 0);
+  animateMove(m, 1, () => { showSel(-1); afterMove(); });
+}
+let resultAt = 0;
+function finish() {
+  state = 'result';
+  const ps = scoreOf(boardS, 0), cs = scoreOf(boardS, 1), diff = ps - cs;
+  const win = diff > 0;
+  jingle(win);
+  signal('end', { score: diff });
+  let html = '';
+  let nb = false;
+  if (win && diff > bestMargin) { bestMargin = diff; nb = true; }
+  if (win && stage === 2) {
+    cleared = true;
+    html = `<div class="big">${T.allClear}</div><div class="sub">${T.allClearSub}</div>`;
+  } else html = `<div class="big">${win ? T.win : diff < 0 ? T.lose : T.draw}</div>`;
+  html += `<div class="res">${T.you} ${ps} : ${cs} ${T.names[stage]}</div>`;
+  if (bestMargin > 0) html += `<div class="best">${nb ? T.newBest + ' ' : ''}${T.best(bestMargin)}</div>`;
+  const tap = win ? (stage === 2 ? T.tapNew : T.tapNext) : T.tapAgain;
+  html += `<div class="tap">${tap}</div>`;
+  if (win) stage = stage === 2 ? 0 : stage + 1;
+  saveNow();
+  $('result').innerHTML = html;
+  $('left').textContent = T.left(0);
+  setTimeout(() => $('result').classList.remove('hide'), 650);
+  resultAt = simT + 650 + 700;
+  $('turn').textContent = '';
+}
+
+// ---------- save ----------
+function saveNow() { try { parent.postMessage({ agf: 'save', data: { stage, bestMargin, cleared } }, '*'); } catch (e) {} }
+addEventListener('message', (e) => {
+  if (e.data && e.data.agf === 'loaded' && e.data.data && state === 'title') {
+    const d = e.data.data; stage = Math.min(2, Math.max(0, d.stage | 0)); bestMargin = d.bestMargin | 0; cleared = !!d.cleared; renderTitle();
+  }
+});
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+
+// ---------- title ----------
+function renderTitle() {
+  $('title').innerHTML = `<h1>${T.title}</h1><div class="sub">${T.sub}</div>` + T.how.map((s) => `<p>${s}</p>`).join('') +
+    (stage > 0 ? `<p style="margin-top:14px;opacity:.8">${T.vs} ${T.names[stage]}（${T.stage(stage + 1, 3)}）</p>` : '') +
+    `<div class="tap">${T.tap}</div>`;
+}
+renderTitle();
+// a decorative board under the title
+boardS = layout(0); buildVisual();
+
+// ---------- input ----------
+const ndc = new THREE.Vector3();
+function toScreen(x, y, z) {
+  ndc.set(x, y, z).project(camera);
+  return [(ndc.x + 1) / 2 * innerWidth, (1 - ndc.y) / 2 * innerHeight];
+}
+function pickCell(px, py) {
+  let best = -1, bd = 1e9;
+  for (let i = 0; i < N * N; i++) {
+    const s = boardS[i];
+    const [sx, sy] = toScreen(cellX(i), stackY(s.length) * 0.6, cellZ(i));
+    const [bx, by] = toScreen(cellX(i), 0, cellZ(i));
+    // distance to the segment between the base and top of the tower
+    const vx = sx - bx, vy = sy - by, l2 = vx * vx + vy * vy || 1;
+    const u = Math.max(0, Math.min(1, ((px - bx) * vx + (py - by) * vy) / l2));
+    const d = Math.hypot(px - (bx + vx * u), py - (by + vy * u));
+    if (d < bd) { bd = d; best = i; }
+  }
+  const [ax] = toScreen(-0.5, 0, 0), [bx2] = toScreen(0.5, 0, 0);
+  return bd < Math.abs(bx2 - ax) * 0.75 ? best : -1;
+}
+function dragMove(i, dx, dy) {
+  const len = Math.hypot(dx, dy);
+  const [ox, oy] = toScreen(cellX(i), 0, cellZ(i));
+  let bd = -1, bdot = -1e9, cellLen = 1;
+  for (let d = 0; d < 4; d++) {
+    const [tx, ty] = toScreen(cellX(i) + DIRS[d][0], 0, cellZ(i) + DIRS[d][1]);
+    const vx = tx - ox, vy = ty - oy, vl = Math.hypot(vx, vy);
+    const dot = (dx * vx + dy * vy) / vl;
+    if (dot > bdot) { bdot = dot; bd = d; cellLen = vl; }
+  }
+  if (len < cellLen * 0.35) return null;
+  const h = boardS[i].length;
+  const k = Math.max(1, Math.min(h, Math.round(bdot / cellLen + 0.15)));
+  const r = (i / N) | 0, c = i % N;
+  const nc = c + DIRS[bd][0], nr = r + DIRS[bd][1];
+  if (nc < 0 || nr < 0 || nc >= N || nr >= N) return null;
+  return { i, d: bd, k };
+}
+function showSel(i, cpu) {
+  selected = i;
+  vis && vis.forEach((s, j) => s.forEach((m) => { m.material.emissive.setHex(j === i ? (cpu ? 0x223366 : 0x553311) : 0x000000); }));
+}
+function showPreview(m) {
+  markers.forEach((mk) => (mk.visible = false));
+  if (!m) { setGhosts([]); showDanger(boardS); return; }
+  showDanger(applyMove(boardS, m));
+  const s = boardS[m.i], take = s.slice(s.length - m.k);
+  const r = (m.i / N) | 0, c = m.i % N, [dc, dr] = DIRS[m.d];
+  const list = [];
+  take.forEach((col, j) => {
+    const nc = c + dc * (j + 1), nr = r + dr * (j + 1);
+    if (nc < 0 || nr < 0 || nc >= N || nr >= N) { list.push({ x: cellX(m.i) + dc * (j + 1), z: cellZ(m.i) + dr * (j + 1), y: -0.05, color: col }); return; }
+    const ti = nr * N + nc;
+    list.push({ x: cellX(ti), z: cellZ(ti), y: stackY(boardS[ti].length) + 0.02, color: col });
+  });
+  setGhosts(list);
+  // lift preview of the picked discs
+  vis[m.i].forEach((g, k) => { g.position.y = stackY(k) + (k >= s.length - m.k ? 0.25 : 0); });
+}
+function showTargets(i) {
+  markers.forEach((mk) => (mk.visible = false));
+  if (i < 0) return;
+  const h = boardS[i].length, r = (i / N) | 0, c = i % N;
+  let n = 0;
+  for (let d = 0; d < 4; d++) for (let k = 1; k <= h; k++) {
+    const nc = c + DIRS[d][0] * k, nr = r + DIRS[d][1] * k;
+    if (nc < 0 || nr < 0 || nc >= N || nr >= N) break;
+    const mk = markers[n++]; if (!mk) break;
+    mk.visible = true; mk.position.set(nc - 2, stackY(boardS[nr * N + nc].length) + 0.03, nr - 2);
+    mk.userData = { i, d, k };
+  }
+}
+function resetLift(i) { if (i >= 0 && vis[i]) vis[i].forEach((g, k) => (g.position.y = stackY(k))); }
+function tapTarget(px, py) {
+  let best = null, bd = 1e9;
+  for (const mk of markers) {
+    if (!mk.visible) continue;
+    const [sx, sy] = toScreen(mk.position.x, mk.position.y, mk.position.z);
+    const d = Math.hypot(px - sx, py - sy);
+    if (d < bd) { bd = d; best = mk.userData; }
+  }
+  const [ax] = toScreen(-0.5, 0, 0), [bx2] = toScreen(0.5, 0, 0);
+  return bd < Math.abs(bx2 - ax) * 0.6 ? best : null;
+}
+function commit(m) {
+  pendingTap = null;
+  showPreview(null); markers.forEach((mk) => (mk.visible = false));
+  resetLift(m.i);
+  showSel(-1);
+  state = 'anim';
+  if (hintStage === 0 && stage === 0) { hintStage = 1; showHint(T.hint2, 4500); }
+  else if (hintTimer > 0 && stage === 0) hintTimer = Math.min(hintTimer, 800);
+  updateHud();
+  animateMove(m, 0, afterMove);
+}
+
+canvas.addEventListener('pointerdown', onDown);
+$('title').addEventListener('pointerdown', onDown);
+$('result').addEventListener('pointerdown', onDown);
+addEventListener('pointermove', onMoveP);
+addEventListener('pointerup', onUp);
+addEventListener('pointercancel', (e) => { if (drag && drag.id === e.pointerId) { resetLift(drag.i); showPreview(null); drag = null; } });
+function onDown(e) {
+  initAudio();
+  if (state === 'title') { startRound(); return; }
+  if (state === 'result') { if (simT >= resultAt) startRound(); return; }
+  if (state !== 'play' || drag) return;
+  const px = e.clientX, py = e.clientY;
+  if (selected >= 0) {
+    const t = tapTarget(px, py);
+    if (t) {
+      // first tap on a ring previews the move, second tap on it confirms
+      if (pendingTap && pendingTap.d === t.d && pendingTap.k === t.k && pendingTap.i === t.i) { pendingTap = null; commit(t); return; }
+      pendingTap = t; resetLift(t.i); showPreview(t); showTargets(t.i); clack(1.8 + t.k * 0.15, 0.18); return;
+    }
+  }
+  if (pendingTap) { pendingTap = null; resetLift(selected); showPreview(null); }
+  const i = pickCell(px, py);
+  if (i >= 0 && topOf(boardS[i]) === 0) {
+    if (selected !== i) { resetLift(selected); showSel(i); clack(1.5, 0.25); }
+    showTargets(i);
+    drag = { id: e.pointerId, i, x: px, y: py, m: null };
+  } else if (selected >= 0) { resetLift(selected); showSel(-1); showTargets(-1); }
+  else if (i >= 0 && topOf(boardS[i]) === 1) showHint(T.hint, 2500);
+}
+function onMoveP(e) {
+  if (!drag || drag.id !== e.pointerId) return;
+  const m = dragMove(drag.i, e.clientX - drag.x, e.clientY - drag.y);
+  if ((m && (!drag.m || m.d !== drag.m.d || m.k !== drag.m.k)) || (!m && drag.m)) {
+    resetLift(drag.i);
+    if (m) { markers.forEach((mk) => (mk.visible = false)); clack(1.8 + m.k * 0.15, 0.18); }
+    else showTargets(drag.i);
+    showPreview(m);
+  }
+  drag.m = m;
+}
+function onUp(e) {
+  if (!drag || drag.id !== e.pointerId) return;
+  const m = drag.m; drag = null;
+  if (m) commit(m);
+  else { resetLift(selected); showPreview(null); showTargets(selected); }
+}
+
+// ---------- loop ----------
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(50, Math.max(0, now - last)); last = now;
+  simT += dt;
+  // animations
+  const run = anims; anims = [];
+  for (const an of run) {
+    if (simT < an.t0) { anims.push(an); continue; }
+    const u = Math.min(1, (simT - an.t0) / an.dur);
+    an.f(u);
+    if (u >= 1) an.end && an.end(); else anims.push(an);
+  }
+  if (state === 'cpu') { cpuWait -= dt; if (cpuWait <= 0) cpuAct(); }
+  if (hintTimer > 0) { hintTimer -= dt; if (hintTimer <= 0) $('hint').style.opacity = 0; }
+  // selected pulse
+  if (selected >= 0 && vis[selected]) {
+    const p = 0.5 + 0.5 * Math.sin(simT * 0.008);
+    vis[selected].forEach((m) => m.material.emissiveIntensity = 0.6 + p * 0.8);
+  }
+  dangers.forEach((d) => { if (d.visible) d.material.opacity = 0.6 + 0.35 * Math.sin(simT * 0.007); });
+  markers.forEach((mk, j) => { if (mk.visible) mk.material.opacity = 0.45 + 0.35 * Math.sin(simT * 0.006 + j); });
+  for (let q = popups.length - 1; q >= 0; q--) {
+    const p = popups[q]; p.t += dt;
+    const s = boardS[p.ti];
+    const [x, y] = toScreen(cellX(p.ti), stackY(s.length) + 0.4 + p.t * 0.0006, cellZ(p.ti));
+    p.d.style.left = x + 'px'; p.d.style.top = y + 'px'; p.d.style.opacity = String(Math.max(0, 1 - Math.max(0, p.t - 700) / 500));
+    if (p.t > 1200) { p.d.remove(); popups.splice(q, 1); }
+  }
+  if (state === 'title') { scene.rotation.y = Math.sin(simT * 0.0004) * 0.12; } else scene.rotation.y *= 0.9;
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

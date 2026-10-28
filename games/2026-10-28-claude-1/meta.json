@@ -1,0 +1,591 @@
+{
+  "id": "2026-10-28-claude-1",
+  "status": "published",
+  "title": "てっぺん取り",
+  "genre": "ボードゲーム",
+  "concept": "積み重なった駒は、いちばん上の色の持ち主のもの。高い塔ほど点になるが、1まい乗せられれば下の段ごと全部取られる。持ち上げた駒を1まいずつ置いていく動かし方で、狙った塔に届くか・自分が落とした駒で取り返されないかを読む、対CPUの小さな陣取り。",
+  "howToPlay": "自分の色（白）がてっぺんの塔を押してスワイプ。引く長さで持ち上げるまい数が決まり、1まいずつ置かれていちばん遠くにてっぺんの1まいが乗る。10手で、てっぺんを取った塔の段数の合計が多いほうの勝ち。",
+  "libraryDecision": "three.js を使う。塔の高さがそのまま点数なので、3Dで高さと影が見えると「どれが大きいか」が一目で分かり、高い塔を1まいで奪う重みも出るため。再考で、塔の段数の札、置く先の半透明の駒、持ち上げる動きを足した。物理演算は置き方が決まっているルールに合わないので使わない。",
+  "soundDecision": "BGMは付けず、考える時間を静かにした。駒を1まい置くたびに木の「コトッ」が少しずつ高く鳴り、3段以上を奪うと段数ぶんの和音が鳴るので、大きく取った手ごたえが耳でも分かる。音はすべてWeb Audioで作った。",
+  "improvements": [
+    {
+      "found": "全部1段の市松模様で始まり、最初の数手が単調な取り合いになる／先に指す自分が不利で、最後の一手も相手が打つ／盤が小さく画面の下3分の1が空いていた",
+      "changed": "2〜3段の塔がまじる初期配置にした。最後の一手をプレイヤーに（自分10手・相手9手）。カメラを寄せ角度を上げて盤を大きくした",
+      "foundEn": "Started as a checkerboard of single discs, so the first moves were a flat back-and-forth / moving first was a disadvantage and the CPU also had the final move / the board was small and the lower third of the screen was empty",
+      "changedEn": "Opening layouts now mix 2- and 3-high towers. The player gets the final move (10 vs 9). Camera moved closer and steeper so the board is bigger"
+    },
+    {
+      "found": "自分が置いていった藍の駒ですぐ取り返され、なぜ取られたか分からない／最初の相手（こだぬき）でも気軽に指すと半分負ける強さ（試合のシミュレーションで確認）／最後の相手の思考で画面が最大0.5秒止まる",
+      "changed": "次に取られそうな2段以上の塔に赤い輪を出し、引いている間は「動かした後」の輪を予告するようにした。こだぬきの手にゆらぎを足して弱くし、探索を差分計算にして約6倍速くした",
+      "foundEn": "The CPU kept retaking towers using the navy discs I had just dropped, and it was unclear why / even the first opponent beat a casual player half the time (checked with simulated games) / the last opponent froze the screen for up to 0.5s while thinking",
+      "changedEn": "Towers of 2+ that can be taken next turn get a red ring, and while pulling, the rings preview the position after the move. The first opponent got noisier, weaker play, and the search uses incremental evaluation (~6x faster)"
+    },
+    {
+      "found": "塔をタップして行き先の輪をタップすると、予告なしにいきなり確定してしまう／最後の一手の緊張が画面から伝わらない／終わった後も「のこり1手」と表示されたまま",
+      "changed": "行き先の輪は1回目のタップで予告（半透明の駒と赤い輪）、2回目で確定にした。最後の手番に「最後の一手！」と出し、終了時は残り0手と表示するようにした",
+      "foundEn": "Tap a tower then a target ring and the move committed instantly with no preview / the tension of the final move did not show / after the game it still said '1 move left'",
+      "changedEn": "The first tap on a ring previews the move (ghost discs and red rings), the second confirms. The final turn shows 'Your final move!' and the counter reads 0 at the end"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "ボードゲーム",
+      "en": "Board game",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "てっぺん取り：積み重なった駒のいちばん上の色が塔の持ち主。持ち上げた駒を1まいずつ置いて相手の塔にふたをし、段ごと奪う対CPUボードゲーム（3D）。",
+        "ideaEn": "Top Taker: the top disc's colour owns the whole tower. Lift discs, drop them one per square, and cap the CPU's towers to steal every layer (3D board game).",
+        "fromDraw": true
+      },
+      {
+        "idea": "ぷるぷるゼリー積み：揺れるゼリーを皿の上に積み上げ、崩れる前にどこまで高くできるかを競う3D物理ゲーム。",
+        "ideaEn": "Wobbly jelly stack: pile up jiggling jellies on a plate as high as you can before they topple (3D physics).",
+        "fromDraw": false
+      },
+      {
+        "idea": "灯籠流し：指で川に流れを描き、ゆらゆら流れる灯籠を岸の家々へ届ける、終わりのない遊び場。",
+        "ideaEn": "Lantern river: draw currents on a river with your finger to guide drifting lanterns to houses on the bank; an endless playground.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "limit",
+    "input": [
+      "swipe",
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Top Taker",
+      "concept": "A tower belongs to whoever owns its top disc. Tall towers are worth more, but one disc on top steals every layer. Lifted discs are dropped one per square, so you read whether your top disc reaches the target and whether the discs you leave behind let the CPU take it back.",
+      "howToPlay": "Press a tower with your colour (white) on top and swipe. Pull length sets how many discs you lift; they drop one per square with your top disc landing farthest. After 10 moves, the side owning more layers wins.",
+      "libraryDecision": "Uses three.js. Tower height is the score, so seeing height and shadow in 3D makes the big towers obvious and gives weight to stealing one with a single disc. The rethink added height tags, ghost discs at the landing squares and a lift animation. No physics: the rules place discs exactly.",
+      "soundDecision": "No music, to keep thinking time calm. Each dropped disc makes a wooden clack that rises in pitch, and stealing a tower of 3+ plays a chord with one note per layer, so a big capture is felt by ear too. All sound is Web Audio."
+    }
+  },
+  "createdAt": "2026-10-28T09:07:03+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-28T09:07:03+09:00",
+    "metricsFrom": "2026-10-28T00:06:18.261Z",
+    "transcript": "9459203b-7772-4183-94f9-ea58001d6927.jsonl",
+    "validationRuns": 7,
+    "finishedAt": "2026-10-28T09:56:10+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-28T09:38:42+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "36.2KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=184",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=231",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=172",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=204",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 37106,
+    "lines": 751
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js"
+    }
+  ],
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 26334,
+    "outputTokens": 45413,
+    "contextTokens": 18465009,
+    "turns": 100,
+    "toolCalls": 104,
+    "webSearches": 0,
+    "minutes": 49.9,
+    "from": "2026-10-28T00:06:18.261Z",
+    "to": "2026-10-28T00:56:11.025Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-28T09:56:11+09:00",
+    "validationRuns": 7,
+    "codeKB": 36.2
+  },
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "高い塔の取り合いが『乗せる→すぐ乗せ返される』の往復になりやすく、序盤〜中盤の手の多くが最後の数手で帳消しになる。塔の中の色の並びも横からしか見えず、持ち上げたときに何色が残るか予告を見ないと分かりにくい",
+    "comment": "最初の対戦は、自分が置いていった藍の駒で何度も取り返されて負けかけたが、赤い輪と予告で『今取ると残った1まいで取り返される』と分かるようになった。藍8段の塔のとなりに白を置いて最後の一手まで待ち、9段まるごとひっくり返して20対16で逆転した場面ははっきり気持ちよかった。ただ一手ごとの選択肢が多く、予告を見ずに指すと理由の分からない取り返しが続くので、数分は遊べるが人を選ぶ",
+    "similar": [
+      {
+        "title": "Tak",
+        "url": "https://en.wikipedia.org/wiki/Tak_(game)",
+        "similarity": "高",
+        "note": "てっぺんの持ち主だけが塔を動かせ、持ち上げた駒を下から順にまっすぐ置いていく動かし方はほぼ同じ。Takは道をつなぐのが目的で1マスに複数置けるが、本作は1マス1まいで、てっぺんを取った塔の段数の合計を競う",
+        "note_en": "Moving only stacks you top and dropping carried pieces from the bottom in a straight line is nearly the same. Tak is about building a road and allows several pieces per square; here it is exactly one per square and you score the layers of towers you top"
+      },
+      {
+        "title": "Focus (Domination)",
+        "url": "https://en.wikipedia.org/wiki/Focus_(board_game)",
+        "similarity": "中",
+        "note": "いちばん上の駒の色が塔を支配し、上の一部だけ動かせる点が同じ。Focusは塔ごと移動して重ね、5段を超えた下の駒を取るが、本作は1まいずつばらまき、塔の高さそのものが点になる",
+        "note_en": "Shared: the top piece controls the stack and you may move just the top part. Focus moves the stack as a unit and captures pieces beyond 5; here discs are spread one per square and tower height itself is the score"
+      }
+    ],
+    "research": "ウェブ検索で『上の駒が塔を支配する』『持ち上げた駒を1つずつ置く』ボードゲームを調べた。動かし方はTakにとても近く、支配のルールはFocusが元祖。自分では独自のつもりだったが、核の動きは既存の抽象ゲームとほぼ同じで、違いは得点のしかたと3D・予告表示",
+    "i18n": {
+      "en": {
+        "worst": "Fights over tall towers tend to become 'cap, get re-capped' ping-pong, and many early moves are undone by the last few. The colour order inside a tower is only visible from the side, so you need the preview to know what will be left behind",
+        "comment": "In the first match the CPU kept retaking towers with navy discs I had left behind, but the red rings and preview taught me 'if I take now, the leftover disc retakes it'. Parking a white next to a navy 8-stack and waiting for my final move, then flipping all 9 layers for a 20-16 comeback, felt clearly great. But there are many options per move, and without the preview the retakes feel unexplained, so it holds a few minutes yet will not suit everyone",
+        "research": "Searched the web for board games where the top piece controls a stack and carried pieces are dropped one by one. The movement is very close to Tak, and top-control comes from Focus. I thought it was original, but the core movement matches existing abstract games; the differences are the scoring and the 3D board with move previews"
+      }
+    },
+    "method": "スマホ縦画面で 16 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 16 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "タイトルをタップして開始。2段・3段の塔がまじった盤",
+        "noteEn": "Tap the title to start. The board mixes 2- and 3-high towers",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.50,0.55) 120ms",
+        "note": "中央の白3段をタップ。行き先の輪が出る",
+        "noteEn": "Tap the white 3-stack in the centre; target rings appear",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.50,0.39) 120ms",
+        "note": "2つ上の藍3段を狙う予告。下に藍が残り、赤い輪が出た＝取り返される",
+        "noteEn": "Preview capping the navy 3-stack two up: a navy disc is left below and a red ring appears, so it would be retaken",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.85,0.85) 120ms → swipe(0.17,0.39→0.17,0.47) 300ms → wait 3000ms",
+        "note": "やめて別の手。左上の白1まいを下の藍2段へ。まわりに藍がいないので取り返されにくい",
+        "noteEn": "Cancel and pick another: drop the top-left white onto the navy 2-stack below; no navy nearby to retake it",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.17,0.47) 120ms → tap(0.67,0.47) 120ms",
+        "note": "取ったばかりの白3段を、右へ3まい全部ばらまく予告を見てみる",
+        "noteEn": "Preview spreading my new white 3-stack all the way to the right",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.85,0.85) 120ms → swipe(0.82,0.31→0.82,0.39) 300ms → wait 3000ms",
+        "note": "予告は藍の駒を2つばらまき赤い輪だらけ。やめて、右上の白で下の藍2段を取る",
+        "noteEn": "The preview scatters two navy discs and rings everywhere. Instead, cap the navy 2-stack with the top-right white",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "swipe(0.33,0.55→0.33,0.63) 300ms → wait 3000ms",
+        "note": "どれも取り返されそうで迷う。左下の藍2段に白1まいを乗せる",
+        "noteEn": "Everything looks retakeable; I hesitate. Cap the navy 2-stack bottom-left",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "swipe(0.50,0.63→0.35,0.63) 300ms → wait 3000ms",
+        "note": "藍4段のまわりが空いた。右どなりの白で乗せれば5段、しかも取り返す駒がいない",
+        "noteEn": "The squares around the navy 4-stack are empty. Cap it from the right for 5, with nothing left to retake it",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "swipe(0.17,0.46→0.32,0.46) 300ms → wait 3000ms",
+        "note": "白5段に赤い輪。2つ上の藍2段が2まい運べば届く。先にその藍2段にふたをする",
+        "noteEn": "Red ring on my 5-stack: the navy 2-stack two squares up can reach it by carrying 2. Cap that navy stack first",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.33,0.62) 120ms → tap(0.33,0.46) 120ms",
+        "note": "白5段から2まい持ち上げて藍4段に届く手を予告で確かめる",
+        "noteEn": "Preview lifting 2 from my 5-stack to reach the navy 4-stack",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.33,0.46) 120ms → wait 3000ms",
+        "note": "左の藍1まいに取り返される赤い輪が出るが、5段を取れるので確定",
+        "noteEn": "A red ring says the lone navy on the left can retake, but taking 5 now is worth it; confirm",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "swipe(0.33,0.62→0.33,0.46) 350ms → wait 3000ms",
+        "note": "藍6段になった。下の白3段から2まい運べばまた届く。取り合いの山場",
+        "noteEn": "Now a navy 6-stack. Carrying 2 from my 3-stack below reaches it again; the tug of war peaks",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "swipe(0.33,0.62→0.33,0.55) 300ms → wait 3000ms",
+        "note": "藍8段にはもう届かない。最後の一手で届くよう、すぐ下の藍に白を乗せて足場を作る",
+        "noteEn": "Can't reach the navy 8-stack now. Cap the navy just below it to set up a reach for my final move",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "swipe(0.67,0.55→0.67,0.47) 300ms → wait 3000ms",
+        "note": "今8段を取ると、残った藍1まいで取り返される。最後の一手まで待ち、別の場所で藍1まいを取る",
+        "noteEn": "Taking the 8-stack now would leave a navy disc to retake it. Wait for the final move; take a single navy elsewhere",
+        "image": "ai-play/step-14.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "swipe(0.33,0.55→0.33,0.47) 300ms → wait 1500ms",
+        "note": "最後の一手。待っていた白1まいを藍8段に乗せて、9段まるごと逆転",
+        "noteEn": "Final move: drop the waiting white onto the navy 8-stack and steal all 9 to turn it around",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 4
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "bestMargin": 4,
+              "cleared": false
+            }
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "wait 800ms → tap(0.50,0.70) 120ms → wait 600ms",
+        "note": "待っていた9段を最後の一手でひっくり返して逆転勝ち。タップで2人目のきつねへ",
+        "noteEn": "Flipped the 9-stack on the final move for a comeback win. Tap to face the 2nd opponent, the fox",
+        "image": "ai-play/step-16.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 4
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "bestMargin": 4,
+              "cleared": false
+            }
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-28T09:56:10+09:00"
+  },
+  "publishedAt": "2026-10-28T09:56:10+09:00"
+}

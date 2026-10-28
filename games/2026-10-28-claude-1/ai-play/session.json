@@ -1,0 +1,564 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-10-28T00:38:49.407Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.5
+        ]
+      },
+      "desc": "tap(0.50,0.50) 120ms",
+      "note": "タイトルをタップして開始。2段・3段の塔がまじった盤",
+      "noteEn": "Tap the title to start. The board mixes 2- and 3-high towers",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": {
+        "tap": [
+          0.5,
+          0.547
+        ]
+      },
+      "desc": "tap(0.50,0.55) 120ms",
+      "note": "中央の白3段をタップ。行き先の輪が出る",
+      "noteEn": "Tap the white 3-stack in the centre; target rings appear",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": {
+        "tap": [
+          0.5,
+          0.39
+        ]
+      },
+      "desc": "tap(0.50,0.39) 120ms",
+      "note": "2つ上の藍3段を狙う予告。下に藍が残り、赤い輪が出た＝取り返される",
+      "noteEn": "Preview capping the navy 3-stack two up: a navy disc is left below and a red ring appears, so it would be retaken",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "tap": [
+            0.85,
+            0.85
+          ]
+        },
+        {
+          "swipe": [
+            0.172,
+            0.388,
+            0.172,
+            0.47
+          ],
+          "hold": 300
+        },
+        {
+          "wait": 3000
+        }
+      ],
+      "desc": "tap(0.85,0.85) 120ms → swipe(0.17,0.39→0.17,0.47) 300ms → wait 3000ms",
+      "note": "やめて別の手。左上の白1まいを下の藍2段へ。まわりに藍がいないので取り返されにくい",
+      "noteEn": "Cancel and pick another: drop the top-left white onto the navy 2-stack below; no navy nearby to retake it",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": [
+        {
+          "tap": [
+            0.172,
+            0.47
+          ]
+        },
+        {
+          "tap": [
+            0.667,
+            0.47
+          ]
+        }
+      ],
+      "desc": "tap(0.17,0.47) 120ms → tap(0.67,0.47) 120ms",
+      "note": "取ったばかりの白3段を、右へ3まい全部ばらまく予告を見てみる",
+      "noteEn": "Preview spreading my new white 3-stack all the way to the right",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "tap": [
+            0.85,
+            0.85
+          ]
+        },
+        {
+          "swipe": [
+            0.825,
+            0.313,
+            0.825,
+            0.39
+          ],
+          "hold": 300
+        },
+        {
+          "wait": 3000
+        }
+      ],
+      "desc": "tap(0.85,0.85) 120ms → swipe(0.82,0.31→0.82,0.39) 300ms → wait 3000ms",
+      "note": "予告は藍の駒を2つばらまき赤い輪だらけ。やめて、右上の白で下の藍2段を取る",
+      "noteEn": "The preview scatters two navy discs and rings everywhere. Instead, cap the navy 2-stack with the top-right white",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "swipe": [
+            0.333,
+            0.547,
+            0.333,
+            0.633
+          ],
+          "hold": 300
+        },
+        {
+          "wait": 3000
+        }
+      ],
+      "desc": "swipe(0.33,0.55→0.33,0.63) 300ms → wait 3000ms",
+      "note": "どれも取り返されそうで迷う。左下の藍2段に白1まいを乗せる",
+      "noteEn": "Everything looks retakeable; I hesitate. Cap the navy 2-stack bottom-left",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": [
+        {
+          "swipe": [
+            0.5,
+            0.633,
+            0.35,
+            0.633
+          ],
+          "hold": 300
+        },
+        {
+          "wait": 3000
+        }
+      ],
+      "desc": "swipe(0.50,0.63→0.35,0.63) 300ms → wait 3000ms",
+      "note": "藍4段のまわりが空いた。右どなりの白で乗せれば5段、しかも取り返す駒がいない",
+      "noteEn": "The squares around the navy 4-stack are empty. Cap it from the right for 5, with nothing left to retake it",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": [
+        {
+          "swipe": [
+            0.172,
+            0.461,
+            0.32,
+            0.461
+          ],
+          "hold": 300
+        },
+        {
+          "wait": 3000
+        }
+      ],
+      "desc": "swipe(0.17,0.46→0.32,0.46) 300ms → wait 3000ms",
+      "note": "白5段に赤い輪。2つ上の藍2段が2まい運べば届く。先にその藍2段にふたをする",
+      "noteEn": "Red ring on my 5-stack: the navy 2-stack two squares up can reach it by carrying 2. Cap that navy stack first",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "action": [
+        {
+          "tap": [
+            0.333,
+            0.62
+          ]
+        },
+        {
+          "tap": [
+            0.333,
+            0.461
+          ]
+        }
+      ],
+      "desc": "tap(0.33,0.62) 120ms → tap(0.33,0.46) 120ms",
+      "note": "白5段から2まい持ち上げて藍4段に届く手を予告で確かめる",
+      "noteEn": "Preview lifting 2 from my 5-stack to reach the navy 4-stack",
+      "image": "ai-play/step-10.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "action": [
+        {
+          "tap": [
+            0.333,
+            0.461
+          ]
+        },
+        {
+          "wait": 3000
+        }
+      ],
+      "desc": "tap(0.33,0.46) 120ms → wait 3000ms",
+      "note": "左の藍1まいに取り返される赤い輪が出るが、5段を取れるので確定",
+      "noteEn": "A red ring says the lone navy on the left can retake, but taking 5 now is worth it; confirm",
+      "image": "ai-play/step-11.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 12,
+      "action": [
+        {
+          "swipe": [
+            0.333,
+            0.62,
+            0.333,
+            0.461
+          ],
+          "hold": 350
+        },
+        {
+          "wait": 3000
+        }
+      ],
+      "desc": "swipe(0.33,0.62→0.33,0.46) 350ms → wait 3000ms",
+      "note": "藍6段になった。下の白3段から2まい運べばまた届く。取り合いの山場",
+      "noteEn": "Now a navy 6-stack. Carrying 2 from my 3-stack below reaches it again; the tug of war peaks",
+      "image": "ai-play/step-12.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 13,
+      "action": [
+        {
+          "swipe": [
+            0.333,
+            0.62,
+            0.333,
+            0.547
+          ],
+          "hold": 300
+        },
+        {
+          "wait": 3000
+        }
+      ],
+      "desc": "swipe(0.33,0.62→0.33,0.55) 300ms → wait 3000ms",
+      "note": "藍8段にはもう届かない。最後の一手で届くよう、すぐ下の藍に白を乗せて足場を作る",
+      "noteEn": "Can't reach the navy 8-stack now. Cap the navy just below it to set up a reach for my final move",
+      "image": "ai-play/step-13.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 14,
+      "action": [
+        {
+          "swipe": [
+            0.667,
+            0.547,
+            0.667,
+            0.47
+          ],
+          "hold": 300
+        },
+        {
+          "wait": 3000
+        }
+      ],
+      "desc": "swipe(0.67,0.55→0.67,0.47) 300ms → wait 3000ms",
+      "note": "今8段を取ると、残った藍1まいで取り返される。最後の一手まで待ち、別の場所で藍1まいを取る",
+      "noteEn": "Taking the 8-stack now would leave a navy disc to retake it. Wait for the final move; take a single navy elsewhere",
+      "image": "ai-play/step-14.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 15,
+      "action": [
+        {
+          "swipe": [
+            0.333,
+            0.547,
+            0.333,
+            0.47
+          ],
+          "hold": 300
+        },
+        {
+          "wait": 1500
+        }
+      ],
+      "desc": "swipe(0.33,0.55→0.33,0.47) 300ms → wait 1500ms",
+      "note": "最後の一手。待っていた白1まいを藍8段に乗せて、9段まるごと逆転",
+      "noteEn": "Final move: drop the waiting white onto the navy 8-stack and steal all 9 to turn it around",
+      "image": "ai-play/step-15.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 4
+        },
+        {
+          "agf": "save",
+          "data": {
+            "stage": 1,
+            "bestMargin": 4,
+            "cleared": false
+          }
+        }
+      ]
+    },
+    {
+      "step": 16,
+      "action": [
+        {
+          "wait": 800
+        },
+        {
+          "tap": [
+            0.5,
+            0.7
+          ]
+        },
+        {
+          "wait": 600
+        }
+      ],
+      "desc": "wait 800ms → tap(0.50,0.70) 120ms → wait 600ms",
+      "note": "待っていた9段を最後の一手でひっくり返して逆転勝ち。タップで2人目のきつねへ",
+      "noteEn": "Flipped the 9-stack on the final move for a comeback win. Tap to face the 2nd opponent, the fox",
+      "image": "ai-play/step-16.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 4
+        },
+        {
+          "agf": "save",
+          "data": {
+            "stage": 1,
+            "bestMargin": 4,
+            "cleared": false
+          }
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}
