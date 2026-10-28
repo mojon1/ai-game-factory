@@ -1,0 +1,408 @@
+{
+  "id": "2026-10-28-claude-2",
+  "status": "published",
+  "title": "ぐるぐる わたあめ屋台",
+  "genre": "料理",
+  "concept": "縁日のわたあめ機で、指をぐるぐる回して宙に舞う糸を巻き取る手触りが核。お客の注文どおりの大きさと色の重なり順に、点線を見ながら止めどきを決める。大きいほど回転部と縁の間の細い帯を回る必要があり、こすると綿が削れて固くなる。",
+  "howToPlay": "ざらめの瓶をタップして機械に入れ、ボウルの中を指でぐるぐる回して綿を集める。点線の大きさと色の順になったら「わたす」。",
+  "libraryDecision": "使わない。綿の糸は数百本の弧を Canvas 2D でまとめて描けば十分なめらかで、物理演算や3Dは「指で回して巻き取る」核を強めないため。",
+  "soundDecision": "BGMは付けず、機械のうなり（砂糖が入っている間だけ大きくなる）、綿を集める「シュワー」という音（指の速さで高さが変わる）、こすれた時のガリガリ音、ざらめを入れる音、わたした時のチャイムを Web Audio で鳴らす。手の動きがそのまま音になる手触りを優先し、それを隠すBGMは入れない。",
+  "improvements": [
+    {
+      "found": "糸が細く少なくて綿あめに見えない／自然に速く回すと「ちぎれる！」が出て叱られる／お客ごとに急ぐ理由がなく、だらっとする",
+      "changed": "糸をぼかしと細線の二重描きにして量も増やし、集めた糸が棒へ吸い込まれる線を足した。ちぎれる速さを大きく引き上げた。待ち時間が短いほど増える「はやわざ」ボーナスとゲージを付けた",
+      "foundEn": "Strands were thin and sparse, not cotton-candy-like / natural fast swirls got scolded with \"Tearing!\" / no reason to hurry, so each guest felt slack",
+      "changedEn": "Drew strands as a soft glow plus a fine line and emitted more; added lines of floss being sucked onto the stick. Raised the tearing speed a lot. Added a \"Quick\" bonus with a gauge that shrinks while the guest waits"
+    },
+    {
+      "found": "注文の色名がふきだしからはみ出す／同じお面のお客が続く／大きさを合わせる以外に腕の見せどころがない",
+      "changed": "色の順を丸いチップと矢印で見せるようにした。お客の顔を毎晩シャッフル。大きさが±4%に入ると白いリングが光り、わたすと「ぴったり！」ボーナス、続けると×2・×3になるようにした",
+      "foundEn": "Color names overflowed the bubble / the same masked guest appeared twice / nothing to master beyond rough size",
+      "changedEn": "Showed the color order as chips with arrows. Shuffled guest faces each night. Inside ±4% a white ring glows; serving then gives a \"Perfect!\" bonus that grows ×2, ×3 in a streak"
+    },
+    {
+      "found": "色をまちがえても「いいね！」82点もらえる／2色目を入れても綿がなかなか届かず間に合わない／指の動きが不規則だと「ちぎれる」が誤って出る",
+      "changed": "色ちがいは大きさ・ふわふわ点ごと大きく減らすようにした。綿の出る速さと広がる速さを上げた。指の速さを0.25秒の時間窓で測るようにした",
+      "foundEn": "Wrong colors still earned \"Nice!\" and 82 / the second color took too long to reach the stick / uneven touch events falsely triggered \"Tearing!\"",
+      "changedEn": "Wrong colors now cut the size and fluff points too. Floss comes out and spreads faster. Finger speed is measured over a 0.25 s window"
+    },
+    {
+      "found": "雑に作っても「すばらしい！」が出て差がない／後半も前半と同じ手応え／縁にこすりつければ大きさが勝手にそろう抜け道がある",
+      "changed": "ほめ言葉をボーナス前の点で決め、基準を上げた。お客が進むほど綿が速く広がるようにした。こすれた綿は固くなり、ふわふわ点が下がるようにした",
+      "foundEn": "Sloppy candy still got \"Wonderful!\" / later guests felt the same as early ones / scraping on the rim trimmed candy to size for free",
+      "changedEn": "Praise now uses the score before bonuses, with higher bars. Floss spreads faster with each guest. Scraped floss gets crushed and loses fluff points"
+    },
+    {
+      "found": "何も考えずに全部集めても最高ランク「伝説の職人」に届く／砂糖1杯がちょうど注文の大きさで、止めどきを考えなくていい／ランクの目標が低い",
+      "changed": "1杯の量を増やして、全部集めると大きすぎるようにした（点線を見て指を離す止めどきが腕前になる）。ランクの基準を引き上げた",
+      "foundEn": "Gathering everything mindlessly still reached the top rank \"Legend\" / one scoop happened to equal the order size, so no need to judge when to stop / rank goals were low",
+      "changedEn": "Made each scoop larger so gathering it all overshoots — judging when to lift your finger at the dashed ring is now the skill. Raised the rank thresholds"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "料理",
+      "en": "Cooking",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "わたあめ屋台: 指でぐるぐる回して綿を巻き取り、注文の大きさと色の重なりに仕上げる。上から見たボウルに光る糸が渦を巻く2D。",
+        "ideaEn": "Cotton candy stall: swirl your finger to wind floss onto the stick and match each order's size and color layers. 2D top view of the bowl with glowing swirling strands.",
+        "fromDraw": true
+      },
+      {
+        "idea": "こだま洞窟: 真っ暗な洞窟でタップすると音の波紋が広がり、一瞬だけ壁が見える。覚えた形を頼りにコウモリを飛ばしてホタルを集める。",
+        "ideaEn": "Echo cave: in a pitch-dark cave, each tap sends a sound ripple that briefly reveals the walls; fly a bat by memory to collect fireflies.",
+        "fromDraw": false
+      },
+      {
+        "idea": "つな渡り: 風が吹く綱の上で、指を左右に動かして長い棒の傾きを直し、どこまで渡れるか。3Dで足元の高さを感じさせる。",
+        "ideaEn": "Tightrope: on a windy rope, drag left and right to counter-tilt a balance pole and see how far you get. 3D to feel the height below.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "limit",
+    "input": [
+      "drag",
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Cotton Candy Swirl",
+      "concept": "At a festival cotton-candy machine, the core is the feel of swirling your finger to wind up floating strands. Watch the dashed rings to stop at each order's size and color layering. Bigger orders force you into the thin band between spinner and rim, where scraping crushes the floss.",
+      "howToPlay": "Tap a sugar jar to feed the machine, swirl your finger in the bowl to gather floss, and tap Serve when it matches the dashed size and color order.",
+      "libraryDecision": "None. A few hundred arcs drawn in batches on Canvas 2D are smooth enough, and physics or 3D would not strengthen the core of swirling and winding.",
+      "soundDecision": "No BGM. Web Audio makes the machine hum (louder while it has sugar), a whooshing gather sound whose pitch follows your finger speed, a grinding scrape, the sugar pour and a chime when serving. The priority is that your hand motion itself becomes sound; BGM would hide it."
+    }
+  },
+  "createdAt": "2026-10-28T12:07:05+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-28T12:07:05+09:00",
+    "metricsFrom": "2026-10-28T03:05:46.990Z",
+    "transcript": "119c2358-5b65-4cf9-af09-dd193364cc4a.jsonl",
+    "validationRuns": 7,
+    "finishedAt": "2026-10-28T12:33:53+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-28T12:32:28+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "42.1KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=186",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=204",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=140",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=231",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 43060,
+    "lines": 864
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "8人とも「ざらめを入れる→回す→わたす」の同じ流れで、後半は大きさと色数が増えるだけ。慣れると変化が少ない",
+    "comment": "ボウルいっぱいに光る糸が渦を巻き、指で回すと棒へ吸い込まれていく場面は触っていて気持ちいい。3色の注文で、色を入れ替えるタイミングと点線で指を離す止めどきを考えた時が一番面白かった。特大で回転部と縁のすき間を回る緊張もある。一方、1晩が同じ手順のくり返しで、2晩目はやや作業的。",
+    "similar": [
+      {
+        "title": "Cotton Candy! - Maker Games",
+        "url": "https://apps.apple.com/app/id438486810",
+        "similarity": "中",
+        "note": "砂糖を機械に入れ、棒で綿を集める流れが同じ。こちらは注文の大きさ・色の重なりに合わせる採点と、指の回し方・こすれの手触りが中心",
+        "note_en": "Same flow of pouring sugar and gathering floss on a rod. Mine centers on scoring against ordered size and color layers, and on how you swirl and scrape"
+      },
+      {
+        "title": "Sweet Cotton Candy Mania!",
+        "url": "https://apps.apple.com/kr/app/id1155891038",
+        "similarity": "中",
+        "note": "棒をドラッグして綿あめを作る点が同じ。あちらは飾りつけ中心、こちらは止めどきと注文合わせのスコア遊び",
+        "note_en": "Also drags a stick to build cotton candy. That one focuses on decorating; mine is a score game about when to stop and matching orders"
+      }
+    ],
+    "research": "WebSearch で「cotton candy maker game swirl stick mobile」を1回検索し、綿あめ作りのスマホゲームを確認した",
+    "i18n": {
+      "en": {
+        "worst": "All eight guests follow the same pour → swirl → serve loop; later ones only add size and colors, so it gets samey once learned",
+        "comment": "Watching glowing strands swirl across the bowl and get sucked onto the stick as I circle feels great. The best moments were three-color orders: timing the sugar switch and lifting my finger at the dashed ring. XL orders add tension in the gap between spinner and rim. But a night is the same routine repeated, and a second night feels a bit like work.",
+        "research": "One WebSearch for 'cotton candy maker game swirl stick mobile' to find cotton candy maker mobile games"
+      }
+    },
+    "method": "スマホ縦画面で 7 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 7 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 300ms",
+        "note": "スタート",
+        "noteEn": "Start",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.55,0.93) 120ms → wait 500ms → path(0.80,0.56→0.76,0.64→0.65,0.71→0.50,0.73→0.35,0.71→0.24,0.64→0.20,0.56→0.24,0.48→0.35,0.41→0.50,0.39→0.65,0.41→0.76,0.48→0.80,0.56→0.76,0.64→0.65,0.71→0.50,0.73→0.35,0.71→0.24,0.64→0.20,0.56→0.24,0.48→0.35,0.41→0.50,0.39→0.65,0.41→0.76,0.48→0.80,0.56) 2400ms",
+        "note": "レモン小。前と同じ回し方で全部集めると…",
+        "noteEn": "Lemon S. Gathering everything like before…",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.82,0.93) 120ms → wait 600ms",
+        "note": "わたす。今度は集めすぎていないか",
+        "noteEn": "Serve. Did I gather too much this time?",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 1700ms",
+        "note": "次の注文を見る",
+        "noteEn": "Check the next order",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.30,0.93) 120ms → tap(0.30,0.93) 120ms → wait 400ms → path(0.82,0.56→0.78,0.65→0.66,0.72→0.50,0.74→0.34,0.72→0.22,0.65→0.18,0.56→0.22,0.47→0.34,0.40→0.50,0.38→0.66,0.40→0.78,0.47→0.82,0.56→0.78,0.65→0.66,0.72→0.50,0.74→0.34,0.72→0.22,0.65→0.18,0.56→0.22,0.47→0.34,0.40→0.50,0.38→0.66,0.40→0.78,0.47→0.82,0.56) 2000ms",
+        "note": "みずいろ2杯。2周したところで指を離して大きさを見る",
+        "noteEn": "Two sky scoops. Lift after two laps to check the size",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "path(0.82,0.56→0.78,0.65→0.66,0.72→0.50,0.74→0.34,0.72→0.22,0.65→0.18,0.56) 500ms",
+        "note": "まだ点線より少し小さいので、半周だけ足す",
+        "noteEn": "Still a bit under the dashed ring; add half a lap",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.82,0.93) 120ms → wait 600ms",
+        "note": "点線ちょうどで止めた。残りの綿は縁へ流れていく。わたす",
+        "noteEn": "Stopped right at the dashed ring; leftover floss drifts to the rim. Serve",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-28T12:33:53+09:00"
+  },
+  "publishedAt": "2026-10-28T12:33:53+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 20401,
+    "outputTokens": 57381,
+    "contextTokens": 23029193,
+    "turns": 116,
+    "toolCalls": 134,
+    "webSearches": 0,
+    "minutes": 28.1,
+    "from": "2026-10-28T03:05:46.990Z",
+    "to": "2026-10-28T03:33:53.776Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-28T12:33:53+09:00",
+    "validationRuns": 7,
+    "codeKB": 42.1
+  }
+}
