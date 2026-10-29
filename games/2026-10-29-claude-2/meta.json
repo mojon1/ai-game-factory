@@ -1,0 +1,765 @@
+{
+  "id": "2026-10-29-claude-2",
+  "status": "published",
+  "title": "みっつの影",
+  "genre": "組み立て・建築",
+  "concept": "前・横・上の三方向から光を当て、おく・ひだり・ゆかの影がそれぞれ枠どおりになる立体を積み木で組む。影が出せる場所に全部積めば解けるが、同じ三つの影を最少の数で作るには「どの積み木が影を兼ねられるか」を見抜く必要がある、その発見が核。",
+  "howToPlay": "タップで積み木を積み、ドラッグで回して見る。三つの影を枠どおりにしたら完成、少ない数ほど★が増える。",
+  "libraryDecision": "three.js（と角丸の箱）を使う。三方向からの光で本物の影が壁と床に落ちる様子が企画そのものなので、3Dの光と影で見せると「一つの形が三つの影を作る」驚きが強まる。物理演算や効果音ライブラリは不要。",
+  "soundDecision": "BGMは付けず、考える静けさを残す。積むと木のコトッという音（高く積むほど音が上がる）、影が一つそろうたびに壁ごとに違う鈴の音（ド・ミ・ソ）が鳴り、三つそろうと和音になるので、耳でも進み具合が分かる。",
+  "improvements": [
+    {
+      "found": "奥のマスが手前の積み木に隠れて押せない／押す前にどこへ置かれるか分からない／中に埋もれた積み木をけずれない",
+      "changed": "視点を高めにし真上近くまで回せるようにした。指を置くと置き場所の予告（半透明の箱と影パネルの点線）を出す。けずる時は長押しで選択が奥の積み木へ移り、ほかが透ける。影を変えずにとれる積み木を青く光らせるヒントを追加。",
+      "foundEn": "Back cells were hidden behind front blocks / you could not tell where a block would go before tapping / buried blocks could not be carved",
+      "changedEn": "Raised the default view and allowed turning to nearly top-down. Touching now previews the spot (ghost box plus dashed cells on the shadow panels). In carve mode, holding moves the pick deeper while other blocks turn see-through. Blocks removable without changing a shadow glow blue."
+    },
+    {
+      "found": "次の面に進んでも「けずる」のままで積めずに戸惑う／完成画面が作品を隠して眺められない／支えをけずると積み木が宙に残るのが不自然",
+      "changed": "面が変わるたびに「つむ」に戻す。完成画面の文字を下に寄せ、作品がゆっくり回って見えるようにした。浮いた積み木はふわふわ漂わせ「影の部屋では浮かんでいられる」と一言出して、最少に近づく発見の演出にした。けずり続けて最少に届いたときも完成画面が出るよう直した。",
+      "foundEn": "Carve mode carried over to the next stage so taps did nothing / the result screen hid the finished piece / blocks left hanging after removing their support looked like a bug",
+      "changedEn": "Mode resets to Build on each stage. The result text moved down and the piece slowly turns on show. Floating blocks now gently bob with a one-line note that blocks can hover in the shadow room, making it part of the discovery. Reaching a better count while carving now shows the result screen again."
+    },
+    {
+      "found": "床の影の枠が棚から大きくずれて見え、どこを押すか迷う／高い所に置くには足場を積んでけずる手間がかかる／面に名前がなく進む楽しみが薄い",
+      "changed": "床を棚に近づけてずれを小さくした。奥と左の壁をタップすると壁ぎわの高い所に直接積めるようにし、3面でその一言ヒントを出す。各面に「とう」「わ」「ハート」などの名前を付けた。",
+      "foundEn": "The floor outline looked far off the shelf so it was unclear where to tap / placing high blocks needed scaffolding you then had to carve / stages had no names, so progress felt flat",
+      "changedEn": "Moved the floor closer to the shelf. Tapping the back or left wall now places a block high against it, with a hint on stage 3. Each stage got a name such as Tower, Ring and Heart."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "組み立て・建築",
+      "en": "Building / construction",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "三方向の光が落とす三つの影を、それぞれ枠どおりにする立体を積み木で組む。少ない数で作るほど★が増える。",
+        "ideaEn": "Stack blocks into a solid whose shadows from three lights each match an outline; fewer blocks earn more stars.",
+        "fromDraw": true
+      },
+      {
+        "idea": "くさび形の石をアーチの型枠に並べ、最後に要石を入れて型枠を外す。石の隙間が大きいと崩れる、物理で確かめる石橋づくり。",
+        "ideaEn": "Lay wedge stones on an arch frame, drop in the keystone and pull the frame out; gaps make it collapse, tested with physics.",
+        "fromDraw": false
+      },
+      {
+        "idea": "天井から吊るすモビールに飾りを足していき、腕の吊り点をずらして全体を水平につり合わせる。",
+        "ideaEn": "Add ornaments to a hanging mobile and slide the hanging point of each arm until the whole thing balances level.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "tap",
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Three Shadows",
+      "concept": "Lights shine from the front, side and top; build a block solid whose shadows on the back wall, left wall and floor each match an outline. Filling every allowed spot always works, but making the same three shadows with the fewest blocks means spotting which blocks can serve several shadows at once. That discovery is the core.",
+      "howToPlay": "Tap to stack blocks, drag to turn the view. Match all three shadows to finish; fewer blocks earn more stars.",
+      "libraryDecision": "Uses three.js (with rounded boxes). Real shadows falling on the walls and floor from three lights are the whole idea, so 3D light and shadow make the surprise of one shape casting three different shadows stronger. No physics or sound library needed.",
+      "soundDecision": "No music, to keep a quiet space for thinking. Stacking makes a wooden tock that rises in pitch with height, each wall chimes its own bell (C, E, G) when its shadow matches, and all three make a chord, so you can hear your progress."
+    }
+  },
+  "createdAt": "2026-10-29T12:09:12+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-29T12:09:12+09:00",
+    "metricsFrom": "2026-10-29T03:05:51.283Z",
+    "transcript": "244a7433-8859-4394-958f-a5830afe0b33.jsonl",
+    "validationRuns": 8,
+    "finishedAt": "2026-10-29T12:35:19+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-29T12:35:19+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "38.0KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=151",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=70",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=146",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=132",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 38929,
+    "lines": 654
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js"
+    },
+    {
+      "name": "three.js addons",
+      "version": "0.186.1",
+      "file": "three-addons-0.186.1.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "積み木が増える後半の面では、奥のマスを押すのに視点を回したり長押ししたりする手間が多く、考えるより操作に気を取られる",
+    "comment": "1面で塔の下の積み木を長押しでけずると塔が宙に浮き、影は変わらず6個で★3になった瞬間は「そういうことか」と声が出た。2面でも段の下を抜いて8個にでき、少ない数を探す遊びは面白い。ただ置く・けずる操作がやや細かく、5×5の面は手数が多いので★3とする。",
+    "similar": [
+      {
+        "title": ".projekt",
+        "url": "https://apps.apple.com/us/app/projekt/id1244456273?uo=4",
+        "similarity": "高",
+        "note": "格子に積み木を積んで影の形に合わせる点が同じ。こちらは床・壁の三方向の影を同時に合わせ、最少の数を目指す点が違う",
+        "note_en": "Same idea of stacking blocks on a grid to match shadow shapes; this one matches three shadows (two walls and floor) at once and rewards the fewest blocks"
+      },
+      {
+        "title": "Trip-let（『ゲーデル、エッシャー、バッハ』の表紙）",
+        "url": "https://mathworld.wolfram.com/Trip-Let.html",
+        "similarity": "中",
+        "note": "三方向の影が別々の文字になる立体というアイデアのルーツ。こちらは遊びとして自分で組み、少ない積み木で作る",
+        "note_en": "The root idea: a solid whose three projections are different letters. Here you build it yourself as a game and try to use as few blocks as possible"
+      }
+    ],
+    "research": "WebSearchで「影を合わせて積み木を積むパズル」と「GEBの表紙の立体」を検索した",
+    "i18n": {
+      "en": {
+        "worst": "In later stages with many blocks, reaching back cells takes a lot of view-turning and holding, so handling the controls gets in the way of thinking",
+        "comment": "On stage 1, holding to carve the block under the tower left it floating with the shadows unchanged, 6 blocks for 3 stars, a real aha moment. On stage 2 I pulled out the block under a step to reach 8. Hunting for fewer blocks is fun, but placing and carving are a bit fiddly and the 5x5 stages take many taps, so 3 stars.",
+        "research": "Used WebSearch for block-stacking shadow puzzle games and the GEB cover solid"
+      }
+    },
+    "method": "スマホ縦画面で 10 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 10 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 300ms",
+        "note": "タイトルをタップ。三つの影の枠（逆T・逆T・十字）が出る",
+        "noteEn": "Tap the title. Three outlines appear: two upside-down T's and a cross",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.50,0.66) 120ms → wait 120ms → tap(0.50,0.60) 120ms → wait 120ms → tap(0.50,0.54) 120ms → wait 300ms",
+        "note": "まん中に3段の塔。おくとひだりの壁に縦の影が伸びた",
+        "noteEn": "A 3-high tower in the middle; tall shadows rise on the back and left walls",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.60,0.63) 120ms → wait 120ms → tap(0.40,0.63) 120ms → wait 120ms → tap(0.59,0.69) 120ms → wait 120ms → tap(0.41,0.69) 120ms → wait 2000ms",
+        "note": "床の十字を4つ置くと、三つの影がそろって「できた！」。7個で★2、最少は6個らしい",
+        "noteEn": "Adding the four arms completes all three shadows: Done! 7 blocks for 2 stars, but the fewest is 6",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 1,
+              "best": [
+                7
+              ],
+              "cur": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 2
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.50,0.93) 120ms → wait 400ms",
+        "note": "「もっと減らす」。けずるモードで、まん中の下の積み木が青く光るはずだが外からは見えない",
+        "noteEn": "Use fewer: in carve mode the hidden center-bottom block should glow, but it is buried",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 1,
+              "best": [
+                7
+              ],
+              "cur": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 2
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.50,0.62) 1000ms → wait 2200ms",
+        "note": "塔を長押しすると透けて、選択が奥のまん中の下へ移る。離すとけずれて塔が浮かび、6個で★3！",
+        "noteEn": "Holding the tower turns blocks see-through and moves the pick to the hidden center; releasing carves it, the tower floats, 6 blocks for 3 stars!",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 1,
+              "best": [
+                7
+              ],
+              "cur": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 1,
+              "best": [
+                6
+              ],
+              "cur": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.50,0.40) 120ms → wait 500ms → tap(0.50,0.60) 120ms → wait 120ms → tap(0.50,0.54) 120ms → wait 120ms → tap(0.50,0.48) 120ms → wait 120ms → tap(0.41,0.63) 120ms → wait 120ms → tap(0.50,0.66) 120ms → wait 120ms → tap(0.50,0.60) 120ms → wait 300ms",
+        "note": "2面「だんだん」。奥の角に3段、その手前に段を作っていく",
+        "noteEn": "Stage 2, Steps: three high in the back corner, then steps toward the front",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 1,
+              "best": [
+                7
+              ],
+              "cur": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 1,
+              "best": [
+                6
+              ],
+              "cur": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.32,0.66) 120ms → wait 120ms → tap(0.41,0.69) 120ms → wait 120ms → tap(0.50,0.72) 120ms → wait 2200ms",
+        "note": "手前の段で完成。9個で★2。宙に浮かせれば8個にできるはず",
+        "noteEn": "The front row completes it: 9 blocks, 2 stars. Floating one could make it 8",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 1,
+              "best": [
+                7
+              ],
+              "cur": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 1,
+              "best": [
+                6
+              ],
+              "cur": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 2,
+              "best": [
+                6,
+                9
+              ],
+              "cur": 1
+            }
+          },
+          {
+            "agf": "end",
+            "score": 5
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.50,0.93) 120ms → wait 400ms → swipe(0.50,0.42→0.50,0.66) 300ms → wait 200ms",
+        "note": "もっと減らす→真上から見る。浮かせられそうなのは右下の段の下",
+        "noteEn": "Use fewer, then look straight down. The block under the middle step looks removable",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 1,
+              "best": [
+                7
+              ],
+              "cur": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 1,
+              "best": [
+                6
+              ],
+              "cur": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 2,
+              "best": [
+                6,
+                9
+              ],
+              "cur": 1
+            }
+          },
+          {
+            "agf": "end",
+            "score": 5
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.50,0.59) 1000ms → wait 2200ms",
+        "note": "まん中の段を長押しして、その下の積み木を選んでけずる。上の段が浮いて8個、★3",
+        "noteEn": "Hold the middle step to pick the block beneath and carve it; the step floats, 8 blocks, 3 stars",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 1,
+              "best": [
+                7
+              ],
+              "cur": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 1,
+              "best": [
+                6
+              ],
+              "cur": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 2,
+              "best": [
+                6,
+                9
+              ],
+              "cur": 1
+            }
+          },
+          {
+            "agf": "end",
+            "score": 5
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 2,
+              "best": [
+                6,
+                8
+              ],
+              "cur": 1
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.50,0.40) 120ms → wait 500ms → tap(0.68,0.45) 120ms → wait 150ms → tap(0.31,0.45) 120ms → wait 400ms",
+        "note": "3面「わ」。おくの壁とひだりの壁の上の段をタップすると、壁ぎわの高い所に積み木が浮かんで置けた",
+        "noteEn": "Stage 3, Ring. Tapping the top row of the back and left walls places blocks floating high against the walls",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 1,
+              "best": [
+                7
+              ],
+              "cur": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 1,
+              "best": [
+                6
+              ],
+              "cur": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 2,
+              "best": [
+                6,
+                9
+              ],
+              "cur": 1
+            }
+          },
+          {
+            "agf": "end",
+            "score": 5
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 2,
+              "best": [
+                6,
+                8
+              ],
+              "cur": 1
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-29T12:35:19+09:00"
+  },
+  "publishedAt": "2026-10-29T12:35:19+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 41140,
+    "outputTokens": 53726,
+    "contextTokens": 18685307,
+    "turns": 92,
+    "toolCalls": 104,
+    "webSearches": 0,
+    "minutes": 29.5,
+    "from": "2026-10-29T03:05:51.283Z",
+    "to": "2026-10-29T03:35:19.690Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-29T12:35:19+09:00",
+    "validationRuns": 8,
+    "codeKB": 38
+  }
+}

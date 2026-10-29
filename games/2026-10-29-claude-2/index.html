@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>みっつの影 / Three Shadows</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #f3ece0; }
+body { font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif; color: #2b2a33; }
+#gl { position: fixed; left: 0; top: 0; width: 100vw; height: 100dvh; display: block; }
+#ui { position: fixed; inset: 0; pointer-events: none; }
+#hud { position: absolute; left: 0; right: 0; top: 0; height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 6px; }
+.navb { pointer-events: auto; width: 44px; height: 44px; border: 0; background: none; font-size: 20px; color: #6b5d4b; display: flex; align-items: center; justify-content: center; }
+.navb[disabled] { opacity: .2; }
+#stg { display: flex; align-items: center; font-size: 16px; font-weight: 700; }
+#stgname { margin: 0 2px; min-width: 76px; text-align: center; white-space: nowrap; }
+#stgname small { font-size: 13px; font-weight: 600; color: #8a7a66; }
+#cnt { font-size: 15px; font-weight: 700; padding-right: 8px; text-align: right; line-height: 1.15; }
+#cnt small { display: block; font-size: 12px; font-weight: 500; color: #8a7a66; }
+#panels { position: absolute; left: 0; right: 0; display: flex; justify-content: center; gap: 10px; }
+.pan { display: flex; flex-direction: column; align-items: center; }
+.pan canvas { display: block; border-radius: 10px; background: #fffaf2; box-shadow: 0 1px 4px rgba(80,60,30,.18); }
+.pan span { font-size: 12px; margin-top: 3px; color: #6b5d4b; white-space: nowrap; font-weight: 600; }
+#bar { position: absolute; left: 0; right: 0; bottom: 0; height: 76px; display: flex; justify-content: center; align-items: center; gap: 8px; padding-bottom: env(safe-area-inset-bottom); }
+.tb { pointer-events: auto; min-width: 56px; height: 52px; border-radius: 14px; border: 2px solid #d9cbb5; background: #fffaf2; color: #4a3f33; font: 700 15px system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif; padding: 0 12px; display: flex; align-items: center; justify-content: center; gap: 4px; }
+.tb.on { background: #4a3f33; color: #fffaf2; border-color: #4a3f33; }
+.tb.sm { min-width: 52px; padding: 0 8px; font-size: 20px; }
+#hint { position: absolute; left: 0; right: 0; bottom: 84px; text-align: center; font-size: 14px; color: #6b5d4b; transition: opacity .6s; text-shadow: 0 0 6px #f3ece0, 0 0 3px #f3ece0; padding: 0 12px; }
+.ov { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: rgba(243,236,224,.84); pointer-events: auto; padding: 0 20px; box-sizing: border-box; }
+.hide { display: none !important; }
+#title h1 { font-size: 44px; margin: 0 0 6px; letter-spacing: .06em; color: #3a3140; }
+#title .sub { font-size: 15px; color: #6b5d4b; margin-bottom: 26px; }
+#title .how { font-size: 15px; line-height: 1.7; margin-bottom: 28px; }
+.tap { font-size: 18px; font-weight: 700; color: #3a3140; animation: blink 1.6s infinite; }
+@keyframes blink { 50% { opacity: .35; } }
+#clear { justify-content: flex-end; padding-bottom: 18px; background: linear-gradient(to bottom, rgba(243,236,224,0) 50%, rgba(243,236,224,.94) 66%); }
+#clear .big { font-size: 32px; font-weight: 800; margin-bottom: 6px; color: #3a3140; }
+#clear .stars { font-size: 36px; letter-spacing: 6px; color: #e2a33a; margin-bottom: 6px; }
+#clear .stars .off { color: #d8cfc0; }
+#clear .res { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+#clear .note { font-size: 14px; color: #6b5d4b; min-height: 20px; margin-bottom: 12px; }
+#clear .nb { color: #d0532f; font-weight: 800; }
+#more { margin-top: 12px; pointer-events: auto; }
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div id="ui">
+  <div id="hud">
+    <div id="stg"><button class="navb" id="prev">◀</button><span id="stgname"></span><button class="navb" id="next">▶</button></div>
+    <div id="cnt"></div>
+  </div>
+  <div id="panels"></div>
+  <div id="hint"></div>
+  <div id="bar">
+    <button class="tb on" id="mAdd"></button>
+    <button class="tb" id="mDel"></button>
+    <button class="tb sm" id="undo">↶</button>
+    <button class="tb sm" id="reset">⟲</button>
+  </div>
+  <div id="title" class="ov">
+    <h1 id="tName"></h1>
+    <div class="sub" id="tSub"></div>
+    <div class="how" id="tHow"></div>
+    <div class="tap" id="tTap"></div>
+  </div>
+  <div id="clear" class="ov hide">
+    <div class="big" id="cBig"></div>
+    <div class="stars" id="cStars"></div>
+    <div class="res" id="cRes"></div>
+    <div class="note" id="cNote"></div>
+    <div class="tap" id="cTap"></div>
+    <button class="tb" id="more"></button>
+  </div>
+</div>
+<script src="../../lib/three-0.186.1.min.js"></script>
+<script src="../../lib/three-addons-0.186.1.min.js"></script>
+<script>
+(() => {
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+const TX = {
+  ja: { name: 'みっつの影', sub: '三方向の光で、三つの影をつくる積み木', how: 'タップで積む・ドラッグで回す<br>おく・ひだり・ゆかの影を<br>枠どおりの形にしよう', tap: 'タップでスタート',
+    add: '＋ つむ', del: '− けずる', back: 'おくの壁', left: 'ひだりの壁', floor: 'ゆか', blocks: (n) => `積み木 ${n}`, stage: (i, n) => `${i}/${n}`,
+    hint0: 'タップで積む・ドラッグで回して見る', hint1: '影が枠からはみ出すと赤くなる', hintWall: '奥や左の壁をタップすると、壁ぎわの高い所に積める', floatHint: '浮いた！ 影の部屋では積み木は浮かんでいられる', hintSpare: '青く光る積み木は、とっても影が変わらない', hintDel: '長押しすると奥の積み木を選べる',
+    done: 'できた！', res: (n, m) => `${n}個（最少 ${m}個）`, more: 'まだ減らせる。光の通り道を考えよう', perfect: '最少の数でぴったり！', best: 'ベスト更新！', next: 'タップで次へ', moreBtn: 'もっと減らす',
+    allDone: 'ぜんぶの影がそろった！', total: (s, t) => `★ ${s} / ${t}`, againAll: 'タップでもう一度', solved: (b) => `ベスト ${b}個` },
+  en: { name: 'Three Shadows', sub: 'Build blocks that cast three shadows at once', how: 'Tap to stack · drag to turn<br>Make the shadows on the back wall,<br>left wall and floor fit the outlines', tap: 'Tap to start',
+    add: '+ Build', del: '− Carve', back: 'Back wall', left: 'Left wall', floor: 'Floor', blocks: (n) => `Blocks ${n}`, stage: (i, n) => `${i}/${n}`,
+    hint0: 'Tap to stack · drag to look around', hint1: 'Shadow outside the outline turns red', hintWall: 'Tap the back or left wall to place a block high against it', floatHint: 'It floats! In the shadow room blocks can hover', hintSpare: 'Glowing blue blocks can go without changing a shadow', hintDel: 'Hold to reach blocks hidden behind',
+    done: 'Done!', res: (n, m) => `${n} blocks (fewest ${m})`, more: 'You can use fewer. Think about where light passes.', perfect: 'Perfect — the fewest blocks!', best: 'New best!', next: 'Tap to continue', moreBtn: 'Use fewer',
+    allDone: 'Every shadow is complete!', total: (s, t) => `★ ${s} / ${t}`, againAll: 'Tap to play again', solved: (b) => `best ${b}` }
+}[LANG === 'ja' ? 'ja' : 'en'];
+
+// F: back wall as seen (rows top->bottom, cols x). S: left wall as seen (col0 = front). T: floor as seen (row0 = back).
+const STAGES = [
+  { F: ['.#.', '.#.', '###'], S: ['.#.', '.#.', '###'], T: ['.#.', '###', '.#.'], min: 6, max: 7 },
+  { F: ['#..', '##.', '###'], S: ['..#', '.##', '###'], T: ['#..', '##.', '###'], min: 8, max: 10 },
+  { F: ['###', '#.#', '###'], S: ['###', '#.#', '###'], T: ['###', '#.#', '###'], min: 8, max: 20 },
+  { F: ['#..', '##.', '###'], S: ['###', '###', '###'], T: ['###', '###', '###'], min: 11, max: 18 },
+  { F: ['#..#', '.##.', '.##.', '#..#'], S: ['#..#', '.##.', '.##.', '#..#'], T: ['#..#', '.##.', '.##.', '#..#'], min: 8, max: 16 },
+  { F: ['####', '####', '#..#', '#..#'], S: ['####', '.##.', '.##.', '.##.'], T: ['#..#', '####', '####', '#..#'], min: 14, max: 28 },
+  { F: ['.##.', '####', '#..#', '#..#'], S: ['#...', '####', '####', '####'], T: ['####', '####', '####', '####'], min: 18, max: 34 },
+  { F: ['..#..', '.###.', '#####', '.###.', '..#..'], S: ['..#..', '.###.', '#####', '.###.', '..#..'], T: ['..#..', '.###.', '#####', '.###.', '..#..'], min: 14, max: 33 },
+  { F: ['.#.#.', '#####', '#####', '.###.', '..#..'], S: ['..#..', '.###.', '#####', '#####', '.#.#.'], T: ['.#.#.', '#####', '#####', '.###.', '..#..'], min: 19, max: 45 }
+];
+const NAMES = LANG === 'ja' ? ['とう', 'だんだん', 'わ', 'かいだん', 'ばってん', 'アーチ', 'いえ', 'ひしがた', 'ハート'] : ['Tower', 'Steps', 'Ring', 'Stairs', 'Cross', 'Arch', 'House', 'Diamond', 'Heart'];
+const NS = STAGES.length;
+const starsFor = (st, n) => n <= st.min ? 3 : n <= st.min + Math.ceil((st.max - st.min) / 2) ? 2 : 1;
+
+// ---------- save ----------
+let save = { u: 0, best: [], cur: 0 };
+let loaded = false;
+addEventListener('message', (e) => {
+  if (e.data && e.data.agf === 'loaded' && !loaded) {
+    loaded = true;
+    const d = e.data.data;
+    if (d && typeof d === 'object') { save.u = Math.min(NS - 1, d.u | 0); save.best = Array.isArray(d.best) ? d.best.slice(0, NS) : []; save.cur = Math.min(save.u, d.cur | 0); }
+    if (!started) refreshTitle();
+  }
+});
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+const persist = () => { try { parent.postMessage({ agf: 'save', data: save }, '*'); } catch (e) {} };
+
+// ---------- audio ----------
+let ac = null, master = null;
+function initAudio() {
+  try {
+    if (!ac) { ac = new (window.AudioContext || window.webkitAudioContext)(); master = ac.createGain(); master.gain.value = 0.55; master.connect(ac.destination); }
+    if (ac.state === 'suspended') ac.resume();
+  } catch (e) { ac = null; }
+}
+let noiseBuf = null;
+function noise() {
+  if (!noiseBuf) { noiseBuf = ac.createBuffer(1, ac.sampleRate * 0.2, ac.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 3); }
+  const s = ac.createBufferSource(); s.buffer = noiseBuf; return s;
+}
+function tock(height, soft) {
+  if (!ac) return; const t = ac.currentTime;
+  const f = 520 + height * 90;
+  const o = ac.createOscillator(), g = ac.createGain();
+  o.type = 'sine'; o.frequency.setValueAtTime(f * 1.6, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.03);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(soft ? 0.12 : 0.32, t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.13);
+  o.connect(g); g.connect(master); o.start(t); o.stop(t + 0.15);
+  const n = noise(), bp = ac.createBiquadFilter(), g2 = ac.createGain();
+  bp.type = 'bandpass'; bp.frequency.value = soft ? 3200 : 1800; bp.Q.value = 2.5; g2.gain.value = soft ? 0.18 : 0.35;
+  n.connect(bp); bp.connect(g2); g2.connect(master); n.start(t); n.stop(t + 0.08);
+}
+function thud() {
+  if (!ac) return; const t = ac.currentTime;
+  const o = ac.createOscillator(), g = ac.createGain();
+  o.type = 'triangle'; o.frequency.setValueAtTime(140, t); o.frequency.exponentialRampToValueAtTime(70, t + 0.12);
+  g.gain.setValueAtTime(0.25, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
+  o.connect(g); g.connect(master); o.start(t); o.stop(t + 0.18);
+}
+function bell(freq, when = 0, vol = 0.16, dur = 1.6) {
+  if (!ac) return; const t = ac.currentTime + when;
+  for (const [m, a] of [[1, 1], [2.76, 0.35], [5.4, 0.12]]) {
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = 'sine'; o.frequency.value = freq * m;
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol * a, t + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, t + dur / m);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.05);
+  }
+}
+const PANEL_NOTES = [523.25, 659.25, 783.99];
+function fanfare(stars) {
+  const seq = [523.25, 659.25, 783.99, 1046.5];
+  seq.forEach((f, i) => bell(f, i * 0.09, 0.14, 1.4));
+  if (stars >= 3) { bell(1318.5, 0.42, 0.12, 2); bell(1568, 0.5, 0.1, 2.2); }
+}
+
+// ---------- three ----------
+const canvas = document.getElementById('gl');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFShadowMap;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xf3ece0);
+const cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 200);
+scene.add(new THREE.HemisphereLight(0xfff6e8, 0xb8a58c, 1.05));
+const ACC = ['#e0892f', '#2f9e9a', '#7b5cc9'];
+const ACC_LIGHT = ['rgba(224,137,47,', 'rgba(47,158,154,', 'rgba(123,92,201,'];
+const lights = [];
+for (let i = 0; i < 3; i++) {
+  const l = new THREE.DirectionalLight(0xffffff, 1.5);
+  l.castShadow = true; l.shadow.mapSize.set(1024, 1024);
+  l.shadow.bias = -0.0008; l.shadow.normalBias = 0.02;
+  const c = l.shadow.camera; c.left = -6; c.right = 6; c.top = 6; c.bottom = -6; c.near = 0.5; c.far = 40;
+  scene.add(l); scene.add(l.target); lights.push(l);
+}
+const { RoundedBoxGeometry } = THREE_ADDONS;
+const boxGeo = new RoundedBoxGeometry(0.96, 0.96, 0.96, 3, 0.1);
+const WOOD = [0xe9c48f, 0xe2b77d, 0xedcb98, 0xdcae74, 0xe6bf88].map((c) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.75, metalness: 0 }));
+
+const DELMAT = new THREE.MeshStandardMaterial({ color: 0xe88a7a, roughness: 0.7, emissive: 0x5a1010, emissiveIntensity: 0.25 });
+const GLASS = new THREE.MeshStandardMaterial({ color: 0xe9c48f, roughness: 0.7, transparent: true, opacity: 0.28, depthWrite: false });
+const HINTMAT = new THREE.MeshStandardMaterial({ color: 0xf6dfb4, roughness: 0.6, emissive: 0x5a7fc0, emissiveIntensity: 0.28 });
+let world = null; // per-stage group
+let N = 3, st = null, stageIdx = 0;
+let blocks = new Map(); // key -> mesh
+let fc, sc, tc; // projection counts
+let undoStack = [];
+let mode = 'add';
+let wallTex = [], wallCv = [];
+let gridPlane = null, wallMeshes = [];
+let solvedNow = false, overlayLock = 0;
+let flashes = []; // {panel, a, b, t}
+let anims = [];
+const key = (x, y, z) => x + ',' + y + ',' + z;
+const pos = (x, y, z) => new THREE.Vector3(x - (N - 1) / 2, y + 0.5, z - (N - 1) / 2);
+const tF = (x, y) => st.F[N - 1 - y][x] === '#';
+const tS = (z, y) => st.S[N - 1 - y][N - 1 - z] === '#';
+const tT = (x, z) => st.T[z][x] === '#';
+
+const GAP = 0.55, FGAP = 0.3;
+function buildWorld() {
+  if (world) { scene.remove(world); world.traverse((o) => { if (o.geometry && o.geometry !== boxGeo) o.geometry.dispose(); if (o.material && !WOOD.includes(o.material)) { if (o.material.map) o.material.map.dispose(); o.material.dispose(); } }); }
+  world = new THREE.Group(); scene.add(world);
+  blocks = new Map(); undoStack = [];
+  const h = N / 2;
+  wallCv = []; wallTex = []; wallMeshes = [];
+  const S = N + 2 * GAP;
+  for (let i = 0; i < 3; i++) {
+    const cv = document.createElement('canvas'); cv.width = cv.height = 512;
+    const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
+    wallCv.push(cv); wallTex.push(tex);
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(S, S), new THREE.MeshLambertMaterial({ map: tex }));
+    m.receiveShadow = true;
+    if (i === 0) { m.position.set(0, N / 2, -h - GAP); }
+    if (i === 1) { m.rotation.y = Math.PI / 2; m.position.set(-h - GAP, N / 2, 0); }
+    if (i === 2) { m.rotation.x = -Math.PI / 2; m.position.set(0, -FGAP, 0); }
+    world.add(m); wallMeshes.push(m);
+  }
+  // glass shelf
+  const shelf = new THREE.Mesh(new THREE.BoxGeometry(N + 0.1, 0.06, N + 0.1), new THREE.MeshStandardMaterial({ color: 0xe4f2f6, transparent: true, opacity: 0.55, roughness: 0.2 }));
+  shelf.position.set(0, -0.03, 0); world.add(shelf);
+  const sEdge = new THREE.LineSegments(new THREE.EdgesGeometry(shelf.geometry), new THREE.LineBasicMaterial({ color: 0x8fb4c2 }));
+  sEdge.position.copy(shelf.position); world.add(sEdge);
+  const grid = new THREE.GridHelper(N, N, 0x6f9fb0, 0x6f9fb0); grid.position.y = 0.004; grid.material.transparent = true; grid.material.opacity = 0.85; world.add(grid);
+  // bounding cage
+  const cage = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(N, N, N)), new THREE.LineDashedMaterial({ color: 0xa89880, dashSize: 0.12, gapSize: 0.1, transparent: true, opacity: 0.6 }));
+  cage.computeLineDistances(); cage.position.y = N / 2; world.add(cage);
+  gridPlane = new THREE.Mesh(new THREE.PlaneGeometry(N, N), new THREE.MeshBasicMaterial({ visible: false }));
+  gridPlane.rotation.x = -Math.PI / 2; gridPlane.position.y = 0.001; world.add(gridPlane);
+  // lights: front -> back wall, right -> left wall, top -> floor
+  const D = 20;
+  lights[0].position.set(0, N / 2, D); lights[0].target.position.set(0, N / 2, 0);
+  lights[1].position.set(D, N / 2, 0); lights[1].target.position.set(0, N / 2, 0);
+  lights[2].position.set(0, D, 0); lights[2].target.position.set(0, 0, 0);
+  for (const l of lights) { const c = l.shadow.camera; c.left = c.bottom = -N; c.right = c.top = N; c.updateProjectionMatrix(); l.target.updateMatrixWorld(); }
+  fc = Array.from({ length: N }, () => new Array(N).fill(0));
+  sc = Array.from({ length: N }, () => new Array(N).fill(0));
+  tc = Array.from({ length: N }, () => new Array(N).fill(0));
+}
+
+// panel helpers: return (target, lit) for panel p at as-seen (col, row)
+function cellInfo(p, c, r) {
+  if (p === 0) { const x = c, y = N - 1 - r; return [tF(x, y), fc[x][y] > 0]; }
+  if (p === 1) { const z = N - 1 - c, y = N - 1 - r; return [tS(z, y), sc[z][y] > 0]; }
+  const x = c, z = r; return [tT(x, z), tc[x][z] > 0];
+}
+function panelOK(p) { for (let c = 0; c < N; c++) for (let r = 0; r < N; r++) { const [t, l] = cellInfo(p, c, r); if (t !== l) return false; } return true; }
+
+function drawWall(p) {
+  const cv = wallCv[p], g = cv.getContext('2d'), W = cv.width;
+  const S = N + 2 * GAP, u = W / S, o = GAP * u;
+  g.fillStyle = p === 2 ? '#efe4d2' : '#fbf5ea'; g.fillRect(0, 0, W, W);
+  g.strokeStyle = 'rgba(120,100,70,.18)'; g.lineWidth = 2;
+  for (let i = 0; i <= N; i++) { g.beginPath(); g.moveTo(o + i * u, o); g.lineTo(o + i * u, o + N * u); g.stroke(); g.beginPath(); g.moveTo(o, o + i * u); g.lineTo(o + N * u, o + i * u); g.stroke(); }
+  const ok = panelOK(p);
+  for (let c = 0; c < N; c++) for (let r = 0; r < N; r++) {
+    const [t, l] = cellInfo(p, c, r);
+    if (t) { g.fillStyle = ACC_LIGHT[p] + (ok ? '.55)' : '.3)'); g.fillRect(o + c * u + 3, o + r * u + 3, u - 6, u - 6); }
+    if (l && !t) { g.fillStyle = 'rgba(214,64,52,.55)'; g.fillRect(o + c * u + 3, o + r * u + 3, u - 6, u - 6); }
+  }
+  g.strokeStyle = ACC[p]; g.lineWidth = 5; g.lineJoin = 'round';
+  outline(g, p, o, u);
+  wallTex[p].needsUpdate = true;
+}
+function outline(g, p, o, u) {
+  g.beginPath();
+  for (let c = 0; c < N; c++) for (let r = 0; r < N; r++) {
+    if (!cellInfo(p, c, r)[0]) continue;
+    const x0 = o + c * u, y0 = o + r * u;
+    const T = (cc, rr) => cc >= 0 && rr >= 0 && cc < N && rr < N && cellInfo(p, cc, rr)[0];
+    if (!T(c, r - 1)) { g.moveTo(x0, y0); g.lineTo(x0 + u, y0); }
+    if (!T(c, r + 1)) { g.moveTo(x0, y0 + u); g.lineTo(x0 + u, y0 + u); }
+    if (!T(c - 1, r)) { g.moveTo(x0, y0); g.lineTo(x0, y0 + u); }
+    if (!T(c + 1, r)) { g.moveTo(x0 + u, y0); g.lineTo(x0 + u, y0 + u); }
+  }
+  g.stroke();
+}
+
+// ---------- 2D panels ----------
+const panelsEl = document.getElementById('panels');
+const pans = [];
+const PLABEL = [TX.back, TX.left, TX.floor];
+const PICON = ['→', '←', '↓'];
+for (let i = 0; i < 3; i++) {
+  const d = document.createElement('div'); d.className = 'pan';
+  const cv = document.createElement('canvas'); const sp = document.createElement('span');
+  sp.textContent = PLABEL[i];
+  sp.style.color = ACC[i];
+  d.appendChild(cv); d.appendChild(sp); panelsEl.appendChild(d); pans.push({ cv, sp, ok: false, pulse: 0 });
+}
+let panelPx = 100;
+function drawPanel(p, now) {
+  const P = pans[p], cv = P.cv, dpr = Math.min(2, devicePixelRatio || 1);
+  const sz = panelPx;
+  if (cv.width !== Math.round(sz * dpr)) { cv.width = cv.height = Math.round(sz * dpr); cv.style.width = cv.style.height = sz + 'px'; }
+  const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.clearRect(0, 0, sz, sz);
+  const ok = panelOK(p);
+  const pad = 8, u = (sz - pad * 2) / N, o = pad;
+  g.fillStyle = ok ? ACC_LIGHT[p] + '.12)' : '#fffaf2'; g.fillRect(0, 0, sz, sz);
+  for (let c = 0; c < N; c++) for (let r = 0; r < N; r++) {
+    const [t, l] = cellInfo(p, c, r);
+    const x = o + c * u, y = o + r * u;
+    if (t && l) { g.fillStyle = '#3a3140'; g.fillRect(x + 1.5, y + 1.5, u - 3, u - 3); }
+    else if (t) { g.fillStyle = ACC_LIGHT[p] + '.22)'; g.fillRect(x + 1.5, y + 1.5, u - 3, u - 3); }
+    else if (l) { g.fillStyle = '#d64034'; g.fillRect(x + 1.5, y + 1.5, u - 3, u - 3); g.strokeStyle = '#fff'; g.lineWidth = 2; g.beginPath(); g.moveTo(x + u * .3, y + u * .3); g.lineTo(x + u * .7, y + u * .7); g.moveTo(x + u * .7, y + u * .3); g.lineTo(x + u * .3, y + u * .7); g.stroke(); }
+    else { g.fillStyle = 'rgba(120,100,70,.07)'; g.fillRect(x + 1.5, y + 1.5, u - 3, u - 3); }
+  }
+  g.strokeStyle = ACC[p]; g.lineWidth = 2.5; g.lineJoin = 'round'; g.lineCap = 'round';
+  outline(g, p, o, u);
+  if (aim && (aim.t === "add" || aim.t === "del")) {
+    const [x, y, z] = aim.c; const cr = p === 0 ? [x, N - 1 - y] : p === 1 ? [N - 1 - z, N - 1 - y] : [x, z];
+    g.setLineDash([4, 3]); g.strokeStyle = aim.t === "add" ? "#3a3140" : "#d64034"; g.lineWidth = 2.5; g.strokeRect(o + cr[0] * u + 2, o + cr[1] * u + 2, u - 4, u - 4); g.setLineDash([]);
+  }
+  for (const f of flashes) if (f.p === p) {
+    const k = Math.max(0, 1 - (now - f.t) / 600);
+    g.strokeStyle = `rgba(255,255,255,${k})`; g.lineWidth = 3; g.strokeRect(o + f.c * u + 2, o + f.r * u + 2, u - 4, u - 4);
+    g.strokeStyle = `rgba(58,49,64,${k * 0.8})`; g.lineWidth = 1.5; g.strokeRect(o + f.c * u + 0.5, o + f.r * u + 0.5, u - 1, u - 1);
+  }
+  if (ok) {
+    const k = Math.max(0, 1 - (now - P.pulse) / 700);
+    g.strokeStyle = ACC[p]; g.lineWidth = 4 + k * 4; g.strokeRect(2, 2, sz - 4, sz - 4);
+    g.fillStyle = ACC[p]; g.beginPath(); g.arc(sz - 13, 13, 10, 0, 7); g.fill();
+    g.strokeStyle = '#fff'; g.lineWidth = 2.5; g.beginPath(); g.moveTo(sz - 18, 13); g.lineTo(sz - 14, 17); g.lineTo(sz - 8, 9); g.stroke();
+  }
+}
+
+// ---------- state ops ----------
+function setBlock(x, y, z, on, animate = true) {
+  const k = key(x, y, z);
+  if (on) {
+    if (blocks.has(k)) return;
+    const wi = (x * 7 + y * 3 + z * 5) % WOOD.length; const m = new THREE.Mesh(boxGeo, WOOD[wi]); m.userData.wi = wi;
+    m.castShadow = true; m.position.copy(pos(x, y, z)); m.userData.cell = [x, y, z];
+    world.add(m); blocks.set(k, m);
+    fc[x][y]++; sc[z][y]++; tc[x][z]++;
+    if (animate) { m.scale.setScalar(0.5); anims.push({ m, t: performance.now(), type: 'in' }); }
+  } else {
+    const m = blocks.get(k); if (!m) return;
+    blocks.delete(k); fc[x][y]--; sc[z][y]--; tc[x][z]--;
+    m.userData.cell = null;
+    if (animate) anims.push({ m, t: performance.now(), type: 'out' }); else world.remove(m);
+  }
+}
+function flashCell(x, y, z) {
+  const t = performance.now();
+  flashes.push({ p: 0, c: x, r: N - 1 - y, t }, { p: 1, c: N - 1 - z, r: N - 1 - y, t }, { p: 2, c: x, r: z, t });
+}
+let prevOK = [false, false, false];
+let floatHinted = false;
+function updateFloat() {
+  const ground = new Set(), q = [];
+  for (const [k, m] of blocks) if (m.userData.cell[1] === 0) { ground.add(k); q.push(m.userData.cell); }
+  while (q.length) { const [x, y, z] = q.pop(); for (const [a, b, c] of [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]]) { const k = key(x + a, y + b, z + c); if (blocks.has(k) && !ground.has(k)) { ground.add(k); q.push([x + a, y + b, z + c]); } } }
+  let any = false;
+  for (const [k, m] of blocks) { const f = !ground.has(k); if (!f && m.userData.float) m.position.copy(pos(...m.userData.cell)); m.userData.float = f; if (f) any = true; }
+  if (any && !floatHinted && started) { floatHinted = true; showHint(TX.floatHint); }
+}
+function refresh(sound = true) {
+  for (let p = 0; p < 3; p++) drawWall(p);
+  const ok = [0, 1, 2].map(panelOK);
+  const now = performance.now();
+  for (let p = 0; p < 3; p++) { if (ok[p] && !prevOK[p]) { pans[p].pulse = now; if (sound) bell(PANEL_NOTES[p], 0.05, 0.13, 1.4); } }
+  prevOK = ok;
+  const n = blocks.size;
+  const all = ok[0] && ok[1] && ok[2] && n > 0;
+  if (all && (!solvedNow || n < (save.best[stageIdx] || 1e9))) onSolved(n);
+  solvedNow = all;
+  document.getElementById('cnt').innerHTML = TX.blocks(n) + (save.best[stageIdx] ? `<small>${TX.solved(save.best[stageIdx])}</small>` : '');
+  updateFloat();
+  paintBlocks();
+}
+function doOp(op, rec = true) {
+  if (op.t === 'add') setBlock(...op.c, true);
+  else if (op.t === 'del') setBlock(...op.c, false);
+  else if (op.t === 'set') { for (const k of [...blocks.keys()]) { const c = k.split(',').map(Number); setBlock(...c, false); } for (const c of op.to) setBlock(...c, true); }
+  if (rec) undoStack.push(op);
+}
+function undo() {
+  const op = undoStack.pop(); if (!op) { thud(); return; }
+  if (op.t === 'add') { setBlock(...op.c, false); tock(op.c[1], true); }
+  else if (op.t === 'del') { setBlock(...op.c, true); tock(op.c[1]); }
+  else if (op.t === 'set') { for (const k of [...blocks.keys()]) { const c = k.split(',').map(Number); setBlock(...c, false); } for (const c of op.from) setBlock(...c, true); tock(1); }
+  refresh();
+}
+
+// ---------- stage flow ----------
+let started = false;
+function startStage(i) {
+  stageIdx = i; save.cur = i; st = STAGES[i]; N = st.F.length;
+  buildWorld();
+  prevOK = [false, false, false]; solvedNow = false;
+  setMode('add');
+  flashes = [];
+  refresh(false);
+  for (let p = 0; p < 3; p++) drawPanel(p, 0);
+  document.getElementById('stgname').innerHTML = TX.stage(i + 1, NS) + ` <small>${NAMES[i]}</small>`;
+  document.getElementById('prev').disabled = i <= 0;
+  document.getElementById('next').disabled = i >= save.u;
+  yaw = 0.78; pitch = 0.64;
+  layout();
+  if (i === 2) showHint(TX.hintWall);
+  signal('start');
+}
+let lastClear = null, camKeep = null;
+function onSolved(n) {
+  const prevBest = save.best[stageIdx] || 0;
+  const s = starsFor(st, n);
+  const improved = !prevBest || n < prevBest;
+  if (!improved) { bell(1046.5, 0.1, 0.1, 1.2); return; }
+  save.best[stageIdx] = n;
+  if (stageIdx + 1 > save.u && stageIdx + 1 < NS) save.u = stageIdx + 1;
+  persist();
+  fanfare(s);
+  for (const m of blocks.values()) anims.push({ m, t: performance.now() + 250 + (m.position.y + m.position.x * 0.3) * 70, type: 'hop' });
+  setTimeout(() => showClear(n, s, !!prevBest), 900);
+}
+function totalStars() { let t = 0; STAGES.forEach((s, i) => { if (save.best[i]) t += starsFor(s, save.best[i]); }); return t; }
+function showClear(n, s, wasBest) {
+  const last = stageIdx === NS - 1;
+  document.getElementById('cBig').textContent = TX.done;
+  document.getElementById('cStars').innerHTML = [0, 1, 2].map((i) => `<span class="${i < s ? '' : 'off'}">★</span>`).join('');
+  document.getElementById('cRes').textContent = TX.res(n, st.min);
+  document.getElementById('cNote').innerHTML = (wasBest ? `<span class="nb">${TX.best}</span> ` : '') + (s === 3 ? TX.perfect : TX.more);
+  document.getElementById('cTap').textContent = last ? TX.allDone + '  ' + TX.total(totalStars(), NS * 3) : TX.next;
+  document.getElementById('more').textContent = TX.moreBtn;
+  document.getElementById('more').classList.toggle('hide', s === 3);
+  document.getElementById('clear').classList.remove('hide');
+  overlayLock = performance.now() + 700;
+  camKeep = [yaw, pitch];
+  lastClear = { last };
+  signal('end', { score: totalStars() });
+}
+document.getElementById('clear').addEventListener('pointerup', (e) => {
+  if (performance.now() < overlayLock) return;
+  if (e.target.id === 'more') return;
+  document.getElementById('clear').classList.add('hide');
+  if (lastClear && lastClear.last) {
+    let j = STAGES.findIndex((s, i) => !save.best[i] || starsFor(s, save.best[i]) < 3);
+    startStage(j < 0 ? 0 : j);
+  } else startStage(Math.min(NS - 1, stageIdx + 1));
+});
+document.getElementById('more').addEventListener('pointerup', (e) => {
+  if (performance.now() < overlayLock) return;
+  e.stopPropagation();
+  document.getElementById('clear').classList.add('hide');
+  if (camKeep) { [yaw, pitch] = camKeep; updateCam(); }
+  showHint(TX.hintSpare); setTimeout(() => showHint(TX.hintDel), 3800);
+  setMode('del');
+});
+
+// ---------- UI ----------
+const hintEl = document.getElementById('hint');
+let hintTimer = 0;
+function showHint(t) { hintEl.textContent = t; hintEl.style.opacity = 1; clearTimeout(hintTimer); hintTimer = setTimeout(() => (hintEl.style.opacity = 0), 3500); }
+function setMode(m) { mode = m; if (typeof paintBlocks === "function" && blocks) paintBlocks(); document.getElementById('mAdd').classList.toggle('on', m === 'add'); document.getElementById('mDel').classList.toggle('on', m === 'del'); }
+document.getElementById('mAdd').textContent = TX.add;
+document.getElementById('mDel').textContent = TX.del;
+const btn = (id, f) => document.getElementById(id).addEventListener('pointerdown', (e) => { e.stopPropagation(); initAudio(); f(); });
+btn('mAdd', () => { setMode('add'); tock(0, true); });
+btn('mDel', () => { setMode('del'); tock(0, true); });
+btn('undo', undo);
+btn('reset', () => { if (!blocks.size) { thud(); return; } const from = [...blocks.keys()].map((k) => k.split(',').map(Number)); doOp({ t: 'set', from, to: [] }); thud(); refresh(); });
+btn('prev', () => { if (stageIdx > 0) startStage(stageIdx - 1); });
+btn('next', () => { if (stageIdx < save.u) startStage(stageIdx + 1); });
+
+function refreshTitle() {
+  document.getElementById('tName').textContent = TX.name;
+  document.getElementById('tSub').textContent = TX.sub;
+  document.getElementById('tHow').innerHTML = TX.how;
+  document.getElementById('tTap').textContent = TX.tap;
+}
+refreshTitle();
+document.getElementById('title').addEventListener('pointerdown', (e) => {
+  initAudio();
+  document.getElementById('title').classList.add('hide');
+  started = true;
+  startStage(save.cur || 0);
+  showHint(TX.hint0);
+  setTimeout(() => { if (blocks.size) showHint(TX.hint1); }, 9000);
+});
+
+// ---------- camera & layout ----------
+let yaw = 0.78, pitch = 0.64;
+let W = 360, H = 640, region = { x: 0, y: 0, w: 360, h: 400 };
+function layout() {
+  W = Math.max(1, innerWidth); H = Math.max(1, innerHeight);
+  renderer.setSize(W, H, false);
+  panelPx = Math.max(64, Math.min(124, Math.floor((W - 32 - 20) / 3), Math.floor(H * 0.17)));
+  panelsEl.style.top = '46px';
+  const pb = 46 + panelPx + 20;
+  region = { x: 0, y: pb, w: W, h: Math.max(60, H - pb - 80) };
+  updateCam();
+  for (let p = 0; p < 3; p++) drawPanel(p, performance.now());
+}
+function updateCam() {
+  const cy = N / 2 - 0.3;
+  const target = new THREE.Vector3(-0.35, cy, -0.35);
+  const r = 30;
+  cam.position.set(target.x + r * Math.cos(pitch) * Math.sin(yaw), target.y + r * Math.sin(pitch), target.z + r * Math.cos(pitch) * Math.cos(yaw));
+  cam.lookAt(target);
+  const ext = (N + 2 * GAP) * 0.98;
+  const scale = Math.min(region.w, region.h) / (ext * 1.95);
+  // full-screen ortho with offset so target is centered in region
+  const halfW = W / 2 / scale, halfH = H / 2 / scale;
+  const offX = (region.x + region.w / 2 - W / 2) / scale, offY = (region.y + region.h / 2 - H / 2) / scale;
+  cam.left = -halfW - offX; cam.right = halfW - offX; cam.top = halfH + offY; cam.bottom = -halfH + offY;
+  cam.updateProjectionMatrix();
+}
+addEventListener('resize', layout);
+
+// ---------- input ----------
+const ray = new THREE.Raycaster();
+let ptr = null;
+const ghostMat = new THREE.MeshBasicMaterial({ color: 0x5a4a8a, transparent: true, opacity: 0.32, depthWrite: false });
+const ghost = new THREE.Mesh(boxGeo, ghostMat); ghost.visible = false; scene.add(ghost);
+const ghostEdge = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1, 1, 1)), new THREE.LineBasicMaterial({ color: 0x3a3140 }));
+ghost.add(ghostEdge);
+let aim = null; // {t:'add'|'del'|'bad', c:[x,y,z]}
+function spare(c) { const [x, y, z] = c; return fc[x][y] > 1 && sc[z][y] > 1 && tc[x][z] > 1; }
+function paintBlocks() { const hint = solvedNow && mode === 'del', xr = aim && aim.t === 'del' && aim.list.length > 1; for (const m of blocks.values()) m.material = xr ? GLASS : hint && m.userData.cell && spare(m.userData.cell) ? HINTMAT : WOOD[m.userData.wi]; }
+function setAim(a) {
+  aim = a;
+  ghost.visible = false;
+  paintBlocks();
+  if (!a) return;
+  if (a.t === 'add' || a.t === 'bad') {
+    ghost.position.copy(pos(...a.c)); ghost.visible = true;
+    ghostMat.color.set(a.t === 'bad' ? 0xd64034 : 0x5a4a8a);
+  } else if (a.t === 'del') {
+    const m = blocks.get(key(...a.c)); if (m) m.material = DELMAT;
+  }
+}
+function aimAt(cx, cy) {
+  const v = new THREE.Vector2((cx / W) * 2 - 1, -(cy / H) * 2 + 1);
+  ray.setFromCamera(v, world ? cam : cam);
+  const hits = ray.intersectObjects([...blocks.values()].concat([gridPlane, wallMeshes[0], wallMeshes[1]]), false);
+  if (!hits.length) return null;
+  const h = hits[0];
+  if (h.object === gridPlane) {
+    if (mode !== 'add') return null;
+    const x = Math.floor(h.point.x + N / 2), z = Math.floor(h.point.z + N / 2);
+    if (x < 0 || z < 0 || x >= N || z >= N) return null;
+    return { t: 'add', c: [x, 0, z] };
+  }
+  if (h.object === wallMeshes[0] || h.object === wallMeshes[1]) {
+    if (mode !== 'add') return null;
+    const back = h.object === wallMeshes[0];
+    const a = Math.floor((back ? h.point.x : h.point.z) + N / 2), y = Math.floor(h.point.y);
+    if (a < 0 || y < 0 || a >= N || y >= N) return null;
+    const c = back ? [a, y, 0] : [0, y, a];
+    return { t: blocks.has(key(...c)) ? 'bad' : 'add', c };
+  }
+  const c = h.object.userData.cell; if (!c) return null;
+  if (mode === 'del') { const list = []; for (const hh of hits) { const cc = hh.object.userData.cell; if (cc && !list.some((q) => q.join() === cc.join())) list.push(cc.slice()); } return { t: 'del', c: c.slice(), list, idx: 0 }; }
+  const n = h.face.normal;
+  const ax = Math.abs(n.x), ay = Math.abs(n.y), az = Math.abs(n.z);
+  const d = [0, 0, 0];
+  if (ax >= ay && ax >= az) d[0] = Math.sign(n.x); else if (ay >= az) d[1] = Math.sign(n.y); else d[2] = Math.sign(n.z);
+  const t = [c[0] + d[0], c[1] + d[1], c[2] + d[2]];
+  const bad = t.some((q) => q < 0 || q >= N);
+  return { t: bad ? 'bad' : 'add', c: bad ? t.map((q) => Math.max(-1, Math.min(N, q))) : t };
+}
+canvas.addEventListener('pointerdown', (e) => {
+  initAudio();
+  if (!started || ptr || !document.getElementById('clear').classList.contains('hide')) return;
+  ptr = { id: e.pointerId, x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, drag: false, t0: performance.now() };
+  try { canvas.setPointerCapture(e.pointerId); } catch (er) {}
+  setAim(aimAt(e.clientX, e.clientY));
+});
+canvas.addEventListener('pointermove', (e) => {
+  if (!ptr || e.pointerId !== ptr.id) return;
+  const dx = e.clientX - ptr.x, dy = e.clientY - ptr.y;
+  if (!ptr.drag && Math.hypot(e.clientX - ptr.sx, e.clientY - ptr.sy) > 12) { ptr.drag = true; setAim(null); }
+  if (ptr.drag) {
+    yaw = Math.max(0.1, Math.min(1.47, yaw - dx * 0.009));
+    pitch = Math.max(0.1, Math.min(1.45, pitch + dy * 0.007));
+    updateCam();
+  }
+  ptr.x = e.clientX; ptr.y = e.clientY;
+});
+const endPtr = (e) => {
+  if (!ptr || e.pointerId !== ptr.id) return;
+  const p = ptr; ptr = null;
+  const a = aim; setAim(null);
+  if (e.type !== 'pointerup' || p.drag) return;
+  if (!a) return;
+  if (a.t === 'bad') { thud(); return; }
+  if (a.t === 'del') { doOp({ t: 'del', c: a.c }); tock(a.c[1], true); flashCell(...a.c); refresh(); return; }
+  if (blocks.has(key(...a.c))) { thud(); return; }
+  doOp({ t: 'add', c: a.c }); tock(a.c[1]); flashCell(...a.c); refresh();
+};
+canvas.addEventListener('pointerup', endPtr);
+canvas.addEventListener('pointercancel', endPtr);
+
+function deeper(now) {
+  if (!ptr || ptr.drag || !aim || aim.t !== 'del' || aim.list.length < 2) return;
+  const want = Math.floor(Math.max(0, now - ptr.t0 - 350) / 550) % aim.list.length;
+  if (want !== aim.idx) { aim.idx = want; aim.c = aim.list[want]; setAim(aim); tock(3 + want, true); }
+}
+// ---------- loop ----------
+let last = performance.now();
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(50, now - last); last = now;
+  for (let i = anims.length - 1; i >= 0; i--) {
+    const a = anims[i]; const k = (now - a.t) / (a.type === 'hop' ? 420 : 140);
+    if (k < 0) continue;
+    if (a.type === 'in') { const e = Math.min(1, k); a.m.scale.setScalar(0.5 + 0.5 * (1 + 0.25 * Math.sin(e * Math.PI)) * e + (e >= 1 ? 0 : 0)); if (k >= 1) { a.m.scale.setScalar(1); anims.splice(i, 1); } }
+    else if (a.type === 'out') { a.m.scale.setScalar(Math.max(0.01, 1 - k)); if (k >= 1) { world.remove(a.m); anims.splice(i, 1); } }
+    else if (a.type === 'hop') { if (!a.m.userData.cell) { anims.splice(i, 1); continue; } const base = pos(...a.m.userData.cell).y; a.m.position.y = base + Math.sin(Math.min(1, k) * Math.PI) * 0.25; if (k >= 1) { a.m.position.y = base; anims.splice(i, 1); } }
+  }
+  deeper(now);
+  for (const m of blocks.values()) if (m.userData.float && m.userData.cell && !anims.some((a) => a.m === m)) { const p = pos(...m.userData.cell); m.position.y = p.y + 0.05 + Math.sin(now / 520 + m.userData.cell[0] + m.userData.cell[2] * 1.7) * 0.035; }
+  if (started && !document.getElementById('clear').classList.contains('hide')) { yaw = 0.78 + Math.sin(now / 1400) * 0.5; pitch += (0.55 - pitch) * 0.08; updateCam(); }
+  flashes = flashes.filter((f) => now - f.t < 650);
+  if (started) for (let p = 0; p < 3; p++) drawPanel(p, now);
+  renderer.render(scene, cam);
+}
+// demo object behind title
+startStageDemo();
+function startStageDemo() {
+  st = STAGES[8]; N = 5; stageIdx = 8; buildWorld();
+  const demo = [];
+  for (let x = 0; x < N; x++) for (let y = 0; y < N; y++) for (let z = 0; z < N; z++) if (tF(x, y) && tS(z, y) && tT(x, z)) demo.push([x, y, z]);
+  for (const c of demo) setBlock(...c, true, false);
+  for (let p = 0; p < 3; p++) drawWall(p);
+  yaw = 0.78; pitch = 0.64; layout();
+}
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
