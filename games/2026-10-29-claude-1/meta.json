@@ -1,0 +1,621 @@
+{
+  "id": "2026-10-29-claude-1",
+  "status": "published",
+  "title": "にじみ陣取り",
+  "genre": "陣取り",
+  "concept": "長押しした所から墨がにじみ、紙の繊維にそって走る。繊維を読んで少ない墨で遠くへ届かせ、乾く前の相手の墨には注いで押し返す。リアルタイムで広がる水彩のにじみ自体を陣取りの手触りにし、囲んだ白地も自分のものになる。",
+  "howToPlay": "紙を長押しすると墨が広がり、指をずらすと注ぐ場所が変わる。墨を使い切ったとき、多く染めていたほうが勝ち。",
+  "libraryDecision": "使わない。墨のにじみは64×100のマス目で最短経路のように広げる自前の計算で、描画もCanvas 2Dの小さな画像を拡大・ぼかすだけで足りる。PixiJSのフィルターも検討したが、核の「繊維を読む」には効かないと判断した。",
+  "soundDecision": "BGMは付けず、書道の部屋のような静けさにした。押した瞬間の「ぽちょん」、注いでいる間のさらさらした水音と小さな泡の音、押し返した時の短い音、囲んだ時の鈴のような音で、墨の動きを耳でも感じられるようにした。",
+  "improvements": [
+    {
+      "found": "墨の縁がマス目のままでカクカクし、にじみに見えない／紙の4割が白いまま終わり、勝ち負けが盛り上がらない／墨同士が触れても何も起きず、取り合いの手応えがない",
+      "changed": "描画をぼかして縁を濃くする水彩風にした／墨の量を1.5倍にし、繊維とふつうの紙のにじみやすさの差を大きくした／乾く前の相手の墨には、注げば押し返せる「にじみ合い」を足した",
+      "foundEn": "Ink edges were blocky grid cells, not bleeding ink / 40% of the paper stayed blank, so results felt flat / inks touching did nothing, no sense of contest",
+      "changedEn": "Blurred rendering with darker watercolor rims / 1.5x ink and stronger fiber contrast / added wet-into-wet: pour next to wet rival ink to push it back"
+    },
+    {
+      "found": "相手の墨がぬれているか（押し返せるか）見分けられず、1.3秒ですぐ乾く／乾いた相手の墨の上を押すと何も起きず反応がない／ぼかしすぎてピンぼけに見え、つやが縞模様になった",
+      "changed": "ぬれた墨は濃くつやが光り、乾くと薄くなる見た目にして、乾くまでを3.2秒に延ばした／押せない所を押したら近くの注げる場所から注ぐ／ぼかしを弱め、つやを点状のきらめきにした。あいてもぬれた墨を押し返しに来るようにした",
+      "foundEn": "Couldn't tell if rival ink was wet (pushable), and it dried in 1.3s / pressing dry rival ink did nothing / blur was too strong and the sheen looked like stripes",
+      "changedEn": "Wet ink is deep and glossy, dry ink turns pale; wet window extended to 3.2s / pressing an invalid spot pours at the nearest valid cell / softer blur, sparkle sheen; the rival now fights over wet fronts too"
+    },
+    {
+      "found": "あいてが墨を使い切ったあと、自分に墨が残っていても何も促されず止まる／ゲームの終わりがはっきりしない／待っている間に何をすればいいか分からない",
+      "changed": "あいてが墨切れになったら「残りの墨を注いで仕上げよう」と点滅で案内するようにした",
+      "foundEn": "After the rival ran out, nothing told me to spend my remaining ink / unclear how the round ends / unclear what to do while waiting",
+      "changedEn": "When the rival is out of ink, a blinking prompt asks you to pour the rest to finish"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "陣取り",
+      "en": "Territory control",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "墨のにじみ陣取り：長押しで墨をたらすと紙の繊維にそってにじむ。乾く前の相手の墨は押し返せる、対CPUのリアルタイム陣取り（2D水彩表現）",
+        "ideaEn": "Ink-bleed territory: hold to drip ink that bleeds along paper fibers; push back wet rival ink. Real-time vs CPU, 2D watercolor look",
+        "fromDraw": true
+      },
+      {
+        "idea": "くもの巣はり：枝の間に指で糸を張って巣を作り、飛んでくる虫を捕まえる。糸の量は限られ、虫が暴れると糸が切れる",
+        "ideaEn": "Spider web: draw threads between twigs to build a web and catch flying bugs; thread is limited and struggling bugs snap it",
+        "fromDraw": false
+      },
+      {
+        "idea": "しわのばしアイロン：3Dの布のしわを、アイロンをなぞって伸ばしていく。スチームを長押しで当て、焦がさないように仕上げる",
+        "ideaEn": "Ironing: smooth out wrinkles on a 3D cloth by dragging an iron, holding for steam without scorching it",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "limit",
+    "input": [
+      "hold",
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Ink Bleed",
+      "concept": "Hold anywhere and ink bleeds out, racing along paper fibers. Read the fibers to reach far with little ink, and pour into your rival's still-wet ink to push it back. The live watercolor bleed itself is the feel of territory control; blank pockets you surround become yours too.",
+      "howToPlay": "Hold on the paper to spread ink; slide to move where you pour. When the ink runs out, whoever covered more wins.",
+      "libraryDecision": "No libraries. The bleed is a custom shortest-path spread on a 64x100 grid, and drawing is just a small Canvas 2D image scaled and blurred. I considered PixiJS filters but they would not help the core of reading fibers.",
+      "soundDecision": "No BGM, to keep the quiet of a calligraphy room. A drip when you press, a soft trickle with tiny bubbles while pouring, a short tone when you push ink back and a bell when you surround a pocket let you hear the ink move."
+    }
+  },
+  "createdAt": "2026-10-29T09:07:21+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-29T09:07:21+09:00",
+    "metricsFrom": "2026-10-29T00:05:51.460Z",
+    "transcript": "7e5a911e-47fd-4487-a7ed-4c4ae72114f6.jsonl",
+    "validationRuns": 5,
+    "finishedAt": "2026-10-29T09:22:16+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-29T09:22:02+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "38.8KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=74",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=188",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=57",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=254",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 39776,
+    "lines": 832
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 17
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "どこに注げば有利か（繊維の向き・ぬれた墨の押し返し）が分かるまでに1〜2枚かかり、最初の紙は空いている所に置いていくだけに感じやすい。墨の縁にマス目の段差も少し残る",
+    "comment": "和紙の長い繊維に乗った墨が一気に縦へ走る瞬間と、つやつやした赤い墨のそばで注いで青がぐいっと押し返した場面は気持ちよかった。2枚目は繊維の取り合いで37%対43%で負け、もう一度やりたくなった。ただ1枚目は駆け引きが薄く、★3とした",
+    "similar": [
+      {
+        "title": "スプラトゥーン（Splatoon）",
+        "similarity": "中",
+        "note": "インクで地面を塗って面積を競う陣取りの代表作。こちらは1人で、塗るのではなく長押しで墨がにじみ、紙の繊維と乾く前の押し返しが核",
+        "note_en": "The best-known ink-painting territory game. Here it is single-player, ink bleeds from a held point instead of being sprayed, and paper fibers and pushing wet ink are the core"
+      },
+      {
+        "title": "Crystal Battle",
+        "url": "https://ariescar.itch.io/crystal-battle",
+        "similarity": "低",
+        "note": "対AIでもできるリアルタイムの陣取り。囲って取るのは似ているが、壁を置く方式でにじみの要素はない",
+        "note_en": "Real-time territory war playable vs AI. Surrounding to capture is similar, but it uses walls, with no bleeding ink"
+      }
+    ],
+    "research": "ウェブ検索で「ink spreading territory game」を1回調べ、塗り陣取りの代表作（スプラトゥーン）は自分の知識から挙げた。囲碁の「囲んだ地を数える」考え方もルーツ",
+    "i18n": {
+      "en": {
+        "worst": "It takes a sheet or two to grasp what gives an edge (fiber direction, pushing wet ink), so the first sheet can feel like just dropping blobs in empty space. Slight grid steps remain on ink edges",
+        "comment": "Ink racing up a long washi fiber and the moment my blue shoved back the glossy wet red felt great. I lost sheet 2 at 37% vs 43% fighting over fibers and wanted to retry. But sheet 1 has little tension, so 3 stars",
+        "research": "One web search for ink-spreading territory games; Splatoon added from my own knowledge. The Go idea of counting surrounded territory is also a root"
+      }
+    },
+    "method": "スマホ縦画面で 11 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 11 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 2700ms → tap(0.60,0.33) 1500ms",
+        "note": "開始して右上の繊維のあたりを長押し",
+        "noteEn": "Start and hold near the fibers at upper right",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.60,0.42) 1800ms",
+        "note": "つやのある（ぬれた）あいての墨のすぐ下で注いで押し返す",
+        "noteEn": "Pour just below the glossy wet rival ink to push it back",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.45,0.62) 2000ms",
+        "note": "下のつやのある赤の左で注いで押し返す",
+        "noteEn": "Pour left of the glossy red below to push it back",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "path(0.20,0.25→0.20,0.50→0.20,0.80) 3000ms",
+        "note": "左側を縦に注いで広く取る",
+        "noteEn": "Pour down the left side to take a wide strip",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.75,0.85) 2500ms → wait 6000ms",
+        "note": "残りを右下に注いで結果を待つ",
+        "noteEn": "Spend the rest at lower right and wait for the result",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "unlocked": 1,
+              "best": [
+                34,
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 34
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.50,0.50) 120ms → wait 2800ms",
+        "note": "次の紙（和紙）へ",
+        "noteEn": "On to the next sheet (washi)",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "unlocked": 1,
+              "best": [
+                34,
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 34
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.30,0.12) 2000ms",
+        "note": "縦に長い繊維の上の端で注ぐ",
+        "noteEn": "Pour at the top end of a long vertical fiber",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "unlocked": 1,
+              "best": [
+                34,
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 34
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.50,0.55) 2200ms",
+        "note": "中央の空きへ。下の赤がまだつやつやなので押し返しも狙う",
+        "noteEn": "Into the open center, also pushing the still-glossy red below",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "unlocked": 1,
+              "best": [
+                34,
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 34
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.15,0.80) 3000ms → wait 7000ms",
+        "note": "左下に残りを注いで結果を見る",
+        "noteEn": "Spend the rest at lower left and see the result",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "unlocked": 1,
+              "best": [
+                34,
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 34
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 500ms",
+        "note": "あいてが墨切れになり、残りを注ぐよう下に表示が出る",
+        "noteEn": "Rival is out of ink; a prompt at the bottom asks me to pour the rest",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "unlocked": 1,
+              "best": [
+                34,
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 34
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.60,0.12) 2500ms → wait 3000ms",
+        "note": "右上の白地に残りを注いで仕上げる。2枚目はあいての勝ち",
+        "noteEn": "Pour the rest into the upper-right gap. The rival wins sheet 2",
+        "image": "ai-play/step-11.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "unlocked": 1,
+              "best": [
+                34,
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 34
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "unlocked": 1,
+              "best": [
+                34,
+                37,
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 37
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-29T09:22:16+09:00"
+  },
+  "publishedAt": "2026-10-29T09:22:16+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 22101,
+    "outputTokens": 38126,
+    "contextTokens": 7720023,
+    "turns": 45,
+    "toolCalls": 54,
+    "webSearches": 0,
+    "minutes": 16.4,
+    "from": "2026-10-29T00:05:51.460Z",
+    "to": "2026-10-29T00:22:16.770Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-29T09:22:16+09:00",
+    "validationRuns": 5,
+    "codeKB": 38.8
+  }
+}
