@@ -1,0 +1,435 @@
+{
+  "id": "2026-10-30-claude-1",
+  "status": "published",
+  "title": "ぐらり射的",
+  "genre": "シューティング",
+  "concept": "夜店のコルク射的を3D物理で。景品は当てた高さで倒れ方が変わり、重い招き猫や特賞は上の角に当てるとぐらっと傾いて戻る。その揺れが戻る前に「カチッ」の装てん音を聞いてすぐ2発目を撃つ、ねらいと間合いの手触りを核にした。",
+  "howToPlay": "どこでもドラッグで照準を動かし、指をはなすと撃つ。景品をたなから落とせばもらえる（コルク8発）。重い景品は上をねらい、ぐらっと揺れたらすぐもう一発。",
+  "libraryDecision": "three.js と cannon-es を使う。景品が当たった高さで傾き・揺れ戻る様子そのものが遊びなので、3Dの奥行きと本物らしい剛体の倒れ方が核を強める。再考で、衝撃を水平方向だけにして「当てる高さ」と「2発目の間合い」で結果が決まるようにし、重力を少し弱めて揺れを読める長さにした。",
+  "soundDecision": "BGMは入れず、夜店のざわめきを小さく流す。コルクの「ポン」、景品に当たる「コツ」、装てんの「カチッ」、落ちたときの鐘「カランカラン」をWeb Audioで作った。とくに「カチッ」は2発目を撃つ合図になるので、音がそのまま操作のリズムになる。",
+  "improvements": [
+    {
+      "found": "鉄砲が逆向きで台尻が画面をふさぐ／重い景品が連射だけで落ち、揺れを待つ意味がない／外れたコルクの行方が分からず、当たっても手応えが薄い",
+      "changed": "鉄砲の向きを直した。重力を0.6倍にして揺れを読める長さにし、装てん中の予約連射をやめて「カチッ」のあとに撃つ形に。招き猫と特賞の重さを試算して調整した。コルクの筋と着弾の輪を表示した。",
+      "foundEn": "The gun faced backwards and its stock blocked the view / heavy prizes fell to plain spam-fire, so waiting for the wobble meant nothing / missed corks vanished and hits felt weak",
+      "changedEn": "Turned the gun around. Lowered gravity to 0.6x so wobbles last long enough to read, removed queued rapid-fire so you shoot after the reload click, and tuned the cat and grand prize weights by simulation. Added a cork trail and impact rings."
+    },
+    {
+      "found": "10発では棚のほとんどを落とせて、どれをねらうか迷わない／特賞を落としても鐘だけで盛り上がりが小さい／結果画面の下にヒントが残る",
+      "changed": "コルクを8発にした。100点以上の景品が落ちると紙吹雪が舞うようにした。結果画面ではヒントを消した。",
+      "foundEn": "With 10 corks you could clear most of the shelf, so there was no choosing / dropping the grand prize only rang a bell / the hint lingered under the results",
+      "changedEn": "Cut to 8 corks, added a confetti burst for prizes worth 100+, and hid the hint on the results screen."
+    },
+    {
+      "found": "コルクの上向きの勢いで景品が浮き、遅い2発目でも倒れてしまう／重い景品の顔に当てても何も起きず、何が悪いか分からない／コルクが重力で3cmも落ち、上の角をねらっても中ほどに当たる",
+      "changed": "衝撃を水平方向だけにして当てた高さで傾きが決まるようにした。重い景品が傾かなかったら「びくともしない…もっと上！」と出す。コルクの落ち幅を1cm弱にし、照準どおりに当たるようにした。招き猫と特賞を少し軽くした。",
+      "foundEn": "The cork's upward push lifted prizes so even a late second shot worked / hitting a heavy prize's face did nothing and gave no clue why / corks dropped 3 cm, so aiming at the top edge hit the middle",
+      "changedEn": "Impulses are now horizontal so hit height decides the tilt. Heavy prizes that barely move show 'Won't budge… aim higher!'. Cork drop cut to under 1 cm so shots land where you aim. Made the cat and grand prize slightly lighter."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "シューティング",
+      "en": "Shooter",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "夜店の射的。コルクで景品をたなから落とす。重い景品は上の角に当てて揺らし、揺れ戻る前にもう一発。3D物理で倒れ方を見せる。",
+        "ideaEn": "A night-fair cork-gun stall: knock prizes off the shelf. Rock heavy ones by hitting their top edge and fire again before they settle; 3D physics shows how they tip.",
+        "fromDraw": true
+      },
+      {
+        "idea": "金魚すくい。水に入れるほど破れやすくなる紙のポイで、金魚の動きを読んですくう。水面のゆらぎを2Dで描く。",
+        "ideaEn": "Goldfish scooping with a paper scoop that tears the longer it stays in water; read the fish and lift at the right time. 2D water ripples.",
+        "fromDraw": false
+      },
+      {
+        "idea": "影ふみ鬼。夕方の路地で、傾く日の長い影を踏まれないよう指で逃げる。影の向きと長さが時間で変わる。",
+        "ideaEn": "Shadow tag in an evening alley: drag to keep your long shadow from being stepped on, as the sun's angle changes its length and direction.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "limit",
+    "input": [
+      "drag",
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Wobble Shot",
+      "concept": "A night-fair cork-gun stall in 3D physics. Where you hit decides how a prize tips: heavy lucky cats and grand prizes rock back when hit on the top edge, and you must fire again right after the reload click, before they settle. Aim plus timing is the core.",
+      "howToPlay": "Drag anywhere to move the sight, release to shoot. Knock a prize off the shelf to win it (8 corks). Hit heavy prizes high and fire again while they wobble.",
+      "libraryDecision": "Uses three.js and cannon-es. The way a prize tilts and rocks back depending on where it is hit is the game itself, so 3D depth and real rigid-body tipping strengthen the core. On rethinking, impulses were made horizontal so hit height and the timing of the second shot decide the outcome, and gravity was softened so wobbles are readable.",
+      "soundDecision": "No music; a quiet festival murmur instead. The cork 'pop', the 'tok' of a hit, the reload 'click' and a hand bell when a prize falls are all made with Web Audio. The click doubles as the cue for the follow-up shot, so the sound becomes the rhythm of play."
+    }
+  },
+  "createdAt": "2026-10-30T11:17:18+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-30T11:17:18+09:00",
+    "metricsFrom": "2026-10-30T02:16:13.059Z",
+    "transcript": "71667abf-df98-4fa8-9f78-6e938bca29ee.jsonl",
+    "validationRuns": 9,
+    "finishedAt": "2026-10-30T11:46:30+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-30T11:46:14+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "46.6KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=400",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=303",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=359",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=351",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 47744,
+    "lines": 703
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js"
+    },
+    {
+      "name": "cannon-es",
+      "version": "0.20.0",
+      "file": "cannon-es-0.20.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "1回が8発と短く、景品の顔ぶれも毎回ほぼ同じなので、慣れると「まず特賞の上の角」の一択になりやすい。上の角は数ピクセルの勝負で、指だと照準合わせが少し細かい。",
+    "comment": "特賞のまん中を撃つと「びくともしない…もっと上！」と出て、上の角に当て直すとぐらっと後ろへ傾いた。そこへ「カチッ」を聞いてすぐ2発目を入れると箱が倒れて鐘と紙吹雪が出る流れは気持ちよく、遅れると戻ってしまう差もはっきりあった。だるまは起き上がるので押し出し方が違い、軽い箱は1発で飛ぶので緩急もある。数分は普通に楽しめるが、もう1回やりたくなる変化はまだ少ない。画像は各手で見て判断した。",
+    "similar": [
+      {
+        "title": "射的でお祭り",
+        "url": "https://apps.apple.com/us/app/%E5%B0%84%E7%9A%84%E3%81%A7%E3%81%8A%E7%A5%AD%E3%82%8A/id1389704073",
+        "similarity": "中",
+        "note": "夜店の射的で景品を撃ち落とす題材は同じ。あちらは流れる景品をタップして撃つ得点競争で、当てる高さや揺れの間合いで倒す物理の遊びはない。",
+        "note_en": "Same night-fair shooting-gallery theme. That one is a tap-to-shoot score attack on moving prizes, without physics where hit height and wobble timing decide the topple."
+      },
+      {
+        "title": "射的の達人",
+        "url": "https://apps.apple.com/jp/app/%E5%B0%84%E7%9A%84%E3%81%AE%E9%81%94%E4%BA%BA/id1183271170",
+        "similarity": "低",
+        "note": "スマホの射的ゲーム。動く景品の移動先を予測して撃つ点が中心で、重い景品を揺らして落とす要素はない。",
+        "note_en": "A phone shooting-gallery game focused on leading moving prizes; no rocking heavy prizes off the shelf."
+      }
+    ],
+    "research": "WebSearchで「射的 ゲーム コルク 景品 落とす 3D 物理 スマホ」と英語で同様の語を2回検索。射的アプリは複数あるが、当てた高さと揺れの間合いで倒す物理を核にしたものは見つからなかった。ルーツは日本の夜店の射的そのもの。",
+    "i18n": {
+      "en": {
+        "worst": "A round is only 8 corks and the prize lineup barely changes, so once you know it the play collapses into 'go for the grand prize's top edge'. That edge is a few pixels wide, which is fiddly with a finger.",
+        "comment": "Shooting the middle of the grand prize said 'Won't budge… aim higher!'; hitting its top edge made it rock back, and a second shot right after the click toppled it with a bell and confetti — satisfying, and being late visibly let it settle back. The self-righting daruma needs a different push, and light boxes fly off in one shot, so there's some contrast. Fine for a few minutes, but there's not yet much variety pulling you back. I looked at every step's screenshot.",
+        "research": "Two WebSearch queries (Japanese and English) for cork-gun shooting-gallery games. Several shateki apps exist, but none found that center on hit height and wobble timing with physics. The root is the real Japanese festival shateki."
+      }
+    },
+    "method": "スマホ縦画面で 8 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 8 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "夜店の射的屋。三段の棚に景品が並ぶ。タップで開始",
+        "noteEn": "A night-fair shooting stall with three shelves of prizes. Tap to start",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "swipe(0.50,0.70→0.53,0.54) 400ms → wait 700ms",
+        "note": "まず特賞のまん中を撃つ。「びくともしない…もっと上！」と出る",
+        "noteEn": "First a shot at the middle of the grand prize: 'Won't budge… aim higher!'",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "swipe(0.50,0.70→0.50,0.66) 350ms → wait 230ms → tap(0.50,0.70) 120ms → wait 1400ms",
+        "note": "上の角をねらって当て、ぐらっと傾いたところへカチッのあとすぐ2発目",
+        "noteEn": "Hit the top edge, and while it leaned back, fired again right after the click",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "swipe(0.50,0.70→0.25,0.70) 400ms → wait 900ms",
+        "note": "招き猫の頭のてっぺんに1発。傾くか見る",
+        "noteEn": "One shot at the top of the lucky cat's head, watching whether it tilts",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "swipe(0.50,0.50→0.46,0.67) 400ms → wait 900ms",
+        "note": "中段のこけしの頭をねらう",
+        "noteEn": "Aimed at the head of a kokeshi on the middle shelf",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "swipe(0.20,0.50→0.76,0.53) 450ms → wait 1000ms",
+        "note": "だるまの顔の上を撃つ。起き上がりこぼしなので押し出せるか",
+        "noteEn": "Shot the daruma above its face; it rights itself, so can it be pushed off?",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "swipe(0.50,0.60→0.54,0.41) 400ms → wait 900ms",
+        "note": "上段右のブリキのロボの頭をねらう",
+        "noteEn": "Aimed at the tin robot's head, top right",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "swipe(0.50,0.60→0.46,0.60) 400ms → wait 3500ms",
+        "note": "右にそれたので少し左へ直して最後の1発",
+        "noteEn": "It went wide right, so I nudged left for the last cork",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 510
+            }
+          },
+          {
+            "agf": "end",
+            "score": 510
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-30T11:46:30+09:00"
+  },
+  "publishedAt": "2026-10-30T11:46:30+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 35747,
+    "outputTokens": 61019,
+    "contextTokens": 19566877,
+    "turns": 92,
+    "toolCalls": 97,
+    "webSearches": 0,
+    "minutes": 30.4,
+    "from": "2026-10-30T02:16:13.059Z",
+    "to": "2026-10-30T02:46:35.234Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-30T11:46:35+09:00",
+    "validationRuns": 9,
+    "codeKB": 46.6
+  }
+}
