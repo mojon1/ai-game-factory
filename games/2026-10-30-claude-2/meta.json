@@ -1,0 +1,562 @@
+{
+  "id": "2026-10-30-claude-2",
+  "status": "published",
+  "title": "しゃぼん玉くぐり",
+  "genre": "物理おもちゃ",
+  "concept": "吹いたしゃぼん玉に直接さわらず、指でなでて起こした風だけで運び、つるした輪をくぐらせる。空気の流れを読む手触りが核。玉の虹色は本物の薄膜の干渉色で計算し、膜が薄くなると金色から黒ずんで割れる合図になる。",
+  "howToPlay": "下の輪を長押しでしゃぼん玉をふくらませ、はなして飛ばす。玉の近くを指でなでて風を送り、すべての輪をくぐらせる。玉にさわると割れる。",
+  "libraryDecision": "使わない。玉の動きは小さな空気の格子（流体）と自作の運動で十分なめらかに作れ、玉の虹色やたわみも Canvas 2D で描けるため、棚のライブラリでは核の「風で運ぶ手触り」は強まらないと判断した。",
+  "soundDecision": "BGMは付けない。ふくらませる息の音、なでる速さに合わせて強まる風の音、輪をくぐるたびに一段ずつ上がる鈴の音、ぷちっと割れる音を Web Audio で作り、静かな庭で空気を扱っている感じを優先した。",
+  "improvements": [
+    {
+      "found": "1) 風を送っても玉の動きが遅れ、どこをなでれば効くのか分からない（空気が見えない） 2) 玉のすぐ下からなでようとすると、新しい玉をふくらませてしまう 3) 輪のふちに少しかすっただけで割れて理不尽",
+      "changed": "指の前方の空気も押し出すようにして風が玉に届くようにし、なでた所から白い渦が流れて風の行き先が見えるようにした。下の輪から指をすぐ動かしたら「なでる」扱いにし、輪の当たり判定を小さくした。ふちに軽くふれた玉は「ぷにっ」とたわんではね返り、強く当たったときだけ割れるようにした。",
+      "foundEn": "1) The bubble reacted late to the wind and it was unclear where to stroke (the air was invisible) 2) Stroking just below the bubble started blowing a new one 3) Merely grazing a hoop rim popped the bubble, which felt unfair",
+      "changedEn": "Strokes now push the air ahead of the finger, and white swirls show where the wind goes. A quick stroke starting on the wand counts as fanning, and the wand hit area is smaller. A gentle rim touch now squishes and bounces the bubble; only a hard hit pops it."
+    },
+    {
+      "found": "1) 縦の輪で、玉が浮きすぎて上のふちに引っかかる 2) 風がすぐ消えて何度もなでる必要があり、テンポが悪い 3) ステージ1を玉1つで★3が取れてしまい、星の価値が軽い。「くぐった！」と「れんぞく！」の文字が重なる",
+      "changed": "玉の浮く速さを抑え、横から押す余裕を作った。風が残る時間を長くした。星の基準を厳しくし（★3は石けん液75以上）、文字の位置を分けて縁取りを付けた。",
+      "foundEn": "1) On upright hoops the bubble rose too fast and caught on the top rim 2) The wind faded too quickly, forcing constant strokes 3) Stage 1 gave three stars for a single bubble; the \"Through!\" and \"Chain!\" labels overlapped",
+      "changedEn": "Slower rise so there is time to push sideways, longer-lasting wind, stricter stars (3 stars need 75+ soap), separated and outlined labels."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "デッキ構築",
+      "en": "Deck-building",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "くじ「デッキ構築」: 星をつないで星座を作るデッキ構築。山札から引いた星の札を夜空に置き、線でつないだ形が星座になると強い札が加わる。",
+        "ideaEn": "Deck-building (drawn genre): draw star cards, place them in the night sky and link them; completed constellations add stronger cards to the deck.",
+        "fromDraw": true
+      },
+      {
+        "idea": "しゃぼん玉を風だけで運ぶ。指でなでて起こした空気の流れで玉を押し、つるした輪をくぐらせる。玉の色は膜の厚さで変わり、黒ずむと割れる。",
+        "ideaEn": "Carry soap bubbles using only wind: stroke the air to push them through hanging hoops. The film colour shows its thickness and darkens before it bursts.",
+        "fromDraw": false
+      },
+      {
+        "idea": "1本指のゆびずもう。CPUの指を3秒押さえこめば勝ち。押さえる・かわす・フェイントの読み合い。",
+        "ideaEn": "One-finger thumb wrestling against the CPU: pin its thumb for three seconds; press, dodge and feint.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 1
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "hold",
+      "swipe"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Bubble Through",
+      "concept": "Never touch the bubble you blew: carry it only with the wind your finger stirs up, and float it through hanging hoops. Reading the airflow is the core. The rainbow is computed from real thin-film interference; as the film thins it turns gold, then dark — the sign it is about to burst.",
+      "howToPlay": "Hold the wand at the bottom to blow a bubble, let go to release it, then stroke the air near it to push it through every hoop. Touching it pops it.",
+      "libraryDecision": "None. A tiny air grid (fluid) and hand-written motion move the bubbles smoothly, and Canvas 2D draws their colours and wobble, so no shelf library would strengthen the core feel of steering with wind.",
+      "soundDecision": "No BGM. Web Audio makes the breath while blowing, a wind sound that follows how fast you stroke, a chime that rises a step with each hoop, and a soft pop — keeping the feel of handling air in a quiet garden."
+    }
+  },
+  "createdAt": "2026-10-30T12:07:43+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-30T12:07:43+09:00",
+    "metricsFrom": "2026-10-30T03:06:00.133Z",
+    "transcript": "501be794-bb38-4183-8d64-a7829cabec66.jsonl",
+    "validationRuns": 3,
+    "finishedAt": "2026-10-30T12:22:10+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-30T12:20:15+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "42.7KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=156",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=211",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=134",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=172",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 43759,
+    "lines": 829
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "風を送ってから玉が動くまでに少し間があり、狙いどおりに寄せるのに慣れが要る。ステージは6つで、遊びの変化がやや少ない",
+    "comment": "下からそっとなでた風で玉がふわっと持ち上がり、輪の前半分の奥を通って『くぐった！』と鈴が鳴る瞬間は気持ちよかった。ステージ1では1つの玉で2つの輪を連続でくぐれ、金色に変わっていく膜を見ながら間に合うかとはらはらした。ふちに軽く当たると『ぷにっ』とはね返るので理不尽さは減ったが、玉に指が触れて割ってしまう失敗はまだ起きやすい。数分は普通に遊べる★3。",
+    "similar": [
+      {
+        "title": "Fly In The Wind",
+        "url": "https://toucharcade.com/games/fly-in-the-wind",
+        "similarity": "中",
+        "note": "画面をなでて風を起こし、しゃぼん玉を障害物から守って運ぶ点が近い。本作は輪をくぐらせる目標と、膜の干渉色で残り寿命を見せる点が違う",
+        "note_en": "Close in stroking the screen to make wind and carry bubbles past obstacles. This game differs with hoops to pass through and thin-film colours that show remaining life"
+      },
+      {
+        "title": "Soap Me Up (Global Game Jam 2025)",
+        "url": "https://globalgamejam.org/games/2025/project-soapy-4",
+        "similarity": "中",
+        "note": "扇風機の風でしゃぼん玉を運び、とげを避ける。本作は指の動きそのものが風になり、空気の流れが残って渦になる",
+        "note_en": "Steers a bubble with a fan past spikes. Here the finger itself is the wind, and the air keeps flowing as swirls"
+      }
+    ],
+    "research": "WebSearchで『blow wind to guide soap bubble through hoops』を検索し、風でしゃぼん玉を運ぶ既存作を確認した",
+    "i18n": {
+      "en": {
+        "worst": "There is a short lag between a stroke and the bubble moving, so precise steering takes practice. Only six stages, with limited variety",
+        "comment": "Lifting the bubble with a soft stroke from below, watching it slip behind the front of the hoop and hearing the chime felt good. In stage 1 one bubble went through both hoops, and seeing the film turn gold made me anxious whether it would make it. Gentle rim touches now bounce instead of popping, but popping it with my own finger still happens easily. A solid few minutes of play: 3 stars.",
+        "research": "Searched the web for games where wind guides soap bubbles through hoops"
+      }
+    },
+    "method": "スマホ縦画面で 12 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 12 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "タイトルをタップして開始。輪が2つ吊られている",
+        "noteEn": "Tapped the title; two hoops hang in the sky",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.50,0.90) 900ms",
+        "note": "下の輪を長押し。息の音とともに虹色の玉がふくらむ",
+        "noteEn": "Held the wand; a rainbow bubble grows with a breath sound",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 500ms → swipe(0.50,0.90→0.50,0.83) 110ms → wait 900ms",
+        "note": "玉の下を上へなでる。白い渦が上へ流れ、少し遅れて玉が持ち上がる",
+        "noteEn": "Stroked upward under it; white swirls drift up and the bubble lifts a moment later",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "swipe(0.50,0.86→0.50,0.77) 110ms → wait 1100ms",
+        "note": "もう一度押し上げて輪の中へ",
+        "noteEn": "Another push up into the hoop",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "swipe(0.80,0.68→0.66,0.60) 120ms → wait 1200ms",
+        "note": "右下から左上へなでて、左上の輪をねらう",
+        "noteEn": "Stroked up-left from the lower right, aiming at the upper-left hoop",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "swipe(0.66,0.55→0.56,0.47) 120ms → wait 1300ms",
+        "note": "ふちに当たらないよう少しずつ寄せる",
+        "noteEn": "Nudging it closer without hitting the rim",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 1200ms",
+        "note": "膜が金色っぽくなってきた。ぎりぎりで上の輪をくぐれるか",
+        "noteEn": "The film is turning gold. Will it clear the top hoop in time?",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 1800ms",
+        "note": "ステージクリア。1つの玉で2つくぐると石けん液が戻る",
+        "noteEn": "Stage clear. One bubble through two hoops refunds soap",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "stars": [
+                3
+              ],
+              "best": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "ステージ2へ。縦向きの輪と傾いた輪",
+        "noteEn": "On to stage 2: an upright hoop and a tilted one",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "stars": [
+                3
+              ],
+              "best": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.50,0.90) 800ms → wait 1200ms → swipe(0.50,0.90→0.50,0.83) 110ms → wait 700ms",
+        "note": "ふくらませて少し持ち上げる",
+        "noteEn": "Blow, then lift it a little",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "stars": [
+                3
+              ],
+              "best": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "swipe(0.90,0.66→0.72,0.65) 110ms → wait 1500ms",
+        "note": "右から左へなでて縦の輪へ運ぶ",
+        "noteEn": "Stroke right-to-left to carry it to the upright hoop",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "stars": [
+                3
+              ],
+              "best": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "swipe(0.75,0.66→0.55,0.64) 100ms → wait 1300ms",
+        "note": "もうひと押しで縦の輪を横切らせる",
+        "noteEn": "One more push to cross the upright hoop",
+        "image": "ai-play/step-12.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "stars": [
+                3
+              ],
+              "best": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-30T12:22:10+09:00"
+  },
+  "publishedAt": "2026-10-30T12:22:10+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 25547,
+    "outputTokens": 42885,
+    "contextTokens": 13304659,
+    "turns": 73,
+    "toolCalls": 80,
+    "webSearches": 0,
+    "minutes": 16.2,
+    "from": "2026-10-30T03:06:00.133Z",
+    "to": "2026-10-30T03:22:10.303Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-10-30T12:22:10+09:00",
+    "validationRuns": 3,
+    "codeKB": 42.7
+  }
+}
