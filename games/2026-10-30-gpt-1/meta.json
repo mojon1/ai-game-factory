@@ -1,0 +1,1037 @@
+{
+  "id": "2026-10-30-gpt-1",
+  "status": "published",
+  "title": "月の裏の拾いもの",
+  "genre": "収集",
+  "concept": "小さな月を指で回し、裏側や極に隠れた六つの落としものを拾う。見えていなかった輪郭が縁から現れる瞬間と、空白の図鑑が一つずつ埋まる安心感を核にする。点数や時間に追われず、立体を手元で調べる収集。",
+  "howToPlay": "月をなぞって回し、小物をタップして収集。六つの落としものをそろえよう。",
+  "libraryDecision": "three.jsで月の裏に本当に小物を隠し、縁から立体が現れる発見を強める。再考して赤道だけでなく両極にも配置し、上下に回す意味を加えた。影と輪郭を読ませるため画面効果や物理演算は使わない。 anime.jsを加え、小物が膨らんで図鑑へ収まる動きとカードの弾みで収集の一区切りを強めた。",
+  "soundDecision": "小物を拾うと六つの高さが違う短いベル音を鳴らす。BGMを重ねず、静かな探索の中で一つ埋まったことが耳でも分かるようにする。",
+  "improvements": [
+    {
+      "found": "縁の小物が小さく押しづらい／残りを探す手掛かりがない／拾った瞬間に消えて手応えが薄い。",
+      "changed": "見えている小物には半径26pxのタップ補助を追加。図鑑の空欄に赤道・北・南のヒントを出し、収集アニメーションと小物ごとの短い言葉を加えた。",
+      "foundEn": "Rim objects were hard to tap; missing finds had no location clues; instant disappearance felt flat.",
+      "changedEn": "Added a 26px tap assist for visible finds, equator/north/south clues in empty album slots, collection animation, and a short line for each object."
+    },
+    {
+      "found": "上下に回すと北と画面の上がずれて迷う／下の小物と発見メッセージが重なる／旅や途中の収集が記録されず集めた実感が残らない。 最終プレイでは、月の移動後に描画とタップ座標のずれも見つかった。",
+      "changed": "北を上へ戻す44pxボタンを追加。月を少し縮めてメッセージと分け、途中の図鑑と完成した旅数を共通保存へ記録。完成後は次の旅の初期角度を変えた。 カメラの距離で表示範囲を調整し、描画・選択の前に座標更新を明示。完成時には帰りのロケットも描画する。",
+      "foundEn": "Tilting made north hard to track; lower finds overlapped discovery text; neither partial progress nor completed journeys remained. Final play also exposed a mismatch between rendered and tapped positions after raising the moon.",
+      "changedEn": "Added a 44px north-up button, reduced the moon clear of messages, saved partial albums and completed journeys, and changed the next journey's starting angle. Adjust framing using camera distance and explicitly update world transforms before rendering and picking, and show the returning rocket on completion."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "収集",
+      "en": "Collecting",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "月を指で回し、裏側や極の落としものを拾う。3Dの隠れと輪郭の出現を収集の喜びにする。2Dの円盤では裏がなく、この発見が弱くなる。",
+        "ideaEn": "Rotate a moon to collect finds on its far side and poles. 3D occlusion makes silhouettes emerge; a flat disk would lose the far-side discovery.",
+        "fromDraw": true
+      },
+      {
+        "idea": "折った紙の水路をつなぐパズル。2Dの折り目を重ねて流れを比較する。3Dの折る演出も考えたが、重なった出口の読みやすさが核。",
+        "ideaEn": "Fold paper channels into a water route. 2D favors comparing overlapping exits; 3D folding could enrich motion but not the core reading.",
+        "fromDraw": false
+      },
+      {
+        "idea": "三つの香りを順に混ぜ、客の記憶の景色を探す喫茶店。2Dのにじむ色で香りを表現する。3Dのカップより景色の変化が核になる。",
+        "ideaEn": "Blend three aromas to evoke a guest's remembered landscape. Flowing 2D colors carry the change better than a 3D cup.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "complete",
+    "ending": "goal",
+    "input": [
+      "drag",
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Lost on the Moon",
+      "concept": "Turn a little moon to collect six objects hidden on its far side and poles. The pleasure lies in a new silhouette emerging over the rim and an empty album filling without score or time pressure.",
+      "howToPlay": "Drag to rotate the moon and tap objects to collect all six.",
+      "libraryDecision": "Three.js makes the far side truly hide objects and lets silhouettes emerge over the rim. The rethink added polar finds so vertical rotation matters. No post-processing or physics is needed to read these shapes. Anime.js adds a small squash-and-collect motion and a springing album card to mark each find.",
+      "soundDecision": "Each object plays a short bell at a different pitch. No background music: a quiet search makes each discovery audible."
+    }
+  },
+  "createdAt": "2026-10-30T12:05:41+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "\"GPT-6.1",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-30T12:05:41+09:00",
+    "metricsFrom": "2026-10-30T03:04:25.237Z",
+    "transcript": null,
+    "validationRuns": 5,
+    "finishedAt": "2026-10-30T12:24:03+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-30T12:22:59+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "11.0KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=84",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=114",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=76",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=92",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 11234,
+    "lines": 27
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js"
+    },
+    {
+      "name": "anime.js",
+      "version": "4.5.0",
+      "file": "anime-4.5.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "\"GPT-6.1",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "小物は六種類で配置も固定。最初の発見はあるが、図鑑を覚えると再訪して探す新鮮さが薄い。",
+    "comment": "初版6手・改善版6手で遊んで直し、最終版は各画像を見ながら12手プレイ。極のねじを正面に出す発見と、月の縁から星・輪・ベルが現れて図鑑が6/6になる場面は、短い静かな探索として楽しめた。旅の記録1、終了と保存、初期角度を変えた再開、北を上へ戻す操作を確認。別途、実際に保存された1/6を再読み込み後に復元できた。長い探索や繰り返しの深さはないため★3。",
+    "similar": [
+      {
+        "title": "Hidden Folks",
+        "url": "https://adriaan.itch.io/hidden-folks",
+        "similarity": "中",
+        "note": "小さな景色の中を観察し、見つけたものを触って一覧を埋める点が共通。本作は3D球の裏と極を回して探す六個の収集で、大きな2D群衆や多段の仕掛けはない。",
+        "note_en": "Both inspect miniature scenes and tap finds to fill a list. This is six-object collection on the far side and poles of a rotatable 3D sphere, rather than a large 2D crowd scene with layered interactions."
+      }
+    ],
+    "research": "Hidden Folksの公式情報を1検索し、作者のitch.ioページで探索とタップ操作のルーツを比較した。",
+    "i18n": {
+      "en": {
+        "worst": "There are only six object types in fixed locations. The first discoveries work, but remembering the album removes much of the novelty on return.",
+        "comment": "Played six moves on the initial version and six on the first revision, then twelve image-inspected moves on the final version. Bringing a polar screw forward and revealing the shard, ring and bell over the rim made a pleasant brief search ending at 6/6. Verified journey 1, end/save signals, a changed starting angle, north-up control and reload restoration of an actually saved 1/6 album. It lacks depth for repeated searches, so three stars.",
+        "research": "Used one search for official Hidden Folks information and compared search-and-tap roots using its creator's itch.io page."
+      }
+    },
+    "method": "スマホ縦画面で 12 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 12 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.80) 120ms",
+        "note": "月の大きさで表示を整えた最終版を開始する。",
+        "noteEn": "Starting the final framing adjusted through camera distance.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "見えている赤いボタンの中心をタップする。",
+        "noteEn": "Tapping the visible center of the red button.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0
+              ],
+              "completed": 0
+            }
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.64,0.28) 120ms",
+        "note": "北の青いねじを見た位置で拾う。",
+        "noteEn": "Collecting the northern blue screw at its visible position.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3
+              ],
+              "completed": 0
+            }
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.34,0.72) 120ms",
+        "note": "下の種を拾う。今はメッセージと重ならない。",
+        "noteEn": "Collecting the lower seed; it no longer overlaps the message.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3,
+                4
+              ],
+              "completed": 0
+            }
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "swipe(0.20,0.50→0.78,0.50) 650ms",
+        "note": "右へ回して裏側の赤道を探す。",
+        "noteEn": "Turning right to search the far-side equator.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3,
+                4
+              ],
+              "completed": 0
+            }
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.39,0.50) 120ms",
+        "note": "縁から現れた黄色いかけらを拾う。",
+        "noteEn": "Picking up the yellow shard revealed over the rim.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3,
+                4
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3,
+                4,
+                2
+              ],
+              "completed": 0
+            }
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "swipe(0.30,0.50→0.69,0.50) 550ms",
+        "note": "さらに右へ回す。残り二つが同じ側に出るか。",
+        "noteEn": "Turning farther right to reveal the final two on this side.",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3,
+                4
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3,
+                4,
+                2
+              ],
+              "completed": 0
+            }
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.10,0.50) 120ms",
+        "note": "左端の輪を拾う。縁でもタップ補助が働く。",
+        "noteEn": "Collecting the ring at the left edge with tap assistance.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3,
+                4
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3,
+                4,
+                2
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3,
+                4,
+                2,
+                1
+              ],
+              "completed": 0
+            }
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.50,0.50) 120ms → wait 900ms",
+        "note": "最後のベルで図鑑を完成させる。",
+        "noteEn": "Completing the album with the final bell.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3,
+                4
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3,
+                4,
+                2
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3,
+                4,
+                2,
+                1
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3,
+                4,
+                2,
+                1,
+                5
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [],
+              "completed": 1
+            }
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.50,0.80) 120ms",
+        "note": "旅の記録1を保存して終了した。次の旅は違う初期角度で始まるか。",
+        "noteEn": "Journey 1 was saved and ended; checking the next starting angle.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3,
+                4
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3,
+                4,
+                2
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3,
+                4,
+                2,
+                1
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3,
+                4,
+                2,
+                1,
+                5
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [],
+              "completed": 1
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "swipe(0.50,0.50→0.50,0.68) 500ms",
+        "note": "次の旅で月を縦に傾ける。北を上へ戻す操作を試す。",
+        "noteEn": "Tilting the next moon before testing north-up recovery.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3,
+                4
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3,
+                4,
+                2
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3,
+                4,
+                2,
+                1
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3,
+                4,
+                2,
+                1,
+                5
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [],
+              "completed": 1
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.16,0.18) 120ms",
+        "note": "北を上へを押す。図鑑を消さず傾きだけ戻るか。",
+        "noteEn": "Pressing North up to restore tilt without clearing the album.",
+        "image": "ai-play/step-12.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3,
+                4
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3,
+                4,
+                2
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3,
+                4,
+                2,
+                1
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [
+                0,
+                3,
+                4,
+                2,
+                1,
+                5
+              ],
+              "completed": 0
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "partial": [],
+              "completed": 1
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-30T12:24:03+09:00"
+  },
+  "publishedAt": "2026-10-30T12:24:03+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 7234,
+    "outputTokens": 11343,
+    "contextTokens": 9389700,
+    "turns": 43,
+    "toolCalls": 43,
+    "webSearches": null,
+    "minutes": 19.8,
+    "from": "2026-10-30T03:04:25.237Z",
+    "to": "2026-10-30T03:24:10.966Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-10-30T12:24:11+09:00",
+    "validationRuns": 5,
+    "codeKB": 11,
+    "evidence": "metrics-evidence.json"
+  }
+}

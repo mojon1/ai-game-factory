@@ -1,0 +1,1214 @@
+{
+  "id": "2026-10-30-gpt-2",
+  "status": "published",
+  "title": "しおりの帰り道",
+  "genre": "アドベンチャー",
+  "concept": "一方通行の先で鍵を拾っても、しおりを先に置いた足場へなら帰れる。二色の鍵を持ったまま戻り、奥の分かれ道へしおりを移し直す。進むことより帰り道の準備を考える、三つの小さな森の冒険。",
+  "howToPlay": "つながる足場をタップして移動。分かれ道にしおりを置き、鍵を拾って戻り、三つの扉を開こう。",
+  "libraryDecision": "2Dの絵本の地図で一方通行と戻る足場を比較させる。3Dの森は道を隠してしまうため使わず、anime.jsで歩く動きとしおりへ飛び戻る動きを変え、帰還の手触りを強めた。",
+  "soundDecision": "歩く音、鍵の高い音、帰還の柔らかな音をWeb Audioで短く鳴らす。BGMは置かず、道を考える静けさと、戻れた時の小さな安心を残す。",
+  "improvements": [
+    {
+      "found": "点線と矢印の意味の凡例がない／鍵の丸表示では色を区別しづらい／扉を開いた章末が文字だけで達成感が薄い。",
+      "changed": "道の凡例と金・青の鍵アイコンを追加。章末に開いた扉と小さな星、旅をつなぐ短い言葉を描いた。",
+      "foundEn": "Routes lacked a legend; plain HUD circles hid key colors; text-only chapter endings felt flat.",
+      "changedEn": "Added a route legend and gold/blue key icons, plus an open doorway, small stars and a short connecting line at each chapter ending."
+    },
+    {
+      "found": "今行ける足場がすぐ読めない／しおりを忘れた行き止まりで復帰方法が分からない／取り消しても古いメッセージが残り鍵の状態が曖昧。",
+      "changed": "移動できる足場を金の輪で強調。帰り道がない時はひとつ戻すを案内し、取り消した位置・鍵・しおりを明示。使う準備のない帰還・取り消しボタンも色で区別した。",
+      "foundEn": "Available stones were hard to read; an unbookmarked dead end lacked recovery guidance; Undo left stale feedback and unclear key state.",
+      "changedEn": "Highlighted reachable stones with gold rings, explained Undo at dead ends, explicitly reported restored position/keys/bookmark, and dimmed unprepared Return/Undo controls."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "アドベンチャー",
+      "en": "Adventure",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "一方通行の森でしおりを置き、鍵を持ってその場所へ飛び戻る。2D絵本の地図で帰り道を読む。3Dも考えたが、枝に道が隠れるより準備の比較を優先。",
+        "ideaEn": "Set a bookmark before a one-way forest path and return carrying its key. A 2D storybook map favors comparing return plans over 3D routes hidden by branches.",
+        "fromDraw": true
+      },
+      {
+        "idea": "触れる順で音色が変わる砂時計を並べる楽器。3Dの砂の量で残り音を読ませる。2Dの音符列より流れと残量を立体で見せたい。",
+        "ideaEn": "Arrange hourglasses whose tones change with touch order. 3D sand volumes would show the remaining sound more directly than a flat note sequence.",
+        "fromDraw": false
+      },
+      {
+        "idea": "透ける三枚の切手を重ねて一つの生き物を作る図形パズル。2Dの色面の重なりが核で、3Dの厚みは完成図を読みづらくする。",
+        "ideaEn": "Overlay three translucent stamps into an animal puzzle. Flat 2D colors make the combined silhouette clearer than 3D thickness.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "The Bookmark Way Home",
+      "concept": "A bookmark lets you return from a one-way path carrying the key you found. Move it deeper into the forest to prepare the next way home. Three small woods make planning a return as important as moving forward.",
+      "howToPlay": "Tap connected stones to move. Set bookmarks at forks, collect keys and return to open three doors.",
+      "libraryDecision": "A 2D storybook map keeps one-way routes and return points comparable. 3D foliage would hide routes; anime.js distinguishes walking from springing back to the bookmark.",
+      "soundDecision": "Short generated tones distinguish steps, bright key discoveries and soft returns. No background music, leaving quiet space for route planning."
+    }
+  },
+  "createdAt": "2026-10-30T12:28:20+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "\"GPT-6.1",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-10-30T12:28:20+09:00",
+    "metricsFrom": "2026-10-30T03:24:25.256Z",
+    "transcript": null,
+    "validationRuns": 3,
+    "finishedAt": "2026-10-30T12:44:09+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-10-30T12:35:29+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "10.4KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=40",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=88",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=33",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=83",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 10639,
+    "lines": 42
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "anime.js",
+      "version": "4.5.0",
+      "file": "anime-4.5.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "\"GPT-6.1",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "道筋がほぼ一本道で、しおりを移す意味を理解すると答えが見えやすい。三章とも同じ手順の延長で、解いた後の再プレイの広がりは小さい。",
+    "comment": "初版6手と改善版6手で遊んで直し、最終版を画像で確かめながら28手で全三章クリアと再開までプレイした。第二・第三の森でしおりを奥の広場へ置き直し、青い鍵を持って帰って扉を開く場面には、小さな冒険をつないだ納得感があった。しおりを忘れた時の取り消し、鍵の復元、各章の終了と保存も確認。別途英語表示で、実際に保存された第二の森を再読み込み後に復元できた。道の選択は浅いため★3。",
+    "similar": [
+      {
+        "title": "The Swapper",
+        "url": "https://facepalmgames.com/the-swapper/",
+        "similarity": "低",
+        "note": "あらかじめ残した地点を移動の手掛かりにする発想は近い。本作は一つのしおりへ鍵を持って帰る地図の冒険で、分身の同時操作・乗り移り・横視点の跳躍はない。",
+        "note_en": "Both use a prepared location to rethink movement. This is a map adventure returning to one bookmark with keys, without simultaneous clones, control swapping or platform jumps."
+      }
+    ],
+    "research": "The Swapperの公式情報を1検索し、開発元Facepalm Gamesの説明で分身と移動の仕組みを確認して比較した。",
+    "i18n": {
+      "en": {
+        "worst": "Routes are nearly linear, so solutions become obvious once bookmark relocation is understood. The three chapters extend the same procedure and offer little replay depth.",
+        "comment": "Played six moves on each of the initial and first-revision versions, then inspected 28 final-version moves through all three chapters and restart. Relocating the bookmark to the deep glade, returning with the blue key and opening the door gave a small sense of a connected adventure. Checked Undo and key restoration after forgetting a bookmark, chapter end/save signals, and English-mode reload restoration of an actually saved second forest. Route choices remain shallow, so three stars.",
+        "research": "Used one search for official The Swapper information and compared its clone-and-movement premise using the developer Facepalm Games page."
+      }
+    },
+    "method": "スマホ縦画面で 28 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 28 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.80) 120ms",
+        "note": "最終版を開始し、三つの森を通して遊ぶ。",
+        "noteEn": "Starting the final version for a complete three-forest playthrough.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.50,0.55) 120ms",
+        "note": "金の輪で示された分かれ道へ。",
+        "noteEn": "Moving to the fork outlined in gold.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.19,0.90) 120ms",
+        "note": "鍵の前に帰り道を分かれ道へ置く。",
+        "noteEn": "Setting the way back at the fork before collecting the key.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.22,0.33) 120ms",
+        "note": "金の鍵を取りに片道を進む。",
+        "noteEn": "Taking the one-way route to the gold key.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.50,0.90) 120ms",
+        "note": "鍵ごとしおりへ帰り、開いた道を確かめる。",
+        "noteEn": "Returning with the key and checking the unlocked route.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.78,0.33) 120ms → wait 800ms",
+        "note": "一つ目の扉を開け、章の保存と開いた扉の絵を見る。",
+        "noteEn": "Opening the first door and checking chapter save and the doorway illustration.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 1
+            }
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.50,0.80) 120ms",
+        "note": "二つ目の森へ。金の先に青い鍵がある。",
+        "noteEn": "Entering forest two; a blue key lies beyond the gold route.",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 1
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.44,0.61) 120ms",
+        "note": "二つ目の分かれ道へ進む。",
+        "noteEn": "Moving to the second forest fork.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 1
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.19,0.90) 120ms",
+        "note": "まず金の鍵への帰り道を置く。",
+        "noteEn": "Setting the return point before the gold-key trip.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 1
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.18,0.35) 120ms",
+        "note": "左の金の鍵を取る。",
+        "noteEn": "Collecting the gold key on the left.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 1
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.50,0.90) 120ms",
+        "note": "金の鍵を持って最初のしおりへ。",
+        "noteEn": "Returning to the first bookmark with the gold key.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 1
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.78,0.52) 120ms",
+        "note": "開いた道で奥の広場へ。ここから青い鍵を取りに行く。",
+        "noteEn": "Following the unlocked path to the deep glade before the blue key.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 1
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "tap(0.19,0.90) 120ms",
+        "note": "しおりを奥の広場へ移す。前のリボンが消えるか。",
+        "noteEn": "Moving the bookmark to the deep glade and checking that the old ribbon disappears.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 1
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "tap(0.78,0.24) 120ms",
+        "note": "青い鍵を拾う。金と青の両方が手元に残る。",
+        "noteEn": "Collecting the blue key while keeping the gold key.",
+        "image": "ai-play/step-14.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 1
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "tap(0.50,0.90) 120ms",
+        "note": "新しいしおりの広場へ帰る。入口側へ戻されない。",
+        "noteEn": "Returning to the new glade bookmark instead of the earlier fork.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 1
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "tap(0.42,0.24) 120ms → wait 800ms",
+        "note": "二つ目の扉へ。保存された次の章を確認する。",
+        "noteEn": "Opening the second door and checking the next chapter save.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 1
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 2
+            }
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 17,
+        "action": "tap(0.50,0.80) 120ms",
+        "note": "最後の森。広場から橋へ進む道も片道になっている。",
+        "noteEn": "Entering the final forest; the route from the glade to the bridge is also one-way.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 1
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 2
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 18,
+        "action": "tap(0.46,0.62) 120ms",
+        "note": "最後の分かれ道へ進む。",
+        "noteEn": "Moving to the final forest fork.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 1
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 2
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 19,
+        "action": "tap(0.19,0.90) 120ms",
+        "note": "分かれ道へしおりを置く。",
+        "noteEn": "Bookmarking the fork.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 1
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 2
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 20,
+        "action": "tap(0.17,0.38) 120ms",
+        "note": "金の鍵を拾い、広場への道を開く。",
+        "noteEn": "Collecting gold to unlock the glade route.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 1
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 2
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 21,
+        "action": "tap(0.50,0.90) 120ms",
+        "note": "金の鍵と一緒に帰る。",
+        "noteEn": "Returning with the gold key.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 1
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 2
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 22,
+        "action": "tap(0.79,0.53) 120ms",
+        "note": "片道を渡って奥の広場へ。ここで帰り先を移す。",
+        "noteEn": "Crossing the one-way path to the deep glade, where the bookmark must move.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 1
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 2
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 23,
+        "action": "tap(0.19,0.90) 120ms",
+        "note": "しおりを広場へ置き直す。",
+        "noteEn": "Moving the bookmark to the glade.",
+        "image": "ai-play/step-23.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 1
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 2
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 24,
+        "action": "tap(0.79,0.27) 120ms",
+        "note": "青い鍵を拾い、橋と扉への道を開ける。",
+        "noteEn": "Collecting blue to unlock the bridge and door route.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 1
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 2
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 25,
+        "action": "tap(0.50,0.90) 120ms",
+        "note": "青い鍵を持って広場へ帰る。二色の鍵が残る。",
+        "noteEn": "Returning to the glade with both key colors retained.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 1
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 2
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 26,
+        "action": "tap(0.46,0.35) 120ms",
+        "note": "小さな橋へ。最後の扉へ進める輪が見えるか。",
+        "noteEn": "Crossing to the small bridge and checking the final door is reachable.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 1
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 2
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 27,
+        "action": "tap(0.14,0.20) 120ms → wait 900ms",
+        "note": "三つ目の扉を開き、森を抜ける。",
+        "noteEn": "Opening the third door and leaving the forest.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 1
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 2
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 0
+            }
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 28,
+        "action": "tap(0.50,0.80) 120ms",
+        "note": "全三章のあと最初の森へ再開する。",
+        "noteEn": "Restarting at the first forest after clearing all three chapters.",
+        "image": "ai-play/step-28.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 1
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 2
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "chapter": 0
+            }
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-10-30T12:44:09+09:00"
+  },
+  "publishedAt": "2026-10-30T12:44:09+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 6523,
+    "outputTokens": 11451,
+    "contextTokens": 12027880,
+    "turns": 46,
+    "toolCalls": 46,
+    "webSearches": null,
+    "minutes": 19.8,
+    "from": "2026-10-30T03:24:25.256Z",
+    "to": "2026-10-30T03:44:15.074Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-10-30T12:44:15+09:00",
+    "validationRuns": 3,
+    "codeKB": 10.4,
+    "evidence": "metrics-evidence.json"
+  }
+}
