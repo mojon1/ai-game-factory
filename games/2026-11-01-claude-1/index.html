@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>けん玉ふわり</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; margin: 0; height: 100%; overflow: hidden; background: #e9dcc0; }
+canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const L = {
+  ja: {
+    title: 'けん玉ふわり',
+    how: ['画面のどこかを指でなぞると、けん玉が動く', 'サッと上へ引いて玉を浮かせ、お題の皿で受けよう', '受ける瞬間に少し下げると、ふわっと乗る'],
+    tap: 'タップでスタート',
+    score: '点', best: 'ベスト', odai: 'お題',
+    trick: { big: '大皿', small: '小皿', spike: 'とめけん' },
+    hint: 'サッと上へ引いて、止める → 玉が浮く',
+    hint2: '光っている皿の下へ動かして受けよう',
+    hard: 'かたい！ ひざを使って', fall: '落ちた…', wrong: '{k}！ でもお題は{w}', pita: 'ぴたっ',
+    side: 'ずれた', hole: '穴がずれた',
+    practice: 'さいしょのお題はミスなし',
+    rankup: '{r} に昇級！', chain: '{n} れんぞく', clear: 'お題クリア',
+    over: 'そこまで', reach: 'とどいた段位', newbest: 'ベスト更新！', again: 'タップでもう一度',
+    life: 'のこり',
+    ranks: ['10級', '9級', '8級', '7級', '6級', '5級', '4級', '3級', '2級', '1級', '初段', '二段', '三段', '四段', '五段', '六段', '七段', '八段', '九段', '十段', '名人'],
+  },
+  en: {
+    title: 'Kendama: Soft Catch',
+    how: ['Drag anywhere to move the kendama', 'Flick it up to toss the ball, catch it on the glowing cup', 'Dip a little as it lands for a soft catch'],
+    tap: 'Tap to start',
+    score: 'pts', best: 'Best', odai: 'Trick',
+    trick: { big: 'Big cup', small: 'Small cup', spike: 'Spike' },
+    hint: 'Flick up and stop → the ball flies',
+    hint2: 'Move the glowing cup under it to catch',
+    hard: 'Too hard! Dip as you catch', fall: 'Dropped…', wrong: '{k}! But the trick is {w}', pita: 'Soft!',
+    side: 'Off center', hole: 'Hole missed',
+    practice: 'First trick: misses are free',
+    rankup: 'Promoted to {r}!', chain: '{n} in a row', clear: 'Trick clear',
+    over: 'Session over', reach: 'Rank reached', newbest: 'New best!', again: 'Tap to play again',
+    life: 'left',
+    ranks: ['10th kyu', '9th kyu', '8th kyu', '7th kyu', '6th kyu', '5th kyu', '4th kyu', '3rd kyu', '2nd kyu', '1st kyu', '1st dan', '2nd dan', '3rd dan', '4th dan', '5th dan', '6th dan', '7th dan', '8th dan', '9th dan', '10th dan', 'Master'],
+  },
+}[LANG === 'ja' ? 'ja' : 'en'];
+const fmt = (s, o) => s.replace(/\{(\w+)\}/g, (_, k) => o[k]);
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+const rankName = (r) => r < L.ranks.length - 1 ? L.ranks[r] : L.ranks[L.ranks.length - 1] + (r >= L.ranks.length ? ' ' + (r - L.ranks.length + 2) : '');
+
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d');
+const TAU = Math.PI * 2;
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const rnd = (a, b) => a + Math.random() * (b - a);
+const angDiff = (a, b) => { let d = (a - b) % TAU; if (d > Math.PI) d -= TAU; if (d < -Math.PI) d += TAU; return d; };
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+
+// ---------- save ----------
+let best = 0, bestRank = 0;
+addEventListener('message', (e) => { if (e.data && e.data.agf === 'loaded' && e.data.data) { best = e.data.data.best || 0; bestRank = e.data.data.bestRank || 0; } });
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+const store = () => { try { parent.postMessage({ agf: 'save', data: { best, bestRank } }, '*'); } catch (e) {} };
+
+// ---------- layout ----------
+let W = 360, H = 640, DPR = 1, S = 1, WW = 360, WH = 640;
+function resize() {
+  W = Math.max(1, innerWidth); H = Math.max(1, innerHeight);
+  DPR = Math.min(2, devicePixelRatio || 1);
+  cv.width = Math.max(1, W * DPR | 0); cv.height = Math.max(1, H * DPR | 0);
+  S = Math.max(0.01, Math.min(W / 300, H / 540));
+  WW = W / S; WH = H / S;
+  buildBg();
+  if (ken) { ken.tx = clamp(ken.tx, 70, WW - 70); ken.ty = clamp(ken.ty, minKenY(), maxKenY()); }
+}
+const minKenY = () => Math.max(130, WH * 0.26);
+const maxKenY = () => Math.max(minKenY() + 40, WH - STR - 44);
+
+// ---------- kendama geometry (local coords, origin = string knot on the crosspiece) ----------
+const G = 1500;            // gravity (logical px / s^2)
+const BR = 16;             // ball radius
+const STR = 112;           // string length
+const CUPS = {
+  big: { x: -48, y: -12, hw: 16, rest: -23, thr: 560, pts: 1, e: 0.45 },
+  small: { x: 46, y: -10, hw: 11, rest: -22, thr: 440, pts: 2, e: 0.45 },
+};
+const SPIKE = { x: 0, y0: -12, y1: -57, r: 4.5, tip: -62, rest: -53, thr: 640, tol: 5.5, ang: 0.5, pts: 4 };
+const PITA = 170;
+
+// ---------- audio ----------
+let AC = null, master = null, noiseBuf = null;
+function initAudio() {
+  try {
+    if (!AC) {
+      AC = new (window.AudioContext || window.webkitAudioContext)();
+      master = AC.createGain(); master.gain.value = 0.55; master.connect(AC.destination);
+      noiseBuf = AC.createBuffer(1, AC.sampleRate * 0.3 | 0, AC.sampleRate);
+      const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    }
+    if (AC.state !== 'running') AC.resume();
+  } catch (e) { AC = null; }
+}
+function tone(f, dur, vol, type = 'sine', t0 = 0, slide = 0) {
+  if (!AC) return;
+  try {
+    const t = AC.currentTime + t0, o = AC.createOscillator(), g = AC.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t); if (slide) o.frequency.exponentialRampToValueAtTime(f * slide, t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.02);
+  } catch (e) {}
+}
+function noise(dur, vol, freq, q = 1.2, t0 = 0, kind = 'bandpass') {
+  if (!AC || !noiseBuf) return;
+  try {
+    const t = AC.currentTime + t0, s = AC.createBufferSource(), f = AC.createBiquadFilter(), g = AC.createGain();
+    s.buffer = noiseBuf; f.type = kind; f.frequency.value = freq; f.Q.value = q;
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(f); f.connect(g); g.connect(master); s.start(t); s.stop(t + dur + 0.02);
+  } catch (e) {}
+}
+// wooden knock: a resonant body + a click
+function knock(f, vol) { tone(f, 0.09, vol * 0.5); tone(f * 2.76, 0.04, vol * 0.18); noise(0.03, vol * 0.5, f * 3, 2.5); }
+const SFX = {
+  big: (v) => knock(620, v),
+  small: (v) => knock(860, v),
+  spike: (v) => { tone(300, 0.12, v * 0.5, 'triangle', 0, 0.7); noise(0.07, v * 0.6, 900, 0.8, 0, 'lowpass'); knock(1300, v * 0.4); },
+  clack: (v) => { knock(1500, v * 0.8); tone(2600, 0.03, v * 0.1, 'square'); },
+  taut: (v) => noise(0.02, v * 0.25, 3200, 3),
+  pita: () => { tone(1568, 0.5, 0.06, 'sine', 0.03); tone(2350, 0.4, 0.035, 'sine', 0.06); },
+  clear: (n) => { const sc = [293.7, 329.6, 392, 440, 493.9, 587.3, 659.3, 784, 880, 987.8]; const b = Math.min(n % 6, 5); for (let i = 0; i < 3; i++) { const f = sc[b + i * 2] || sc[sc.length - 1]; tone(f, 0.7, 0.09, 'triangle', i * 0.09); tone(f * 2, 0.25, 0.03, 'sine', i * 0.09); } },
+  miss: () => { tone(220, 0.28, 0.1, 'triangle', 0, 0.6); tone(165, 0.4, 0.07, 'sine', 0.1); },
+  over: () => { [392, 329.6, 293.7, 220].forEach((f, i) => tone(f, 0.6, 0.08, 'triangle', i * 0.16)); },
+};
+
+// ---------- state ----------
+let state = 'title';       // title | play | over
+let ken = null, ball = null;
+let score = 0, rank = 0, lives = 3, task = [], step = 0, chain = 0;
+let toss = null;           // {active, valid, y0, minY, t, bounced, reason}
+let pops = [], parts = [], banner = null, hintT = 0, overT = 0, newBest = false, playT = 0, flash = 0, missShake = 0;
+let titleT = 0;
+
+function makeKen() { return { x: WW / 2, y: Math.min(WH * 0.56, maxKenY()), vx: 0, vy: 0, tx: WW / 2, ty: Math.min(WH * 0.56, maxKenY()), ax: 0, ay: 0 }; }
+function makeBall() { return { x: ken.x, y: ken.y + STR, vx: 0, vy: 0, a: 0, w: 0, mode: 'free', taut: true }; }
+
+const FIXED = [['big'], ['small'], ['big', 'small'], ['spike'], ['small', 'big'], ['big', 'big', 'big'], ['big', 'spike'], ['small', 'small'], ['small', 'spike'], ['big', 'small', 'spike'], ['spike', 'spike']];
+function makeTask(r) {
+  if (r < FIXED.length) return FIXED[r].slice();
+  const n = Math.min(5, 2 + Math.floor((r - FIXED.length) / 3));
+  const t = []; let spikes = 0;
+  for (let i = 0; i < n; i++) {
+    let k; do { const q = Math.random(); k = q < 0.4 ? 'big' : q < 0.72 ? 'small' : 'spike'; } while (k === 'spike' && spikes >= 2);
+    if (k === 'spike') spikes++;
+    t.push(k);
+  }
+  return t;
+}
+
+function startGame() {
+  ken = makeKen(); ball = makeBall();
+  score = 0; rank = 0; lives = 3; task = makeTask(0); step = 0; toss = null; chain = 0;
+  pops = []; parts = []; banner = null; hintT = 0; playT = 0; newBest = false; flash = 0;
+  state = 'play';
+  signal('start');
+}
+
+// ---------- input ----------
+let drag = null; // {id, x, y}
+cv.addEventListener('pointerdown', (e) => {
+  e.preventDefault(); initAudio();
+  if (state === 'title') { startGame(); }
+  else if (state === 'over') { if (overT > 0.7) startGame(); return; }
+  if (!drag) drag = { id: e.pointerId, x: e.clientX, y: e.clientY };
+  try { cv.setPointerCapture(e.pointerId); } catch (err) {}
+}, { passive: false });
+cv.addEventListener('pointermove', (e) => {
+  if (!drag || e.pointerId !== drag.id || state !== 'play') return;
+  const dx = (e.clientX - drag.x) / S, dy = (e.clientY - drag.y) / S;
+  drag.x = e.clientX; drag.y = e.clientY;
+  ken.tx = clamp(ken.tx + dx, 70, WW - 70);
+  ken.ty = clamp(ken.ty + dy, minKenY(), maxKenY());
+}, { passive: false });
+const endDrag = (e) => { if (drag && e.pointerId === drag.id) drag = null; };
+cv.addEventListener('pointerup', endDrag);
+cv.addEventListener('pointercancel', endDrag);
+
+// ---------- game events ----------
+function pop(text, x, y, col, size = 18) { pops.push({ text, x, y, col, size, t: 0 }); }
+function burst(x, y, n, col, sp = 160) { for (let i = 0; i < n; i++) { const a = rnd(0, TAU), s = rnd(0.3, 1) * sp; parts.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 60, t: 0, life: rnd(0.4, 0.8), col, r: rnd(1.5, 3.2) }); } }
+
+function onCatch(kind, rel) {
+  const valid = toss && toss.active && toss.valid;
+  const bx = ball.x, by = ball.y;
+  const v = clamp(rel / 600, 0.25, 1);
+  SFX[kind](v);
+  if (!valid) { toss = null; return; }
+  toss = null;
+  const want = task[step];
+  if (kind !== want) {
+    step = 0;
+    pop(fmt(L.wrong, { k: L.trick[kind], w: L.trick[want] }), bx, by - 30, '#7a5a3a', 17);
+    return;
+  }
+  const soft = rel < PITA;
+  chain++;
+  const pts = (kind === 'spike' ? SPIKE.pts : CUPS[kind].pts) * (soft ? 2 : 1) + Math.min(chain - 1, 9);
+  score += pts;
+  if (chain >= 2) pop(fmt(L.chain, { n: chain }), WW / 2, Math.min(ken.y + 130, WH - 70), '#b8281d', 16 + Math.min(chain, 8));
+  if (soft) { SFX.pita(); pop(L.pita + ' +' + pts, bx, by - 34, '#c0392b', 20); burst(bx, by, 14, '#f7d774', 190); }
+  else { pop('+' + pts, bx, by - 30, '#5a3d24', 18); burst(bx, by, 6, '#d9b98a', 110); }
+  step++;
+  if (step >= task.length) {
+    const bonus = 3 * task.length + Math.floor(rank / 3);
+    score += bonus;
+    rank++;
+    if (lives < 3) lives++;
+    SFX.clear(rank);
+    banner = { text: fmt(L.rankup, { r: rankName(rank) }), sub: L.clear + ' +' + bonus, t: 0 };
+    flash = 1;
+    burst(bx, by, 26, '#e8574a', 260);
+    task = makeTask(rank); step = 0;
+  }
+}
+
+function onMiss(reason) {
+  toss = null; chain = 0;
+  const free = rank === 0;
+  step = 0;
+  SFX.miss();
+  pop(reason, ball.x, Math.min(ball.y - 20, ken.y - 40), '#a03020', 19);
+  if (free) { pop(L.practice, WW / 2, WH - 70, '#6b5a44', 14); return; }
+  lives--; missShake = 0.35;
+  if (lives <= 0) endGame();
+}
+
+function endGame() {
+  state = 'over'; overT = 0;
+  newBest = score > best;
+  if (newBest) best = score;
+  if (rank > bestRank) bestRank = rank;
+  store();
+  SFX.over();
+  signal('end', { score });
+}
+
+// ---------- physics ----------
+const DT = 1 / 240;
+let acc = 0;
+function physStep(dt) {
+  // ken follows the finger with a stiff critically-damped spring (smooths jitter, keeps accelerations physical)
+  const w = 32;
+  const pvx = ken.vx, pvy = ken.vy;
+  ken.vx += (w * w * (ken.tx - ken.x) - 2 * w * ken.vx) * dt;
+  ken.vy += (w * w * (ken.ty - ken.y) - 2 * w * ken.vy) * dt;
+  ken.x += ken.vx * dt; ken.y += ken.vy * dt;
+  ken.ax = ken.ax * 0.6 + 0.4 * (ken.vx - pvx) / dt;
+  ken.ay = ken.ay * 0.6 + 0.4 * (ken.vy - pvy) / dt;
+
+  const b = ball;
+  if (b.mode !== 'free') {
+    const rest = b.mode === 'spike' ? { x: SPIKE.x, y: SPIKE.rest } : { x: CUPS[b.mode].x, y: CUPS[b.mode].rest };
+    b.x = ken.x + rest.x; b.y = ken.y + rest.y; b.vx = ken.vx; b.vy = ken.vy;
+    // ball leaves when the cup accelerates downward faster than gravity (flick up then stop), or is jerked sideways
+    const sideLim = b.mode === 'spike' ? 1e9 : G * 2.6;
+    // (lowering the ken steadily keeps the ball seated, like a real cup)
+    if ((ken.ay > G * 1.5 && ken.vy < 120) || Math.abs(ken.ax) > sideLim) {
+      b.mode = 'free';
+      toss = { active: true, valid: false, y0: rest.y, minY: rest.y, t: 0, bounced: false, from: 'cup' };
+    }
+    return;
+  }
+  b.vy += G * dt;
+  const dmp = 1 - 0.12 * dt; b.vx *= dmp; b.vy *= dmp;
+  b.x += b.vx * dt; b.y += b.vy * dt;
+  b.a += b.w * dt; b.w *= 1 - 0.25 * dt;
+
+  // string (inextensible, can go slack)
+  let dx = b.x - ken.x, dy = b.y - ken.y, d = Math.hypot(dx, dy);
+  b.taut = false;
+  if (d > STR) {
+    const nx = dx / d, ny = dy / d;
+    b.x = ken.x + nx * STR; b.y = ken.y + ny * STR;
+    const vr = (b.vx - ken.vx) * nx + (b.vy - ken.vy) * ny;
+    if (vr > 0) {
+      if (vr > 320) SFX.taut(clamp(vr / 1200, 0.2, 1));
+      b.vx -= 1.05 * vr * nx; b.vy -= 1.05 * vr * ny;
+      if (vr > 250) b.w += rnd(-1, 1) * Math.min(vr / 900, 1) * 0.9;
+    }
+    b.taut = true;
+    // the string is knotted opposite the hole: when taut, the hole turns away from the knot
+    const target = Math.atan2(nx, ny);
+    b.w += (380 * angDiff(target, b.a) - 22 * b.w) * dt;
+  }
+
+  // local coords
+  const lx = b.x - ken.x, ly = b.y - ken.y;
+  if (toss) {
+    toss.t += dt; if (ly < toss.minY) toss.minY = ly;
+    if (!toss.valid && (toss.y0 - toss.minY > 22 || toss.t > 0.32)) toss.valid = true;
+  } else if (ly < -10 && b.vy - ken.vy < 0) {
+    toss = { active: true, valid: true, y0: ly, minY: ly, t: 0, bounced: false, from: 'hang' };
+  }
+
+  // cups (one-sided, from above)
+  for (const k of ['big', 'small']) {
+    const c = CUPS[k];
+    const qx = clamp(lx, c.x - c.hw, c.x + c.hw), qy = c.y;
+    const ex = lx - qx, ey = ly - qy, dist = Math.hypot(ex, ey);
+    if (dist < BR + 3 && ly < c.y + 2 && dist > 0.001) {
+      const nx = ex / dist, ny = ey / dist;
+      if (ny > -0.2) continue;
+      const rvx = b.vx - ken.vx, rvy = b.vy - ken.vy, vn = rvx * nx + rvy * ny;
+      if (vn >= 0 || rvy <= 0) continue; // only a ball coming down meets the cup
+      // judged by how fast it comes down onto the cup; a slow ball touching the rim rolls in
+      const rel = Math.max(0, rvy), adx = Math.abs(lx - c.x);
+      const inside = adx <= c.hw * 0.95 || (adx <= c.hw + 7 && rel < 240);
+      if (inside && rel < c.thr) { b.mode = k; b.w = 0; onCatch(k, rel); return; }
+      // bounce
+      b.x = ken.x + qx + nx * (BR + 3); b.y = ken.y + qy + ny * (BR + 3);
+      bounce(nx, ny, rvx, rvy, vn, c.e);
+      if (toss && toss.valid) { toss.bounced = true; toss.reason = inside ? L.hard : L.side; }
+      SFX.clack(clamp(rel / 700, 0.2, 1));
+      return;
+    }
+  }
+  // spike (only when the ball is above the crosspiece and coming down; a rising ball passes in front of it)
+  if (ly < SPIKE.y1 + 2 && b.vy - ken.vy > 0) { // only the tip matters; the shaft is behind the ball
+    const qy = clamp(ly, SPIKE.y1, SPIKE.y0), qx = SPIKE.x;
+    const ex = lx - qx, ey = ly - qy, dist = Math.hypot(ex, ey);
+    if (dist < BR + SPIKE.r && dist > 0.001) {
+      const nx = ex / dist, ny = ey / dist;
+      const rvx = b.vx - ken.vx, rvy = b.vy - ken.vy, vn = rvx * nx + rvy * ny;
+      if (vn < 0 && Math.abs(rvx) < 260) { // a fast sideways sweep passes in front of the ball
+        const rel = -vn;
+        const atTip = qy <= SPIKE.y1 + 0.5 && Math.abs(lx) < SPIKE.tol;
+        if (atTip && Math.abs(angDiff(b.a, 0)) < SPIKE.ang && rel < SPIKE.thr) { b.mode = 'spike'; b.w = 0; b.a = 0; onCatch('spike', rel); return; }
+        b.x = ken.x + qx + nx * (BR + SPIKE.r); b.y = ken.y + qy + ny * (BR + SPIKE.r);
+        bounce(nx, ny, rvx, rvy, vn, 0.5);
+        if (atTip) { b.vx += (lx > 0.5 ? 1 : lx < -0.5 ? -1 : (Math.random() < 0.5 ? -1 : 1)) * rnd(90, 150); } // a ball can't balance on the point
+        if (toss && toss.valid) { toss.bounced = true; toss.reason = atTip ? (rel >= SPIKE.thr ? L.hard : L.hole) : L.side; }
+        SFX.clack(clamp(rel / 700, 0.2, 1));
+      }
+    }
+  }
+  // dropped below the crosspiece during a toss
+  if (toss && ly > 44) {
+    if (toss.valid || toss.from === 'cup') onMiss(toss.bounced ? toss.reason || L.fall : L.fall);
+    toss = null;
+  }
+}
+function bounce(nx, ny, rvx, rvy, vn, e) {
+  const b = ball;
+  let tx = rvx - vn * nx, ty = rvy - vn * ny;
+  b.w += (tx * -ny + ty * nx) / BR * 0.6;
+  tx *= 0.85; ty *= 0.85;
+  b.vx = ken.vx + tx - e * vn * nx;
+  b.vy = ken.vy + ty - e * vn * ny;
+}
+
+// ---------- drawing ----------
+const bg = document.createElement('canvas');
+function buildBg() {
+  bg.width = Math.max(1, W * DPR | 0); bg.height = Math.max(1, H * DPR | 0);
+  const g = bg.getContext('2d');
+  g.setTransform(DPR * S, 0, 0, DPR * S, 0, 0);
+  // shoji wall in late afternoon light
+  const gr = g.createLinearGradient(0, 0, 0, WH);
+  gr.addColorStop(0, '#f6ecd6'); gr.addColorStop(0.7, '#efe0bf'); gr.addColorStop(1, '#e2cfa6');
+  g.fillStyle = gr; g.fillRect(0, 0, WW, WH);
+  const floorY = WH - 54;
+  g.strokeStyle = 'rgba(150,115,70,.22)'; g.lineWidth = 2;
+  const cw = 60, ch = 76;
+  for (let x = (WW % cw) / 2; x <= WW; x += cw) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, floorY); g.stroke(); }
+  for (let y = 40; y < floorY; y += ch) { g.beginPath(); g.moveTo(0, y); g.lineTo(WW, y); g.stroke(); }
+  // warm sun patch
+  const sun = g.createRadialGradient(WW * 0.78, WH * 0.28, 10, WW * 0.78, WH * 0.28, WW * 0.9);
+  sun.addColorStop(0, 'rgba(255,214,150,.45)'); sun.addColorStop(1, 'rgba(255,214,150,0)');
+  g.fillStyle = sun; g.fillRect(0, 0, WW, floorY);
+  // tatami
+  const tg = g.createLinearGradient(0, floorY, 0, WH);
+  tg.addColorStop(0, '#b9b06e'); tg.addColorStop(1, '#9e9658');
+  g.fillStyle = tg; g.fillRect(0, floorY, WW, WH - floorY);
+  g.fillStyle = '#5d4a2e'; g.fillRect(0, floorY, WW, 5);
+  g.strokeStyle = 'rgba(80,70,30,.18)'; g.lineWidth = 1;
+  for (let y = floorY + 9; y < WH; y += 4) { g.beginPath(); g.moveTo(0, y); g.lineTo(WW, y); g.stroke(); }
+}
+
+function wood(g, x0, y0, x1, y1, light) {
+  const gr = g.createLinearGradient(x0, y0, x1, y1);
+  gr.addColorStop(0, light ? '#f2d6a2' : '#e2bd82'); gr.addColorStop(0.45, light ? '#e4bf86' : '#cf9f5f'); gr.addColorStop(1, light ? '#c99a5c' : '#a8773e');
+  return gr;
+}
+function drawKen(x, y, glow, tg) {
+  ctx.save(); ctx.translate(x, y);
+  // shadow
+  ctx.save(); ctx.globalAlpha = 0.12; ctx.fillStyle = '#3a2a14'; ctx.translate(6, 8);
+  ctx.fillRect(-7, 8, 14, 96); ctx.fillRect(-34, -9, 68, 18); ctx.restore();
+  // handle
+  ctx.fillStyle = wood(ctx, -8, 0, 8, 0);
+  ctx.beginPath(); ctx.moveTo(-6.5, 6); ctx.lineTo(6.5, 6); ctx.lineTo(7.5, 92); ctx.lineTo(-7.5, 92); ctx.closePath(); ctx.fill();
+  // base cup (decorative, bottom of the handle)
+  ctx.fillStyle = wood(ctx, -14, 0, 14, 0);
+  ctx.beginPath(); ctx.moveTo(-7.5, 90); ctx.quadraticCurveTo(-14, 98, -14, 106); ctx.lineTo(14, 106); ctx.quadraticCurveTo(14, 98, 7.5, 90); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = 'rgba(70,45,20,.35)'; ctx.beginPath(); ctx.ellipse(0, 106, 14, 3, 0, 0, TAU); ctx.fill();
+  // grip mark
+  ctx.strokeStyle = 'rgba(90,55,25,.25)'; ctx.lineWidth = 1;
+  for (let i = 0; i < 3; i++) { ctx.beginPath(); ctx.moveTo(-6.8, 54 + i * 8); ctx.lineTo(6.8, 54 + i * 8); ctx.stroke(); }
+  // spike
+  ctx.fillStyle = wood(ctx, -5, 0, 5, 0, true);
+  ctx.beginPath(); ctx.moveTo(-5, -6); ctx.lineTo(-4.5, -50); ctx.quadraticCurveTo(-3.5, -60, 0, -64); ctx.quadraticCurveTo(3.5, -60, 4.5, -50); ctx.lineTo(5, -6); ctx.closePath(); ctx.fill();
+  // cups
+  const cup = (c, light) => {
+    const x0 = c.x - c.hw - 1, x1 = c.x + c.hw + 1;
+    ctx.fillStyle = wood(ctx, x0, 0, x1, 0, light);
+    ctx.beginPath(); ctx.moveTo(x0, c.y); ctx.quadraticCurveTo(c.x - c.hw * 0.6, c.y + 16, c.x, c.y + 18);
+    ctx.quadraticCurveTo(c.x + c.hw * 0.6, c.y + 16, x1, c.y); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(80,48,18,.45)'; ctx.beginPath(); ctx.ellipse(c.x, c.y, c.hw + 1, 3.6, 0, 0, TAU); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,240,210,.7)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.ellipse(c.x, c.y, c.hw + 1, 3.6, 0, Math.PI, TAU); ctx.stroke();
+  };
+  // crosspiece
+  ctx.fillStyle = wood(ctx, 0, -9, 0, 9);
+  ctx.beginPath(); ctx.roundRect ? ctx.roundRect(-36, -8, 72, 16, 7) : ctx.rect(-36, -8, 72, 16); ctx.fill();
+  ctx.fillStyle = wood(ctx, 0, -9, 0, 9);
+  ctx.beginPath(); ctx.moveTo(-34, -6); ctx.lineTo(-42, -2); ctx.lineTo(-42, 4); ctx.lineTo(-34, 6); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(34, -6); ctx.lineTo(41, -1); ctx.lineTo(41, 4); ctx.lineTo(34, 6); ctx.fill();
+  cup(CUPS.big); cup(CUPS.small);
+  ctx.fillStyle = '#6b4220'; ctx.beginPath(); ctx.arc(0, 2, 2.2, 0, TAU); ctx.fill();
+  // target glow
+  if (glow) {
+    const p = 0.55 + 0.45 * Math.sin(titleT * 6);
+    ctx.save(); ctx.globalAlpha = 0.5 + 0.4 * p; ctx.strokeStyle = '#fff6b0'; ctx.lineWidth = 3; ctx.shadowColor = '#ffd23a'; ctx.shadowBlur = 14;
+    if (tg === 'spike') { ctx.beginPath(); ctx.arc(0, -63, 7 + 2 * p, 0, TAU); ctx.stroke(); }
+    else { const c = CUPS[tg]; ctx.beginPath(); ctx.ellipse(c.x, c.y - 1, c.hw + 4 + 2 * p, 6 + p, 0, 0, TAU); ctx.stroke(); }
+    ctx.restore();
+  }
+  ctx.restore();
+}
+function drawString() {
+  const b = ball;
+  const ax = ken.x, ay = ken.y + 2;
+  // knot is opposite the hole
+  const kx = b.x - Math.sin(b.a) * BR * 0.92, ky = b.y - Math.cos(b.a) * BR * 0.92;
+  const d = Math.hypot(kx - ax, ky - ay);
+  const sag = b.mode !== 'free' || !b.taut ? Math.sqrt(Math.max(0, STR * STR - d * d)) * 0.55 : 0;
+  ctx.strokeStyle = '#fbf6ec'; ctx.lineWidth = 1.6; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(ax, ay);
+  ctx.quadraticCurveTo((ax + kx) / 2, Math.max(ay, ky) + sag, kx, ky); ctx.stroke();
+  ctx.strokeStyle = 'rgba(120,100,70,.35)'; ctx.lineWidth = 0.6; ctx.stroke();
+}
+function drawBall() {
+  const b = ball;
+  ctx.save(); ctx.translate(b.x, b.y);
+  const gr = ctx.createRadialGradient(-5, -6, 2, 0, 0, BR);
+  gr.addColorStop(0, '#ff8a7a'); gr.addColorStop(0.35, '#e23a2c'); gr.addColorStop(1, '#8e1712');
+  ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(0, 0, BR, 0, TAU); ctx.fill();
+  // hole (only visible when facing roughly toward the viewer side drawn as a flattened ellipse at the rim)
+  const hx = Math.sin(b.a), hy = Math.cos(b.a);
+  ctx.save(); ctx.rotate(-b.a);
+  ctx.fillStyle = '#2b0d08'; ctx.beginPath(); ctx.ellipse(0, BR * 0.72, 6.2, 3.2, 0, 0, TAU); ctx.fill();
+  ctx.fillStyle = 'rgba(255,200,180,.35)'; ctx.beginPath(); ctx.ellipse(0, BR * 0.72 - 1.5, 5.5, 1.2, 0, Math.PI, TAU); ctx.fill();
+  ctx.restore();
+  // gloss
+  ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.beginPath(); ctx.ellipse(-5.5, -7, 4.5, 2.6, -0.6, 0, TAU); ctx.fill();
+  ctx.restore();
+  void hx; void hy;
+}
+
+function txt(s, x, y, size, col, weight = 700, align = 'center', maxW) {
+  ctx.font = `${weight} ${size}px ${FONT}`; ctx.textAlign = align; ctx.textBaseline = 'middle';
+  const mw = maxW || WW - 24, w = ctx.measureText(s).width;
+  if (w > mw) ctx.font = `${weight} ${size * mw / w}px ${FONT}`;
+  ctx.fillStyle = col; ctx.fillText(s, x, y);
+}
+function otxt(s, x, y, size, col, weight = 800, maxW) {
+  ctx.save(); ctx.lineJoin = 'round'; ctx.strokeStyle = 'rgba(255,250,238,.95)'; ctx.lineWidth = 5;
+  ctx.font = `${weight} ${size}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const mw = maxW || WW - 24, w = ctx.measureText(s).width; if (w > mw) ctx.font = `${weight} ${size * mw / w}px ${FONT}`;
+  ctx.strokeText(s, x, y); ctx.restore(); txt(s, x, y, size, col, weight, 'center', maxW);
+}
+function miniBall(x, y, r, on) {
+  ctx.fillStyle = on ? '#d8352a' : 'rgba(120,90,60,.25)'; ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill();
+  if (on) { ctx.fillStyle = 'rgba(255,255,255,.6)'; ctx.beginPath(); ctx.arc(x - r * 0.35, y - r * 0.35, r * 0.3, 0, TAU); ctx.fill(); }
+}
+function chip(label, x, y, w, state) {
+  const h = 28;
+  ctx.fillStyle = state === 'done' ? '#d8352a' : state === 'now' ? '#fff3c4' : 'rgba(255,250,238,.85)';
+  ctx.strokeStyle = state === 'now' ? '#e0a020' : 'rgba(110,80,45,.35)'; ctx.lineWidth = state === 'now' ? 2.5 : 1;
+  ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x - w / 2, y - h / 2, w, h, 14) : ctx.rect(x - w / 2, y - h / 2, w, h); ctx.fill(); ctx.stroke();
+  txt(label, x, y + 1, 14, state === 'done' ? '#fff' : '#4a3018', 800, 'center', w - 8);
+}
+
+function drawHUD() {
+  txt(score + ' ' + L.score, 14, 22, 22, '#4a3018', 800, 'left', WW * 0.4);
+  txt(L.best + ' ' + Math.max(best, score), WW - 14, 18, 14, '#6b5a44', 700, 'right', WW * 0.4);
+  for (let i = 0; i < 3; i++) miniBall(WW - 20 - i * 18, 40, 6.5, i < lives);
+  // rank + task
+  txt(rankName(rank), WW / 2, 22, 16, '#7a4a20', 800, 'center', WW * 0.3);
+  const n = task.length, gap = 14;
+  ctx.font = `800 14px ${FONT}`;
+  const ws = task.map((k) => Math.max(62, ctx.measureText(L.trick[k]).width + 22));
+  let tot = ws.reduce((a, b) => a + b, 0) + gap * (n - 1);
+  const sc = Math.min(1, (WW - 24) / tot);
+  let x = WW / 2 - tot * sc / 2;
+  const y = 64;
+  ctx.save();
+  if (sc < 1) { ctx.translate(WW / 2, y); ctx.scale(sc, sc); ctx.translate(-WW / 2, -y); x = WW / 2 - tot / 2; }
+  for (let i = 0; i < n; i++) {
+    const w = ws[i];
+    chip(L.trick[task[i]], x + w / 2, y, w, i < step ? 'done' : i === step ? 'now' : 'todo');
+    if (i < n - 1) txt('→', x + w + gap / 2, y, 14, '#8a6a44', 800);
+    x += w + gap;
+  }
+  ctx.restore();
+}
+
+function draw() {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.drawImage(bg, 0, 0);
+  ctx.setTransform(DPR * S, 0, 0, DPR * S, 0, 0);
+  if (missShake > 0) ctx.translate(Math.sin(missShake * 80) * missShake * 10, 0);
+
+  if (state === 'title') { drawTitle(); return; }
+
+  if (flash > 0) { ctx.fillStyle = `rgba(255,236,170,${flash * 0.35})`; ctx.fillRect(0, 0, WW, WH); }
+  // floor shadow of the ball
+  const floorY = WH - 52;
+  ctx.fillStyle = 'rgba(60,45,20,.18)'; ctx.beginPath(); ctx.ellipse(ball.x, floorY + 6, 14, 3.5, 0, 0, TAU); ctx.fill();
+  ctx.fillStyle = 'rgba(60,45,20,.12)'; ctx.beginPath(); ctx.ellipse(ken.x, floorY + 6, 30, 4, 0, 0, TAU); ctx.fill();
+
+  if (banner) {
+    const a = clamp(banner.t < 0.15 ? banner.t / 0.15 : 1.25 - banner.t, 0, 1) * 0.9, sc = 1 + 0.2 * Math.max(0, 1 - banner.t * 5);
+    ctx.save(); ctx.globalAlpha = a; ctx.translate(WW / 2, WH * 0.2 + 6); ctx.scale(sc, sc);
+    otxt(banner.text, 0, 0, 26, '#c0392b', 900, WW - 40);
+    otxt(banner.sub, 0, 30, 15, '#6b4a24', 700, WW - 40);
+    ctx.restore();
+  }
+  drawKen(ken.x, ken.y, state === 'play', task[step]);
+  // landing guide: the ball's shadow on the cup line while it is up in the air
+  if (ball.mode === 'free' && ball.y < ken.y - 30) {
+    const h = ken.y - 12 - ball.y, a = clamp(0.5 - h / 500, 0.12, 0.5), r = clamp(9 - h / 40, 4, 9);
+    ctx.fillStyle = `rgba(70,30,10,${a})`; ctx.beginPath(); ctx.ellipse(ball.x, ken.y - 13, r * 1.6, r * 0.45, 0, 0, TAU); ctx.fill();
+    ctx.strokeStyle = `rgba(160,60,40,${a * 0.5})`; ctx.lineWidth = 1; ctx.setLineDash([3, 5]);
+    ctx.beginPath(); ctx.moveTo(ball.x, ball.y + BR + 4); ctx.lineTo(ball.x, ken.y - 16); ctx.stroke(); ctx.setLineDash([]);
+  }
+  drawString();
+  drawBall();
+
+  for (const p of parts) { ctx.globalAlpha = clamp(1 - p.t / p.life, 0, 1); ctx.fillStyle = p.col; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, TAU); ctx.fill(); }
+  ctx.globalAlpha = 1;
+  for (const p of pops) { ctx.globalAlpha = clamp(1.4 - p.t / 0.9, 0, 1); otxt(p.text, clamp(p.x, 70, WW - 70), Math.max(100, p.y) - p.t * 40, p.size, p.col, 800, WW * 0.7); }
+  ctx.globalAlpha = 1;
+
+  drawHUD();
+
+  if (state === 'play' && hintT < 7) {
+    const a = clamp(Math.min(hintT * 3, 7 - hintT), 0, 1);
+    const s = hintT < 3.5 ? L.hint : L.hint2;
+    ctx.globalAlpha = a;
+    ctx.font = `700 14px ${FONT}`; const w = Math.min(WW - 20, ctx.measureText(s).width + 26);
+    ctx.fillStyle = 'rgba(60,40,20,.72)'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(WW / 2 - w / 2, WH - 42, w, 30, 15) : ctx.rect(WW / 2 - w / 2, WH - 42, w, 30); ctx.fill();
+    txt(s, WW / 2, WH - 27, 14, '#fff', 700, 'center', w - 14);
+    ctx.globalAlpha = 1;
+  }
+  if (state === 'over') drawOver();
+}
+
+function drawTitle() {
+  // idle kendama swaying gently
+  const t = titleT;
+  const kx = WW / 2 + Math.sin(t * 1.2) * 6, ky = WH * 0.62;
+  ken.x = kx; ken.y = ky;
+  ball.x = kx + Math.sin(t * 2.1) * 10; ball.y = ky + Math.sqrt(STR * STR - 100); ball.a = Math.sin(t * 2.1) * -0.08; ball.mode = 'free'; ball.taut = true;
+  drawKen(kx, ky, false);
+  drawString(); drawBall();
+  otxt(L.title, WW / 2, WH * 0.17, 40, '#b8281d', 900, WW - 30);
+  for (let i = 0; i < L.how.length; i++) txt(L.how[i], WW / 2, WH * 0.27 + i * 24, 14, '#4a3018', 700, 'center', WW - 30);
+  if (best > 0) txt(L.best + ' ' + best + (bestRank > 0 ? '  ·  ' + rankName(bestRank) : ''), WW / 2, WH * 0.27 + 80, 14, '#7a5a3a', 700);
+  ctx.globalAlpha = 0.6 + 0.4 * Math.sin(t * 4);
+  otxt(L.tap, WW / 2, WH - 30, 20, '#7a3a14', 800);
+  ctx.globalAlpha = 1;
+}
+function drawOver() {
+  const a = clamp(overT * 3, 0, 1);
+  ctx.globalAlpha = a;
+  ctx.fillStyle = 'rgba(246,236,214,.86)'; ctx.fillRect(0, 0, WW, WH);
+  otxt(L.over, WW / 2, WH * 0.24, 30, '#7a4a20', 900);
+  txt(L.reach, WW / 2, WH * 0.33, 14, '#6b5a44', 700);
+  otxt(rankName(rank), WW / 2, WH * 0.33 + 34, 36, '#b8281d', 900);
+  otxt(score + ' ' + L.score, WW / 2, WH * 0.50, 44, '#4a3018', 900);
+  if (newBest) otxt(L.newbest, WW / 2, WH * 0.50 + 44, 20, '#c0392b', 900);
+  else txt(L.best + ' ' + best, WW / 2, WH * 0.50 + 44, 16, '#6b5a44', 700);
+  if (overT > 0.7) { ctx.globalAlpha = a * (0.6 + 0.4 * Math.sin(overT * 4)); otxt(L.again, WW / 2, WH * 0.78, 20, '#7a3a14', 800); }
+  ctx.globalAlpha = 1;
+}
+
+// ---------- loop ----------
+let last = 0;
+function frame(ts) {
+  const dt = Math.min(0.05, Math.max(0, (ts - (last || ts)) / 1000)); last = ts;
+  titleT += dt;
+  if (state === 'play' || state === 'over') {
+    if (state === 'play') { playT += dt; hintT += dt; }
+    if (state === 'over') overT += dt;
+    acc += dt;
+    let n = 0;
+    while (acc >= DT && n < 16) { physStep(DT); acc -= DT; n++; }
+    if (n >= 16) acc = 0;
+    for (const p of parts) { p.t += dt; p.vy += 500 * dt; p.x += p.vx * dt; p.y += p.vy * dt; }
+    parts = parts.filter((p) => p.t < p.life);
+    for (const p of pops) p.t += dt;
+    pops = pops.filter((p) => p.t < 1.4);
+    if (banner) { banner.t += dt; if (banner.t > 1.25) banner = null; }
+    flash = Math.max(0, flash - dt * 2.5); missShake = Math.max(0, missShake - dt);
+  }
+  draw();
+  requestAnimationFrame(frame);
+}
+ken = makeKen(); ball = makeBall();
+addEventListener('resize', resize);
+resize();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
