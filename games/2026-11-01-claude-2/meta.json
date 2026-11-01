@@ -1,0 +1,479 @@
+{
+  "id": "2026-11-01-claude-2",
+  "status": "published",
+  "title": "ひょっこり雪合戦",
+  "genre": "シューティング",
+  "concept": "指を置いている間だけ雪の壁から顔を出せる雪合戦。ねらうには顔を出す必要があり、その間は相手の雪玉も当たる。隠れていれば雪玉を作れる。いつ顔を出し、いつ引っこむかの「ひょっこり」の間合いと、ふりかぶった子へのカウンターが核。",
+  "howToPlay": "指を置くと壁から顔を出し、指を動かしてねらう。はなすと雪玉を投げて隠れる。",
+  "libraryDecision": "three.js（と角丸の箱）を使う。雪玉が放物線で飛んでくる奥行きと、壁から顔を出す・引っこむ視点の上下がそのまま遊びなので3Dにした。物理演算は放物線と当たり判定だけで足りるので使わない。",
+  "soundDecision": "Web Audio で自作。投げる風切り、当たったときのボフッという音と子どもの声のような短い音、頭上を通りすぎるヒュッ、雪玉を固めるギュッを鳴らす。隠れている間は相手が見えないので、音で「顔を出した」「投げた」が分かるようにした。",
+  "improvements": [
+    {
+      "found": "①隠れている間の画面が一面の灰色の壁で、何も分からず退屈 ②最初に顔を出すとほぼ確実に当てられ理不尽 ③子どもが小さく遠く、頭が少し出るだけでねらえない",
+      "changed": "隠れている間も子どもの位置と動きが壁ごしに丸い印で見えるようにし、視点を少し空に向けて飛んでくる雪玉が見えるようにした。相手のねらいを甘くし、子どもを大きく近くに配置して、立ち上がると胸まで見えるようにした。雪に質感を付けた。",
+      "foundEn": "(1) While ducked the screen was a flat grey wall with nothing to read (2) The first peek almost always got you hit (3) Kids were tiny and far, only the tops of their heads showed",
+      "changedEn": "While ducked, round markers now show each kid's position and movement through the wall, and the view tilts up so incoming balls are visible. Kids aim less precisely, are bigger and closer, and show their chests when they stand. Added snow texture."
+    },
+    {
+      "found": "①顔を出しただけの子をねらっても、雪玉が届く前に引っこまれて当たる気がしない ②投げた直後に手元の雪玉が画面を大きくふさぐ ③外れたときに何が起きたか分からない",
+      "changed": "子どもは投げ終わったあとしばらく顔を出したままにして「よけてから反撃」の間を作り、こちらの雪玉を速くした。ふりかぶった子に当てるとカウンター（高得点）とタイトルで伝えた。投げた瞬間は手元の雪玉を消し、近くに外れたら「おしい！」と出すようにした。雪の粒を丸くし、文字が画面の端で切れないようにした。",
+      "foundEn": "(1) Kids who just peeked always ducked before the ball arrived, so hits felt impossible (2) Right after a throw the snowball in hand blocked the view (3) Misses gave no feedback",
+      "changedEn": "Kids now linger after throwing, creating a dodge-then-strike-back window, and your throws fly faster. The title explains that hitting a kid mid-windup is a high-scoring counter. The hand snowball disappears on release, and near misses show 'Close!'. Snow particles are round and pop-up text no longer clips at the edges."
+    },
+    {
+      "found": "①隠れているのに、頭上を越える雪玉に当たることがあった（理不尽） ②隠れている間も画面の大半が壁で、空を飛ぶ雪玉が見えにくい ③壁ごしの印が画面の下に固まり、読み取りにくい",
+      "changed": "隠れている間は絶対に当たらないようにし、頭上を越えたら「セーフ！」になるようにした。隠れたときの視点をさらに空へ向け、雪玉の放物線が見えるようにした。印を子どもの頭より上に出して、壁の上のほうで読めるようにした。",
+      "foundEn": "(1) You could get hit while ducked by a ball dropping over the wall (unfair) (2) While ducked the wall still filled most of the screen, hiding the arcing balls (3) The through-the-wall markers bunched up near the bottom",
+      "changedEn": "Ducking is now always safe; a ball passing overhead shows 'SAFE!'. The ducked view tilts further toward the sky so the arcs are visible, and markers float above each kid so they read higher on the wall."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "シューティング",
+      "en": "Shooter",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "3Dの雪合戦。指を置いている間だけ壁から顔を出してねらえ、はなすと投げて隠れる。顔を出す間合いが核。",
+        "ideaEn": "A 3D snowball fight: you peek over your wall only while touching; release to throw and duck. Timing your peeks is the core.",
+        "fromDraw": true
+      },
+      {
+        "idea": "枯山水の庭を熊手でなぞって砂紋を描き、石を置く。目標も終わりもない静かな遊び場。",
+        "ideaEn": "Rake ripples into a zen sand garden and place stones; a quiet playground with no goal or ending.",
+        "fromDraw": false
+      },
+      {
+        "idea": "指で線を描くとドミノが並び、倒すと連鎖して鐘を鳴らす3D物理パズル。限られた枚数で届かせる。",
+        "ideaEn": "Draw a line to lay out dominoes, then tip them so the chain rings a bell; a 3D physics puzzle with a limited count.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "fail",
+    "input": [
+      "hold",
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Peek-a-Snow",
+      "concept": "A snowball fight where you can only peek over your snow wall while your finger is down. To aim you must show your face, and that is when their snowballs can hit you; ducking packs new snowballs. The core is the timing of popping up and ducking, plus countering a kid mid-windup.",
+      "howToPlay": "Touch to pop up from your wall and drag to aim. Release to throw and duck back down.",
+      "libraryDecision": "Uses three.js (plus RoundedBoxGeometry). The depth of snowballs arcing toward you and the camera rising and dropping behind the wall are the game itself, so it is 3D. No physics library: parabolas and simple hit tests are enough.",
+      "soundDecision": "Hand-made Web Audio: throw whooshes, a soft thump plus a short kid-like squeal on hits, a whoosh when a ball flies overhead, and a crunch when packing snow. While ducked you cannot see the kids, so sound tells you when they pop up and throw."
+    }
+  },
+  "createdAt": "2026-11-01T17:55:00+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-01T17:55:00+09:00",
+    "metricsFrom": "2026-11-01T08:54:18.443Z",
+    "transcript": "b419ebb0-b47b-4a95-b84c-6dd6b16b4cfe.jsonl",
+    "validationRuns": 6,
+    "finishedAt": "2026-11-01T18:37:23+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-01T18:33:56+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "46.9KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=37",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=34",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=34",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=136",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 47988,
+    "lines": 831
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 2
+  },
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js"
+    },
+    {
+      "name": "three.js addons",
+      "version": "0.186.1",
+      "file": "three-addons-0.186.1.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "隠れている時間の多くは壁を見ているだけで、子どもが小さいため指の少し上に出る照準でねらうのが慣れるまで難しい",
+    "comment": "印が浮いたのを見て立ち、投げ終わりで顔を出したままの子に当てて「アウト！」になる流れは気持ちよかった。ふりかぶりの「!」を見て隠れ、雪玉が頭上を越えて「セーフ！」と出たあと反撃する、という読み合いが数回で分かる。一方で、ピンク帽の素早い子にはよく引っこまれ、外れが続くと単調。立ったままの画面は自己プレイでは指を離した直後しか撮れず、画像で確認できたのは投げた直後と隠れた状態が中心（立ち続ける場面は別の検証用の撮影で確認した）。",
+    "similar": [
+      {
+        "title": "Time Crisis (Namco, 1995)",
+        "url": "https://en.wikipedia.org/wiki/Time_Crisis_(video_game)",
+        "similarity": "高",
+        "note": "ペダルを踏んでいる間だけ物陰から出て撃て、離すと隠れて弾を込める仕組みがほぼ同じ。違いは、指を置く＝顔を出す・離す＝投げる、を1本の指にまとめたことと、放物線で飛ぶ雪玉で、ふりかぶった相手へのカウンターと投げ終わりへの反撃を読み合いにしたこと。",
+        "note_en": "Nearly the same idea: you leave cover only while holding the pedal and reload when you release it. Differences: peek, aim and throw are folded into a single finger, and arcing snowballs turn countering a windup and punishing the follow-through into a read."
+      },
+      {
+        "title": "Snowball Fight (Neopets)",
+        "url": "https://thedailyneopets.com/neopets-games/snowball-fight",
+        "similarity": "中",
+        "note": "雪の砦の陰にかがみ、ねらうときだけ立つ雪合戦。こちらは横からの2D視点。本作は一人称の3Dで、隠れている間は壁ごしの印と音だけで相手を読む。",
+        "note_en": "A snowball fight where you crouch behind a snow fort and stand only to aim, seen from the side in 2D. This game is first-person 3D, and while ducked you read the kids only through markers and sound."
+      }
+    ],
+    "research": "WebSearch で「Time Crisis ペダル 隠れる」「雪合戦 壁に隠れて顔を出して投げる スマホ」を検索した。",
+    "i18n": {
+      "en": {
+        "worst": "Much of the time you just stare at your wall while ducked, and the kids are small enough that aiming with the reticle above your finger takes getting used to",
+        "comment": "Watching a marker rise, popping up and hitting a kid who lingers after throwing for an 'OUT!' felt good. Within a few rounds you learn the read: duck at the '!' windup, hear the ball go over for 'SAFE!', then strike back. But the quick pink-hat kid often ducks in time, and a run of misses gets monotonous. Self-play screenshots are taken after the finger lifts, so I mostly saw the ducked view and the moment after a throw; the standing view was checked with separate test captures.",
+        "research": "Used WebSearch for 'Time Crisis pedal duck cover' and 'snowball fight hide behind wall pop up throw mobile'."
+      }
+    },
+    "method": "スマホ縦画面で 11 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 11 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 1700ms",
+        "note": "スタート。隠れて壁ごしの印を見る",
+        "noteEn": "Start. Ducked, watching the markers over the wall",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "path(0.20,0.66→0.14,0.57) 330ms",
+        "note": "左の印が浮いた＝顔を出した。サッと立って投げる",
+        "noteEn": "Left marker rose: the kid is up. Pop up and throw",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 700ms",
+        "note": "隠れて結果を待つ",
+        "noteEn": "Duck and wait",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "path(0.80,0.66→0.86,0.57) 330ms → wait 600ms",
+        "note": "左は引っこまれた。投げ終わりで立っている右の子に反撃",
+        "noteEn": "Left one ducked. Strike back at the right kid lingering after its throw",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 500ms",
+        "note": "残りは左の子。印を見て待つ",
+        "noteEn": "Only the left kid left; watching its marker",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 900ms",
+        "note": "左の子が出るのを待つ",
+        "noteEn": "Waiting for the left kid",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "path(0.20,0.66→0.14,0.57) 300ms → wait 700ms",
+        "note": "左の印が浮きかけた。顔を出しきる前に投げておく",
+        "noteEn": "Left marker is rising; throw as it comes up",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 3000ms",
+        "note": "カウンターでウェーブ1クリア。ウェーブ2へ",
+        "noteEn": "Counter cleared wave 1; on to wave 2",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "path(0.50,0.70→0.50,0.60) 900ms",
+        "note": "様子見で顔を出し続けてみる",
+        "noteEn": "Try staying up longer to look around",
+        "image": "ai-play/step-09.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 1200ms",
+        "note": "左の青い子がふりかぶっていたので隠れた",
+        "noteEn": "The blue kid on the left was winding up, so I ducked",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "path(0.20,0.66→0.13,0.56) 300ms → wait 700ms",
+        "note": "投げ終わりの青い子に反撃",
+        "noteEn": "Strike back at the blue kid after its throw",
+        "image": "ai-play/step-11.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-01T18:37:23+09:00"
+  },
+  "publishedAt": "2026-11-01T18:37:23+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 26707,
+    "outputTokens": 54870,
+    "contextTokens": 19221874,
+    "turns": 95,
+    "toolCalls": 106,
+    "webSearches": 0,
+    "minutes": 43.1,
+    "from": "2026-11-01T08:54:18.443Z",
+    "to": "2026-11-01T09:37:26.685Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-01T18:37:26+09:00",
+    "validationRuns": 6,
+    "codeKB": 46.9
+  }
+}
