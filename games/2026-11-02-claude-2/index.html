@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>パッチン！めんこ / Menko Slap</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #2a1a10; }
+body { font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif; color: #fff4e2; }
+#gl { position: fixed; left: 0; top: 0; width: 100vw; height: 100dvh; display: block; }
+#ui { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+#hud { position: absolute; left: 0; right: 0; top: 0; display: none; justify-content: space-between; align-items: flex-start; padding: 8px 12px; text-shadow: 0 1px 3px #000d; }
+#who { font-size: 15px; font-weight: 800; line-height: 1.25; }
+#who small { display: block; font-size: 14px; font-weight: 700; opacity: .9; }
+#right { text-align: right; }
+#throws { display: flex; gap: 3px; justify-content: flex-end; }
+.th { width: 12px; height: 16px; border-radius: 2px; background: linear-gradient(#ffd77a, #e0902e); box-shadow: inset 0 0 0 1.5px #7a3d12; }
+.th.used { background: #ffffff22; box-shadow: inset 0 0 0 1.5px #ffffff33; }
+#left { font-size: 14px; font-weight: 700; margin-top: 5px; }
+#swap { position: absolute; right: 12px; bottom: 14px; width: 64px; min-height: 64px; display: none; pointer-events: auto; border-radius: 12px; background: #00000055; border: 2px solid #ffe2a866; color: #fff; font-size: 12px; font-weight: 800; text-align: center; padding: 4px 2px; box-sizing: border-box; }
+#swap canvas { width: 34px; height: 46px; display: block; margin: 0 auto 2px; border-radius: 3px; }
+#hint { position: absolute; left: 0; right: 0; bottom: 13%; text-align: center; font-size: 15px; font-weight: 800; text-shadow: 0 1px 3px #000, 0 0 6px #000a; transition: opacity .5s; opacity: 0; padding: 0 16px; }
+.pop { position: absolute; transform: translate(-50%, -50%); font-weight: 900; white-space: nowrap; text-shadow: 0 2px 4px #000c, 0 0 2px #000; pointer-events: none; }
+#banner { position: absolute; left: 0; right: 0; top: 34%; text-align: center; opacity: 0; transition: opacity .35s; text-shadow: 0 2px 6px #000c; }
+#banner .b1 { font-size: 16px; font-weight: 800; color: #ffd98c; }
+#banner .b2 { font-size: 34px; font-weight: 900; margin-top: 4px; }
+#banner .b3 { font-size: 15px; font-weight: 700; margin-top: 8px; }
+.ov { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; background: radial-gradient(ellipse at 50% 45%, #3a2212cc, #140a05ee); }
+.ov.on { display: flex; }
+.ttl { font-size: 44px; font-weight: 900; color: #ffe39e; text-shadow: 0 3px 0 #b2361f, 0 0 18px #ff8a4a77; line-height: 1.15; }
+.sub { font-size: 14px; color: #ffcf9a; margin-top: 8px; letter-spacing: .08em; }
+.how { margin-top: 24px; font-size: 15px; line-height: 1.75; color: #fff3df; }
+.how b { color: #ffd36b; }
+.tap { margin-top: 28px; font-size: 18px; font-weight: 800; color: #fff; animation: blink 1.2s ease-in-out infinite; }
+.cont { margin-top: 10px; font-size: 14px; color: #ffd98c; }
+@keyframes blink { 50% { opacity: .35; } }
+.rs-h { font-size: 18px; font-weight: 800; color: #ffcf9a; }
+.rs-s { font-size: 50px; font-weight: 900; color: #ffe39e; line-height: 1.15; text-shadow: 0 3px 0 #b2361f; margin-top: 4px; }
+.rs-b { font-size: 16px; margin-top: 8px; line-height: 1.5; }
+.rs-b.new { color: #ffd36b; font-weight: 800; }
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div id="ui">
+  <div id="hud">
+    <div id="who"></div>
+    <div id="right"><div id="throws"></div><div id="left"></div></div>
+  </div>
+  <div id="swap"><canvas id="swapc" width="68" height="92"></canvas><span id="swapn"></span></div>
+  <div id="banner"><div class="b1" id="bn1"></div><div class="b2" id="bn2"></div><div class="b3" id="bn3"></div></div>
+  <div id="hint"></div>
+  <div id="title" class="ov on">
+    <div class="ttl" id="t-title"></div>
+    <div class="sub" id="t-sub"></div>
+    <div class="how" id="t-how"></div>
+    <div class="tap" id="t-tap"></div>
+    <div class="cont" id="t-cont"></div>
+  </div>
+  <div id="result" class="ov">
+    <div class="rs-h" id="r-h"></div>
+    <div class="rs-s" id="r-s"></div>
+    <div class="rs-b" id="r-b"></div>
+    <div class="tap" id="r-tap"></div>
+  </div>
+</div>
+<script src="../../lib/three-0.186.1.min.js"></script>
+<script src="../../lib/cannon-es-0.20.0.min.js"></script>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const D = {
+  ja: {
+    title: 'パッチン！めんこ', sub: '― 夕ぐれの路地で めんこ勝負 ―',
+    how: '指で<b>ねらって</b>、<b>下へさっとはじく</b>とたたきつける<br>相手のめんこを<b>うら返すか、円の外へ</b>出せば勝ち<br>まん中より、<b>ふちのすぐ外</b>をねらえ',
+    tap: 'タップでスタート', cont: (n) => `つづき：${n}人目から`, again: 'タップでもう一度', next: 'タップで次へ',
+    hint: '指でねらって、下へ さっとはじく！',
+    who: (i, n) => `${i}人目 ${n}`, left: (n) => `のこり ${n}まい`, vs: (i) => `${i}人目の相手`,
+    throwsN: (n) => `${n}回で ぜんぶ取れ`,
+    win: 'かち！', lose: 'まけ…', got: (n) => `${n}まい いただき！`, lost: 'めんこが残ってしまった',
+    allClear: 'めんこ名人！', total: (n) => `合計 ${n}回で 5人ぬき`, best: (n) => `ベスト ${n}回`, newBest: 'ベスト更新！',
+    slap: ['ペチッ', 'パン！', 'パァン！', 'バッチーン！！'], flip: 'かえった！', out: 'とび出た！', self: 'じばく… 1回へる',
+    tipCenter: 'まん中だと風がにげない。ふちのすぐ外へ！', tipFar: '遠すぎて 風がとどかない', tipWeak: 'もっと強く はじいて！', tipSelf: '強すぎ！ 札のふちに乗ると 自分がかえる',
+    tipHeavy: 'ぶあつい！ 強く、すぐ横に', tipClose: 'おしい！', tipOn: '札の上に乗ると おさえつけるだけ。少し外へ', tipEdge: 'ふちに乗ってしまった。指一本ぶん外へ',
+    bonus: (n, k) => `${n}まい抜き！ はじく回数 +${k}`,
+    reward: (n) => `「${n}」を手に入れた！`, swapHint: '右下で めんこを持ちかえられる',
+    names: ['たっくん', 'みよちゃん', 'けんちゃん', 'ガキ大将ゴロー', '名人のじいちゃん'],
+    lines: ['手かげんしてね', '丸いのは かるいよ', 'うちの、ぶあついぞ', '反ってるのは 内緒だ', 'ほっほ、来なさい'],
+    cards: { std: 'ふつう', big: '大判', thick: '厚紙' },
+  },
+  en: {
+    title: 'Menko Slap', sub: '— a card-slapping duel in the evening alley —',
+    how: '<b>Aim</b> with your finger, then <b>flick down</b> to slap<br><b>Flip</b> their cards or <b>blow them out</b> of the ring<br>Don’t hit the middle — land <b>just beside the edge</b>',
+    tap: 'Tap to start', cont: (n) => `Continue from opponent ${n}`, again: 'Tap to play again', next: 'Tap to continue',
+    hint: 'Aim with your finger, flick down fast!',
+    who: (i, n) => `#${i} ${n}`, left: (n) => `${n} left`, vs: (i) => `Opponent #${i}`,
+    throwsN: (n) => `Take them all in ${n} slaps`,
+    win: 'You win!', lose: 'You lose…', got: (n) => `Won ${n} cards!`, lost: 'Cards left on the ground',
+    allClear: 'Menko Master!', total: (n) => `Beat all 5 in ${n} slaps`, best: (n) => `Best ${n} slaps`, newBest: 'New best!',
+    slap: ['tap', 'Slap!', 'SLAP!', 'KA-POW!!'], flip: 'Flipped!', out: 'Out!', self: 'Self-flip… −1 slap',
+    tipCenter: 'The middle traps the air. Land just outside the edge!', tipFar: 'Too far — the wind can’t reach', tipWeak: 'Flick harder!', tipSelf: 'Too hard onto an edge — your own card flipped',
+    tipHeavy: 'Thick one! Hard, and right beside it', tipClose: 'So close!', tipOn: 'Landing on a card just pins it. Go a bit outside', tipEdge: 'You clipped its edge. One finger-width further out',
+    bonus: (n, k) => `${n} in one slap! +${k} slap`,
+    reward: (n) => `You got the “${n}” card!`, swapHint: 'Switch cards at the bottom right',
+    names: ['Takkun', 'Miyo', 'Ken', 'Goro the Boss', 'Grandpa Master'],
+    lines: ['Go easy on me', 'Round ones are light', 'Mine are thick!', 'Don’t look at the curl', 'Ho ho, come at me'],
+    cards: { std: 'Basic', big: 'Big', thick: 'Thick' },
+  },
+}[LANG === 'ja' ? 'ja' : 'en'];
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+const $ = (id) => document.getElementById(id);
+$('t-title').textContent = D.title; $('t-sub').textContent = D.sub; $('t-how').innerHTML = D.how; $('t-tap').textContent = D.tap;
+
+// ---------- save ----------
+let save = { stage: 0, deck: ['std'], best: 0, cur: 'std', total: 0 };
+addEventListener('message', (e) => {
+  if (e.data && e.data.agf === 'loaded' && e.data.data && state === 'title') {
+    save = Object.assign(save, e.data.data); showCont();
+  }
+});
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+const doSave = () => { try { parent.postMessage({ agf: 'save', data: save }, '*'); } catch (e) {} };
+function showCont() { $('t-cont').textContent = save.stage > 0 ? D.cont(save.stage + 1) : ''; }
+
+// ---------- audio ----------
+let AC = null, master = null, noiseBuf = null;
+function initAudio() {
+  try {
+    if (!AC) {
+      AC = new (window.AudioContext || window.webkitAudioContext)();
+      master = AC.createGain(); master.gain.value = 0.6; master.connect(AC.destination);
+      noiseBuf = AC.createBuffer(1, AC.sampleRate * 2, AC.sampleRate);
+      const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    }
+    if (AC.state !== 'running') AC.resume();
+  } catch (e) { AC = null; }
+}
+function noise(t, dur, f, q, vol, type = 'bandpass', f2) {
+  const s = AC.createBufferSource(); s.buffer = noiseBuf;
+  const fl = AC.createBiquadFilter(); fl.type = type; fl.frequency.setValueAtTime(f, t); if (f2) fl.frequency.exponentialRampToValueAtTime(f2, t + dur); fl.Q.value = q;
+  const g = AC.createGain(); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0008, t + dur);
+  s.connect(fl); fl.connect(g); g.connect(master); s.start(t, Math.random()); s.stop(t + dur + 0.02);
+}
+function tone(t, f, dur, vol, type = 'sine', f2) {
+  const o = AC.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur);
+  const g = AC.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.005); g.gain.exponentialRampToValueAtTime(0.0006, t + dur);
+  o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.03);
+}
+const SND = {
+  slap(p) { if (!AC) return; const t = AC.currentTime; noise(t, 0.05 + 0.05 * p, 2200, 0.6, 0.35 + 0.55 * p, 'highpass'); noise(t, 0.16, 300, 0.7, 0.35 + 0.4 * p, 'lowpass'); tone(t, 120 + 40 * p, 0.14, 0.25 + 0.3 * p, 'sine', 50); },
+  gust(p) { if (!AC) return; const t = AC.currentTime; noise(t + 0.01, 0.3 + 0.2 * p, 500, 0.8, 0.12 + 0.15 * p, 'bandpass', 2600); },
+  flip() { if (!AC) return; const t = AC.currentTime; for (let i = 0; i < 4; i++) noise(t + i * 0.045, 0.03, 3000 + i * 400, 3, 0.18); tone(t + 0.05, 500, 0.2, 0.08, 'triangle', 900); },
+  land() { if (!AC) return; const t = AC.currentTime; noise(t, 0.04, 1600, 1, 0.12); },
+  get(i) { if (!AC) return; const t = AC.currentTime; const n = [659, 784, 880, 1047, 1175][i % 5]; tone(t, n, 0.25, 0.16, 'triangle'); tone(t + 0.09, n * 1.5, 0.3, 0.12, 'triangle'); },
+  self() { if (!AC) return; const t = AC.currentTime; tone(t, 330, 0.3, 0.12, 'triangle', 200); },
+  win() { if (!AC) return; const t = AC.currentTime; [523, 659, 784, 1047, 1319].forEach((f, i) => tone(t + i * 0.09, f, 0.35, 0.14, 'triangle')); },
+  lose() { if (!AC) return; const t = AC.currentTime; [392, 330, 262].forEach((f, i) => tone(t + i * 0.16, f, 0.4, 0.12, 'triangle')); },
+  chirp() { if (!AC) return; const t = AC.currentTime; const f = 3800 + Math.random() * 900; for (let i = 0; i < 3; i++) tone(t + i * 0.06, f, 0.04, 0.012, 'sine'); },
+};
+
+// PHYS-BEGIN
+// physics core: cards are thin boxes / cylinders; a slap pushes air out from under the
+// landing card, giving each nearby card edge an upward/outward kick (a "gust").
+function makePhys(C) {
+  const world = new C.World({ gravity: new C.Vec3(0, -24, 0) });
+  world.allowSleep = true; world.solver.iterations = 14;
+  const mat = new C.Material('m');
+  world.addContactMaterial(new C.ContactMaterial(mat, mat, { friction: 0.5, restitution: 0.06 }));
+  const ground = new C.Body({ mass: 0, material: mat, shape: new C.Plane() });
+  ground.quaternion.setFromEuler(-Math.PI / 2, 0, 0); world.addBody(ground);
+  const P = { world, cards: [], player: null, pspec: null, gusted: false, power: 0, K: { W: 32, H: 2.0, L: 6 } };
+  function samples(sp) {
+    const out = [], y = -sp.t / 2;
+    if (sp.shape === 'round') { for (let i = 0; i < 16; i++) { const a = i / 16 * Math.PI * 2; out.push(new C.Vec3(Math.cos(a) * sp.r, y, Math.sin(a) * sp.r)); } }
+    else {
+      const hw = sp.w / 2, hh = sp.h / 2;
+      for (let i = 0; i < 4; i++) { const u = -1 + i * 2 / 3; out.push(new C.Vec3(u * hw, y, -hh), new C.Vec3(u * hw, y, hh)); }
+      for (let i = 1; i < 4; i++) { const u = -1 + i * 2 / 4; out.push(new C.Vec3(-hw, y, u * hh), new C.Vec3(hw, y, u * hh)); }
+    }
+    return out;
+  }
+  function body(sp) {
+    const shape = sp.shape === 'round' ? new C.Cylinder(sp.r, sp.r, sp.t, 16) : new C.Box(new C.Vec3(sp.w / 2, sp.t / 2, sp.h / 2));
+    const b = new C.Body({ mass: sp.mass, material: mat, shape, linearDamping: 0.15, angularDamping: 0.2 });
+    b.sleepSpeedLimit = 0.12; b.sleepTimeLimit = 0.25;
+    return b;
+  }
+  P.addCard = (sp) => {
+    const b = body(sp);
+    b.position.set(sp.x, (sp.y || 0) + sp.t / 2 + 0.002, sp.z);
+    b.quaternion.setFromEuler(sp.tilt || 0, sp.rot || 0, 0, 'YXZ');
+    world.addBody(b);
+    const c = { spec: sp, body: b, samples: samples(sp), gone: false };
+    P.cards.push(c); return c;
+  };
+  P.removeCard = (c) => { c.gone = true; world.removeBody(c.body); };
+  P.slam = (sp, x, z, power, rot) => {
+    if (P.player) world.removeBody(P.player);
+    const b = body(sp);
+    b.position.set(x, 1.4, z); b.quaternion.setFromEuler(0, rot || 0, 0);
+    b.velocity.set(0, -(9 + 16 * power), 0);
+    world.addBody(b); P.player = b; P.pspec = sp; P.gusted = false; P.power = power;
+    for (const c of P.cards) if (!c.gone) c.body.wakeUp();
+  };
+  P.clearPlayer = () => { if (P.player) world.removeBody(P.player); P.player = null; };
+  P.gust = () => {
+    P.gusted = true;
+    const pp = P.player.position, ps = P.pspec, K = P.K;
+    const pr = ps.foot, GR = ps.reach, S = P.power * ps.gust;
+    P.edgeHit = false;
+    for (const c of P.cards) {
+      if (c.gone) continue;
+      const b = c.body, sp = c.spec; b.wakeUp();
+      const cx = b.position.x - pp.x, cz = b.position.z - pp.z, dc = Math.hypot(cx, cz);
+      const inner = sp.shape === 'round' ? sp.r * 0.75 : Math.min(sp.w, sp.h) * 0.42;
+      if (dc < inner) { b.velocity.y += 1.2 * P.power; continue; } // slapped right on top: air is trapped
+      const { gap, near } = P.gapTo(c, pp.x, pp.z, ps);
+      if (gap > GR) continue;
+      let f = gap < 0 ? 0.7 : gap < 0.2 ? 1 : 1 - (gap - 0.2) / (GR - 0.2);
+      if (gap < 0) P.edgeHit = true;
+      if (b.position.y > sp.t / 2 + 0.03) f *= 1.6;                 // air already under a raised card
+      if (sp.warp && near.x * sp.warp > 0) f *= 1.9;               // curled side catches the wind
+      const T = S * f / Math.pow(sp.mass, 0.35) * (sp.shape === 'round' ? 1.1 : 1);
+      const ux = cx / dc, uz = cz / dc;
+      // lift the near edge, roll it over the far edge
+      b.angularVelocity.x += uz * T * K.W; b.angularVelocity.z += -ux * T * K.W;
+      b.velocity.x += ux * T * K.H; b.velocity.z += uz * T * K.H; b.velocity.y += T * K.L;
+    }
+    // too hard onto another card's edge: your own card kicks back and turns over
+    if (P.edgeHit && P.power > 0.82) { const b = P.player; b.angularVelocity.set(14 * (P.power - 0.6), 0, 9); b.velocity.y = 6; P.selfKick = true; }
+  };
+  // signed distance from a card's edge to the slapping card's rectangle (negative = overlapping)
+  P.gapTo = (c, px, pz, ps) => {
+    let gap = 1e9, near = null; const hw = ps.w / 2, hh = ps.h / 2;
+    for (const s of c.samples) {
+      const q = c.body.pointToWorldFrame(s), ax = Math.abs(q.x - px) - hw, az = Math.abs(q.z - pz) - hh;
+      const d = ax > 0 || az > 0 ? Math.hypot(Math.max(ax, 0), Math.max(az, 0)) : Math.max(ax, az);
+      if (d < gap) { gap = d; near = s; }
+    }
+    return { gap, near };
+  };
+  P.step = (dt) => {
+    const h = 1 / 240; let n = Math.round(dt / h); if (n < 1) n = 1;
+    for (let i = 0; i < n; i++) {
+      world.step(h);
+      if (P.player && !P.gusted && P.player.position.y < 0.32) P.gust();
+      // paper catches the air once it is over: the spin dies and it slaps down face-down
+      for (const c of P.cards) { if (c.gone) continue; const b = c.body; if (b.sleepState !== C.Body.SLEEPING && P.upY(b) < -0.1) b.angularVelocity.scale(0.97, b.angularVelocity); }
+    }
+  };
+  P.quiet = () => {
+    for (const b of world.bodies) { if (b.mass === 0 || b.sleepState === C.Body.SLEEPING) continue; if (b.velocity.length() > 0.12 || b.angularVelocity.length() > 0.25) return false; }
+    return true;
+  };
+  P.upY = (b) => b.quaternion.vmult(new C.Vec3(0, 1, 0)).y;
+  return P;
+}
+// PHYS-END
+
+// ---------- cards & stages ----------
+const PCARD = {
+  std: { shape: 'rect', w: 1.0, h: 1.4, t: 0.05, mass: 1, foot: 0.62, reach: 1.25, gust: 1.0, face: { bg: '#e8463a', ring: '#ffd34a', ch: '勝', st: '#2a3d8f' } },
+  big: { shape: 'rect', w: 1.3, h: 1.8, t: 0.05, mass: 1.4, foot: 0.8, reach: 1.6, gust: 1.15, face: { bg: '#2f7bd8', ring: '#fff1c2', ch: '龍', st: '#f2b632' } },
+  thick: { shape: 'rect', w: 1.0, h: 1.4, t: 0.1, mass: 2.4, foot: 0.62, reach: 1.3, gust: 1.5, face: { bg: '#3c3c46', ring: '#ff6b3d', ch: '鉄', st: '#c9c9d4' } },
+};
+const R = 2.7;
+function rc(x, z, rot, o = {}) { return Object.assign({ shape: 'rect', w: 1.0, h: 1.4, t: 0.05, mass: 1, x, z, rot }, o); }
+function rd(x, z, o = {}) { return Object.assign({ shape: 'round', r: 0.62, t: 0.05, mass: 0.8, x, z, rot: 0 }, o); }
+const HEAVY = { t: 0.1, mass: 2.6 };
+const STAGES = [
+  { throws: 5, reward: null, cards: [rc(-1.0, -0.4, 0.25), rc(1.1, 0.7, -0.5)] },
+  { throws: 6, reward: 'big', cards: [rc(0.1, -1.1, 0.5), rd(-1.4, 0.7, { r: 0.5, mass: 0.6 }), rc(1.3, 1.0, 1.2)] },
+  { throws: 6, reward: 'thick', cards: [rc(0.2, -0.9, 0.1, HEAVY), rc(-1.3, 1.0, -0.3), rc(-0.75, 1.25, 0.9, { y: 0.06 }), rd(1.5, 0.8)] },
+  { throws: 7, reward: null, cards: [rc(-1.2, -1.0, 0.4, HEAVY), rc(1.2, -0.9, -0.2, { warp: 1 }), rd(0.1, 0.6, HEAVY), rc(-1.5, 1.4, 1.4)] },
+  { throws: 7, reward: null, cards: [rc(-1.3, -1.0, -0.3, HEAVY), rc(1.3, -1.2, 0.3, Object.assign({ warp: -1 }, HEAVY)), rd(0.0, 0.2, { mass: 2.2, t: 0.1 }), rc(1.2, 1.3, 0.6, HEAVY), rc(0.75, 1.55, -0.5, { y: 0.11 }), rc(-1.4, 1.4, 0.2)] },
+];
+const FACES = [
+  { bg: '#f0b93a', ring: '#c22d22', ch: '星', st: '#1f5f3a' }, { bg: '#4aa36a', ring: '#fff3c4', ch: '虎', st: '#a52a1e' },
+  { bg: '#e57aa8', ring: '#fff', ch: '桜', st: '#6a2a7a' }, { bg: '#5b5fd8', ring: '#ffd34a', ch: '雷', st: '#ffffff' },
+  { bg: '#d8452a', ring: '#ffe9b0', ch: '鬼', st: '#ffd34a' }, { bg: '#1e8fa0', ring: '#ffeec2', ch: '波', st: '#f07a2a' },
+  { bg: '#8a3a2a', ring: '#f6c14a', ch: '鷹', st: '#2b2b2b' }, { bg: '#f27b2a', ring: '#ffffff', ch: '炎', st: '#7a1a12' },
+];
+
+// ---------- three ----------
+const canvas = $('gl');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color('#3b2416'); scene.fog = new THREE.Fog('#3b2416', 18, 34);
+const camera = new THREE.PerspectiveCamera(48, 0.56, 0.1, 80);
+const camTarget = new THREE.Vector3(0, 0, 0.35);
+let camDist = 13, shake = 0;
+scene.add(new THREE.HemisphereLight('#ffd9a8', '#5a3a26', 1.1));
+const sun = new THREE.DirectionalLight('#ffc27a', 2.3);
+sun.position.set(-6, 9, 3); sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024); Object.assign(sun.shadow.camera, { left: -6, right: 6, top: 6, bottom: -6, near: 1, far: 30 });
+sun.shadow.bias = -0.0008; sun.shadow.normalBias = 0.02;
+scene.add(sun);
+
+function canvasTex(w, h, draw) { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t; }
+// ground: packed dirt with pebbles
+const groundTex = canvasTex(512, 512, (g, w, h) => {
+  g.fillStyle = '#9b7350'; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 9000; i++) { const v = Math.random(); g.fillStyle = v < 0.5 ? `rgba(70,45,25,${Math.random() * 0.18})` : `rgba(210,175,130,${Math.random() * 0.16})`; g.fillRect(Math.random() * w, Math.random() * h, 1 + Math.random() * 3, 1 + Math.random() * 3); }
+  for (let i = 0; i < 70; i++) { g.fillStyle = `rgba(${150 + Math.random() * 60},${120 + Math.random() * 50},${90 + Math.random() * 40},0.8)`; g.beginPath(); g.ellipse(Math.random() * w, Math.random() * h, 1.5 + Math.random() * 3, 1 + Math.random() * 2, Math.random() * 3, 0, 7); g.fill(); }
+});
+groundTex.wrapS = groundTex.wrapT = THREE.RepeatWrapping; groundTex.repeat.set(5, 5);
+const groundM = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.MeshLambertMaterial({ map: groundTex }));
+groundM.rotation.x = -Math.PI / 2; groundM.receiveShadow = true; scene.add(groundM);
+// chalk ring
+const chalk = new THREE.Mesh(new THREE.RingGeometry(R - 0.05, R + 0.05, 96), new THREE.MeshBasicMaterial({ color: '#f4efe4', transparent: true, opacity: 0.8 }));
+chalk.rotation.x = -Math.PI / 2; chalk.position.y = 0.004; scene.add(chalk);
+// aim helpers: gust disk + ghost footprint
+const gustTex = canvasTex(256, 256, (g, w) => {
+  const gr = g.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2);
+  gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(0.32, 'rgba(255,255,255,0)'); gr.addColorStop(0.36, 'rgba(255,240,190,0.55)'); gr.addColorStop(1, 'rgba(255,240,190,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, w, w);
+});
+const gustDisk = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: gustTex, transparent: true, depthWrite: false }));
+gustDisk.rotation.x = -Math.PI / 2; gustDisk.position.y = 0.012; gustDisk.visible = false; scene.add(gustDisk);
+const ghost = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ color: '#000', transparent: true, opacity: 0.22, depthWrite: false }));
+ghost.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-0.5, -0.5, 0.002), new THREE.Vector3(0.5, -0.5, 0.002), new THREE.Vector3(0.5, 0.5, 0.002), new THREE.Vector3(-0.5, 0.5, 0.002)]), new THREE.LineBasicMaterial({ color: '#fff3c0' })));
+ghost.rotation.x = -Math.PI / 2; ghost.position.y = 0.01; ghost.visible = false; scene.add(ghost);
+const ring = new THREE.Mesh(new THREE.RingGeometry(0.92, 1, 64), new THREE.MeshBasicMaterial({ color: '#fff6d8', transparent: true, opacity: 0, depthWrite: false }));
+ring.rotation.x = -Math.PI / 2; ring.position.y = 0.02; scene.add(ring);
+let ringR = 1;
+
+function drawFace(g, w, h, f, round, heavy) {
+  g.fillStyle = '#f6ead2'; g.fillRect(0, 0, w, h);
+  const m = w * 0.06;
+  g.fillStyle = f.bg;
+  if (round) { g.beginPath(); g.arc(w / 2, h / 2, w / 2 - m, 0, 7); g.fill(); }
+  else g.fillRect(m, m, w - 2 * m, h - 2 * m);
+  g.save(); if (round) { g.beginPath(); g.arc(w / 2, h / 2, w / 2 - m, 0, 7); g.clip(); } else { g.beginPath(); g.rect(m, m, w - 2 * m, h - 2 * m); g.clip(); }
+  g.fillStyle = f.st; g.globalAlpha = 0.85;
+  for (let i = -4; i < 10; i++) { g.beginPath(); g.moveTo(i * w * 0.22, 0); g.lineTo(i * w * 0.22 + w * 0.08, 0); g.lineTo(i * w * 0.22 + w * 0.08 - h * 0.5, h); g.lineTo(i * w * 0.22 - h * 0.5, h); g.fill(); }
+  g.globalAlpha = 1;
+  // sun rays
+  g.fillStyle = 'rgba(255,255,255,0.18)';
+  for (let i = 0; i < 12; i++) { g.save(); g.translate(w / 2, h / 2); g.rotate(i * Math.PI / 6); g.beginPath(); g.moveTo(0, 0); g.lineTo(-w * 0.1, -h); g.lineTo(w * 0.1, -h); g.fill(); g.restore(); }
+  g.restore();
+  const rr = w * 0.3;
+  g.fillStyle = f.ring; g.beginPath(); g.arc(w / 2, h / 2, rr, 0, 7); g.fill();
+  g.lineWidth = w * 0.025; g.strokeStyle = '#1b1208'; g.stroke();
+  g.fillStyle = '#1b1208'; g.font = `900 ${Math.round(rr * 1.25)}px "Hiragino Mincho ProN", "Yu Mincho", serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText(f.ch, w / 2, h / 2 + rr * 0.06);
+  g.lineWidth = w * 0.02; g.strokeStyle = '#1b1208';
+  if (round) { g.beginPath(); g.arc(w / 2, h / 2, w / 2 - m, 0, 7); g.stroke(); } else g.strokeRect(m, m, w - 2 * m, h - 2 * m);
+  if (heavy) { // thick pasteboard: dark frame with rivets
+    g.lineWidth = w * 0.09; g.strokeStyle = '#2b1d14';
+    if (round) { g.beginPath(); g.arc(w / 2, h / 2, w / 2 - w * 0.05, 0, 7); g.stroke(); } else g.strokeRect(w * 0.045, w * 0.045, w - w * 0.09, h - w * 0.09);
+    g.fillStyle = '#d9d2c0';
+    const pts = round ? [0, 1, 2, 3].map((i) => [w / 2 + Math.cos(i * 1.571 + 0.785) * w * 0.45, h / 2 + Math.sin(i * 1.571 + 0.785) * w * 0.45]) : [[w * 0.045, w * 0.045], [w * 0.955, w * 0.045], [w * 0.045, h - w * 0.045], [w * 0.955, h - w * 0.045]];
+    for (const [x, y] of pts) { g.beginPath(); g.arc(x, y, w * 0.035, 0, 7); g.fill(); }
+  }
+}
+function drawBack(g, w, h, round) {
+  g.fillStyle = '#c7a068'; g.fillRect(0, 0, w, h);
+  g.strokeStyle = 'rgba(90,55,25,0.45)'; g.lineWidth = 2;
+  for (let x = 0; x < w; x += w / 6) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); }
+  for (let y = 0; y < h; y += w / 6) { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
+  g.fillStyle = 'rgba(80,40,15,0.6)'; g.font = `800 ${Math.round(w * 0.16)}px sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText('×', w / 2, h / 2);
+  if (round) { g.strokeStyle = '#6a4220'; g.lineWidth = w * 0.03; g.beginPath(); g.arc(w / 2, h / 2, w / 2 - 3, 0, 7); g.stroke(); }
+}
+const backRect = canvasTex(128, 180, (g, w, h) => drawBack(g, w, h, false));
+const backRound = canvasTex(128, 128, (g, w, h) => drawBack(g, w, h, true));
+const edgeM = new THREE.MeshLambertMaterial({ color: '#efe2c4' });
+const edgeHeavy = new THREE.MeshLambertMaterial({ color: '#7d6a55' });
+function cardMesh(sp, face) {
+  const round = sp.shape === 'round';
+  const hv = sp.mass > 2;
+  const ft = round ? canvasTex(256, 256, (g, w, h) => drawFace(g, w, h, face, true, hv)) : canvasTex(256, 358, (g, w, h) => drawFace(g, w, h, face, false, hv));
+  const fm = new THREE.MeshLambertMaterial({ map: ft }), bm = new THREE.MeshLambertMaterial({ map: round ? backRound : backRect });
+  const em = sp.t > 0.07 ? edgeHeavy : edgeM;
+  let geo, mats;
+  if (round) { geo = new THREE.CylinderGeometry(sp.r, sp.r, sp.t, 32); mats = [em, fm, bm]; }
+  else {
+    geo = new THREE.BoxGeometry(sp.w, sp.t, sp.h, sp.warp ? 10 : 1, 1, 1);
+    mats = [em, em, fm, bm, em, em];
+    if (sp.warp) { // visual curl on one side
+      const p = geo.attributes.position;
+      for (let i = 0; i < p.count; i++) { const u = p.getX(i) / (sp.w / 2) * sp.warp; if (u > 0) p.setY(i, p.getY(i) + 0.26 * u * u * u); }
+      geo.computeVertexNormals();
+    }
+  }
+  const m = new THREE.Mesh(geo, mats); m.castShadow = true; m.receiveShadow = true;
+  return m;
+}
+// dust particles
+const dustTex = canvasTex(64, 64, (g, w) => { const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(230,205,165,0.9)'); gr.addColorStop(1, 'rgba(230,205,165,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, w); });
+const dust = [];
+for (let i = 0; i < 48; i++) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: dustTex, transparent: true, depthWrite: false, opacity: 0 })); s.visible = false; scene.add(s); dust.push({ s, life: 0, v: new THREE.Vector3() }); }
+let dustI = 0;
+function puff(x, z, power, rad) {
+  const n = 10 + Math.round(20 * power);
+  for (let i = 0; i < n; i++) {
+    const d = dust[dustI++ % dust.length]; const a = Math.random() * Math.PI * 2;
+    d.s.position.set(x + Math.cos(a) * rad, 0.08, z + Math.sin(a) * rad);
+    const sp = 2.5 + 5 * power * (0.5 + Math.random());
+    d.v.set(Math.cos(a) * sp, 0.4 + Math.random() * 1.2, Math.sin(a) * sp);
+    d.life = 1; d.s.visible = true; d.s.scale.setScalar(0.3);
+  }
+}
+
+// ---------- game state ----------
+let phys = null, cards = [], stageI = 0, throwsLeft = 0, state = 'title', stateT = 0, overAt = 0;
+let pcardKey = 'std', handMesh = null, playerMesh = null, aim = null, flyT = 0, landed = false, captures = [], fly = [];
+let lastSlap = null, tipShown = 0, hintTimer = 0, totalThrows = 0, usedThrows = 0, ringT = 1;
+
+function resetStage(i) {
+  stageI = i;
+  phys = makePhys(CANNON);
+  for (const c of cards) scene.remove(c.mesh);
+  cards = [];
+  STAGES[i].cards.forEach((sp, k) => {
+    const c = phys.addCard(Object.assign({}, sp, { x: sp.x * 0.86, z: sp.z * 0.86 }));
+    c.mesh = cardMesh(sp, FACES[(i * 3 + k) % FACES.length]);
+    scene.add(c.mesh); cards.push(c);
+  });
+  for (let k = 0; k < 360; k++) phys.step(1 / 240 * 4); // let stacks settle
+  throwsLeft = STAGES[i].throws; usedThrows = 0;
+  setPlayerCard(save.deck.includes(save.cur) ? save.cur : 'std');
+  syncMeshes(); updHud();
+}
+function setPlayerCard(k) {
+  pcardKey = k; save.cur = k;
+  if (handMesh) scene.remove(handMesh);
+  handMesh = cardMesh(PCARD[k], PCARD[k].face); handMesh.visible = false; handMesh.castShadow = false; scene.add(handMesh);
+  for (const m of handMesh.material) { m.transparent = true; m.opacity = 0.5; m.depthWrite = false; }
+  const sp = PCARD[k];
+  ghost.scale.set(sp.w, sp.h, 1);
+  const gd = (sp.foot + sp.reach) * 2; gustDisk.scale.set(gd, gd, 1);
+  // tune gradient start to footprint
+  drawSwap();
+}
+function drawSwap() {
+  const show = save.deck.length > 1 && (state === 'aim' || state === 'intro');
+  $('swap').style.display = show ? 'block' : 'none';
+  if (!show) return;
+  const c = $('swapc'), g = c.getContext('2d'); drawFace(g, c.width, c.height, PCARD[pcardKey].face, false);
+  $('swapn').textContent = D.cards[pcardKey];
+}
+function syncMeshes() {
+  for (const c of cards) { if (c.gone) continue; c.mesh.position.copy(c.body.position); c.mesh.quaternion.copy(c.body.quaternion); }
+  if (playerMesh && phys.player) { playerMesh.position.copy(phys.player.position); playerMesh.quaternion.copy(phys.player.quaternion); }
+}
+function remaining() { return cards.filter((c) => !c.gone && !c.taken).length; }
+function updHud() {
+  $('who').innerHTML = `${D.who(stageI + 1, D.names[stageI])}`;
+  let h = ''; const tot = usedThrows + throwsLeft;
+  for (let i = 0; i < tot; i++) h += `<div class="th${i < usedThrows ? ' used' : ''}"></div>`;
+  $('throws').innerHTML = h; $('left').textContent = D.left(remaining());
+}
+function hint(text, ms = 2600) { const h = $('hint'); h.textContent = text; h.style.opacity = 1; hintTimer = ms; }
+function pop(text, wx, wy, wz, size = 26, color = '#fff') {
+  const v = new THREE.Vector3(wx, wy, wz).project(camera);
+  const el = document.createElement('div'); el.className = 'pop'; el.textContent = text;
+  el.style.fontSize = size + 'px'; el.style.color = color;
+  const x = (v.x * 0.5 + 0.5) * innerWidth, y = (-v.y * 0.5 + 0.5) * innerHeight;
+  el.style.left = Math.max(70, Math.min(innerWidth - 70, x)) + 'px'; el.style.top = y + 'px';
+  $('ui').appendChild(el);
+  const t0 = performance.now();
+  (function an() { const k = (performance.now() - t0) / 1000; el.style.transform = `translate(-50%,-50%) translateY(${-k * 40}px) scale(${1 + 0.25 * Math.max(0, 1 - k * 6)})`; el.style.opacity = Math.max(0, 1 - Math.max(0, k - 0.6) * 2); if (k < 1.2) requestAnimationFrame(an); else el.remove(); })();
+}
+function banner(a, b, c, show) { $('bn1').textContent = a; $('bn2').textContent = b; $('bn3').textContent = c; $('banner').style.opacity = show ? 1 : 0; }
+
+function startStage(i) {
+  resetStage(i);
+  state = 'intro'; stateT = 0;
+  $('hud').style.display = 'flex';
+  banner(D.vs(i + 1), D.names[i], `「${D.lines[i]}」 ${D.throwsN(STAGES[i].throws)}`, true);
+  drawSwap();
+  signal('start');
+}
+
+// ---------- input ----------
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), gplane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), hit = new THREE.Vector3();
+const AIM_OFF = 70;
+function groundAt(sx, sy) {
+  ndc.set(sx / innerWidth * 2 - 1, -(sy / innerHeight) * 2 + 1); ray.setFromCamera(ndc, camera);
+  if (!ray.ray.intersectPlane(gplane, hit)) return null;
+  const d = Math.hypot(hit.x, hit.z), lim = R + 0.6; if (d > lim) { hit.x *= lim / d; hit.z *= lim / d; }
+  return { x: hit.x, z: hit.z };
+}
+let ptr = null, hist = [];
+canvas.addEventListener('pointerdown', onDown); $('title').addEventListener('pointerdown', onDown); $('result').addEventListener('pointerdown', onDown);
+$('swap').addEventListener('pointerdown', (e) => {
+  e.stopPropagation(); initAudio();
+  if (state !== 'aim' && state !== 'intro') return;
+  const i = save.deck.indexOf(pcardKey); setPlayerCard(save.deck[(i + 1) % save.deck.length]);
+  if (aim) placeAim(aim.x, aim.z); SND.land(); doSave();
+});
+function onDown(e) {
+  initAudio();
+  if (state === 'title') { $('title').classList.remove('on'); totalThrows = save.stage > 0 ? (save.total || 0) : 0; startStage(save.stage || 0); return; }
+  if (state === 'over') {
+    if (performance.now() - overAt < 700) return;
+    $('result').classList.remove('on');
+    if (overKind === 'all') { save.stage = 0; save.total = 0; totalThrows = 0; doSave(); startStage(0); }
+    else startStage(overKind === 'win' ? stageI + 1 : stageI);
+    return;
+  }
+  if (state === 'intro') { state = 'aim'; banner('', '', '', false); if (stageI === 0) hint(D.hint, 3500); }
+  if (state !== 'aim' || ptr !== null) return;
+  ptr = e.pointerId; hist = [{ x: e.clientX, y: e.clientY, t: performance.now() }];
+  const g = groundAt(e.clientX, e.clientY - AIM_OFF); if (g) placeAim(g.x, g.z);
+}
+addEventListener('pointermove', (e) => {
+  if (e.pointerId !== ptr) return;
+  hist.push({ x: e.clientX, y: e.clientY, t: performance.now() }); if (hist.length > 60) hist.shift();
+  // only follow the finger while it moves slowly (fast downward motion is the flick)
+  const n = hist.length; if (n >= 2) {
+    const a = hist[n - 2], b = hist[n - 1], vy = (b.y - a.y) / Math.max(1, b.t - a.t);
+    if (vy > 0.45) return;
+  }
+  const g = groundAt(e.clientX, e.clientY - AIM_OFF); if (g) placeAim(g.x, g.z);
+});
+function endPtr(e, cancel) {
+  if (e.pointerId !== ptr) return; ptr = null;
+  hist.push({ x: e.clientX, y: e.clientY, t: performance.now() });
+  if (cancel || state !== 'aim') return;
+  // walk back while the finger was moving down fast
+  let s = hist.length - 1;
+  while (s > 0) { const a = hist[s - 1], b = hist[s]; const vy = (b.y - a.y) / Math.max(1, b.t - a.t); if (vy > 0.3 || (b.t === a.t && b.y >= a.y)) s--; else break; }
+  const st = hist[s], en = hist[hist.length - 1];
+  const dist = en.y - st.y, dt = Math.max(16, en.t - st.t), sp = dist / dt;
+  if (dist < 35 || sp < 0.5) { if (dist > 15) hint(D.tipWeak, 1800); return; }
+  const g = groundAt(st.x, st.y - AIM_OFF); if (g) placeAim(g.x, g.z);
+  const power = Math.max(0.1, Math.min(1, (sp - 0.4) / 2.4));
+  doSlam(power);
+}
+addEventListener('pointerup', (e) => endPtr(e, false));
+addEventListener('pointercancel', (e) => endPtr(e, true));
+function placeAim(x, z) {
+  aim = { x, z };
+  ghost.position.set(x, 0.01, z); gustDisk.position.set(x, 0.012, z);
+  ghost.visible = gustDisk.visible = true;
+  handMesh.visible = true; handMesh.position.set(x, 0.55, z); handMesh.rotation.set(0, 0, 0);
+}
+
+function doSlam(power) {
+  if (!aim) return;
+  state = 'fly'; stateT = 0; flyT = 0; landed = false;
+  throwsLeft--; usedThrows++; totalThrows++; updHud();
+  handMesh.visible = ghost.visible = gustDisk.visible = false;
+  $('swap').style.display = 'none';
+  const sp = PCARD[pcardKey];
+  phys.slam(sp, aim.x, aim.z, power, 0);
+  if (playerMesh) scene.remove(playerMesh);
+  playerMesh = cardMesh(sp, sp.face); scene.add(playerMesh);
+  lastSlap = { x: aim.x, z: aim.z, power, before: cards.map((c) => phys.upY(c.body)) };
+  $('hint').style.opacity = 0; hintTimer = 0;
+}
+
+let overKind = 'lose';
+function resolveThrow() {
+  // which cards are captured?
+  const got = [];
+  for (const c of cards) {
+    if (c.gone || c.taken) continue;
+    const p = c.body.position;
+    const flipped = phys.upY(c.body) < 0, out = Math.hypot(p.x, p.z) > R;
+    if (flipped || out) { c.taken = true; got.push({ c, how: flipped ? 'flip' : 'out' }); }
+  }
+  const self = phys.player && phys.upY(phys.player) < 0;
+  got.forEach((g, i) => {
+    setTimeout(() => {
+      const p = g.c.body.position; pop(g.how === 'flip' ? D.flip : D.out, p.x, 0.4, p.z, 24, '#ffe07a'); SND.get(i);
+      phys.removeCard(g.c); fly.push({ m: g.c.mesh, t: 0, from: g.c.mesh.position.clone(), q: g.c.mesh.quaternion.clone() });
+      updHud();
+    }, 150 + i * 260);
+  });
+  if (got.length >= 2) {
+    throwsLeft += got.length - 1;
+    setTimeout(() => { hint(D.bonus(got.length, got.length - 1), 2200); SND.win(); updHud(); }, 150 + got.length * 260);
+  }
+  if (self) { throwsLeft = Math.max(0, throwsLeft - 1); setTimeout(() => { SND.self(); updHud(); pop(D.self, phys.player.position.x, 0.4, phys.player.position.z, 20, '#c9d6ff'); }, 120); }
+  // teaching tip when nothing happened
+  if (!got.length) {
+    let tip = '';
+    if (self) tip = D.tipSelf;
+    else {
+      const best = nearestInfo();
+      const moved = cards.some((c, i) => !c.gone && Math.abs(phys.upY(c.body) - lastSlap.before[i]) > 0.15);
+      if (best.inside) tip = D.tipCenter;
+      else if (best.gap < -0.2) tip = D.tipOn;
+      else if (best.gap > PCARD[pcardKey].reach * 0.8) tip = D.tipFar;
+      else if (lastSlap.power < 0.35) tip = D.tipWeak;
+      else if (best.heavy) tip = D.tipHeavy;
+      else if (best.gap < 0.02) tip = D.tipEdge;
+      else tip = D.tipClose;
+    }
+    if (tip) setTimeout(() => hint(tip, 2400), 300);
+  }
+  const wait = 450 + got.length * 260;
+  setTimeout(() => {
+    if (playerMesh) { fly.push({ m: playerMesh, t: 0, from: playerMesh.position.clone(), q: playerMesh.quaternion.clone(), back: true }); playerMesh = null; }
+    phys.clearPlayer();
+    if (remaining() === 0) return finish('win');
+    if (throwsLeft <= 0) return finish('lose');
+    state = 'aim'; drawSwap();
+    if (aim) placeAim(aim.x, aim.z);
+  }, wait);
+  state = 'resolve';
+}
+function nearestInfo() {
+  // distance from the slap point to the nearest card's edge (approx with samples)
+  let gap = 1e9, inside = false, heavy = false;
+  for (const c of cards) {
+    if (c.gone || c.taken) continue;
+    const p = c.body.position, dc = Math.hypot(p.x - lastSlap.x, p.z - lastSlap.z);
+    const rad = c.spec.shape === 'round' ? c.spec.r : 0.6;
+    if (dc < rad * 0.7) inside = true;
+    const g = phys.gapTo(c, lastSlap.x, lastSlap.z, PCARD[pcardKey]).gap;
+    if (g < gap) { gap = g; heavy = c.spec.mass > 2; }
+  }
+  return { gap, inside, heavy };
+}
+function finish(kind) {
+  state = 'over'; overAt = performance.now();
+  ghost.visible = gustDisk.visible = handMesh.visible = false; $('swap').style.display = 'none';
+  const st = STAGES[stageI];
+  let h = '', s = '', b = '', isNew = false;
+  if (kind === 'win') {
+    SND.win();
+    let rewardTxt = '';
+    if (st.reward && !save.deck.includes(st.reward)) { save.deck.push(st.reward); rewardTxt = D.reward(D.cards[st.reward]) + '<br>' + D.swapHint; }
+    if (stageI === STAGES.length - 1) {
+      kind = 'all'; h = D.win; s = D.allClear; b = D.total(totalThrows);
+      if (!save.best || totalThrows < save.best) { save.best = totalThrows; isNew = true; }
+      b += '<br>' + (isNew ? D.newBest : D.best(save.best));
+      save.stage = 0; save.total = 0;
+    } else {
+      h = D.names[stageI]; s = D.win; b = D.got(st.cards.length) + (rewardTxt ? '<br>' + rewardTxt : '');
+      save.stage = stageI + 1; save.total = totalThrows;
+    }
+  } else {
+    SND.lose(); h = D.names[stageI]; s = D.lose; b = D.lost;
+    totalThrows -= st.throws; save.total = totalThrows;
+  }
+  overKind = kind; doSave();
+  signal('end', { score: kind === 'all' ? totalThrows : stageI + (kind === 'win' ? 1 : 0) });
+  setTimeout(() => {
+    $('r-h').textContent = h; $('r-s').textContent = s; $('r-b').innerHTML = b; $('r-b').className = 'rs-b' + (isNew ? ' new' : '');
+    $('r-tap').textContent = kind === 'win' ? D.next : D.again;
+    $('result').classList.add('on'); overAt = performance.now();
+  }, 450);
+}
+
+// ---------- loop ----------
+function resize() {
+  const w = Math.max(1, innerWidth), h = Math.max(1, innerHeight);
+  renderer.setSize(w, h, false); camera.aspect = w / h;
+  const hf = Math.atan(Math.tan(camera.fov * Math.PI / 360) * camera.aspect);
+  camDist = Math.max(10, Math.min(18, (R + 0.45) / Math.tan(hf)));
+  camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize); resize();
+const pitch = 0.98;
+let last = performance.now(), chirpT = 0;
+function frame(now) {
+  requestAnimationFrame(frame);
+  let dt = (now - last) / 1000; last = now; if (dt > 0.05) dt = 0.05; if (dt < 0) dt = 0;
+  stateT += dt;
+  if (hintTimer > 0) { hintTimer -= dt * 1000; if (hintTimer <= 0) $('hint').style.opacity = 0; }
+  if (state === 'intro' && stateT > 2.2) { state = 'aim'; banner('', '', '', false); if (stageI === 0) hint(D.hint, 3500); }
+  if (phys && (state === 'fly' || state === 'resolve')) {
+    phys.step(dt);
+    if (state === 'fly') {
+      flyT += dt;
+      if (!landed && phys.gusted) {
+        landed = true; const p = lastSlap.power, sp = PCARD[pcardKey];
+        SND.slap(p); SND.gust(p); puff(lastSlap.x, lastSlap.z, p, sp.foot); shake = 0.12 + 0.3 * p;
+        ring.position.x = lastSlap.x; ring.position.z = lastSlap.z; ringR = sp.foot + sp.reach * p; ringT = 0;
+        const lvl = p < 0.25 ? 0 : p < 0.5 ? 1 : p < 0.8 ? 2 : 3;
+        pop(D.slap[lvl], lastSlap.x, 0.6, lastSlap.z, 18 + lvl * 6, '#fff');
+        setTimeout(() => { if (cards.some((c) => !c.gone && phys.upY(c.body) < 0.3)) SND.flip(); }, 260);
+      }
+      if ((landed && flyT > 0.9 && phys.quiet()) || flyT > 4) resolveThrow();
+    }
+  }
+  if (phys) syncMeshes();
+  // flying (captured / returning) meshes
+  for (let i = fly.length - 1; i >= 0; i--) {
+    const f = fly[i]; f.t += dt / 0.7; const k = Math.min(1, f.t), e = k * k * (3 - 2 * k);
+    const to = f.back ? new THREE.Vector3(3.6, 0.6, 5.2) : new THREE.Vector3(-2.4, 6, -1.5);
+    if (f.back) { f.m.position.copy(f.from); f.m.position.y += e * 1.2; f.m.scale.setScalar(Math.max(0.001, 1 - e)); }
+    else { f.m.position.lerpVectors(f.from, to, e); f.m.position.y += Math.sin(k * Math.PI) * 1.5; }
+    f.m.rotation.y += dt * 6;
+    if (k >= 1) { scene.remove(f.m); fly.splice(i, 1); }
+  }
+  if (ringT < 1) { ringT += dt / 0.45; const k = Math.min(1, ringT), e = 1 - (1 - k) * (1 - k); ring.scale.setScalar(0.3 + (ringR - 0.3) * e); ring.material.opacity = (1 - k) * 0.9; }
+  if (handMesh && handMesh.visible) { handMesh.position.y = 0.55 + Math.sin(now / 300) * 0.04; }
+  for (const d of dust) {
+    if (d.life <= 0) continue; d.life -= dt * 1.4;
+    d.s.position.addScaledVector(d.v, dt); d.v.multiplyScalar(1 - 3 * dt);
+    d.s.scale.setScalar(0.3 + (1 - d.life) * 0.9); d.s.material.opacity = Math.max(0, d.life) * 0.55;
+    if (d.life <= 0) d.s.visible = false;
+  }
+  chirpT -= dt; if (chirpT < 0) { chirpT = 0.8 + Math.random() * 1.6; if (state !== 'title') SND.chirp(); }
+  shake *= Math.pow(0.002, dt);
+  camera.position.set(camTarget.x + (Math.random() - 0.5) * shake, camTarget.y + Math.sin(pitch) * camDist + (Math.random() - 0.5) * shake, camTarget.z + Math.cos(pitch) * camDist);
+  camera.lookAt(camTarget);
+  renderer.render(scene, camera);
+}
+showCont();
+resetStage(0); state = 'title';
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

@@ -1,0 +1,605 @@
+{
+  "id": "2026-11-02-claude-2",
+  "status": "published",
+  "title": "パッチン！めんこ",
+  "genre": "狙って打つ（ゴルフ・ビリヤードなど）",
+  "concept": "めんこの「たたきつけた風で隣の札がめくれる」手触りが核。まん中に当てると風は逃げず、ふちのすぐ外に落とすほど近い側が持ち上がってうら返る。強くはじくほど風は遠くまで届くが、札のふちに乗ると自分がかえる。2枚の間を狙う一撃抜きも。",
+  "howToPlay": "指を置いて落とす場所を決め、そのまま下へさっとはじいてたたきつける。相手のめんこをうら返すか円の外へ出せば取れる。",
+  "libraryDecision": "three.js と cannon-es を使う。札が浮いてくるっと返る高さと影、2枚が同時に舞う瞬間は3Dの物理でこそ気持ちよく見えるため。物理任せだと結果が運まかせになったので、風は「最寄りのふちまでの距離」で決まる回転と浮きとして与え、返ったあとの回転を空気で止めて、狙いと結果がつながるようにした。",
+  "soundDecision": "BGMは入れず、Web Audioで作った「パァン」という破裂音（強さで音量と低音が変わる）、風の抜ける音、紙がめくれるパラパラ音、取ったときの音、夕方の虫の声だけにした。たたきつけた手応えを耳で感じることが、この遊びの気持ちよさそのものだから。",
+  "improvements": [
+    {
+      "found": "①札が小さく円の中が間延びして見える ②はじいた強さがどれくらいだったか分からない ③1枚ずつ返すだけで単調",
+      "changed": "場を小さくしカメラを低くして札を大きく見せた。たたいた瞬間に風の届いた範囲を輪で広げて見せ、1回で2枚以上取ると回数が戻るボーナスを足して「2枚の間を狙う」判断を作った。札の上に乗ったときのヒントも追加。",
+      "foundEn": "1) Cards looked tiny in an empty ring 2) No sense of how hard the flick was 3) Flipping one card at a time felt flat",
+      "changedEn": "Smaller ring and lower camera so cards read bigger; a ring flashes out to show how far the wind reached; taking 2+ cards in one slap refunds slaps, creating the 'aim between two' choice; added a hint for landing on a card."
+    },
+    {
+      "found": "①狙い中に浮かせた自分の札が相手の札を隠し、落ちる場所とずれて見える ②戻っていく自分の札が画面を大きく横切る ③重い札が見た目で分からず、当たり判定も見た目の四角とずれていた",
+      "changed": "自分の札は落ちる場所の真上に低く半透明で浮かせ、地面に枠線を出した。戻る札はその場で小さくなって消える。重い札は太い黒枠と鋲で描き分け、距離の計算を自分の札の四角形基準に直した。",
+      "foundEn": "1) The hovering card hid targets and looked offset from where it lands 2) The returning card swept huge across the screen 3) Heavy cards looked the same, and the hit test used a circle, not the visible rectangle",
+      "changedEn": "Your card now hovers low and see-through right above its outlined landing spot; it shrinks away in place afterwards; heavy cards get a thick dark frame with rivets; distance is now measured from your card's rectangle."
+    },
+    {
+      "found": "①自分がかえる「じばく」に損がなく、いつも全力が正解 ②反った札の反りが見えない ③結果画面がなかなか出ずタップが効かない時間が長い",
+      "changed": "じばくすると回数が1回減るようにし、ヒントで「ふちに乗ると自分がかえる」と伝えた。反りを大きく見せ、結果画面を早めに出すようにした。ふちに少し乗った失敗にも専用のヒントを出す。",
+      "foundEn": "1) Self-flips cost nothing, so max power was always right 2) The curl on warped cards was invisible 3) The result screen came late and taps were ignored for too long",
+      "changedEn": "A self-flip now costs a slap, with a hint explaining edges; the curl is exaggerated; the result shows sooner; a dedicated hint for clipping an edge."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "狙って打つ（ゴルフ・ビリヤードなど）",
+      "en": "Aim and shoot (golf, billiards…)",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "めんこ：落とした札の風で相手の札をうら返す。ふちのすぐ外を狙い、強さを選ぶ3D物理の勝ち抜き戦。",
+        "ideaEn": "Menko: the gust from your slapped card flips the opponent's. Aim just outside the edge and pick your strength, in a 3D physics knockout.",
+        "fromDraw": true
+      },
+      {
+        "idea": "潮だまりの遊び場：石をどけると生き物が逃げたり隠れたりする、目標のない観察の箱庭。",
+        "ideaEn": "Tide-pool sandbox: lift stones and creatures scurry and hide; a goal-free observation toy.",
+        "fromDraw": false
+      },
+      {
+        "idea": "おりがみ影合わせ：3Dの紙を折って、光で落ちる影をお題の形に合わせる。",
+        "ideaEn": "Origami shadows: fold 3D paper so its cast shadow matches a target shape.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "drag",
+      "swipe"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Menko Slap",
+      "concept": "The core is the feel of menko: the air blast from your slapped card flips the one beside it. Hit the middle and the air is trapped; land just outside the edge and the near side lifts and turns over. Harder reaches farther, but landing on an edge flips your own card. Slap between two for a double.",
+      "howToPlay": "Rest a finger to choose where to land, then flick down fast to slap. Flip an opponent's card or blow it out of the ring to win it.",
+      "libraryDecision": "Uses three.js and cannon-es: the lift, shadow and flip of a card, and two cards tumbling at once, look best with 3D physics. Raw physics felt random, so the gust is applied as spin and lift set by the distance to the nearest edge, and air damps the spin after a flip, so aim and outcome connect.",
+      "soundDecision": "No music. Web Audio makes the slap (louder and deeper when harder), the rush of wind, the paper flutter, a capture chime and evening insects. Feeling the slap through your ears is the fun itself."
+    }
+  },
+  "createdAt": "2026-11-02T12:07:28+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-02T12:07:28+09:00",
+    "metricsFrom": "2026-11-02T03:06:17.945Z",
+    "transcript": "401b0cc6-8277-462d-a826-9982b3bcd892.jsonl",
+    "validationRuns": 6,
+    "finishedAt": "2026-11-02T21:04:08+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-02T21:03:24+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "44.2KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=146",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=231",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=136",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=230",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 45310,
+    "lines": 717
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0.1,
+    "idleStarts": 6
+  },
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js"
+    },
+    {
+      "name": "cannon-es",
+      "version": "0.20.0",
+      "file": "cannon-es-0.20.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "落とす場所が指の少し上に出るので、細い「ふちのすぐ外」に合わせるのに慣れが要る。少しでも札のふちに乗ると押さえつけるだけで何も起きず、最初は理不尽に感じやすい。相手も5人で、全部抜けば終わり。",
+    "comment": "2人目で雷と波の札のあいだをたたいたら、2枚が同時にふわっと浮いてくるっと返り「2まい抜き！」で回数が戻った瞬間がいちばん気持ちよかった。ゆっくりはじくと『もっと強く』、ふちに乗ると『指一本ぶん外へ』とヒントが出て、次の一手を直せる。重い札は黒枠で分かり、大判・厚紙に持ちかえて攻略する流れもある。数分は普通に楽しめるが、狙いの細かさと短さで★3。画像は毎手確認した。",
+    "similar": [
+      {
+        "title": "めんこ（伝統的な子どもの遊び）",
+        "url": "https://en.wikipedia.org/wiki/Menko",
+        "similarity": "高",
+        "note": "札をたたきつけて相手の札をうら返す・外へ出すという遊びそのものが元。違いは、スマホで狙いと強さを指のはじきに置きかえ、1人で5人を勝ち抜く形にしたこと、2枚抜きで回数が戻る仕組み。",
+        "note_en": "The direct root: slapping a card to flip or push out the opponent's. Differences: aim and strength become a finger flick on a phone, it is a solo five-opponent knockout, and multi-captures refund slaps."
+      },
+      {
+        "title": "ポグ（POGs）",
+        "similarity": "中",
+        "note": "めんこが元とされる、重い札をたたきつけて積んだ札をうら返す遊び。こちらは積み重ねを崩すのが中心で、地面に置いた札のふちを風で返す狙いの要素は薄い。",
+        "note_en": "Said to descend from menko: slam a heavy slammer onto a stack to flip discs. It is about breaking a stack, with little of the edge-and-wind aiming here."
+      }
+    ],
+    "research": "WebSearch で「menko card flipping game app slap」「めんこ ゲーム アプリ スマホ」を検索。めんこ自体と、めんこが元とされるポグが見つかった。めんこを物理で再現したスマホゲームは見つからなかった。",
+    "i18n": {
+      "en": {
+        "worst": "The landing spot sits a little above your finger, so lining up the narrow 'just outside the edge' zone takes practice. Clipping an edge even slightly just pins the card, which can feel unfair at first. Only five opponents, then it's over.",
+        "comment": "Best moment: on opponent 2, I slapped between the thunder and wave cards and both floated up and flipped together, 'Two in one slap!', refunding a slap. A slow flick says 'flick harder', clipping an edge says 'one finger-width further out', so you can correct the next try. Heavy cards are marked with dark frames, and you switch to the Big or Thick card to beat them. Fun for a few minutes, but the fine aiming and short length keep it at 3 stars. I viewed every step's screenshot.",
+        "research": "Searched 'menko card flipping game app slap' and 'めんこ ゲーム アプリ スマホ'. Found menko itself and POGs, said to descend from it; no physics-based phone menko game turned up."
+      }
+    },
+    "method": "スマホ縦画面で 12 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 12 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 2400ms",
+        "note": "タイトルから開始。1人目たっくんは普通の札2枚",
+        "noteEn": "Start from title. Opponent 1 has two plain cards",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "swipe(0.20,0.66→0.20,0.67) 400ms",
+        "note": "指を置くと、落ちる場所の枠と風の届く輪が出る",
+        "noteEn": "Resting a finger shows the landing outline and the wind ring",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "swipe(0.20,0.66→0.19,0.56) 500ms → swipe(0.19,0.56→0.19,0.80) 72ms → wait 350ms",
+        "note": "指をずらして星の札の左すぐ外に合わせ、下へはじく",
+        "noteEn": "Slide to just left of the star card, then flick down",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 1800ms",
+        "note": "結果を見る",
+        "noteEn": "See the result",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 100ms",
+        "note": "ふちに少し乗っていた",
+        "noteEn": "It clipped the edge",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "swipe(0.16,0.57→0.16,0.81) 72ms → wait 2000ms",
+        "note": "ヒントどおり少し左へずらして再挑戦",
+        "noteEn": "Shift a bit left as the hint says and retry",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "swipe(0.80,0.72→0.80,0.96) 65ms → wait 450ms",
+        "note": "虎の札の右下をすばやく",
+        "noteEn": "Fast flick at the tiger card's lower right",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 2000ms",
+        "note": "虎もかえって1人目に勝ち",
+        "noteEn": "Tiger flips too — beat opponent 1",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "deck": [
+                "std"
+              ],
+              "best": 0,
+              "cur": "std",
+              "total": 3
+            }
+          },
+          {
+            "agf": "end",
+            "score": 1
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 500ms → tap(0.50,0.50) 120ms → wait 2400ms",
+        "note": "2人目みよちゃんへ",
+        "noteEn": "On to Miyo",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "deck": [
+                "std"
+              ],
+              "best": 0,
+              "cur": "std",
+              "total": 3
+            }
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "swipe(0.71,0.56→0.71,0.80) 66ms → wait 450ms",
+        "note": "雷と波の両方のふちに近い所をたたいて2枚抜き狙い",
+        "noteEn": "Slap near both the thunder and wave edges for a double",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "deck": [
+                "std"
+              ],
+              "best": 0,
+              "cur": "std",
+              "total": 3
+            }
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "wait 1800ms",
+        "note": "2枚同時にかえり、はじく回数が1回もどった",
+        "noteEn": "Both flipped at once, earning a slap back",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "deck": [
+                "std"
+              ],
+              "best": 0,
+              "cur": "std",
+              "total": 3
+            }
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "swipe(0.15,0.63→0.15,0.86) 75ms → wait 2400ms",
+        "note": "最後の丸い札の左をはじいて2人目にも勝ち、大判をもらう",
+        "noteEn": "Flick left of the last round card; beat Miyo and get the Big card",
+        "image": "ai-play/step-12.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "deck": [
+                "std"
+              ],
+              "best": 0,
+              "cur": "std",
+              "total": 3
+            }
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 2,
+              "deck": [
+                "std",
+                "big"
+              ],
+              "best": 0,
+              "cur": "std",
+              "total": 5
+            }
+          },
+          {
+            "agf": "end",
+            "score": 2
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-02T21:04:08+09:00"
+  },
+  "publishedAt": "2026-11-02T21:04:08+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 19034,
+    "outputTokens": 52132,
+    "contextTokens": 19489756,
+    "turns": 95,
+    "toolCalls": 101,
+    "webSearches": 0,
+    "minutes": 537.9,
+    "from": "2026-11-02T03:06:17.945Z",
+    "to": "2026-11-02T12:04:12.719Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-02T21:04:12+09:00",
+    "validationRuns": 6,
+    "codeKB": 44.2
+  }
+}

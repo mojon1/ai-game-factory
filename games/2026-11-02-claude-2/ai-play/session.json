@@ -1,0 +1,482 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-11-02T11:58:04.286Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "wait": 2400
+        }
+      ],
+      "desc": "tap(0.50,0.50) 120ms → wait 2400ms",
+      "note": "タイトルから開始。1人目たっくんは普通の札2枚",
+      "noteEn": "Start from title. Opponent 1 has two plain cards",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": {
+        "swipe": [
+          0.2,
+          0.66,
+          0.2,
+          0.665
+        ],
+        "hold": 400
+      },
+      "desc": "swipe(0.20,0.66→0.20,0.67) 400ms",
+      "note": "指を置くと、落ちる場所の枠と風の届く輪が出る",
+      "noteEn": "Resting a finger shows the landing outline and the wind ring",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "swipe": [
+            0.2,
+            0.66,
+            0.19,
+            0.56
+          ],
+          "hold": 500
+        },
+        {
+          "swipe": [
+            0.19,
+            0.56,
+            0.19,
+            0.8
+          ],
+          "hold": 72
+        },
+        {
+          "wait": 350
+        }
+      ],
+      "desc": "swipe(0.20,0.66→0.19,0.56) 500ms → swipe(0.19,0.56→0.19,0.80) 72ms → wait 350ms",
+      "note": "指をずらして星の札の左すぐ外に合わせ、下へはじく",
+      "noteEn": "Slide to just left of the star card, then flick down",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": {
+        "wait": 1800
+      },
+      "desc": "wait 1800ms",
+      "note": "結果を見る",
+      "noteEn": "See the result",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": {
+        "wait": 100
+      },
+      "desc": "wait 100ms",
+      "note": "ふちに少し乗っていた",
+      "noteEn": "It clipped the edge",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "swipe": [
+            0.16,
+            0.57,
+            0.16,
+            0.81
+          ],
+          "hold": 72
+        },
+        {
+          "wait": 2000
+        }
+      ],
+      "desc": "swipe(0.16,0.57→0.16,0.81) 72ms → wait 2000ms",
+      "note": "ヒントどおり少し左へずらして再挑戦",
+      "noteEn": "Shift a bit left as the hint says and retry",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "swipe": [
+            0.8,
+            0.72,
+            0.8,
+            0.96
+          ],
+          "hold": 65
+        },
+        {
+          "wait": 450
+        }
+      ],
+      "desc": "swipe(0.80,0.72→0.80,0.96) 65ms → wait 450ms",
+      "note": "虎の札の右下をすばやく",
+      "noteEn": "Fast flick at the tiger card's lower right",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": {
+        "wait": 2000
+      },
+      "desc": "wait 2000ms",
+      "note": "虎もかえって1人目に勝ち",
+      "noteEn": "Tiger flips too — beat opponent 1",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "stage": 1,
+            "deck": [
+              "std"
+            ],
+            "best": 0,
+            "cur": "std",
+            "total": 3
+          }
+        },
+        {
+          "agf": "end",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": [
+        {
+          "wait": 500
+        },
+        {
+          "tap": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "wait": 2400
+        }
+      ],
+      "desc": "wait 500ms → tap(0.50,0.50) 120ms → wait 2400ms",
+      "note": "2人目みよちゃんへ",
+      "noteEn": "On to Miyo",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "stage": 1,
+            "deck": [
+              "std"
+            ],
+            "best": 0,
+            "cur": "std",
+            "total": 3
+          }
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "action": [
+        {
+          "swipe": [
+            0.71,
+            0.562,
+            0.71,
+            0.8
+          ],
+          "hold": 66
+        },
+        {
+          "wait": 450
+        }
+      ],
+      "desc": "swipe(0.71,0.56→0.71,0.80) 66ms → wait 450ms",
+      "note": "雷と波の両方のふちに近い所をたたいて2枚抜き狙い",
+      "noteEn": "Slap near both the thunder and wave edges for a double",
+      "image": "ai-play/step-10.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "stage": 1,
+            "deck": [
+              "std"
+            ],
+            "best": 0,
+            "cur": "std",
+            "total": 3
+          }
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "action": {
+        "wait": 1800
+      },
+      "desc": "wait 1800ms",
+      "note": "2枚同時にかえり、はじく回数が1回もどった",
+      "noteEn": "Both flipped at once, earning a slap back",
+      "image": "ai-play/step-11.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "stage": 1,
+            "deck": [
+              "std"
+            ],
+            "best": 0,
+            "cur": "std",
+            "total": 3
+          }
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 12,
+      "action": [
+        {
+          "swipe": [
+            0.15,
+            0.625,
+            0.15,
+            0.86
+          ],
+          "hold": 75
+        },
+        {
+          "wait": 2400
+        }
+      ],
+      "desc": "swipe(0.15,0.63→0.15,0.86) 75ms → wait 2400ms",
+      "note": "最後の丸い札の左をはじいて2人目にも勝ち、大判をもらう",
+      "noteEn": "Flick left of the last round card; beat Miyo and get the Big card",
+      "image": "ai-play/step-12.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "stage": 1,
+            "deck": [
+              "std"
+            ],
+            "best": 0,
+            "cur": "std",
+            "total": 3
+          }
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "stage": 2,
+            "deck": [
+              "std",
+              "big"
+            ],
+            "best": 0,
+            "cur": "std",
+            "total": 5
+          }
+        },
+        {
+          "agf": "end",
+          "score": 2
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}
