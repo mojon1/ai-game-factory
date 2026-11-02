@@ -1,0 +1,456 @@
+{
+  "id": "2026-11-02-claude-1",
+  "status": "published",
+  "title": "ひとすじ柿むき",
+  "genre": "癒し・ゆったり",
+  "concept": "干し柿づくりの柿むきを、指でなぞって回す手触りに。細くむくほど皮は長くなるが、急ぐと手がぶれ、きずの所は太くしないとちぎれる。欲張りと安全の間で太さを選び、一本の長い皮がうずまきになる瞬間を楽しむ。",
+  "howToPlay": "左へなぞって柿を回し皮をむく。指を上へずらすと細く、下へずらすと太くなる。きずの所は太めに、ちぎらず目標の長さを目指す。",
+  "libraryDecision": "three.js を使う。皮がらせんにむけていく柿の立体と、垂れて新聞紙にたまる皮の帯が核の気持ちよさなので3Dが合う。再考で、むいた跡を柿の表面に直接描くことと、一本むきの皮を最後にうずまきに並べる演出を足した。物理は自作の簡単な紐の計算で足りるので物理ライブラリは使わない。",
+  "soundDecision": "Web Audio で自作。むいている間だけ鳴るシャリシャリ音（細いほど高い音）、40cmごとに一段上がる琴のような音、ちぎれた時のぷつっ、遠くのコオロギ。BGMは入れず、静かな夕方の縁側でむく音そのものを楽しめるようにした。",
+  "improvements": [
+    {
+      "found": "ナイフを指の上下で直接合わせる操作が分かりにくく、横になぞるだけだと一周ですぐちぎれる／何を目指すか分からない／太さを変える理由がない",
+      "changed": "ナイフは前の切り口に自動で沿わせ、指の上下では皮の太さだけを変える方式に変更。速くむくと手がぶれる仕組みと、柿ごとの目標の長さ（めざせ150cm など）を追加し、細くむく理由を作った",
+      "foundEn": "Matching the knife height by finger was confusing and a plain swipe snapped within one turn; no clear goal; no reason to change width",
+      "changedEn": "The knife now follows the previous cut automatically and vertical finger motion only sets the width. Added hand shake when rushing and a target length per fruit so thin peeling has a purpose"
+    },
+    {
+      "found": "底のほうで回してもなかなか終わらず間延びする／むき終えた長い皮が小さな山になって長さが伝わらない／のれんの合計が二重に数えられ、つるした柿がHUDと重なる",
+      "changedEn": "Rotation follows the surface even near the bottom and the end comes earlier; a finished strip is laid out as a big spiral on the paper; fixed the double count and lowered the eaves",
+      "changed": "底でも指と表面が同じ速さで回るようにし、終わる位置を少し早めた。むき切った一番長い皮を新聞紙の上にうずまきに並べ直す演出を追加。合計の二重計算を直し、軒を下げた",
+      "foundEn": "Turning near the bottom dragged on; the finished long peel was just a small heap; the total was double-counted and hung fruit overlapped the HUD"
+    },
+    {
+      "found": "きずの予告が遅く、気づいた時にはちぎれている／新しい柿で太さが毎回戻る／最後の画面で干し柿ののれんが隠れ、達成感が薄い",
+      "changed": "きずの予告を表面の距離で早めに出し、判定をきずの中心寄りに。太さは次の柿へ引き継ぐ。最終画面のカードを下げ、つるした柿が色づいて縮む干し柿の演出を追加",
+      "foundEn": "Blemish warnings came too late to react; the width reset for each fruit; the final card hid the persimmon curtain",
+      "changedEn": "Warn about blemishes earlier by surface distance and use the blemish core for snapping; carry the width over; lower the final card and let the hung fruit darken and shrink into dried persimmons"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "癒し・ゆったり",
+      "en": "Relaxing / cozy",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "干し柿づくりの柿むき。指でなぞって柿を回し、皮を一本の長い帯にむく。細いほど長いがちぎれやすい（3D）。",
+        "ideaEn": "Peeling persimmons for drying: swipe to turn the fruit and peel one long strip; thinner is longer but snaps more easily (3D).",
+        "fromDraw": true
+      },
+      {
+        "idea": "凧あげ。糸を引いたりゆるめたりして突風に乗せ、雲の上まで凧を上げる（3D）。",
+        "ideaEn": "Kite flying: pull and slack the string to ride gusts up above the clouds (3D).",
+        "fromDraw": false
+      },
+      {
+        "idea": "たき火の火の番。薪を置く位置で炎の形が変わり、消さずに夜明けまで燃やす。",
+        "ideaEn": "Tending a campfire: where you place logs shapes the flame; keep it alive until dawn.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "goal",
+    "input": [
+      "swipe",
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "One-Strip Persimmon",
+      "concept": "Peeling persimmons for drying, as a swipe-to-turn feel. Thinner peels grow longer, but rushing makes your hand shake and blemishes need a wide cut or the strip snaps. Choose the width between greed and safety and enjoy the long single strip laid out as a spiral.",
+      "howToPlay": "Swipe left to turn and peel. Slide up for thinner, down for wider. Go wide over blemishes and reach the target length without snapping.",
+      "libraryDecision": "Uses three.js: the fruit peeled in a spiral and the ribbon of peel hanging and piling on newspaper are the core pleasure, so 3D fits. The rethink added drawing the peeled track directly on the fruit and laying the one-piece peel out as a spiral at the end. A small custom rope simulation is enough, so no physics library.",
+      "soundDecision": "Custom Web Audio: a crisp peeling hiss only while cutting (higher when thinner), a koto-like note rising every 40cm, a soft snap when it breaks, distant crickets. No BGM, so the quiet evening veranda and the peeling sound itself carry the mood."
+    }
+  },
+  "createdAt": "2026-11-02T09:09:36+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-02T09:09:36+09:00",
+    "metricsFrom": "2026-11-02T00:06:19.101Z",
+    "transcript": "33a348c4-024f-4b33-8110-7564916f0700.jsonl",
+    "validationRuns": 9,
+    "finishedAt": "2026-11-02T10:09:14+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-02T10:09:14+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "41.3KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=254",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=289",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=234",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=274",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 42332,
+    "lines": 720
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 3
+  },
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "操作は左へなぞり続けることが中心で、5個むく間に手の動きの変化が少ない。細く・太くの判断は、きずが来た時以外はあまり迫られない",
+    "comment": "皮が柿からするする垂れて新聞紙にたまり、むき切ると一本の皮がうずまきになって並ぶ場面は気持ちよかった。1個目は細めにして204cmの一本むきで目標達成。2個目は細いまま急いできずでちぎれ、最長107cmで目標200cmに届かず、次は早めに太くしようと思えた。ただ同じスワイプの繰り返しなので、★4ほどの『もう1回』には少し足りない",
+    "similar": [
+      {
+        "title": "Perfect Peel",
+        "url": "https://www.seeles.ai/games/casual/perfect-peel-fruit-vegetable-peeling-simulator",
+        "similarity": "高",
+        "note": "果物を一本の皮でむき、長さで得点する点が同じ。こちらは皮の太さを自分で選び、細いほど長いがちぎれやすい・きずは太く、という判断と、干し柿の軒先・うずまきの演出が違う",
+        "note_en": "Same idea of peeling fruit in one continuous strip scored by length. Differs in letting you choose the width (thinner is longer but riskier, blemishes need width) and in the dried-persimmon eaves and spiral presentation"
+      },
+      {
+        "title": "i Peel Good",
+        "url": "https://apps.apple.com/us/app/-/id1471374791",
+        "similarity": "中",
+        "note": "果物を回して皮がむけるのを眺める気持ちよさが近い。目標の長さや太さの判断はない",
+        "note_en": "Similar pleasure of turning fruit and watching the peel come off; no target length or width choice"
+      }
+    ],
+    "research": "WebSearch で fruit peeling game の一本むき系を1回検索。Perfect Peel が最も近いルーツと確認",
+    "i18n": {
+      "en": {
+        "worst": "The core action is swiping left over and over; across five fruits the hand motion changes little, and width decisions are only really forced when a blemish comes",
+        "comment": "Watching the peel slide off and pile on the newspaper, then lay out as one spiral strip, felt good. On the first fruit I went thin and got a 204cm single strip, hitting the goal. On the second I rushed thin, snapped on a blemish, and topped out at 107cm against a 200cm goal — I wanted to widen earlier next time. But it is the same swipe repeated, so it falls a little short of a 4-star 'one more go'",
+        "research": "One WebSearch for one-strip fruit peeling games; Perfect Peel is the closest root"
+      }
+    },
+    "method": "スマホ縦画面で 10 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 10 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "タイトルの3行で遊び方が分かる。タップで開始",
+        "noteEn": "Three title lines explain it; tap to start",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "swipe(0.50,0.62→0.50,0.58) 300ms",
+        "note": "まず指を少し上へずらして、皮を細めにする",
+        "noteEn": "First slide up a little to make the peel thinner",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "swipe(0.85,0.60→0.20,0.60) 800ms → swipe(0.85,0.60→0.20,0.60) 800ms → swipe(0.85,0.60→0.20,0.60) 800ms",
+        "note": "左へなぞると柿が回って皮がするする出てくる。シャリシャリ音と、のびる数字が気持ちいい",
+        "noteEn": "Swiping left turns the fruit and the peel slides out; the growing number feels good",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "swipe(0.85,0.60→0.20,0.60) 800ms → swipe(0.85,0.60→0.20,0.60) 800ms → swipe(0.85,0.60→0.20,0.60) 800ms → swipe(0.85,0.60→0.20,0.60) 800ms → swipe(0.85,0.60→0.20,0.60) 800ms",
+        "note": "皮が垂れて新聞紙の上にたまっていく。白い点線が次の切り口を見せてくれる",
+        "noteEn": "The peel hangs and piles on the newspaper; white dots show the next cut",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "swipe(0.85,0.60→0.20,0.60) 800ms → swipe(0.85,0.60→0.20,0.60) 800ms → swipe(0.85,0.60→0.20,0.60) 800ms → swipe(0.85,0.60→0.20,0.60) 800ms → swipe(0.85,0.60→0.20,0.60) 800ms → swipe(0.85,0.60→0.20,0.60) 800ms → swipe(0.85,0.60→0.20,0.60) 800ms → swipe(0.85,0.60→0.20,0.60) 800ms → wait 3000ms",
+        "note": "細いぶん回す回数は増えるが、皮はどんどん長くなる。底までむき切ると一本の皮がうずまきになって並ぶ",
+        "noteEn": "Thin means more turns but a longer peel; at the bottom it lays out as a spiral",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.50,0.50) 120ms → wait 1200ms → swipe(0.85,0.60→0.20,0.60) 800ms → swipe(0.85,0.60→0.20,0.60) 800ms → swipe(0.85,0.60→0.20,0.60) 800ms → swipe(0.85,0.60→0.20,0.60) 800ms → swipe(0.85,0.60→0.20,0.60) 800ms",
+        "note": "2個目の富有柿。黒いきずが見える。細いままむき進める",
+        "noteEn": "Second fruit with dark blemishes; keep peeling thin",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 200ms",
+        "note": "細いまま急いだら、きずの所でぷつっとちぎれた（53cm）。ゲージに「きず！太めに」と出ていた",
+        "noteEn": "Rushing thin, it snapped on a blemish at 53cm; the gauge had warned 'go wide'",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "swipe(0.50,0.55→0.50,0.63) 400ms → swipe(0.85,0.60→0.20,0.60) 800ms → swipe(0.85,0.60→0.20,0.60) 800ms",
+        "note": "今度は先に指を下へずらして太くしてから回す。きずの上を太い皮で通せた",
+        "noteEn": "This time slide down first to widen, then turn; the wide peel passes over the blemish",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "swipe(0.50,0.62→0.50,0.59) 300ms → swipe(0.85,0.60→0.20,0.60) 800ms → swipe(0.85,0.60→0.20,0.60) 800ms → swipe(0.85,0.60→0.20,0.60) 800ms → swipe(0.85,0.60→0.20,0.60) 800ms → swipe(0.85,0.60→0.20,0.60) 800ms → swipe(0.85,0.60→0.20,0.60) 800ms",
+        "note": "きずを過ぎたら上へずらしてまた細く。太い所と細い所が皮に残る",
+        "noteEn": "Past the blemish, slide up to go thin again; the peel shows wide and thin parts",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 2500ms",
+        "note": "2個目は最初にちぎれたぶん、最長107cmで目標200cmに届かず。きずの手前で太くする判断が早ければ…と、もう1回やりたくなる",
+        "noteEn": "Second fruit: the early snap left a longest of 107cm, short of 200cm. Widening sooner before the blemish would have done it — makes me want another go",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-02T10:09:14+09:00"
+  },
+  "publishedAt": "2026-11-02T10:09:14+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 37814,
+    "outputTokens": 52144,
+    "contextTokens": 15371476,
+    "turns": 77,
+    "toolCalls": 79,
+    "webSearches": 0,
+    "minutes": 62.9,
+    "from": "2026-11-02T00:06:19.101Z",
+    "to": "2026-11-02T01:09:14.662Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-02T10:09:14+09:00",
+    "validationRuns": 9,
+    "codeKB": 41.3
+  }
+}
