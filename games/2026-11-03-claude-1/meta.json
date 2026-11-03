@@ -1,0 +1,492 @@
+{
+  "id": "2026-11-03-claude-1",
+  "status": "published",
+  "title": "湯けむり坂の町",
+  "genre": "街づくり",
+  "concept": "段々の坂に温泉街を建てる。湯元のそばに旅館、旅館の隣に土産屋と、置く前に点の内訳が線で見え、指でマスを動かすと点が変わる。坂なので宿は前2マスが空いていれば屋根ごしに海が見え、前に高い宿を建てると後ろの眺めをふさぐ。",
+  "howToPlay": "下の建物を選び、マスをタップで下見、もう一度タップ（または「建てる」）で建てる。目標点に届くと新しい建物が届く。",
+  "libraryDecision": "three.js を使う。核の「坂の上の宿は手前の屋根ごしに海が見える」は奥行きと高さそのものなので、3Dの段々畑で見せた。再考で、眺めを海まで伸びる光の線にし、夜になると窓と提灯が灯るようにした。物理や効果音ライブラリは不要。",
+  "soundDecision": "BGMは入れず、Web Audio で波の音を小さく流す。下見でマスを動かすと点が高いほど高い音が鳴り、耳でも良い場所が探せる。建てると点をくれた建物の数だけ琴のような音が上がっていき、目標達成で和音が鳴る。",
+  "improvements": [
+    {
+      "found": "海がトレイに隠れて「海が見える」の意味が伝わらない／点の内訳の線が細く見えにくい／最初の湯元が+0で手応えがない（タイルのすき間をタップすると外れる不具合も）",
+      "changed": "カメラを下げて海と空と紅葉の並木・小舟を見せ、線を太く縁取りし、湯元に湧き出し+1を付けた。マスの判定を段全体にしてすき間でも選べるようにした",
+      "foundEn": "The sea was hidden under the tray so \"sea view\" meant nothing / score lines were thin and hard to read / the first spring scored +0 (and tapping gaps between tiles missed)",
+      "changedEn": "Lowered the camera to show sea, sky, maples and boats; thicker outlined lines; springs get +1; tile picking uses whole terraces so gaps work"
+    },
+    {
+      "found": "通しで遊ぶと2段目で建物が尽きて終わる回がある／庭師便（松）が弱くて選ぶ意味がない／奥の段の下見の点数がHUDに隠れる",
+      "changedEn": "Gentler goal curve, every crate has 4 pieces, the Garden crate unlocks from level 3, pines get +2 next to inns, and the preview badge stays below the HUD",
+      "changed": "目標点の上がり方をゆるめ、荷物を4個ずつにし、庭師便は3段目からに。松は旅館の隣で+2に。下見の点数の吹き出しをHUDの下に収めた",
+      "foundEn": "Full runs sometimes ended at level 2 when buildings ran out / the Garden crate (pines) was too weak to pick / the preview badge for back rows hid under the HUD"
+    },
+    {
+      "found": "下見で点は分かるが、目標まであとどれだけかと結びつかない／目標達成の一手が分からない／荷物を選んだあとの次の一手が見えにくい",
+      "changed": "下見中は目標ゲージに増える分を光らせ、その一手で目標に届くなら点数に★を付けた",
+      "foundEn": "The preview showed points but not how they relate to the goal / you could not tell which move would level up / the next step after a delivery was unclear",
+      "changedEn": "While previewing, the goal bar glows with the gain, and a star marks a move that reaches the goal"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "街づくり",
+      "en": "City building",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "（くじ：街づくり）段々の坂に温泉街を建てる。建物は周りとの相性で点が決まり、坂の宿は前が空いていれば海が見える。3Dで奥行きと高さを遊びにする。",
+        "ideaEn": "(Draw: city building) Build a hot-spring town on a terraced hill. Buildings score from their neighbours, and inns on the slope see the sea if nothing tall stands in front. 3D makes depth and height part of the play.",
+        "fromDraw": true
+      },
+      {
+        "idea": "鬼がふり向く間だけ止まる「だるまさんがころんだ」をCPU相手に3Dで。長押しで進み、離して止まる。",
+        "ideaEn": "A 3D game of Red Light, Green Light against CPU kids: hold to walk, release to freeze while the oni turns.",
+        "fromDraw": false
+      },
+      {
+        "idea": "花火玉の中の星の並びを指でなぞって描き、打ち上げると描いた形に開く。お題の形に近いほど高得点。",
+        "ideaEn": "Draw the star layout inside a firework shell with your finger; launched, it bursts in that shape. Closer to the requested shape scores more.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "limit",
+    "input": [
+      "tap",
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Steam Hill Town",
+      "concept": "Build a hot-spring town on a terraced hill. Inns near springs, shops next to inns: lines show the score breakdown before you build, and it changes as you slide your finger. On the slope an inn sees the sea over the roofs if the two tiles ahead are clear, and a tall building in front blocks the view behind it.",
+      "howToPlay": "Pick a building below, tap a tile to preview, tap again (or Build) to build. Reach the goal to get new buildings.",
+      "libraryDecision": "Uses three.js. The core idea, inns uphill seeing the sea over the roofs in front, is about depth and height, so it is shown as 3D terraces. The rethink turned the view into a light line to the sea and made windows and lanterns light up at night. No physics or sound library needed.",
+      "soundDecision": "No BGM; soft Web Audio waves. Sliding the preview plays higher notes for better scores, so you can find good spots by ear. Building plays rising koto-like notes, one per contributing neighbour, and a chord on reaching the goal."
+    }
+  },
+  "createdAt": "2026-11-03T09:07:31+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-03T09:07:31+09:00",
+    "metricsFrom": "2026-11-03T00:06:09.210Z",
+    "transcript": "c5fa80fe-fcb8-4ae6-98fc-01dce72a39e7.jsonl",
+    "validationRuns": 5,
+    "finishedAt": "2026-11-03T09:35:23+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-03T09:35:07+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "45.3KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=240",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=277",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=216",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=244",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 46352,
+    "lines": 741
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "仕組みはIslanders系の配置パズルそのままで、序盤は『湯元の近くに海の見える旅館』と最善手がすぐ分かり、悩みどころが出るのは坂が混み合う後半から",
+    "comment": "下見で指を動かすと線と点数が変わり、旅館の前に旅館を置こうとして『−3 ふさぐ』と赤く出た場面で、坂と眺めのルールが一目で分かった。建てるたびに湯けむりが増え、段が上がると夕方から夜になって窓と提灯が灯るのがごほうびになる。一方で1回が長めで、序盤は簡単すぎる。",
+    "similar": [
+      {
+        "title": "Islanders (Grizzly Games)",
+        "url": "https://en.wikipedia.org/wiki/Islanders_(video_game)",
+        "similarity": "高",
+        "note": "建物の点が周りの建物で決まり、目標点で建物の補充を選ぶ構造が同じ。こちらは坂の段差と『前2マスが空けば海が見える』眺めのルール、温泉街の題材、タップ2回のスマホ操作が違う",
+        "note_en": "Same structure: buildings score from neighbours and reaching a threshold gives a pack choice. Differs in the terraced slope with a sea-view rule (clear 2 tiles ahead), the hot-spring theme and two-tap phone controls"
+      },
+      {
+        "title": "ゆけむり温泉郷（カイロソフト）",
+        "url": "https://apps.apple.com/jp/app/%E3%82%86%E3%81%91%E3%82%80%E3%82%8A%E6%B8%A9%E6%B3%89%E9%83%B7/id408854559",
+        "similarity": "低",
+        "note": "温泉宿に施設を配置する題材が近いが、あちらは客と売上の経営シミュレーション。こちらは点数の配置パズル",
+        "note_en": "Similar theme of placing facilities at a hot-spring inn, but that is a management sim with guests and money; this is a scoring placement puzzle"
+      }
+    ],
+    "research": "WebSearchで『Islanders city building place buildings score』と温泉の街づくりゲームを検索し、実在を確認した2件を挙げた",
+    "i18n": {
+      "en": {
+        "worst": "The system is a straight Islanders-style placement puzzle; early on the best move (an inn with a sea view near a spring) is obvious, and real dilemmas only appear once the hill gets crowded",
+        "comment": "Sliding the preview changes the lines and score; when I tried to put an inn in front of another and saw a red '−3 blocks', the slope-and-view rule clicked instantly. More steam rises with each build and the town goes from evening to night with lit windows and lanterns as it ranks up, which feels rewarding. But a run is longish and the early game is too easy.",
+        "research": "Searched the web for Islanders-style scoring city builders and hot-spring town-building games; listed two confirmed titles"
+      }
+    },
+    "method": "スマホ縦画面で 12 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 12 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "タイトルをタップ。段々の坂と紅葉、手前に海",
+        "noteEn": "Tapped the title: terraced slope, maples, sea in front",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.44,0.42) 120ms → wait 150ms",
+        "note": "湯元を坂の中ほどに下見。+1",
+        "noteEn": "Previewed a spring mid-slope: +1",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.44,0.42) 120ms → wait 300ms → tap(0.30,0.53) 120ms → wait 150ms",
+        "note": "湯元を建てると湯けむり。旅館を左前に下見すると湯元+3と眺め+3の線が出た",
+        "noteEn": "Built the spring, steam rises. Previewing an inn front-left shows lines: spring +3 and view +3",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.30,0.53) 120ms → wait 300ms → tap(0.30,0.60) 120ms → wait 150ms",
+        "note": "旅館を建てた。2軒目をすぐ前に下見すると、後ろの宿の眺めをふさいで−3と赤く出る",
+        "noteEn": "Built it. Previewing the 2nd inn right in front shows a red −3: it would block the first inn's view",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.60,0.50) 120ms → wait 150ms",
+        "note": "ふさぐのはやめて、湯元の右前に下見。+6とゲージが目標まで光る★",
+        "noteEn": "Moved it to the spring's front-right instead: +6, the goal bar glows and shows a star",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.60,0.50) 120ms → wait 2000ms",
+        "note": "建てると和音が鳴り「湯の里」に。荷物を2つから選ぶ",
+        "noteEn": "Built it; a chord plays and the village becomes a Spa Hamlet. Pick one of two crates",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.50,0.47) 120ms → wait 400ms → tap(0.45,0.50) 120ms → wait 150ms",
+        "note": "1つ目の荷物を選んだ。土産屋を2軒の旅館の間に下見、両方の旅館から+2ずつ",
+        "noteEn": "Took the first crate. A shop between the two inns gets +2 from each",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.45,0.50) 120ms → wait 400ms → tap(0.45,0.56) 120ms → wait 150ms",
+        "note": "土産屋を建てた。次の土産屋を前に置くと土産屋どうしで−2。客の取り合いが分かる",
+        "noteEn": "Built it. Another shop in front would get −2 from the neighbouring shop: they compete",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.60,0.95) 120ms → wait 150ms → tap(0.45,0.45) 120ms → wait 150ms",
+        "note": "足湯を選び、湯元と土産屋の間に下見。+3",
+        "noteEn": "Selected the footbath; between the spring and shop: +3",
+        "image": "ai-play/step-09.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.45,0.45) 120ms → wait 400ms → tap(0.22,0.95) 120ms → wait 150ms → tap(0.70,0.39) 120ms → wait 150ms",
+        "note": "足湯を建て湯けむりが増えた。最後の旅館を湯元の右うしろに下見、眺めの線が手前の屋根をこえて海へ",
+        "noteEn": "Built the footbath, more steam. Last inn behind-right of the spring: the view line passes over the roofs to the sea",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.70,0.39) 120ms → wait 2000ms",
+        "note": "旅館を建てて+6、目標26に届き「温泉町」に。空が少し夕方の色になり、次の荷物を選ぶ",
+        "noteEn": "Built the inn (+6), reached 26: now a Spa Town. The sky turns towards evening; pick the next crate",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.50,0.47) 120ms → wait 400ms → tap(0.82,0.39) 120ms → wait 150ms",
+        "note": "宿場便（旅館×3）を選ぶと旅館が選ばれた状態に。旅館を右端に下見、湯元から遠く+3だけ",
+        "noteEn": "Took the Lodging Crate; the Inn gets selected. Previewed one at the right edge: far from springs, only +3",
+        "image": "ai-play/step-12.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-03T09:35:23+09:00"
+  },
+  "publishedAt": "2026-11-03T09:35:23+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 27323,
+    "outputTokens": 51588,
+    "contextTokens": 14493931,
+    "turns": 75,
+    "toolCalls": 79,
+    "webSearches": 0,
+    "minutes": 29.2,
+    "from": "2026-11-03T00:06:09.210Z",
+    "to": "2026-11-03T00:35:23.661Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-03T09:35:23+09:00",
+    "validationRuns": 5,
+    "codeKB": 45.3
+  }
+}
