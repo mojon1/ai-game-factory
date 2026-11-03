@@ -1,0 +1,490 @@
+{
+  "id": "2026-11-03-claude-2",
+  "status": "published",
+  "title": "ぱしっと障子とり",
+  "genre": "ボードゲーム",
+  "concept": "点と線の陣取り（ドット＆ボックス）を障子はりにした対CPU戦。四方を囲むと障子がぱしっとはれてもう一手。指を置くと、その一手で相手に何まい続けてとられるかまで赤く見え、「安全な桟」が尽きる終盤に、どの列をあげて残りを開けさせるかの読み合いが核。",
+  "howToPlay": "点と点のあいだに指を置いて下見し、はなすと桟が入る。四方を囲んだマスは自分のもの。相手にとられる手は、もう一度タップで決定。",
+  "libraryDecision": "使わない。遊びは盤上の線とマスの読み合いで、Canvas 2D で障子・和紙・枝の影まで十分に描け、物理や3Dの奥行きは面白さを増やさないため。",
+  "soundDecision": "BGMは入れず、静かな部屋の対局にした。桟を入れると木の「コン」、障子がはれると紙の「ぱしっ」と琴のような音が鳴り、続けてとるほど音が上がっていく。相手の音は低めにして、耳でもどちらがとったか分かる。",
+  "improvements": [
+    {
+      "found": "終盤、長い列を開ける手でも下見は1マスしか赤くならず、一気に7まいとられて負けが唐突／結果のパネルが完成した障子を隠す／3人目のCPUが2人目より弱かった（相手も見送る前提で長い列を渡していた）",
+      "changed": "下見で相手が続けてとれるマスを全部赤く示し、「この一手で 相手に7まい」と上に出した。結果パネルを下に小さく移した。CPUの段階を整理し、見送り（2まい残し）は4人目から",
+      "foundEn": "In the endgame, opening a long chain showed only one red square, so losing 7 at once felt sudden / the result panel hid the finished shoji / rival 3 was weaker than rival 2 (it handed over long chains assuming declines)",
+      "changedEn": "The preview now marks every square the rival can chain-capture, with 'This move gifts 7' above the board. The result panel is smaller at the bottom. AI levels were reordered; double-dealing starts with rival 4"
+    },
+    {
+      "found": "素早くタップすると下見を読まずに相手へマスをあげてしまう／序盤は何を気にすればよいか分からない／終盤がいつ来るか見えない",
+      "changed": "相手にとられる手だけ、赤く光らせて「もう一度タップで決定」にした。画面下に「いま安全な桟 N本」を出し、尽きると「小さくあげよう」と出すようにした。CPUの乱数を対局ごとに固定した",
+      "foundEn": "Quick taps gave squares away without reading the preview / the opening gave no idea what to watch for / you could not see the endgame coming",
+      "changedEn": "Moves that gift squares now glow red and need a second tap. A 'Safe bars now: N' counter sits at the bottom and turns into 'give away the least' when none remain. AI randomness is fixed per game"
+    },
+    {
+      "found": "とれるマスがあるのに「安全な桟はもうない」と出て紛らわしい／とったときの「+1」が薄くて枠に重なる／勝っても負けても相手が無反応",
+      "changed": "とれるマスがあるときは「とれるマスがある！」と金色で知らせ、「+1」を太く縁取りして大きくした。決着時に相手が「まいった！」などとひと言返すようにし、障子の梅の枝の影も整えた",
+      "foundEn": "It said 'no safe bars' even when a square was ready to take / the '+1' popup was faint and overlapped the frame / the rival did not react to winning or losing",
+      "changedEn": "A gold 'A square is ready to take!' appears when you can capture; the '+1' is bigger and outlined. The rival now says a line at the end, and the plum branch shadow on the paper was refined"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "ボードゲーム",
+      "en": "Board game",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "（くじ：ボードゲーム）点と線の陣取りを障子はりにして5人のCPUと対戦。指を置くと、その一手で相手に何まいとられるかが見える。",
+        "ideaEn": "(Draw: board game) Dots and Boxes as papering shoji, against five CPU rivals. Holding a finger shows how many squares the move would hand over.",
+        "fromDraw": true
+      },
+      {
+        "idea": "相方が手を返すすき間に杵をつく餅つき。タップの間合いがどんどん速くなる。",
+        "ideaEn": "Mochi pounding: strike the mallet between your partner's hand turns as the rhythm speeds up.",
+        "fromDraw": false
+      },
+      {
+        "idea": "夜空の星を指でつなぎ、できた形が星座として動き出す遊び場。",
+        "ideaEn": "A playground: link stars with your finger and the shape comes alive as a constellation.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "tap",
+      "hold"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Shoji Snap",
+      "concept": "Dots and Boxes as papering a shoji screen, against CPU rivals. Close four sides and the paper snaps on, and you move again. Hold a finger and the preview shows how many squares the rival would chain-capture. The core is the endgame: when the safe bars run out, which chain do you give away so the rival has to open the rest?",
+      "howToPlay": "Touch between two dots to preview, release to set a bar. Squares you close are yours. Moves that gift squares need a second tap.",
+      "libraryDecision": "No libraries. The play is reading lines and squares on a board, and Canvas 2D draws the shoji, paper and branch shadow well; physics or 3D depth would not add fun.",
+      "soundDecision": "No BGM, just a quiet room. Bars knock like wood, paper snaps with a koto-like note that rises as you chain captures. The rival's notes are lower, so you can hear who scored."
+    }
+  },
+  "createdAt": "2026-11-03T12:06:33+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-03T12:06:33+09:00",
+    "metricsFrom": "2026-11-03T03:05:59.149Z",
+    "transcript": "cb429879-ef37-467f-92eb-36ad8b99044b.jsonl",
+    "validationRuns": 5,
+    "finishedAt": "2026-11-03T12:24:38+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-03T12:24:25+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "39.9KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=153",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=105",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=107",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=84",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 40812,
+    "lines": 767
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "序盤は安全な桟を置くだけで、どこに引いても大差なく感じる。読み合いが始まるのは終盤からで、題材も昔からある点と線の陣取りそのもの",
+    "comment": "1人目で「いま安全な桟 1本」を見て最後の安全手を自分が使い、子だぬきに先にあげさせた場面が気持ちよかった。わざと2まいだけ渡して残り4まいをぐるっととり返す流れが、下見の赤い表示のおかげで初見でも組み立てられた。障子がぱしっとはれて音が上がる手触りも良い。ただ5人目の師範は2まい残しを使ってくるので、仕組みを知らないとかなり負ける",
+    "similar": [
+      {
+        "title": "Dots and Boxes（点と線の陣取り）",
+        "url": "https://en.wikipedia.org/wiki/Dots_and_boxes",
+        "similarity": "高",
+        "note": "ルールの元。囲んだらもう一手・長い鎖と2まい残しの考え方はそのまま。違いは障子はりの見た目、とられる数まで見える下見、おくりもの手の二度タップ、5人のCPUと穴・梅（2倍）マスのある盤",
+        "note_en": "The source of the rules: extra move on completion, long chains and double-crosses are the same. Differences: the shoji theme, a preview showing chain losses, double-tap for gifting moves, five CPU rivals and boards with holes and double-value plum squares"
+      }
+    ],
+    "research": "WebSearch で Dots and Boxes の長い鎖の規則と2まい残し（double-cross）を調べ、CPUの考え方とルーツを確認した",
+    "i18n": {
+      "en": {
+        "worst": "The opening is just placing safe bars and moves feel interchangeable; the real reading only starts in the endgame, and the game itself is classic Dots and Boxes",
+        "comment": "With rival 1, seeing 'Safe bars now: 1', I took the last safe bar and forced the tanuki to give first. Giving away just two and then sweeping the last four felt great, and the red preview let me plan it on a first play. The paper snap with rising notes is satisfying. Rival 5 double-deals, so without knowing the trick you will lose a lot",
+        "research": "Searched the web for Dots and Boxes long-chain rule and double-crossing to confirm the roots and the AI strategy"
+      }
+    },
+    "method": "スマホ縦画面で 12 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 12 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "開始。子だぬきが「よろしくね！」",
+        "noteEn": "Start; the tanuki says hi",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.50,0.33) 120ms → wait 1500ms",
+        "note": "上のまん中に桟。相手もすぐ一本",
+        "noteEn": "Top middle bar; the rival answers",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.12,0.69) 120ms → wait 1500ms",
+        "note": "左下の縦。下に「いま安全な桟」の数が出る",
+        "noteEn": "Bottom-left; the safe-bar count appears",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.88,0.54) 120ms → wait 1500ms",
+        "note": "右の縦",
+        "noteEn": "Right bar",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.50,0.61) 120ms → wait 1500ms",
+        "note": "まん中の下。安全な桟がどんどん減る",
+        "noteEn": "Middle-low bar; safe bars are running out",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.76,0.33) 120ms → wait 1500ms",
+        "note": "右上の横",
+        "noteEn": "Top-right bar",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.24,0.33) 120ms → wait 1500ms",
+        "note": "左上の横。下に「とれるマスがある！」",
+        "noteEn": "Top-left bar; 'a square is ready to take!'",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.63,0.40) 120ms → wait 600ms",
+        "note": "右上が3本囲まれていたので閉じて1まい。ぱしっと障子がはれる",
+        "noteEn": "Closed the top-right square: the paper snaps on",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.12,0.40) 120ms → wait 2500ms",
+        "note": "安全な桟の最後の1本を自分が使う。子だぬきが先にあげるしかない",
+        "noteEn": "Took the last safe bar so the tanuki has to give first",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.24,0.76) 120ms → wait 300ms → tap(0.50,0.76) 120ms → wait 300ms → tap(0.76,0.61) 120ms → wait 500ms",
+        "note": "下の2まいをもらった。3本目は赤く「もう一度タップで決定」と止めてくれた",
+        "noteEn": "Got the bottom two; the third tap turned red and asked to confirm",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.76,0.61) 120ms → wait 3500ms",
+        "note": "わざと右の2まいだけあげる。残りの4まいは相手が開けるしかない",
+        "noteEn": "Gave away just the right two on purpose; the rival must open the last four",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.37,0.40) 120ms → wait 300ms → tap(0.50,0.47) 120ms → wait 300ms → tap(0.37,0.54) 120ms → wait 2600ms",
+        "note": "ぐるっと4まい続けてとって勝ち。障子に梅の枝の影が浮かんだ",
+        "noteEn": "Swept the last four and won; a plum branch shadow appears on the paper",
+        "image": "ai-play/step-12.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "clears": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 7
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-03T12:24:38+09:00"
+  },
+  "publishedAt": "2026-11-03T12:24:38+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 32646,
+    "outputTokens": 45215,
+    "contextTokens": 12604715,
+    "turns": 66,
+    "toolCalls": 75,
+    "webSearches": 0,
+    "minutes": 18.6,
+    "from": "2026-11-03T03:05:59.149Z",
+    "to": "2026-11-03T03:24:38.060Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-03T12:24:38+09:00",
+    "validationRuns": 5,
+    "codeKB": 39.9
+  }
+}
