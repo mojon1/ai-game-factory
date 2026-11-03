@@ -1,0 +1,647 @@
+{
+  "id": "2026-11-03-gpt-2",
+  "status": "published",
+  "title": "切り口の向こう側",
+  "genre": "クイズ",
+  "concept": "球や円すいを切ったらどんな形になるだろう。立体と切断面を一緒に回して予想し、金色の断面を透かして確かめる。立方体から六角形が現れるような、外からの姿と中の形の違いを発見する六問。",
+  "howToPlay": "指で立体を回して金色の面を観察し、断面の形を三択から選びます。答えを見た後も回して確かめられます。",
+  "libraryDecision": "断面を別の向きから見ることが遊びなのでthree.jsを使う。実際の三角形メッシュと平面の交差から断面を作り、予想の後に内部を透かして見せる形へ核を強めた。",
+  "soundDecision": "選択には短い音、正解には高いチャイムをWeb Audioで作る。空間を考える邪魔にならないようBGMは付けない。",
+  "improvements": [
+    {
+      "found": "正解後も立体が不透明で断面を隠す／答えの理由がない／斜めの断面を正面から確かめにくい。",
+      "changed": "材質の透明化時にシェーダーを更新し、断面が見えるよう修正。各問の理由と、断面を正面へ向けるボタンを加えた。",
+      "foundEn": "The solid remains opaque after answering and hides the section; answers lack reasons; oblique sections are hard to inspect head-on.",
+      "changedEn": "Update the material shader on transparency changes, explain every answer, and add a button to face the cross-section."
+    },
+    {
+      "found": "立体名がなく呼び分けが難しい／断面の縁が半透明の外形に溶ける／予想中に回しすぎると元の向きへ戻しにくい。",
+      "changed": "球・立方体・円すい・円柱の名前を問いへ追加。断面に明るい輪郭線を引き、予想中は向きを戻す、回答後は断面を正面へ向ける操作にした。",
+      "foundEn": "Solids are not named; section edges blend into the translucent silhouette; excessive rotation is hard to reset before answering.",
+      "changedEn": "Name each solid, outline the section brightly, and let the orientation button reset the preview or face the revealed cut."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "クイズ",
+      "en": "Quiz",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "立体を回して切断面を予想するクイズ。3Dの面を実際に切り、答えを金色の内部として見せる。",
+        "ideaEn": "Rotate solids and predict cross-sections. Intersect actual 3D meshes and reveal the answer as a gold interior.",
+        "fromDraw": true
+      },
+      {
+        "idea": "夜の駅で列車の行き違いを二本の線路でさばく。2Dの列車の長さと信号の待ち時間で順番を考える。",
+        "ideaEn": "Route passing trains on two tracks, reading 2D train lengths and signal waits.",
+        "fromDraw": false
+      },
+      {
+        "idea": "風にゆれる積み木灯台を支える物理おもちゃ。3Dで崩れる前の傾きを見て重りを置き、形を保存する。",
+        "ideaEn": "Support a swaying block lighthouse with weights, reading 3D tilts before collapse and preserving its shape.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "limit",
+    "input": [
+      "tap",
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Beyond the Cut",
+      "concept": "Predict what appears inside a sphere or cone. Rotate a solid and its cutting plane together, then inspect the gold cross-section. Six questions reveal differences between outside shape and interior form, such as a hexagon inside a cube.",
+      "howToPlay": "Drag to rotate the solid and inspect the gold plane, then choose one of three cross-sections. Keep rotating after the reveal to check it.",
+      "libraryDecision": "Viewing cuts from different directions is the core, so use three.js. Build the section from actual triangle-plane intersections and reveal it inside a translucent solid.",
+      "soundDecision": "Web Audio supplies short selection notes and high success chimes. No BGM interrupts spatial thinking."
+    }
+  },
+  "createdAt": "2026-11-03T12:18:18+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-03T12:18:18+09:00",
+    "metricsFrom": "2026-11-03T03:15:55.688Z",
+    "transcript": null,
+    "validationRuns": 3,
+    "finishedAt": "2026-11-03T12:29:50+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-03T12:23:13+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "11.7KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=49",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=49",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=46",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=46",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 12018,
+    "lines": 19
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "六問と切る位置が固定なので、一度答えを覚えるとクイズとして戻る理由が弱い。",
+    "comment": "画像を見ながら二回改善し、断面が隠れる表示不具合も直した。最終回は球を意図的に外して5/6正解・500点。立方体の中に金色の六角形が現れ、正面へ向けて辺を数える場面は外形との違いを確かめる楽しさがあった。英語のiPhoneでも同点、再開とベスト保存を確認した。",
+    "similar": [
+      {
+        "title": "Cross Section (Toy Theater)",
+        "url": "https://toytheater.com/cross-section/",
+        "similarity": "高",
+        "note": "立体を回し、切断面と断面の形を見比べる核が共通。相手は切る面を自由に移動・傾斜する学習道具で、こちらは六つの固定面を予想してから答えと理由を確認するクイズ。",
+        "note_en": "Both rotate solids and compare cutting planes with section shapes. That learning tool freely moves and tilts the plane; this quiz predicts six fixed cuts before revealing answers and reasons."
+      }
+    ],
+    "research": "3D断面クイズを1回ウェブ検索し、Toy Theaterの公式Cross Section説明を開いて、操作と共通点を確認した。",
+    "i18n": {
+      "en": {
+        "worst": "Six fixed questions and cut positions give little reason to replay once the answers are known.",
+        "comment": "Two image-inspected improvement rounds fixed the hidden-section rendering bug. One deliberate wrong sphere answer left 5/6 correct and 500 points. Revealing a gold hexagon inside a cube and facing it to count sides made the inside/outside contrast enjoyable. The English iPhone replay matched the score and verified restart and best persistence.",
+        "research": "One web query for 3D cross-section quizzes, followed by Toy Theater's official Cross Section description to verify its interactions."
+      }
+    },
+    "method": "スマホ縦画面で 20 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 20 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.80) 120ms",
+        "note": "最終版の六問を通して遊ぶ。球から金色の面を確かめる。",
+        "noteEn": "Playing all six questions in the final version, starting with the sphere.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "swipe(0.30,0.40→0.65,0.55) 500ms → tap(0.50,0.77) 120ms",
+        "note": "一度回してから向きを戻す。金色の面と球が最初の向きへ戻るか見る。",
+        "noteEn": "Rotating, then resetting the view to check the sphere and plane return together.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.50,0.86) 120ms",
+        "note": "戻る操作は効いた。斜めからだ円に見える誘惑を試し、だ円を選んで説明を見る。",
+        "noteEn": "Reset works; I will choose ellipse to test the misleading oblique view and its explanation.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.50,0.77) 120ms",
+        "note": "正面で円を確認する。斜めの見かけと実際の形が違う点が伝わる。",
+        "noteEn": "Facing the section confirms the circle, separating its true shape from perspective.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 800ms → tap(0.50,0.88) 120ms",
+        "note": "次の立方体へ。水平な面は四つの側面を同じ高さで横切る。",
+        "noteEn": "Moving to the cube; the horizontal plane crosses its four sides at the same height.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.50,0.86) 120ms",
+        "note": "正方形を選び、輪郭を確かめる。",
+        "noteEn": "Choosing square and inspecting its outline.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.50,0.77) 120ms",
+        "note": "断面を正面から見て、四辺が同じ長さなのを確かめる。",
+        "noteEn": "Facing the cut to check four equal sides.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 800ms → tap(0.50,0.88) 120ms",
+        "note": "斜めに回った正方形も正方形と確認できた。次は円すいを縦に切る。",
+        "noteEn": "The rotated square still has equal sides; next is a vertical cut through a cone.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.82,0.86) 120ms",
+        "note": "頂点と軸を通っているので三角形を選ぶ。",
+        "noteEn": "The plane passes through the tip and axis, so I choose triangle.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 800ms → tap(0.50,0.88) 120ms",
+        "note": "三角形の切り口が出た。次は円柱に斜めの面が入っている。",
+        "noteEn": "The triangular section is visible; next, a tilted plane cuts the cylinder.",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.50,0.86) 120ms",
+        "note": "上下の底を切らずに側面を斜めに横切るので、だ円を選ぶ。",
+        "noteEn": "The tilted plane crosses only the curved side, so I choose ellipse.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.50,0.77) 120ms",
+        "note": "正面からも長軸と短軸が違うだ円に見えるか確かめる。",
+        "noteEn": "Checking that the head-on section still has unequal major and minor axes.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "wait 800ms → tap(0.50,0.88) 120ms",
+        "note": "だ円は正面でも伸びている。次は立方体を三方向へ傾いた面で切る。",
+        "noteEn": "The ellipse remains stretched head-on; next is a cube cut by a plane tilted along three axes.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "tap(0.82,0.86) 120ms",
+        "note": "六つの辺を横切りそうなので六角形を選ぶ。四角い立体から別の形が出る場面が楽しみ。",
+        "noteEn": "The plane seems to cross six edges, so I choose hexagon; I want to see a different shape inside the cube.",
+        "image": "ai-play/step-14.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "tap(0.50,0.77) 120ms",
+        "note": "金色の六角形が現れた。正面で六辺を数える。",
+        "noteEn": "The gold hexagon appeared; facing it to count the six sides.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "wait 800ms → tap(0.50,0.88) 120ms",
+        "note": "六角形を確かめた。最後は二方向だけに傾いた面で立方体を切る。",
+        "noteEn": "The hexagon checks out; the last cube is cut by a plane tilted along two axes.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 17,
+        "action": "tap(0.18,0.86) 120ms",
+        "note": "高さは辺一本、横は対角線なので長方形を選ぶ。",
+        "noteEn": "Its height is one cube edge and width is a diagonal, so I choose rectangle.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 18,
+        "action": "tap(0.50,0.77) 120ms",
+        "note": "長方形を正面から見て、二つの辺の長さが違うことを確かめる。",
+        "noteEn": "Facing the rectangle to check its two different side lengths.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 19,
+        "action": "wait 800ms → tap(0.50,0.88) 120ms",
+        "note": "幅の長い長方形が見えた。六問の結果へ進む。",
+        "noteEn": "The wider rectangle is visible; moving to the six-question result.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 500
+            }
+          },
+          {
+            "agf": "end",
+            "score": 500
+          }
+        ]
+      },
+      {
+        "step": 20,
+        "action": "wait 800ms → tap(0.50,0.80) 120ms",
+        "note": "一問を意図的に外して500点。再開すると六問が戻り、ベスト500だけ残るか確かめる。",
+        "noteEn": "One deliberate wrong answer left 500 points; checking restart resets the quiz and retains best 500.",
+        "image": "ai-play/step-20.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 500
+            }
+          },
+          {
+            "agf": "end",
+            "score": 500
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-03T12:29:50+09:00"
+  },
+  "publishedAt": "2026-11-03T12:29:50+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 3770,
+    "outputTokens": 10856,
+    "contextTokens": 9456984,
+    "turns": 39,
+    "toolCalls": 39,
+    "webSearches": null,
+    "minutes": 14,
+    "from": "2026-11-03T03:15:55.688Z",
+    "to": "2026-11-03T03:29:53.090Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-03T12:29:53+09:00",
+    "validationRuns": 3,
+    "codeKB": 11.7,
+    "evidence": "metrics-evidence.json"
+  }
+}
