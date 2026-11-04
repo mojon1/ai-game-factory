@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="ja"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>折り返し電報</title>
+<style>
+*{box-sizing:border-box;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;overflow:hidden;overscroll-behavior:none;background:#102532;color:#f8e8c5;font:16px system-ui,-apple-system,"Hiragino Sans",sans-serif}
+main{width:100vw;height:100dvh;position:relative;background:radial-gradient(ellipse at 50% 38%,#234959,#102532 75%)}
+header{position:absolute;top:3%;left:6%;right:6%;display:flex;justify-content:space-between;font-weight:700}
+#status{position:absolute;top:12%;width:100%;text-align:center;font-size:16px;padding:0 12px}
+canvas{position:absolute;top:24%;left:50%;transform:translateX(-50%);width:min(90vw,50dvh,460px);aspect-ratio:1}
+button{height:48px;border:1px solid #edc47c;border-radius:14px;background:#efc97f;color:#182d38;font:bold 16px system-ui}
+#send{position:absolute;bottom:10%;left:39%;width:54%}#send[aria-disabled=true]{background:#233f4a;color:#d6e3df;border-color:#72939a}#undo{position:absolute;bottom:10%;left:7%;width:28%;background:#284b56;color:#f8e8c5;border-color:#72939a}#undo:disabled{opacity:.45}
+#hint{position:absolute;bottom:3%;width:100%;text-align:center;font-size:13px;color:#bed1c8}
+#cover{position:absolute;inset:0;display:grid;place-content:center;text-align:center;padding:22px;background:#102532f2}
+h1{font-size:clamp(24px,7vw,38px);line-height:1.35}p{font-size:15px;line-height:1.75}.badge{font-size:44px;color:#efc97f}
+</style>
+<main>
+<header><span id="progress"></span><span id="count"></span></header>
+<div id="status"></div><canvas></canvas><button id="undo"></button><button id="send"></button><div id="hint"></div><div id="cover"></div>
+</main>
+<script>
+const words = {
+ ja:{title:'折り返し電報',intro:'鏡を回して、光をすべての受信灯へ。<br>出口までつなげたら電報を送ろう。',start:'タップでスタート',stage:'通信所',lamps:'受信灯',send:'電報を送る',undo:'一手戻す',exitOn:'出口に到達',exitOff:'出口は未到達',ready:'すべて点灯。出口にも到着！',route:'鏡を回して光をつなごう',hint:'銀色の鏡をタップして回す',missing:'受信灯と出口へ光をつなごう',sent:'電報が届いた！',next:'タップで次へ',end:'三つの通信所を開通！',again:'タップでもう一度'},
+ en:{title:'Relay Telegram',intro:'Turn mirrors to light every relay.<br>Connect to the exit, then send your telegram.',start:'Tap to start',stage:'Station',lamps:'Relays',send:'Send telegram',undo:'Undo',exitOn:'Exit reached',exitOff:'Exit not reached',ready:'All relays lit and exit reached!',route:'Turn mirrors to connect the light',hint:'Tap a silver mirror to turn it',missing:'Connect every relay and the exit',sent:'Telegram delivered!',next:'Tap to continue',end:'All three stations connected!',again:'Tap to play again'}
+};
+const lang = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const t = words[lang] || words.en;
+document.documentElement.lang = lang;
+const byId = id => document.getElementById(id);
+const canvas = document.querySelector('canvas');
+const ctx = canvas.getContext('2d');
+const cover = byId('cover');
+const status = byId('status');
+const send = byId('send'), undo = byId('undo');
+let history = [];
+const levels = [
+ {source:2, exit:[1,-1], mirrors:[[1,2,1]], lamps:[[1,0]]},
+ {source:3, exit:[5,3], mirrors:[[1,3,1],[1,1,0],[3,1,0],[3,3,0],[1,4,1],[3,4,0]], lamps:[[1,2],[2,1],[3,2],[4,3]]},
+ {source:4, exit:[5,2], mirrors:[[2,4,1],[2,2,1],[0,2,0],[0,0,0],[4,0,0],[4,4,1],[3,4,1],[3,2,1]], lamps:[[1,4],[2,3],[1,2],[0,1],[2,0],[4,1],[4,3],[3,3],[4,2]]}
+];
+const vectors = [[1,0],[0,1],[-1,0],[0,-1]];
+const turns = [[3,2,1,0],[1,0,3,2]];
+const key = (x,y) => y*5+x;
+let stage = 0, state = 'title', guardUntil = 0, mirrorMap, level, trace, audio, hintTimer;
+const signal = (agf, data={}) => parent.postMessage({agf,...data},'*');
+for (const type of ['contextmenu','selectstart','gesturestart']) addEventListener(type, event => event.preventDefault(), {passive:false});
+function chime(frequency, duration=.15) {
+ try {
+  audio ||= new AudioContext();
+  audio.resume();
+  const oscillator = audio.createOscillator(), volume = audio.createGain(), now = audio.currentTime;
+  oscillator.frequency.value = frequency;
+  volume.gain.setValueAtTime(.045,now);
+  volume.gain.exponentialRampToValueAtTime(.001,now+duration);
+  oscillator.connect(volume).connect(audio.destination);
+  oscillator.start(now);
+  oscillator.stop(now+duration);
+ } catch {}
+}
+function followRay() {
+ let x=-1,y=level.source,heading=0;
+ const route=[[x,y]], lit=new Set(), visited=new Set();
+ for (;;) {
+  const [dx,dy]=vectors[heading]; x+=dx; y+=dy;
+  route.push([x,y]);
+  if(x<0||x>4||y<0||y>4) break;
+  const k=key(x,y), visit=k*4+heading;
+  if(visited.has(visit)) break;
+  visited.add(visit);
+  if(level.lamps.some(([lx,ly])=>x===lx&&y===ly)) lit.add(k);
+  if(mirrorMap.has(k)) heading=turns[mirrorMap.get(k)][heading];
+ }
+ const exited=x===level.exit[0]&&y===level.exit[1];
+ return {route,lit,exited,ready:exited&&lit.size===level.lamps.length};
+}
+function draw() {
+ const pos = n => 32+n*64;
+ ctx.clearRect(0,0,320,320);
+ for(let y=0;y<5;y++) for(let x=0;x<5;x++){
+  ctx.fillStyle=(x+y)%2?'#193845':'#1c404e';
+  ctx.fillRect(x*64+1,y*64+1,62,62);
+ }
+ ctx.save();
+ ctx.lineWidth=5;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#f0c775';
+ ctx.beginPath();
+ trace.route.forEach(([x,y],i)=>{if(i===0)ctx.moveTo(pos(x),pos(y));else ctx.lineTo(pos(x),pos(y));});
+ ctx.stroke();ctx.restore();
+ for(const [x,y] of level.lamps){
+  const lit=trace.lit.has(key(x,y));
+  ctx.beginPath();ctx.arc(pos(x),pos(y),12,0,Math.PI*2);
+  ctx.fillStyle=lit?'#f8db8e':'#294c58';ctx.fill();
+  ctx.strokeStyle=lit?'#fff3c8':'#81a19b';ctx.lineWidth=2;ctx.stroke();
+ }
+ for(const [k,angle] of mirrorMap){
+  const x=pos(k%5),y=pos(Math.floor(k/5));
+  ctx.strokeStyle='#668c91';ctx.lineWidth=1;ctx.strokeRect(x-20,y-20,40,40);
+  ctx.beginPath();ctx.moveTo(x-15,y+(angle?-15:15));ctx.lineTo(x+15,y+(angle?15:-15));
+  ctx.lineWidth=5;ctx.strokeStyle='#c6dfdb';ctx.stroke();
+ }
+ ctx.fillStyle='#f8db8e';
+ ctx.beginPath();ctx.moveTo(3,pos(level.source)-9);ctx.lineTo(18,pos(level.source));ctx.lineTo(3,pos(level.source)+9);ctx.fill();
+ if(!trace.exited){
+  const [lastX,lastY]=trace.route.at(-1);
+  const x=Math.max(6,Math.min(314,pos(lastX))),y=Math.max(6,Math.min(314,pos(lastY)));
+  ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fillStyle='#ef8c81';ctx.fill();
+ }
+ const [exitX,exitY]=level.exit;
+ ctx.fillStyle=trace.exited?'#f8db8e':'#83c9bf';
+ if(exitY<0)ctx.fillRect(pos(exitX)-17,1,34,6);
+ else ctx.fillRect(exitX===5?313:1,pos(exitY)-17,6,34);
+}
+function update() {
+ trace=followRay(); draw();
+ send.setAttribute('aria-disabled',String(!trace.ready));
+ undo.disabled=history.length===0;
+ byId('progress').textContent=t.stage+' '+(stage+1)+'/3';
+ byId('count').textContent=t.lamps+' '+trace.lit.size+'/'+level.lamps.length;
+ status.textContent=trace.ready?t.ready:t.route+' · '+(trace.exited?t.exitOn:t.exitOff);
+}
+function loadLevel() {
+ level=levels[stage];history=[];
+ mirrorMap=new Map(level.mirrors.map(([x,y,a])=>[key(x,y),a]));
+ state='play';cover.style.display='none';
+ clearTimeout(hintTimer);byId('hint').textContent=t.hint;
+ hintTimer=setTimeout(()=>byId('hint').textContent='',4500);
+ update();
+}
+function sendTelegram() {
+ if(!trace.ready){status.textContent=t.missing;chime(190);return;}
+ state='result';guardUntil=performance.now()+700;
+ chime(740,.35);
+ const done=stage===levels.length-1;
+ if(done)signal('end');
+ cover.innerHTML='<div><div class="badge">✦</div><h1>'+(done?t.end:t.sent)+'</h1><p>'+(done?t.again:t.next)+'</p></div>';
+ cover.style.display='grid';
+}
+function resize() {
+ const size=canvas.getBoundingClientRect().width || 320;
+ canvas.width=canvas.height=Math.max(1,Math.round(size*Math.min(devicePixelRatio||1,2)));
+ ctx.setTransform(canvas.width/320,0,0,canvas.height/320,0,0);
+ if(trace)draw();
+}
+addEventListener('resize',resize);
+addEventListener('pointerdown', event=>{
+ if(!event.isPrimary)return;
+ event.preventDefault();
+ if(state==='title'){chime(480);signal('start');loadLevel();return;}
+ if(state==='result'){
+  if(performance.now()<guardUntil)return;
+  stage=(stage+1)%levels.length;
+  if(stage===0)signal('start');
+  loadLevel();return;
+ }
+ if(event.target===send){sendTelegram();return;}
+ if(event.target===undo){const k=history.pop();if(k!==undefined){mirrorMap.set(k,1-mirrorMap.get(k));update();chime(320);}return;}
+ if(event.target!==canvas)return;
+ const rect=canvas.getBoundingClientRect();
+ const x=Math.floor((event.clientX-rect.left)*5/rect.width);
+ const y=Math.floor((event.clientY-rect.top)*5/rect.height);
+ const k=key(x,y);
+ if(x<0||x>4||y<0||y>4||!mirrorMap.has(k))return;
+ history.push(k);mirrorMap.set(k,1-mirrorMap.get(k));chime(420+trace.lit.size*35);update();
+},{passive:false});
+send.textContent=t.send;undo.textContent=t.undo;
+cover.innerHTML='<div><div class="badge">◈</div><h1>'+t.title+'</h1><p>'+t.intro+'</p><p>'+t.start+'</p></div>';
+resize();
+</script></html>
