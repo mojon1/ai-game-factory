@@ -1,0 +1,738 @@
+{
+  "id": "2026-11-04-claude-1",
+  "status": "published",
+  "title": "ちょんちょん氷上ワカサギ",
+  "genre": "釣り",
+  "concept": "ワカサギ釣りの「穂先を読む」手触りが核。ちょんと誘うと寄った魚がまず小さく穂先をふるわせ、本当に食った瞬間だけクッと入る。そこで合わせれば掛かる。掛けたまま待てば次の針にも掛かって点が掛け算で増えるが、暴れる魚で穂先が読みにくくなり、時間とともにバレていく。",
+  "howToPlay": "上下にドラッグして仕掛けを群れの深さへ。タップで誘い、穂先がクッと入った瞬間にタップで合わせ、何匹か掛けたら上までドラッグして引き上げる。",
+  "libraryDecision": "使わない。断面図の2D描画と小さな魚の群れは素のCanvasで十分なめらかに動き、核の「穂先のわずかな動き」を正確に作るには自前で描くのが一番だと判断した。",
+  "soundDecision": "効果音と、テントの外の小さな風の音だけを付けた。魚がつつくと細かい「ちちち」、本当に食うと低い「コツッ」と鳴り、掛けるたびに音階が一段上がるので、連がけの欲ばりを耳でも感じられる。BGMは穂先と音に集中できるよう入れない。",
+  "improvements": [
+    {
+      "found": "①遊びの中心の穂先が画面のすみで小さく、アタリが見えにくい ②群れが画面外の遠くから遅く泳いでくるので待ち時間が長い ③ちょんちょん誘うと、つついている魚に当たって「はやい！」で必ず逃げられ理不尽",
+      "changed": "穂先を太く大きくして目盛りと光を付け、つつき・本アタリの沈みを約2倍にした。群れを近くから速く出し、最初の群れをすぐ出す。早合わせで逃げるのは半分にし、残りはまたつつき直すようにした。",
+      "foundEn": "(1) The rod tip, the heart of the game, was small in a corner and bites were hard to see (2) Schools swam in slowly from far off-screen, so waits were long (3) Twitching to lure often hit a nibbling fish and always scared it off with \"Too early!\"",
+      "changedEn": "Made the tip thicker with a gauge and glow, roughly doubling nibble and bite movement. Schools now spawn closer and faster, the first one right away. An early strike scares the fish only half the time; otherwise it starts nibbling again."
+    },
+    {
+      "found": "①「かかった！」「2連!」の文字が穂先の真上に出て、次のアタリが文字で隠れる ②引き上げている最中に魚が外れ、何が悪かったのか分からない ③連がけの掛け算が引き上げるまで見えず、欲ばる楽しさが伝わらない",
+      "changed": "文字は仕掛けの横（水中）に出すようにした。巻き上げ中は外れないようにし、そのかわり掛けたまま待つほど魚が暴れて穂先の揺れが大きくなる＝外れそうな合図にした。上の表示に「×3 = 9点」と今上げたら何点かを出すようにした。",
+      "foundEn": "(1) \"Hooked!\"/\"2x!\" text appeared right over the tip and hid the next bite (2) Fish dropped off during the reel-up for no visible reason (3) The multiplier was invisible until landing, so the thrill of greed did not come across",
+      "changedEn": "Popups now appear beside the rig underwater. Fish no longer drop while reeling; instead hooked fish thrash harder the longer you wait, making the tip shake more as a warning. The HUD shows \"x3 = 9 pts\", what you would get by landing now."
+    },
+    {
+      "found": "①魚が外れるのが完全に運で、いつ引き上げればいいか読めない ②引き上げようと指を置いた瞬間の「ちょん」で、掛かっていた魚が外れてしまう ③群れと仕掛けの深さが少しずれるだけで全く寄ってこず、ずれているのかも分からない",
+      "changed": "魚ごとに体力を持たせ、外れる1.6秒前から魚が赤くなって激しく暴れ、穂先も大きく揺れて低い音が鳴る＝上げどきの合図にした。誘い直しは体力を少し削るだけで、その場では外れない。巻き上げ中は体力が減らない。寄ってくる深さの幅を広げ、指の動きと仕掛けの動きを1対1にした。終了画面の文字の重なりも直した。",
+      "foundEn": "(1) Losing fish was pure luck, so there was no way to judge when to reel up (2) The twitch from touching down to start reeling could knock a hooked fish off (3) Being slightly off the school depth meant no interest at all, with no clue why",
+      "changedEn": "Each fish now has stamina: 1.6 s before it shakes loose it turns red, thrashes hard, shakes the tip and makes a low rattle — your cue to reel up. Re-twitching only drains stamina a little and never drops a fish on its own. Stamina is frozen while reeling. Fish now notice the bait from a wider depth band, and the rig moves 1:1 with your finger. Fixed overlapping text on the results screen."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "釣り",
+      "en": "Fishing",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "氷の穴からのワカサギ釣り。穂先の小さなふるえ（つつき）と本当のアタリを見分けて合わせ、何本もの針に連がけしてから引き上げる欲ばりの釣り。",
+        "ideaEn": "Ice-hole smelt fishing: tell nibbles from real bites on the rod tip, strike, and chain several fish on the multi-hook rig before reeling up.",
+        "fromDraw": true
+      },
+      {
+        "idea": "傘を指で傾けて雨粒の向きを変え、町の植木鉢すべてに水をやり続ける。どこかが枯れるまで続く生き残り。",
+        "ideaEn": "Tilt an umbrella to redirect rain and keep every flowerpot in town watered; survive until one withers.",
+        "fromDraw": false
+      },
+      {
+        "idea": "3Dの観覧車がゆっくり回る。乗り場に来たゴンドラへ、待っている客を組み合わせて乗せ、頂上で景色を見せたい人を頂上に届ける。",
+        "ideaEn": "A 3D Ferris wheel turns slowly; match waiting guests into gondolas so each reaches the top at the moment they want.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "time",
+    "input": [
+      "tap",
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Tip-Twitch Ice Smelt",
+      "concept": "The core is reading the rod tip, as in real smelt ice fishing. A twitch lures fish; they first make the tip tremble, and only a true bite makes it dip sharply. Strike then and the fish is on. Wait and more hooks fill, multiplying points, but thrashing fish make the tip harder to read and slowly shake loose.",
+      "howToPlay": "Drag up/down to reach the school. Tap to twitch the bait, tap again the moment the tip dips to strike, then drag all the way up to land your chain.",
+      "libraryDecision": "None. A 2D cross-section with small schools runs smoothly on plain Canvas, and the core — tiny rod-tip motions — is best drawn by hand for precise control.",
+      "soundDecision": "Only sound effects plus soft wind outside the tent. Nibbles go \"tick-tick\", a real bite goes \"tok\", and each hooked fish raises the note one step, so the greed of chaining is heard too. No BGM, to keep focus on the tip and the sounds."
+    }
+  },
+  "createdAt": "2026-11-04T09:07:04+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-04T09:07:04+09:00",
+    "metricsFrom": "2026-11-04T00:06:26.705Z",
+    "transcript": "e9d7bfd2-a97a-4cb8-afbd-939724d0498d.jsonl",
+    "validationRuns": 6,
+    "finishedAt": "2026-11-04T09:30:42+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-04T09:26:50+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "32.9KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=140",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=236",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=119",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=207",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 33645,
+    "lines": 626
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "穂先の動きが「つつき」「本アタリ」「掛かった魚の暴れ」の3種類で重なるので、慣れるまでは見分けがつかず、群れが来ない間は待つだけになる",
+    "comment": "穂先が目盛り2つ分クッと入った瞬間に合わせて掛かると気持ちいい。最終プレイでは2匹掛けたあと上の玉が赤く点滅し（外れそうな合図）、それでも欲ばって深いアタリに合わせて3連、引き上げる指を置いた瞬間に4匹目まで掛かって4連+24点になった場面は「もう1回」と思えた。一方、1匹ずつ上げると1〜3点しか入らず、群れの深さを探す間は地味。画面は自己プレイの画像を見て判断した（穂先部分は拡大して確認）。",
+    "similar": [
+      {
+        "title": "THE ワカサギ釣り（D3パブリッシャー）",
+        "url": "https://gamebiz.jp/news/129001",
+        "similarity": "中",
+        "note": "竿の動きを見てタップで合わせ、たくさん釣るワカサギ釣りのスマホゲーム。本作は群れの深さ合わせ、つつきと本アタリの見分け、体力つきの連がけの欲ばりを足した。",
+        "note_en": "A phone smelt-fishing game where you watch the rod and tap to strike for many fish. This game adds matching school depth, telling nibbles from bites, and greedy chaining with fish stamina."
+      },
+      {
+        "title": "ワカサギ釣りゲーム（窓の杜 2006年紹介のフリーソフト）",
+        "url": "https://forest.watch.impress.co.jp/article/2006/02/17/wakasagi.html",
+        "similarity": "中",
+        "note": "穴に垂らした竿がわずかに動いた瞬間にクリックして1〜5匹を釣る。竿先の小さな動きを読む点が近い。本作は連がけを自分で待つか上げるかを選び、点が掛け算になる。",
+        "note_en": "Click when the rod over the hole barely moves to catch 1–5 smelt; reading tiny rod motion is close. Here you choose whether to wait for more on the rig or reel up, and points multiply."
+      }
+    ],
+    "research": "WebSearchで「ワカサギ釣り ゲーム アプリ 連掛け 穂先」「ice fishing mobile game rod tip bite」を検索した。",
+    "i18n": {
+      "en": {
+        "worst": "The rod tip mixes three motions — nibbles, real bites and thrashing hooked fish — so until you get used to it they are hard to tell apart, and between schools you just wait",
+        "comment": "Striking the instant the tip dips two marks feels great. In the final run, after two fish the slots blinked red (about to lose them), I greedily struck one more deep bite for a triple, and the touch to reel up hooked a fourth for 4x and +24 — that moment made me want another go. Landing one at a time gives only 1–3 points, and searching for the school depth is plain. I judged from the self-play screenshots (zooming into the rod tip).",
+        "research": "Searched the web for Japanese smelt-fishing game/app terms and 'ice fishing mobile game rod tip bite'."
+      }
+    },
+    "method": "スマホ縦画面で 26 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 26 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "タイトルをタップして開始。穂先と目盛りが画面上にある",
+        "noteEn": "Tap the title to start. Rod tip and gauge at the top",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "swipe(0.50,0.40→0.50,0.60) 300ms → wait 1500ms",
+        "note": "左から群れ。下へドラッグして群れの深さへ",
+        "noteEn": "A school from the left; drag down to its depth",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "swipe(0.50,0.50→0.50,0.56) 250ms → wait 1800ms → tap(0.50,0.70) 120ms → wait 300ms",
+        "note": "4.6mへ合わせ、ちょんと誘う",
+        "noteEn": "Match 4.6m and twitch",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 250ms",
+        "note": "穂先を見つめる",
+        "noteEn": "Watch the tip",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 250ms",
+        "note": "穂先を見つめる",
+        "noteEn": "Watch the tip",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 250ms",
+        "note": "穂先を見つめる",
+        "noteEn": "Watch the tip",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 250ms",
+        "note": "穂先を見つめる",
+        "noteEn": "Watch the tip",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.50,0.70) 120ms → wait 300ms",
+        "note": "穂先がクッと目盛り2つ分入った！タップで合わせて1匹目",
+        "noteEn": "Tip dipped two marks! Tap to strike — first fish",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 500ms → tap(0.50,0.70) 120ms → wait 200ms",
+        "note": "欲ばって掛けたまま誘い直す",
+        "noteEn": "Greedy: twitch again with one on",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 250ms",
+        "note": "次のアタリを待つ",
+        "noteEn": "Wait for the next bite",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "wait 250ms",
+        "note": "次のアタリを待つ",
+        "noteEn": "Wait for the next bite",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "wait 250ms",
+        "note": "次のアタリを待つ",
+        "noteEn": "Wait for the next bite",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "wait 250ms",
+        "note": "次のアタリを待つ",
+        "noteEn": "Wait for the next bite",
+        "image": "ai-play/step-13.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "wait 250ms",
+        "note": "次のアタリを待つ",
+        "noteEn": "Wait for the next bite",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "wait 250ms",
+        "note": "次のアタリを待つ",
+        "noteEn": "Wait for the next bite",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "wait 250ms",
+        "note": "次のアタリを待つ",
+        "noteEn": "Wait for the next bite",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 17,
+        "action": "tap(0.50,0.70) 120ms → wait 250ms",
+        "note": "2匹目のアタリ。合わせて2連",
+        "noteEn": "Second bite. Strike for a double",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 18,
+        "action": "wait 300ms → tap(0.50,0.70) 120ms → wait 200ms",
+        "note": "さらに欲ばって誘う",
+        "noteEn": "Even greedier: twitch again",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 19,
+        "action": "wait 250ms",
+        "note": "3匹目を待つ。掛かった魚の揺れで穂先が読みにくい",
+        "noteEn": "Waiting for a third; hooked fish make the tip harder to read",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 20,
+        "action": "wait 250ms",
+        "note": "3匹目を待つ。掛かった魚の揺れで穂先が読みにくい",
+        "noteEn": "Waiting for a third; hooked fish make the tip harder to read",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 21,
+        "action": "wait 250ms",
+        "note": "3匹目を待つ。掛かった魚の揺れで穂先が読みにくい",
+        "noteEn": "Waiting for a third; hooked fish make the tip harder to read",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 22,
+        "action": "wait 250ms",
+        "note": "3匹目を待つ。掛かった魚の揺れで穂先が読みにくい",
+        "noteEn": "Waiting for a third; hooked fish make the tip harder to read",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 23,
+        "action": "wait 250ms",
+        "note": "3匹目を待つ。掛かった魚の揺れで穂先が読みにくい",
+        "noteEn": "Waiting for a third; hooked fish make the tip harder to read",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 24,
+        "action": "tap(0.50,0.70) 120ms → wait 200ms",
+        "note": "上の玉が赤く点滅＝外れそう。でも深いアタリも来た！合わせて3連を狙う",
+        "noteEn": "Slots blink red = about to lose them, but a deep bite too! Strike for a triple",
+        "image": "ai-play/step-24.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 25,
+        "action": "swipe(0.50,0.85→0.50,0.25) 450ms → wait 700ms",
+        "note": "3連！赤く暴れているのですぐ上へドラッグして引き上げ",
+        "noteEn": "Triple! They are thrashing red, so reel up at once",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 26,
+        "action": "swipe(0.50,0.30→0.50,0.80) 500ms → wait 1200ms → tap(0.50,0.70) 120ms → wait 500ms",
+        "note": "引き上げ時のちょんで4匹目まで掛かり4連+24点！魚がバケツに飛んでいく。すぐ群れの深さへおろし直す",
+        "noteEn": "The reel-up touch hooked a fourth: 4x for +24! Fish fly into the bucket. Drop straight back to the school",
+        "image": "ai-play/step-26.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-04T09:30:42+09:00"
+  },
+  "publishedAt": "2026-11-04T09:30:42+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 19466,
+    "outputTokens": 48998,
+    "contextTokens": 18122857,
+    "turns": 96,
+    "toolCalls": 105,
+    "webSearches": 0,
+    "minutes": 24.3,
+    "from": "2026-11-04T00:06:26.705Z",
+    "to": "2026-11-04T00:30:42.598Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-04T09:30:42+09:00",
+    "validationRuns": 6,
+    "codeKB": 32.9
+  }
+}

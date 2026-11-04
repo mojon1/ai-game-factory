@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>ちょんちょん氷上ワカサギ</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #0b1a2e; }
+canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const T = {
+  ja: {
+    title: 'ちょんちょん\n氷上ワカサギ',
+    how: ['上下ドラッグで仕掛けを群れの深さへ', 'タップでちょんと誘い、穂先がクッと', '入ったらタップで合わせる。連がけで高得点'],
+    start: 'タップでスタート', again: 'タップでもう一度',
+    pts: '点', left: 'のこり', sec: '秒', best: 'ベスト',
+    hint: 'ドラッグで糸をおろす → タップでちょんちょん誘う',
+    hooked: 'かかった！', early: 'はやい！', off: 'ポロッ…', chain: '連', perfect: 'パーフェクト！',
+    jiai: '時合い！ 群れが寄ってきた', deep: '日がのぼって群れが深くなった', calm: '群れが落ちついた… あと少し',
+    end: '納竿', fish: '釣果', fishU: '匹', maxChain: '最高', newBest: 'ベスト更新！',
+    reelUp: '上へドラッグで巻き上げ！', lift: 'まだ上がっていない魚は数えられない',
+  },
+  en: {
+    title: 'Tip-Twitch\nIce Smelt',
+    how: ['Drag up/down to reach the school', 'Tap to twitch the bait. When the rod', 'tip dips — tap to strike! Chain catches'],
+    start: 'Tap to start', again: 'Tap to play again',
+    pts: 'pts', left: '', sec: 's', best: 'Best',
+    hint: 'Drag down to drop the line, then tap to twitch',
+    hooked: 'Hooked!', early: 'Too early!', off: 'Lost it…', chain: 'x', perfect: 'PERFECT!',
+    jiai: 'Feeding time! A school moves in', deep: 'Sun is up — the fish go deeper', calm: 'The bite slows… almost done',
+    end: 'Lines up', fish: 'Catch', fishU: 'fish', maxChain: 'Best chain', newBest: 'New best!',
+    reelUp: 'Drag up to reel in!', lift: 'Fish still in the water don\'t count',
+  },
+}[LANG === 'ja' ? 'ja' : 'en'];
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+
+// ---------- save ----------
+let best = 0, bestChainAll = 0;
+addEventListener('message', (e) => {
+  if (e.data && e.data.agf === 'loaded' && e.data.data) {
+    best = Math.max(best, e.data.data.best | 0);
+    bestChainAll = Math.max(bestChainAll, e.data.data.chain | 0);
+  }
+});
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+const persist = () => { try { parent.postMessage({ agf: 'save', data: { best, chain: bestChainAll } }, '*'); } catch (e) {} };
+
+// ---------- audio ----------
+let AC = null, master = null, windNode = null;
+function audioInit() {
+  try {
+    if (!AC) {
+      AC = new (window.AudioContext || window.webkitAudioContext)();
+      master = AC.createGain(); master.gain.value = 0.5; master.connect(AC.destination);
+      // tent wind: very quiet filtered noise
+      const len = AC.sampleRate * 2, buf = AC.createBuffer(1, len, AC.sampleRate), d = buf.getChannelData(0);
+      let last = 0; for (let i = 0; i < len; i++) { last = last * 0.985 + (Math.random() * 2 - 1) * 0.015; d[i] = last * 6; }
+      const src = AC.createBufferSource(); src.buffer = buf; src.loop = true;
+      const f = AC.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 500;
+      const g = AC.createGain(); g.gain.value = 0.05;
+      src.connect(f); f.connect(g); g.connect(master); src.start(); windNode = g;
+    }
+    if (AC.state !== 'running') AC.resume();
+  } catch (e) {}
+}
+function tone(freq, dur, type = 'sine', vol = 0.2, when = 0, slide = 0) {
+  if (!AC) return;
+  try {
+    const t0 = AC.currentTime + when;
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t0);
+    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(30, freq * slide), t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(master); o.start(t0); o.stop(t0 + dur + 0.02);
+  } catch (e) {}
+}
+function noise(dur, freq, vol = 0.15, q = 1, when = 0) {
+  if (!AC) return;
+  try {
+    const t0 = AC.currentTime + when;
+    const len = Math.max(1, (AC.sampleRate * dur) | 0), buf = AC.createBuffer(1, len, AC.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+    const s = AC.createBufferSource(); s.buffer = buf;
+    const f = AC.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = q;
+    const g = AC.createGain(); g.gain.value = vol;
+    s.connect(f); f.connect(g); g.connect(master); s.start(t0);
+  } catch (e) {}
+}
+const SCALE = [523.25, 587.33, 659.25, 783.99, 880, 1046.5];
+const sfx = {
+  twitch() { noise(0.07, 2400, 0.08, 2); },
+  nibble() { tone(2600 + Math.random() * 400, 0.025, 'square', 0.025); },
+  bite(big) { tone(big ? 420 : 620, 0.06, 'triangle', 0.18, 0, 0.6); noise(0.04, 1200, 0.08, 4); },
+  hook(n) { const f = SCALE[Math.min(n - 1, 5)]; tone(f, 0.18, 'triangle', 0.22); tone(f * 2, 0.12, 'sine', 0.06, 0.02); },
+  early() { tone(300, 0.14, 'sine', 0.12, 0, 0.6); },
+  off() { tone(700, 0.25, 'sine', 0.12, 0, 0.45); },
+  land(n) { for (let i = 0; i < n + 1; i++) tone(SCALE[Math.min(i, 5)] * (i === n ? 2 : 1), 0.22, 'triangle', 0.17, i * 0.075); noise(0.18, 900, 0.1, 0.7); },
+  splash() { noise(0.25, 700, 0.12, 0.8); },
+  bell() { tone(1318, 0.5, 'sine', 0.12); tone(1975, 0.4, 'sine', 0.05, 0.05); },
+  endBell() { [784, 659, 523].forEach((f, i) => tone(f, 0.5, 'triangle', 0.15, i * 0.18)); },
+};
+
+// ---------- canvas ----------
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+let W = 360, H = 640, DPR = 1;
+function resize() {
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = Math.max(1, cv.clientWidth || innerWidth || 360);
+  H = Math.max(1, cv.clientHeight || innerHeight || 640);
+  cv.width = Math.max(1, Math.round(W * DPR)); cv.height = Math.max(1, Math.round(H * DPR));
+  layout();
+}
+addEventListener('resize', resize);
+
+// layout
+let cx, iceTop, iceBot, waterTop, waterBot, tipBaseX, tipBaseY;
+const D = 8, HOOKS = 5, GAP = 0.27, MIN_D = 0.35, MAX_D = 7.8;
+function layout() {
+  cx = W * 0.5;
+  iceTop = H * 0.27; iceBot = H * 0.315; waterTop = iceBot; waterBot = H - 8;
+  tipBaseX = cx; tipBaseY = H * 0.16;
+}
+const yOf = (d) => waterTop + 6 + (d / D) * (waterBot - waterTop - 6);
+const dPerPx = () => D / Math.max(1, waterBot - waterTop - 6);
+
+// ---------- game state ----------
+const GAME_T = 100;
+let scene = 'title', sceneT = 0, endAt = 0;
+let g = null;
+const rnd = (a, b) => a + Math.random() * (b - a);
+function newGame() {
+  g = {
+    t: 0, score: 0, caught: 0, maxChain: 0, landings: 0,
+    rig: 1.2, rigTarget: 1.2, lure: 0, sinceMove: 0,
+    fish: [], schools: [], nextSchool: 0.3, pop: [], parts: [], fly: [],
+    shak: 0, tipJit: 0, phase: 0, banner: null, hintT: 6, nextSchoolFirst: true, reelHint: 0, bucket: [],
+    biteFx: 0, dipAmt: 0, everHooked: false,
+  };
+}
+function phaseOf(t) { return t < 32 ? 0 : t < 58 ? 1 : t < 84 ? 2 : 3; }
+const PH = [
+  { dmin: 2.2, dmax: 4.8, eager: 1.0, mouth: [0, 2], fake: 0.08, win: 0.5, gapS: [4, 6], size: [9, 14], big: 0.08 },
+  { dmin: 4.6, dmax: 7.2, eager: 0.85, mouth: [1, 3], fake: 0.25, win: 0.42, gapS: [4.5, 7], size: [8, 12], big: 0.12 },
+  { dmin: 1.8, dmax: 6.6, eager: 1.5, mouth: [0, 2], fake: 0.1, win: 0.45, gapS: [2.2, 3.4], size: [12, 18], big: 0.15 },
+  { dmin: 5.5, dmax: 7.5, eager: 0.7, mouth: [1, 3], fake: 0.3, win: 0.36, gapS: [5, 7], size: [6, 9], big: 0.2 },
+];
+function spawnSchool() {
+  const p = PH[g.phase];
+  const dir = Math.random() < 0.5 ? 1 : -1;
+  const sc = { d: rnd(p.dmin, p.dmax), dir, drift: rnd(-0.08, 0.08) };
+  sc.d0 = sc.d;
+  g.schools.push(sc);
+  const n = Math.round(rnd(p.size[0], p.size[1]));
+  const speed = rnd(30, 42);
+  for (let i = 0; i < n; i++) {
+    const big = Math.random() < p.big;
+    g.fish.push({
+      sc, x: dir > 0 ? rnd(-130, -10) : W + rnd(10, 130), d: sc.d + rnd(-0.45, 0.45), off: rnd(-0.45, 0.45),
+      vx: dir * speed * rnd(0.8, 1.2), size: big ? rnd(17, 20) : rnd(11, 14), big, val: big ? 3 : 1,
+      st: 'swim', tm: 0, hook: -1, mouths: 0, wob: rnd(0, 6.28), hookedT: 0, alpha: 0, nib: 0,
+    });
+  }
+}
+function hookPos(i) { // i: 0 top .. 4 bottom
+  const d = g.rig - 0.18 - (HOOKS - 1 - i) * GAP;
+  const side = i % 2 === 0 ? -1 : 1;
+  return { d, x: cx + side * 11, side };
+}
+function hookTaken(i) { return g.fish.some((f) => f.hook === i && (f.st === 'go' || f.st === 'mouth' || f.st === 'pause' || f.st === 'bite' || f.st === 'hooked')); }
+function hookedCount() { return g.fish.filter((f) => f.st === 'hooked').length; }
+
+function popup(text, x, y, col = '#fff', size = 18, life = 1.2) { g.pop.push({ text, x, y, col, size, life, t: 0 }); }
+
+function startPlay() {
+  newGame(); scene = 'play'; sceneT = 0;
+  audioInit(); sfx.bell(); signal('start');
+}
+function finish() {
+  scene = 'end'; sceneT = 0; endAt = performance.now();
+  const isBest = g.score > best;
+  g.newBest = isBest && g.score > 0;
+  if (isBest) best = g.score;
+  if (g.maxChain > bestChainAll) bestChainAll = g.maxChain;
+  persist(); sfx.endBell();
+  signal('end', { score: g.score });
+}
+
+// ---------- input ----------
+let ptr = null;
+cv.addEventListener('pointerdown', (e) => {
+  e.preventDefault(); audioInit();
+  if (scene === 'title') { startPlay(); return; }
+  if (scene === 'end') { if (performance.now() - endAt > 700) startPlay(); return; }
+  if (ptr) return;
+  ptr = { id: e.pointerId, y: e.clientY, y0: e.clientY, moved: 0 };
+  try { cv.setPointerCapture(e.pointerId); } catch (er) {}
+  twitch();
+});
+cv.addEventListener('pointermove', (e) => {
+  if (!ptr || e.pointerId !== ptr.id || scene !== 'play') return;
+  const dy = e.clientY - ptr.y; ptr.y = e.clientY; ptr.moved += Math.abs(dy);
+  g.rigTarget = Math.max(MIN_D, Math.min(MAX_D, g.rigTarget + dy * dPerPx()));
+  if (Math.abs(dy) > 0.5) { g.lure = Math.max(g.lure, 0.55); g.sinceMove = 0; }
+});
+const up = (e) => { if (ptr && e.pointerId === ptr.id) ptr = null; };
+cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+
+function twitch() {
+  g.shak = 1; g.lure = 1; g.sinceMove = 0; sfx.twitch();
+  let newly = 0, early = false;
+  const before = hookedCount();
+  for (const f of g.fish) {
+    if (f.st === 'hooked') f.hookedT = Math.max(f.hookedT, Math.min(f.hookedT + 0.6, f.life - 1.2)); // twitching shakes fish already on, but never knocks one off by itself
+  }
+  for (const f of g.fish) {
+    if (f.st === 'bite') { f.st = 'hooked'; f.hookedT = 0; f.life = f.big ? rnd(3.5, 7) : rnd(4.5, 10); newly++; }
+    else if (f.st === 'mouth' || f.st === 'pause') {
+      early = true;
+      if (Math.random() < 0.5) { f.st = 'flee'; f.tm = 0; } else { f.st = 'pause'; f.tm = 0; f.pDur = rnd(0.3, 0.7); }
+    }
+  }
+  const ry = yOf(g.rig) - 50, px = Math.min(W - 70, cx + 78);
+  if (newly) {
+    const n = hookedCount(); g.everHooked = true;
+    sfx.hook(n);
+    popup(n > 1 ? `${n}${T.chain}!` : T.hooked, px, ry, '#ffe066', n > 1 ? 24 : 20);
+    for (let i = 0; i < 8; i++) g.parts.push({ x: cx, y: yOf(g.rig), vx: rnd(-40, 40), vy: rnd(-60, -10), life: 0.6, t: 0, c: '#cfe8ff' });
+    if (n >= 2 && n > before) g.reelHint = Math.max(g.reelHint, 0);
+  } else if (early) {
+    sfx.early(); popup(T.early, px, ry, '#ff9b8a', 18);
+  }
+}
+function dropFish(f) {
+  f.st = 'off'; f.tm = 0; f.warn = false; f.vx = (Math.random() < 0.5 ? -1 : 1) * 60;
+  sfx.off(); const hp = hookPos(Math.max(0, f.hook));
+  popup(T.off, hp.x + 50 * (f.vx > 0 ? 1 : -1), yOf(hp.d), '#a9c4e0', 15, 1);
+}
+function land() {
+  const hk = g.fish.filter((f) => f.st === 'hooked');
+  if (!hk.length) return;
+  const n = hk.length, sum = hk.reduce((a, f) => a + f.val, 0), pts = sum * n;
+  g.score += pts; g.caught += n; g.landings++;
+  if (n > g.maxChain) g.maxChain = n;
+  for (const f of hk) {
+    f.st = 'gone';
+    g.fly.push({ x: cx, y: iceTop, tx: W * 0.17 + rnd(-10, 10), ty: iceTop - 14 - Math.min(18, g.bucket.length * 0.6), t: 0, big: f.big, delay: rnd(0, 0.15) });
+  }
+  sfx.land(n); sfx.splash();
+  const label = n >= HOOKS ? `${T.perfect} +${pts}` : n > 1 ? `${n}${T.chain} +${pts}` : `+${pts}`;
+  popup(label, cx, iceTop - 40, n >= HOOKS ? '#ffd23f' : n > 2 ? '#ffe066' : '#fff', n >= 3 ? 28 : 22, 1.6);
+  for (let i = 0; i < 14; i++) g.parts.push({ x: cx + rnd(-14, 14), y: iceTop + 4, vx: rnd(-70, 70), vy: rnd(-140, -40), life: 0.8, t: 0, c: '#e6f4ff', grav: 300 });
+}
+
+// ---------- update ----------
+function update(dt) {
+  if (scene !== 'play') return;
+  g.t += dt;
+  const ph = phaseOf(g.t);
+  if (ph !== g.phase) {
+    g.phase = ph;
+    g.banner = { text: [null, T.deep, T.jiai, T.calm][ph], t: 0 };
+    sfx.bell(); g.nextSchool = Math.min(g.nextSchool, 0.8);
+  }
+  if (g.t >= GAME_T) { finish(); return; }
+  const P = PH[g.phase];
+  g.hintT -= dt;
+  g.lure = Math.max(0, g.lure - dt * 0.55);
+  g.sinceMove += dt;
+  g.shak = Math.max(0, g.shak - dt * 4);
+  // rig movement
+  const diff = g.rigTarget - g.rig;
+  const sp = diff > 0 ? 4.2 : 5;
+  g.rig += Math.sign(diff) * Math.min(Math.abs(diff), sp * dt);
+  if (g.rig <= MIN_D + 0.02 && hookedCount() > 0) land();
+  if (hookedCount() >= 2) g.reelHint += dt; else g.reelHint = 0;
+  // schools
+  g.nextSchool -= dt;
+  if (g.nextSchool <= 0) { spawnSchool(); g.nextSchool = rnd(P.gapS[0], P.gapS[1]); }
+  for (const s of g.schools) { s.d += s.drift * dt; if (Math.abs(s.d - s.d0) > 1.2) s.drift *= -1; }
+  // fish
+  const idle = g.sinceMove > 4.5;
+  for (const f of g.fish) {
+    f.wob += dt * (f.st === 'hooked' ? (f.warn ? 30 : 12) : 5);
+    f.tm += dt;
+    f.alpha = Math.min(1, f.alpha + dt * 2);
+    if (f.st === 'swim') {
+      f.x += f.vx * dt;
+      const td = f.sc.d + f.off;
+      f.d += (td - f.d) * Math.min(1, dt * 0.8) + Math.sin(f.wob * 0.5) * 0.04 * dt;
+      // interest in a hook
+      const dx = Math.abs(f.x - cx);
+      if (dx < 85 && g.rig > 0.9) {
+        let bi = -1, bd = 9;
+        for (let i = 0; i < HOOKS; i++) { const hp = hookPos(i); const dd = Math.abs(hp.d - f.d); if (hp.d > 0.25 && dd < bd && !hookTaken(i)) { bd = dd; bi = i; } }
+        if (bi >= 0 && bd < 1.0) {
+          const rate = P.eager * (idle ? 0.04 : 0.1 + 1.1 * g.lure) * (1 - bd / 1.25);
+          if (Math.random() < rate * dt) { f.st = 'go'; f.hook = bi; f.tm = 0; }
+        }
+      }
+    } else if (f.st === 'go') {
+      const hp = hookPos(f.hook);
+      const tx = hp.x + hp.side * (f.size * 0.75 + 3), td = hp.d;
+      const ty = yOf(td), fy = yOf(f.d);
+      const ddx = tx - f.x, ddy = ty - fy, dist = Math.hypot(ddx, ddy);
+      const v = 55 * dt;
+      if (dist < v + 1) {
+        f.x = tx; f.d = td; f.st = 'mouth'; f.tm = 0;
+        f.mouths = Math.round(rnd(P.mouth[0], P.mouth[1] + 0.49)); f.mDur = rnd(0.25, 0.5);
+        if (f.mouths === 0) { f.st = 'pause'; f.pDur = rnd(0.25, 0.6); }
+        f.vx = Math.sign(cx - f.x) || 1;
+      } else { f.x += ddx / dist * v; f.d += (ddy / dist * v) * dPerPx(); f.vx = Math.sign(ddx) * 20 || f.vx; }
+      if (f.tm > 4) { f.st = 'swim'; f.hook = -1; }
+    } else if (f.st === 'mouth' || f.st === 'pause' || f.st === 'bite') {
+      const hp = hookPos(f.hook);
+      f.x = hp.x + hp.side * (f.size * 0.75 + 3) + Math.sin(f.wob * 3) * 1.2; f.d = hp.d;
+      if (f.st === 'mouth') {
+        f.nib -= dt; if (f.nib <= 0) { sfx.nibble(); f.nib = 0.09; }
+        if (f.tm > f.mDur) { f.mouths--; f.st = 'pause'; f.tm = 0; f.pDur = rnd(0.2, 0.55); }
+      } else if (f.st === 'pause') {
+        if (f.tm > f.pDur) {
+          if (f.mouths > 0) { f.st = 'mouth'; f.tm = 0; f.mDur = rnd(0.25, 0.5); }
+          else if (Math.random() < P.fake) { f.st = 'flee'; f.tm = 0; }
+          else { f.st = 'bite'; f.tm = 0; f.win = P.win * (f.big ? 0.85 : 1); sfx.bite(f.big); g.biteFx = 1; }
+        }
+      } else if (f.st === 'bite') {
+        if (f.tm > f.win) { f.st = 'flee'; f.tm = 0; }
+      }
+    } else if (f.st === 'hooked') {
+      const reeling = g.rigTarget < g.rig - 0.05;
+      if (!reeling) f.hookedT += dt;
+      f.warn = f.hookedT > f.life - 1.6;
+      if (f.warn) { f.rat = (f.rat || 0) - dt; if (f.rat <= 0) { f.rat = 0.12; tone(180 + Math.random() * 60, 0.05, 'triangle', 0.06); } }
+      const hp = hookPos(f.hook);
+      f.x = hp.x + hp.side * (f.size * 0.6) + Math.sin(f.wob) * 2.5; f.d = hp.d + 0.04;
+      if (f.hookedT > f.life) dropFish(f);
+    } else if (f.st === 'flee' || f.st === 'off') {
+      if (f.st === 'flee' && f.tm < 0.05) f.vx = (f.x < cx ? -1 : 1) * 110;
+      f.x += f.vx * dt * (f.st === 'off' ? 1.4 : 1); f.d += 0.25 * dt;
+      f.hook = -1;
+      if (f.tm > 1.4) { f.st = 'swim'; f.vx = Math.sign(f.vx) * 30; }
+    }
+  }
+  g.fish = g.fish.filter((f) => f.st !== 'gone' && !((f.st === 'swim' || f.st === 'flee' || f.st === 'off') && (f.x < -260 || f.x > W + 260)));
+  g.schools = g.schools.filter((s) => g.fish.some((f) => f.sc === s));
+  // effects
+  for (const p of g.pop) p.t += dt; g.pop = g.pop.filter((p) => p.t < p.life);
+  for (const p of g.parts) { p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += (p.grav || 0) * dt; } g.parts = g.parts.filter((p) => p.t < p.life);
+  for (const f of g.fly) { f.t += dt; if (f.t - f.delay > 0.55 && !f.done) { f.done = true; g.bucket.push(f.big); } } g.fly = g.fly.filter((f) => !f.done);
+  if (g.banner) { g.banner.t += dt; if (g.banner.t > 2.6) g.banner = null; }
+  g.biteFx = Math.max(0, g.biteFx - dt * 3);
+}
+
+// rod tip offset (positive = down)
+function tipOffset(now) {
+  if (!g) return 0;
+  let y = 0;
+  for (const f of g.fish) {
+    if (f.st === 'mouth') y += Math.sin(now * 0.09 + f.wob) * 3 + (Math.random() - 0.5) * 2.5;
+    else if (f.st === 'bite') { const k = Math.min(1, f.tm / 0.05); y += (f.big ? 32 : 24) * k * (1 - Math.max(0, f.tm - f.win * 0.75) / (f.win * 0.25 + 0.001) * 0.6); }
+    else if (f.st === 'hooked') y += Math.sin(f.wob * 1.3) * (f.warn ? 7 : 2.5) + 2;
+  }
+  y -= g.shak * 22;
+  return Math.max(-26, Math.min(40, y));
+}
+
+// ---------- draw ----------
+const specks = Array.from({ length: 40 }, () => ({ x: Math.random(), y: Math.random(), s: rnd(0.5, 1.6), v: rnd(0.003, 0.012) }));
+const snow = Array.from({ length: 26 }, () => ({ x: Math.random(), y: Math.random(), s: rnd(0.8, 2), v: rnd(0.02, 0.05) }));
+function fitText(text, maxW, size, weight = '700') {
+  let s = size; ctx.font = `${weight} ${s}px ${FONT}`;
+  while (ctx.measureText(text).width > maxW && s > 12) { s -= 1; ctx.font = `${weight} ${s}px ${FONT}`; }
+  return s;
+}
+function drawBg(now, tt) {
+  // sky/tent interior: dawn colors shift over time
+  const k = Math.min(1, tt / GAME_T);
+  const top = ctx.createLinearGradient(0, 0, 0, iceTop);
+  top.addColorStop(0, `hsl(${215 - k * 20}, ${40 + k * 10}%, ${16 + k * 30}%)`);
+  top.addColorStop(1, `hsl(${30 - k * 10}, ${55}%, ${40 + k * 22}%)`);
+  ctx.fillStyle = top; ctx.fillRect(0, 0, W, iceTop + 2);
+  // distant hills
+  ctx.fillStyle = `hsla(220, 25%, ${30 + k * 30}%, 0.8)`;
+  ctx.beginPath(); ctx.moveTo(0, iceTop);
+  for (let x = 0; x <= W; x += 20) ctx.lineTo(x, iceTop - 18 - Math.sin(x * 0.02) * 10 - Math.sin(x * 0.05 + 1) * 5);
+  ctx.lineTo(W, iceTop); ctx.fill();
+  // sun
+  const sy = iceTop - 10 - k * iceTop * 0.55;
+  const sg = ctx.createRadialGradient(W * 0.78, sy, 2, W * 0.78, sy, 60);
+  sg.addColorStop(0, 'rgba(255,240,200,0.95)'); sg.addColorStop(0.2, 'rgba(255,200,140,0.5)'); sg.addColorStop(1, 'rgba(255,180,120,0)');
+  ctx.fillStyle = sg; ctx.fillRect(W * 0.78 - 60, sy - 60, 120, 120);
+  // snow flakes
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  for (const s of snow) { const y = ((s.y + now * 0.00002 * s.v * 1000) % 1) * iceTop; const x = (s.x * W + Math.sin(now * 0.001 + s.y * 10) * 8) % W; ctx.beginPath(); ctx.arc(x, y, s.s, 0, 6.28); ctx.fill(); }
+  // ice
+  const ig = ctx.createLinearGradient(0, iceTop, 0, iceBot);
+  ig.addColorStop(0, '#f4fbff'); ig.addColorStop(0.25, '#cfe6f5'); ig.addColorStop(1, '#7fb0d0');
+  ctx.fillStyle = ig; ctx.fillRect(0, iceTop, W, iceBot - iceTop);
+  // water
+  const wg = ctx.createLinearGradient(0, waterTop, 0, H);
+  wg.addColorStop(0, `hsl(200, 55%, ${30 + k * 8}%)`); wg.addColorStop(0.45, 'hsl(212, 60%, 16%)'); wg.addColorStop(1, 'hsl(222, 65%, 6%)');
+  ctx.fillStyle = wg; ctx.fillRect(0, waterTop, W, H - waterTop);
+  // light shaft from hole
+  const lg = ctx.createLinearGradient(0, waterTop, 0, waterTop + (H - waterTop) * 0.7);
+  lg.addColorStop(0, 'rgba(200,235,255,0.28)'); lg.addColorStop(1, 'rgba(200,235,255,0)');
+  ctx.fillStyle = lg; ctx.beginPath();
+  ctx.moveTo(cx - 20, waterTop); ctx.lineTo(cx + 20, waterTop); ctx.lineTo(cx + 90, waterTop + (H - waterTop) * 0.7); ctx.lineTo(cx - 90, waterTop + (H - waterTop) * 0.7); ctx.fill();
+  // specks
+  ctx.fillStyle = 'rgba(200,230,255,0.25)';
+  for (const s of specks) { const y = waterTop + ((s.y + now * 0.00001 * s.v * 100) % 1) * (H - waterTop); ctx.fillRect((s.x * W + Math.sin(now * 0.0005 + s.y * 9) * 6), y, s.s, s.s); }
+  // hole
+  ctx.fillStyle = '#1d4766';
+  ctx.beginPath(); ctx.ellipse(cx, iceTop + 2, 26, 7, 0, 0, 6.28); ctx.fill();
+  ctx.fillStyle = 'rgba(30,70,100,0.55)'; ctx.fillRect(cx - 24, iceTop + 2, 48, iceBot - iceTop - 2);
+  ctx.strokeStyle = 'rgba(255,255,255,0.8)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(cx, iceTop + 2, 27, 7.5, 0, Math.PI, 0); ctx.stroke();
+  // ice chips
+  ctx.fillStyle = '#ffffff';
+  for (let i = 0; i < 9; i++) { const a = i * 0.7; ctx.beginPath(); ctx.ellipse(cx + Math.cos(a) * (36 + (i % 3) * 7), iceTop + 1 - (i % 2), 4 + (i % 3), 2, 0, 0, 6.28); ctx.fill(); }
+  // depth ticks
+  ctx.fillStyle = 'rgba(200,225,245,0.5)'; ctx.font = `600 12px ${FONT}`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  for (let m = 1; m <= 7; m++) { const y = yOf(m); ctx.fillRect(0, y, 8, 1); ctx.fillText(`${m}m`, 11, y); }
+}
+function drawBucket() {
+  const bx = W * 0.17, by = iceTop;
+  // fish pile
+  const n = g ? g.bucket.length : 0;
+  ctx.save();
+  for (let i = 0; i < Math.min(n, 30); i++) {
+    const px = bx + ((i * 37) % 26) - 13, py = by - 22 - Math.min(16, i * 0.55) + ((i * 13) % 5);
+    ctx.fillStyle = g.bucket[i] ? '#e8eef5' : '#c9d8e6';
+    ctx.beginPath(); ctx.ellipse(px, py, g.bucket[i] ? 9 : 7, 2.4, (i % 5 - 2) * 0.3, 0, 6.28); ctx.fill();
+  }
+  ctx.fillStyle = '#d24b3c'; ctx.beginPath();
+  ctx.moveTo(bx - 20, by - 26); ctx.lineTo(bx + 20, by - 26); ctx.lineTo(bx + 16, by); ctx.lineTo(bx - 16, by); ctx.fill();
+  ctx.fillStyle = '#e8705f'; ctx.fillRect(bx - 20, by - 27, 40, 4);
+  ctx.fillStyle = '#fff'; ctx.font = `800 14px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(String(g ? g.caught : 0), bx, by - 12);
+  ctx.restore();
+}
+function drawFish(f) {
+  const y = yOf(f.d), s = f.size, dir = f.vx >= 0 ? 1 : -1;
+  const depthA = 0.95 - Math.min(1, f.d / D) * 0.5;
+  ctx.save(); ctx.globalAlpha = f.alpha * (f.st === 'hooked' ? 1 : depthA);
+  ctx.translate(f.x, y);
+  if (f.st === 'hooked') { ctx.rotate(Math.PI / 2 * (f.x < cx ? -1 : 1) * 0.8 + Math.sin(f.wob) * (f.warn ? 0.9 : 0.5)); }
+  ctx.scale(dir, 1);
+  const tail = Math.sin(f.wob * (f.st === 'go' ? 2 : 1)) * 0.35;
+  ctx.fillStyle = f.warn ? '#ffd0c4' : f.big ? '#d8e6f2' : '#b8cde0';
+  ctx.beginPath(); ctx.ellipse(0, 0, s * 0.62, s * 0.2, 0, 0, 6.28); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(-s * 0.5, 0); ctx.lineTo(-s * 0.95, -s * 0.22 + tail * 4); ctx.lineTo(-s * 0.95, s * 0.22 + tail * 4); ctx.fill();
+  ctx.fillStyle = 'rgba(120,170,220,0.9)'; ctx.fillRect(-s * 0.45, -s * 0.02, s * 0.85, s * 0.06); // silver stripe
+  ctx.fillStyle = '#123'; ctx.beginPath(); ctx.arc(s * 0.4, -s * 0.04, 1.4, 0, 6.28); ctx.fill();
+  ctx.restore();
+}
+function drawRig(now, tipY) {
+  const ry = yOf(g.rig) + g.shak * -8;
+  // line: tip -> hole -> weight
+  ctx.strokeStyle = 'rgba(255,255,255,0.75)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(tipBaseX, tipY); ctx.lineTo(cx, iceTop + 2); ctx.lineTo(cx, ry); ctx.stroke();
+  // hooks
+  for (let i = 0; i < HOOKS; i++) {
+    const hp = hookPos(i), hy = yOf(hp.d) + g.shak * -8;
+    if (hy < waterTop) continue;
+    ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.beginPath(); ctx.moveTo(cx, hy - 4); ctx.lineTo(hp.x, hy); ctx.stroke();
+    const occupied = g.fish.some((f) => f.hook === i && f.st === 'hooked');
+    if (!occupied) { ctx.fillStyle = '#ff5a5a'; ctx.beginPath(); ctx.ellipse(hp.x + hp.side * 2, hy + 1, 3, 1.8, 0, 0, 6.28); ctx.fill(); }
+    ctx.strokeStyle = '#ddd'; ctx.beginPath(); ctx.arc(hp.x, hy + 2, 2, 0, Math.PI); ctx.stroke();
+  }
+  // sinker
+  ctx.fillStyle = '#9aa4ae'; ctx.beginPath(); ctx.ellipse(cx, ry + 4, 3.5, 6, 0, 0, 6.28); ctx.fill();
+  // depth label
+  ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.font = `700 13px ${FONT}`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  if (ry > waterTop + 4) ctx.fillText(`${g.rig.toFixed(1)}m`, cx + 18, ry + 4);
+}
+function drawRod(tipY) {
+  // rod from lower right, bending toward tip
+  const hx = W * 1.0 + 10, hy = iceTop - 6;
+  const bend = (tipY - tipBaseY);
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = '#3b2a20'; ctx.lineWidth = 10;
+  ctx.beginPath(); ctx.moveTo(hx + 10, hy + 8); ctx.lineTo(W * 0.86, hy - 14); ctx.stroke();
+  ctx.strokeStyle = '#222'; ctx.lineWidth = 4;
+  const midX = W * 0.68, midY = (hy - 14 + tipBaseY) / 2 - 14 + bend * 0.2;
+  ctx.beginPath(); ctx.moveTo(W * 0.86, hy - 14); ctx.quadraticCurveTo(midX, midY, tipBaseX + 48, tipBaseY + bend * 0.45); ctx.stroke();
+  // reel
+  ctx.fillStyle = '#c7cdd4'; ctx.beginPath(); ctx.arc(W * 0.9, hy - 4, 9, 0, 6.28); ctx.fill();
+  ctx.fillStyle = '#777'; ctx.beginPath(); ctx.arc(W * 0.9, hy - 4, 3, 0, 6.28); ctx.fill();
+  // soft tip (穂先)
+  // reference marks to read the tip against
+  ctx.strokeStyle = 'rgba(255,255,255,0.4)'; ctx.lineWidth = 1.5;
+  for (let i = -1; i <= 3; i++) { const yy = tipBaseY + i * 10; ctx.beginPath(); ctx.moveTo(tipBaseX - (i === 0 ? 26 : 20), yy); ctx.lineTo(tipBaseX - 10, yy); ctx.stroke(); }
+  ctx.strokeStyle = '#ff7a1a'; ctx.lineWidth = 3.6;
+  ctx.beginPath(); ctx.moveTo(tipBaseX + 48, tipBaseY + bend * 0.45); ctx.quadraticCurveTo(tipBaseX + 18, tipBaseY + bend * 0.8, tipBaseX, tipY); ctx.stroke();
+  const gl = ctx.createRadialGradient(tipBaseX, tipY, 1, tipBaseX, tipY, 14);
+  gl.addColorStop(0, 'rgba(255,240,120,0.7)'); gl.addColorStop(1, 'rgba(255,240,120,0)');
+  ctx.fillStyle = gl; ctx.fillRect(tipBaseX - 14, tipY - 14, 28, 28);
+  ctx.fillStyle = '#ffe94a'; ctx.beginPath(); ctx.arc(tipBaseX, tipY, 5, 0, 6.28); ctx.fill();
+  ctx.lineCap = 'butt';
+}
+function drawHUD() {
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(0, 0, W, 40);
+  ctx.fillStyle = '#fff'; ctx.textAlign = 'left'; ctx.font = `800 22px ${FONT}`;
+  ctx.fillText(`${g.score}`, 12, 8);
+  const sw = ctx.measureText(`${g.score}`).width;
+  ctx.font = `700 14px ${FONT}`; ctx.fillText(T.pts, 16 + sw, 15);
+  ctx.textAlign = 'right';
+  const left = Math.max(0, Math.ceil(GAME_T - g.t));
+  ctx.font = `800 20px ${FONT}`; ctx.fillStyle = left <= 10 ? '#ffb4a0' : '#fff';
+  ctx.fillText(`${T.left}${left}${T.sec}`, W - 12, 9);
+  ctx.fillStyle = 'rgba(255,255,255,0.75)'; ctx.font = `600 13px ${FONT}`; ctx.textAlign = 'center';
+  ctx.fillText(`${T.best} ${best}`, W / 2, 13);
+  // time bar
+  ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.fillRect(0, 40, W, 3);
+  ctx.fillStyle = '#ffd36b'; ctx.fillRect(0, 40, W * (1 - g.t / GAME_T), 3);
+  // hook slots
+  const n = hookedCount();
+  const sx = cx - 2 * 16, sy = 56, anyWarn = g.fish.some((f) => f.st === 'hooked' && f.warn);
+  for (let i = 0; i < HOOKS; i++) {
+    ctx.beginPath(); ctx.arc(sx + i * 16, sy, 6, 0, 6.28);
+    ctx.fillStyle = i < n ? (anyWarn && Math.sin(performance.now() * 0.03) > 0 ? '#ff7a5a' : '#ffe066') : 'rgba(255,255,255,0.18)'; ctx.fill();
+  }
+  if (n > 0) {
+    ctx.fillStyle = '#ffe066'; ctx.font = `800 14px ${FONT}`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    const sum = g.fish.reduce((a, f) => a + (f.st === 'hooked' ? f.val : 0), 0);
+    ctx.fillText(`×${n} = ${sum * n}${T.pts}`, sx + 4 * 16 + 12, sy);
+  }
+}
+function drawPopups() {
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  for (const p of g.pop) {
+    const k = p.t / p.life; ctx.globalAlpha = 1 - k * k;
+    const s = p.size * (1 + Math.max(0, 0.25 - p.t) * 1.5);
+    ctx.font = `900 ${s}px ${FONT}`; ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(0,20,40,0.7)';
+    const y = p.y - k * 24;
+    ctx.strokeText(p.text, p.x, y); ctx.fillStyle = p.col; ctx.fillText(p.text, p.x, y);
+  }
+  ctx.globalAlpha = 1;
+  for (const p of g.parts) { ctx.globalAlpha = 1 - p.t / p.life; ctx.fillStyle = p.c; ctx.fillRect(p.x, p.y, 2.5, 2.5); }
+  ctx.globalAlpha = 1;
+  for (const f of g.fly) {
+    const k = Math.max(0, Math.min(1, (f.t - f.delay) / 0.55));
+    const x = f.x + (f.tx - f.x) * k, y = f.y + (f.ty - f.y) * k - Math.sin(k * Math.PI) * 70;
+    ctx.save(); ctx.translate(x, y); ctx.rotate(k * 9); ctx.fillStyle = '#e1ecf6';
+    ctx.beginPath(); ctx.ellipse(0, 0, f.big ? 10 : 7, 2.6, 0, 0, 6.28); ctx.fill(); ctx.restore();
+  }
+}
+function drawCenterText(lines, y0) {
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  let y = y0, prev = 0;
+  for (const [text, size, col, w] of lines) {
+    const s = fitText(text, W - 32, size, w || '700');
+    if (prev) y += (prev + s) * 0.72;
+    ctx.fillStyle = col || '#fff'; ctx.fillText(text, W / 2, y); prev = s;
+  }
+}
+let last = 0;
+function frame(now) {
+  requestAnimationFrame(frame);
+  if (!W || !H) return;
+  const dt = Math.min(0.05, Math.max(0, (now - (last || now)) / 1000)); last = now;
+  sceneT += dt;
+  update(dt);
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  const tt = g ? g.t : 0;
+  drawBg(now, tt);
+  if (!g) { newGame(); }
+  const tipY = tipBaseY + tipOffset(now);
+  drawBucket();
+  for (const f of g.fish) if (f.st !== 'gone') drawFish(f);
+  drawRig(now, tipY);
+  drawRod(tipY);
+  if (scene === 'play') {
+    drawHUD();
+    drawPopups();
+    if (g.banner && g.banner.text) {
+      const a = Math.min(1, g.banner.t * 3, (2.6 - g.banner.t) * 2);
+      ctx.globalAlpha = a; ctx.fillStyle = 'rgba(0,25,50,0.6)'; ctx.fillRect(0, H * 0.5 - 22, W, 44);
+      ctx.fillStyle = '#ffe9a8'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; fitText(g.banner.text, W - 24, 17, '800');
+      ctx.fillText(g.banner.text, W / 2, H * 0.5); ctx.globalAlpha = 1;
+    }
+    let hint = null;
+    if (g.hintT > 0 && !g.everHooked) hint = T.hint;
+    else if (g.reelHint > 2.5 && g.reelHint < 7) hint = T.reelUp;
+    if (hint) {
+      ctx.fillStyle = 'rgba(0,10,25,0.55)'; ctx.fillRect(0, H - 50, W, 36);
+      ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; fitText(hint, W - 24, 15, '700'); ctx.fillText(hint, W / 2, H - 32);
+    }
+  } else if (scene === 'title') {
+    ctx.fillStyle = 'rgba(5,15,30,0.55)'; ctx.fillRect(0, 0, W, H);
+    const [l1, l2] = T.title.split('\n');
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    let s = fitText(l1, W - 40, 30, '900'); ctx.fillStyle = '#ffe9a8'; ctx.fillText(l1, W / 2, H * 0.36);
+    s = fitText(l2, W - 40, 40, '900'); ctx.fillStyle = '#fff'; ctx.fillText(l2, W / 2, H * 0.36 + 44);
+    drawCenterText(T.how.map((t) => [t, 15, '#d8ecff', '600']), H * 0.53);
+    const a = 0.6 + Math.sin(now * 0.005) * 0.4;
+    ctx.globalAlpha = a; drawCenterText([[T.start, 20, '#fff', '800']], H * 0.72); ctx.globalAlpha = 1;
+    if (best > 0) drawCenterText([[`${T.best} ${best}${T.pts}`, 14, '#ffd36b', '700']], H * 0.8);
+  } else if (scene === 'end') {
+    ctx.fillStyle = 'rgba(5,15,30,0.68)'; ctx.fillRect(0, 0, W, H);
+    const lines = [
+      [T.end, 22, '#d8ecff', '700'],
+      [`${g.score}${T.pts}`, 46, '#fff', '900'],
+      [g.newBest ? T.newBest : `${T.best} ${best}${T.pts}`, 18, g.newBest ? '#ffd23f' : '#ffd36b', '800'],
+      [`${T.fish} ${g.caught}${T.fishU}   ${T.maxChain} ${g.maxChain}${T.chain}`, 16, '#d8ecff', '700'],
+    ];
+    drawCenterText(lines, H * 0.34);
+    if (hookedCount() > 0) drawCenterText([[T.lift, 13, '#a9c4e0', '600']], H * 0.6);
+    if (performance.now() - endAt > 700) { const a = 0.6 + Math.sin(now * 0.005) * 0.4; ctx.globalAlpha = a; drawCenterText([[T.again, 20, '#fff', '800']], H * 0.7); ctx.globalAlpha = 1; }
+  }
+}
+resize();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
