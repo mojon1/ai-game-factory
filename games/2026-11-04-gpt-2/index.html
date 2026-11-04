@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>水鏡の花あかり</title>
+<style>
+*{box-sizing:border-box;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;overflow:hidden;overscroll-behavior:none;background:#112630;color:#f9e9d5;font:16px system-ui,-apple-system,"Hiragino Sans",sans-serif}
+main{height:100dvh;width:100vw;position:relative;background:radial-gradient(ellipse at 50% 41%,#204a4a,#122630 78%)}
+header{position:absolute;top:3%;left:6%;right:6%;display:flex;justify-content:space-between;font-weight:700}
+#message{position:absolute;top:12%;width:100%;text-align:center;padding:0 12px}
+canvas{position:absolute;top:20%;left:50%;transform:translateX(-50%);width:min(90vw,49dvh,450px);aspect-ratio:6/7;border-radius:25px}
+button{position:absolute;bottom:10%;left:17%;width:66%;height:48px;border:1px solid #deb887;border-radius:15px;background:#e9c89c;color:#1b3136;font:bold 16px system-ui}
+button[aria-disabled=true]{background:#23414a;color:#c5d9d1;border-color:#74988c}
+#hint{position:absolute;bottom:3%;width:100%;text-align:center;font-size:13px;color:#c3d1bd}
+#notes{position:absolute;bottom:19%;width:100%;text-align:center;color:#e5d7af;font-size:14px;min-height:18px;letter-spacing:.15em}
+.postcard canvas{outline:5px solid #edcba0;outline-offset:4px}
+.postcard header,.postcard #message,.postcard #finish,.postcard #notes,.postcard #hint{visibility:hidden}
+#cover.postcard-cover{display:block;background:transparent;padding:0}
+.postcard-cover h1{position:absolute;top:4%;width:100%;margin:0}
+.postcard-cover p{position:absolute;bottom:6%;width:100%;margin:0}
+#cover{position:absolute;inset:0;display:grid;place-content:center;text-align:center;background:#122630f2;padding:20px}
+h1{font-size:clamp(24px,7vw,36px);line-height:1.35}p{line-height:1.75;font-size:15px}.emblem{font-size:49px;color:#f2c397}
+</style>
+<main><header><span id="count"></span><span id="caption"></span></header><div id="message"></div><canvas></canvas><div id="notes"></div><button id="finish"></button><div id="hint"></div><div id="cover"></div></main>
+<script>
+const words = {
+ ja:{title:'水鏡の花あかり',intro:'水面をタップして、波紋を花へ。<br>七つの花を咲かせ、花の音を集めよう。',start:'タップでスタート',count:'花あかり',caption:'月の池',message:'波紋を花へ届けよう',hint:'花の間の水面をタップ',ready:'七つの花が開いた。もう少し奏でてもいい。',finish:'絵葉書にする',missing:'まだつぼみが残っている',complete:'月の池、花あかり',again:'タップでもう一度'},
+ en:{title:'Petals in the Moonpool',intro:'Tap the water to send ripples to flowers.<br>Bloom seven flowers and collect their notes.',start:'Tap to start',count:'Blooms',caption:'Moonpool',message:'Send ripples to the flowers',hint:'Tap the water between flowers',ready:'All seven flowers are open. Keep playing if you like.',finish:'Make a postcard',missing:'Some buds are still closed',complete:'Moonpool in bloom',again:'Tap to play again'}
+};
+const lang=new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language)?'ja':'en');
+const t=words[lang] || words.en;
+document.documentElement.lang=lang;
+const byId=id=>document.getElementById(id);
+const canvas=document.querySelector('canvas'), ctx=canvas.getContext('2d');
+const cover=byId('cover'), finish=byId('finish'), message=byId('message');
+const layout=[
+ [64,84,261.63,'#f6c89a'],[170,66,329.63,'#eec4d4'],[290,105,392,'#c9d4fb'],
+ [106,221,293.66,'#f8d3bd'],[251,222,440,'#dcc9ef'],
+ [61,348,523.25,'#f2d2a6'],[278,354,587.33,'#f1bfc5']
+];
+let state='title', flowers=[], ripples=[], bloomCount=0, audio, guardUntil=0, hintTimer, frameId=0;
+const maxRadius=115;
+const noteNames=lang==='ja'?['ド','ミ','ソ','レ','ラ','高いド','高いレ']:['C','E','G','D','A','C5','D5'];
+let recentNotes=[];
+const signal=(agf,data={})=>parent.postMessage({agf,...data},'*');
+for(const type of ['contextmenu','selectstart','gesturestart']) addEventListener(type,event=>event.preventDefault(),{passive:false});
+function unlockAudio(){
+ try{audio ||= new AudioContext();audio.resume();}catch{}
+}
+function playNote(frequency){
+ if(!audio||audio.state!=='running')return;
+ const tone=audio.createOscillator(), gain=audio.createGain(), now=audio.currentTime;
+ tone.type='sine';tone.frequency.value=frequency;
+ gain.gain.setValueAtTime(.001,now);gain.gain.exponentialRampToValueAtTime(.035,now+.035);
+ gain.gain.exponentialRampToValueAtTime(.001,now+.6);
+ tone.connect(gain).connect(audio.destination);tone.start(now);tone.stop(now+.62);
+}
+function circle(x,y,r,color){
+ ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();
+}
+function update(){
+ byId('count').textContent=t.count+' '+bloomCount+'/7';
+ finish.setAttribute('aria-disabled',String(bloomCount!==7));
+ message.textContent=bloomCount===7?t.ready:t.message;
+}
+function draw(now){
+ const water=ctx.createLinearGradient(0,0,330,420);
+ water.addColorStop(0,'#235553');water.addColorStop(1,'#153743');
+ ctx.fillStyle=water;ctx.fillRect(0,0,360,420);
+ for(let i=0;i<25;i++){
+  const x=(i*71+23)%354,y=(i*139+19)%411;
+  ctx.fillStyle=i%3?'#a4c3a52a':'#d5dbb346';ctx.fillRect(x,y,6+i%3*7,1);
+ }
+ for(const ripple of ripples){
+  ctx.strokeStyle='rgba(220,238,193,'+Math.max(0,.82*Math.pow(1-ripple.radius/maxRadius,.55))+')';
+  ctx.lineWidth=2;ctx.beginPath();ctx.arc(ripple.x,ripple.y,ripple.radius,0,Math.PI*2);ctx.stroke();
+  if(ripple.radius>13){ctx.lineWidth=1;ctx.beginPath();ctx.arc(ripple.x,ripple.y,ripple.radius-13,0,Math.PI*2);ctx.stroke();}
+ }
+ for(const flower of flowers){
+  const {x,y,open,color,hitAt,openedAt}=flower;
+  circle(x,y,23,'#638a64');circle(x+4,y-3,16,'#73956b');
+  if(!open){circle(x,y,7,'#b7a66d');continue;}
+  const age=Math.max(0,now-hitAt), pulse=Math.max(0,1-age/650);
+  const grow=.35+.65*Math.min(1,(now-openedAt)/590);
+  circle(x,y,26+pulse*9,'#ebd7a127');
+  for(let i=0;i<flower.petals;i++){
+   const a=i*2*Math.PI/flower.petals;
+   ctx.beginPath();
+   ctx.ellipse(x+Math.cos(a)*10*grow,y+Math.sin(a)*10*grow,(10+pulse*2)*grow,6.8*grow,a,0,Math.PI*2);
+   ctx.fillStyle=color;ctx.fill();
+  }
+  circle(x,y,6,'#f5ce79');
+ }
+}
+function frame(now){
+ frameId=0;
+ if(state!=='play')return;
+ for(const ripple of ripples){
+  ripple.radius=Math.min(maxRadius,(now-ripple.born)*.17);
+  flowers.forEach((flower,i)=>{
+   if(ripple.seen.has(i)||Math.hypot(flower.x-ripple.x,flower.y-ripple.y)>ripple.radius)return;
+   ripple.seen.add(i);flower.hitAt=now;
+   if(!flower.open){flower.open=true;flower.openedAt=now;bloomCount++;update();}
+   playNote(flower.frequency);
+   recentNotes.push(noteNames[i]);
+   if(recentNotes.length>5)recentNotes.shift();
+   byId('notes').textContent=recentNotes.join(' · ');
+  });
+ }
+ ripples=ripples.filter(ripple=>ripple.radius<maxRadius);
+ draw(now);
+ if(ripples.length||flowers.some(f=>now-f.hitAt<650)) frameId=requestAnimationFrame(frame);
+}
+function start(){
+ state='play';bloomCount=0;ripples=[];recentNotes=[];
+ document.querySelector('main').classList.remove('postcard');cover.classList.remove('postcard-cover');
+ byId('notes').textContent='';
+ flowers=layout.map(([x,y,frequency,color],i)=>({x,y,frequency,color,petals:5+i%3,open:false,openedAt:-10000,hitAt:-10000}));
+ cover.style.display='none';update();draw(performance.now());signal('start');
+ clearTimeout(hintTimer);byId('hint').textContent=t.hint;
+ hintTimer=setTimeout(()=>byId('hint').textContent='',4800);
+}
+function closePond(){
+ if(bloomCount!==7){message.textContent=t.missing;return;}
+ state='end';guardUntil=performance.now()+700;signal('end');ripples=[];cancelAnimationFrame(frameId);frameId=0;draw(performance.now()+650);
+ document.querySelector('main').classList.add('postcard');cover.classList.add('postcard-cover');
+ cover.innerHTML='<h1>'+t.complete+'</h1><p>7 / 7 · '+t.again+'</p>';
+ cover.style.display='block';
+}
+function resize(){
+ const rect=canvas.getBoundingClientRect(), dpr=Math.min(devicePixelRatio||1,2);
+ canvas.width=Math.max(1,Math.round(rect.width*dpr));canvas.height=Math.max(1,Math.round(rect.height*dpr));
+ ctx.setTransform(canvas.width/360,0,0,canvas.height/420,0,0);
+ draw(performance.now());
+}
+addEventListener('resize',resize);
+addEventListener('pointerdown',event=>{
+ if(!event.isPrimary)return;
+ event.preventDefault();unlockAudio();
+ if(state==='title'){start();return;}
+ if(state==='end'){if(performance.now()>=guardUntil)start();return;}
+ if(event.target===finish){closePond();return;}
+ if(event.target!==canvas)return;
+ const rect=canvas.getBoundingClientRect();
+ ripples.push({x:(event.clientX-rect.left)*360/rect.width,y:(event.clientY-rect.top)*420/rect.height,born:performance.now(),radius:0,seen:new Set()});
+ if(ripples.length>16)ripples.shift();
+ if(!frameId)frameId=requestAnimationFrame(frame);
+},{passive:false});
+finish.textContent=t.finish;byId('caption').textContent=t.caption;
+cover.innerHTML='<div><div class="emblem">✿</div><h1>'+t.title+'</h1><p>'+t.intro+'</p><p>'+t.start+'</p></div>';
+resize();
+</script></html>

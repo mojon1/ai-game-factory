@@ -1,0 +1,442 @@
+{
+  "id": "2026-11-04-gpt-1",
+  "status": "published",
+  "title": "折り返し電報",
+  "genre": "その他",
+  "concept": "鏡の向きを変え、出口へ届く一本の光にすべての受信灯を通す。近くの灯が点いても、その先の折り返しが足りないことがある。光の軌跡を読み、最後に電報を送って三つの通信所をつなぐ。",
+  "howToPlay": "鏡をタップして光の向きを変えます。すべての受信灯を点け、出口まで光を通したら電報を送ります。",
+  "libraryDecision": "光の経路と鏡を真上から見渡す2Dにする。Canvasの線と円で経路を描くことで次の反射を読みやすくできるため共有ライブラリは使わない。",
+  "soundDecision": "鏡の操作と送信を短いWeb Audio音で区別する。考える時間を急かさないようBGMは入れない。",
+  "improvements": [
+    {
+      "found": "入口と漏れた先を見分けにくい。鏡の下で光跡が途切れる。出口の到達状況が文字で分からない。",
+      "changed": "入口に矢印、漏れに赤い点を付けた。鏡を枠で描いて光跡を残し、出口の到達状況を表示した。",
+      "foundEn": "Source and leaks look alike, the beam breaks under mirrors, and the exit has no textual status.",
+      "changedEn": "Mark the source with an arrow and leaks with a dot, keep the beam visible through mirror frames, and label exit status."
+    },
+    {
+      "found": "光の順に全て反転するだけになりやすい。未完成でも送信ボタンが目立つ。試しに触った鏡を戻す履歴がない。",
+      "changed": "2面に出口だけ届く近道を作り、既に正しい鏡も混ぜた。送信の可否でボタンを色分けし、一手戻す操作を追加した。",
+      "foundEn": "Flipping every mirror in order is too predictable. Send looks ready before the route is complete. There is no undo for experiments.",
+      "changedEn": "Add an exit-only shortcut and pre-aligned mirrors, distinguish send readiness, and add undo."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "その他",
+      "en": "Other",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "鏡を折り返す光の電報。2Dの光跡で受信灯をつなぐ順番を読む。",
+        "ideaEn": "A mirror telegram with a 2D light trail that reveals relay order.",
+        "fromDraw": true
+      },
+      {
+        "idea": "3Dの回転する紙風船を扇いで棚の間へ運ぶ。",
+        "ideaEn": "Fan a rotating 3D paper balloon between shelves.",
+        "fromDraw": false
+      },
+      {
+        "idea": "波が引いたときだけ砂紋の断片を並べる2D模様遊び。",
+        "ideaEn": "Arrange fragments of sand patterns in 2D when the tide recedes.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Relay Telegram",
+      "concept": "Turn mirrors so a single beam visits every relay on the way to the exit. Follow the beam to see where another reflection is needed, then send the telegram through three stations.",
+      "howToPlay": "Tap mirrors to redirect light. Light every relay and reach the exit, then send the telegram.",
+      "libraryDecision": "An overhead 2D view keeps the light path readable. Canvas lines and circles show the relevant geometry without a shared library.",
+      "soundDecision": "Short Web Audio notes distinguish mirror turns and successful delivery. No BGM rushes the planning."
+    }
+  },
+  "createdAt": "2026-11-04T12:05:11+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-04T12:05:11+09:00",
+    "metricsFrom": "2026-11-04T03:03:09.189Z",
+    "transcript": null,
+    "validationRuns": 3,
+    "finishedAt": "2026-11-04T12:11:21+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-04T12:08:35+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "9.1KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=1",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=25",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=1",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=34",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 9326,
+    "lines": 169
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "固定の3面で、先に光が漏れる場所を追えば解ける場面が多い。",
+    "comment": "2面で出口だけ点いて送れず、残りの灯へ回り道を作ると送れた場面が面白かった。3面は9灯を点けてから最後の出口をつなぐ。画像プレイで2回改善し、全3面と再開をAndroidと英語iPhoneで確認した。",
+    "similar": [
+      {
+        "title": "Laser Maze",
+        "url": "https://www.thinkfun.co.uk/en-GB/pdp/76340",
+        "similarity": "高",
+        "note": "鏡で光を曲げて目標を通す仕組みが共通。Laser Mazeは駒を配置して光を分岐させる。こちらは固定鏡を反転して一本の光をすべての灯と出口へ通す。",
+        "note_en": "Both route light through targets with mirrors. Laser Maze places and splits tokens; this game turns fixed mirrors and routes one beam through relays and an exit."
+      }
+    ],
+    "research": "ウェブで1回検索し、ThinkFun公式の製品説明で確認した。",
+    "i18n": {
+      "en": {
+        "worst": "Three fixed stages often yield to following the next leak.",
+        "comment": "The exit-only shortcut in station two made the relay detour meaningful. Station three lit nine relays before reaching its exit. Two image-guided revisions preceded full Android and English iPhone replays.",
+        "research": "One web search, verified with ThinkFun's official product description."
+      }
+    },
+    "method": "スマホ縦画面で 16 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 16 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.70) 120ms",
+        "note": "送信待ちの色と入口の矢印を確認する。",
+        "noteEn": "Check the inactive send color and source arrow.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.32,0.49) 120ms",
+        "note": "鏡を回すと送信ボタンが金色になる。",
+        "noteEn": "Turning the mirror should make Send gold.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.21,0.86) 120ms",
+        "note": "一手戻して光と送信状態が戻るか見る。",
+        "noteEn": "Undo and check both the beam and send state.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.32,0.49) 120ms → tap(0.67,0.86) 120ms",
+        "note": "再度つないで最初の電報を送る。",
+        "noteEn": "Reconnect and send the first telegram.",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 800ms → tap(0.50,0.60) 120ms",
+        "note": "2面の近道を観察する。",
+        "noteEn": "Inspect the shortcut in station two.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.67,0.86) 120ms",
+        "note": "出口には届いたが受信灯1/4なので、送信が止まることを試す。",
+        "noteEn": "Try sending with the exit reached but only one of four relays lit.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.32,0.59) 120ms",
+        "note": "入口の鏡を上へ。正しい向きの鏡はそのままにする。",
+        "noteEn": "Turn the first mirror upward and leave the aligned mirror alone.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.68,0.39) 120ms",
+        "note": "上の漏れを下へ折り返す。",
+        "noteEn": "Redirect the upper leak downward.",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.67,0.86) 120ms → wait 800ms → tap(0.50,0.60) 120ms",
+        "note": "近道の一部も使って4灯を通れた。最後の通信所へ。",
+        "noteEn": "The lower detour still visits all four relays. Open the last station.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.50,0.69) 120ms",
+        "note": "下端の漏れを上へ振って中央へ通す。",
+        "noteEn": "Turn the bottom leak upward into the center.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.14,0.49) 120ms",
+        "note": "左端の鏡を回して上の二灯へ伸ばす。",
+        "noteEn": "Turn the left mirror toward the upper relays.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.86,0.29) 120ms",
+        "note": "右上で光を下へ折り返す。",
+        "noteEn": "Reflect the beam downward at the top right.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "tap(0.86,0.69) 120ms",
+        "note": "右下で左へ向け、内側の最後の灯へつなぐ。",
+        "noteEn": "Turn left at the bottom right to reach the last interior relay.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "tap(0.68,0.49) 120ms",
+        "note": "9灯が点いた。中央右の鏡で出口へ曲げる。",
+        "noteEn": "All nine relays are lit. Turn the center-right mirror toward the exit.",
+        "image": "ai-play/step-14.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "tap(0.67,0.86) 120ms",
+        "note": "最後の電報を送って完了画面を見る。",
+        "noteEn": "Send the final telegram and inspect the result.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "wait 800ms → tap(0.50,0.60) 120ms",
+        "note": "再開し、1面と空の履歴に戻ることを確認する。",
+        "noteEn": "Restart and check station one and the empty undo history.",
+        "image": "ai-play/step-16.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-04T12:11:21+09:00"
+  },
+  "publishedAt": "2026-11-04T12:11:21+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 1697,
+    "outputTokens": 8156,
+    "contextTokens": 11153568,
+    "turns": 35,
+    "toolCalls": 35,
+    "webSearches": null,
+    "minutes": 8.2,
+    "from": "2026-11-04T03:03:09.189Z",
+    "to": "2026-11-04T03:11:24.132Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-04T12:11:24+09:00",
+    "validationRuns": 3,
+    "codeKB": 9.1,
+    "evidence": "metrics-evidence.json"
+  }
+}
