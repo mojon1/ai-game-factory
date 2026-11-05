@@ -1,0 +1,694 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>そっと金魚すくい</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #0b2233; }
+canvas { display: block; width: 100vw; height: 100vh; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const DICT = {
+  ja: {
+    title: 'そっと金魚すくい',
+    how1: '指をおくとポイが水に入る。はなすとすくう',
+    how2: 'ぬれるほど・速く動かすほど紙は弱る',
+    how3: 'じっと待つと、金魚が寄って浮いてくる',
+    start: 'タップでスタート',
+    hint: '浮いている金魚の下にポイを入れて、指をはなす',
+    pts: '点', best: 'ベスト', poi: 'ポイ',
+    torn: 'ポイが破れた', newBest: 'ベスト更新！', again: 'タップでもう一度',
+    caught: 'すくった金魚', none: 'なし', total: 'これまでにすくった金魚',
+    hiki: '匹', combo: 'いっぺんに', slip: 'にげた…', restock: 'おじさんが金魚を足した', weak: 'みしっ…紙が弱ってきた',
+    names: { red: '小赤', sarasa: '更紗', black: '出目金', big: 'ぬし', gold: '金の金魚' },
+  },
+  en: {
+    title: 'Gently, Goldfish',
+    how1: 'Touch to dip the paper scoop. Let go to scoop.',
+    how2: 'Wet paper and fast moves tear it.',
+    how3: 'Hold still and the fish rise to you.',
+    start: 'Tap to start',
+    hint: 'Slide under a fish near the surface, then let go',
+    pts: 'pts', best: 'Best', poi: 'Scoop',
+    torn: 'The paper tore', newBest: 'New best!', again: 'Tap to play again',
+    caught: 'Caught', none: 'none', total: 'Goldfish caught so far',
+    hiki: '', combo: 'at once', slip: 'slipped…', restock: 'More fish added', weak: 'Creak… the paper is giving',
+    names: { red: 'Red', sarasa: 'Sarasa', black: 'Black moor', big: 'Big one', gold: 'Golden' },
+  },
+};
+const TX = DICT[LANG === 'ja' ? 'ja' : 'en'];
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+
+// ---------- save ----------
+let save = { best: 0, caught: {} };
+addEventListener('message', (e) => {
+  if (e.data && e.data.agf === 'loaded' && e.data.data && typeof e.data.data === 'object') {
+    const d = e.data.data;
+    save.best = Math.max(save.best, d.best | 0);
+    if (d.caught && typeof d.caught === 'object') save.caught = Object.assign({}, d.caught);
+  }
+});
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+function writeSave() { try { parent.postMessage({ agf: 'save', data: save }, '*'); } catch (e) {} }
+
+// ---------- canvas ----------
+const cv = document.getElementById('c');
+const cx = cv.getContext('2d');
+let W = 360, H = 640, DPR = 1, R = 52, S = 1;
+const bowl = { x: 0, y: 0, r: 44 };
+const TOP = 56;
+function resize() {
+  W = Math.max(1, innerWidth || 360); H = Math.max(1, innerHeight || 640);
+  DPR = Math.min(2, devicePixelRatio || 1);
+  cv.width = Math.max(1, Math.round(W * DPR)); cv.height = Math.max(1, Math.round(H * DPR));
+  R = Math.max(38, Math.min(66, Math.min(W, H * 0.6) * 0.15));
+  S = R / 52;
+  bowl.r = 46 * S; bowl.x = W - bowl.r - 18 * S; bowl.y = H - bowl.r - 22 * S;
+  for (const f of fish) { f.x = clamp(f.x, 10, W - 10); f.y = clamp(f.y, TOP, H - 10); }
+}
+addEventListener('resize', resize);
+
+const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+const rand = (a, b) => a + Math.random() * (b - a);
+const smooth = (t) => { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); };
+const angDiff = (a, b) => { let d = b - a; while (d > Math.PI) d -= Math.PI * 2; while (d < -Math.PI) d += Math.PI * 2; return d; };
+
+// ---------- audio ----------
+let AC = null, master = null, noiseBuf = null;
+function initAudio() {
+  if (AC) { if (AC.state === 'suspended') AC.resume(); return; }
+  try {
+    AC = new (window.AudioContext || window.webkitAudioContext)();
+    master = AC.createGain(); master.gain.value = 0.55; master.connect(AC.destination);
+    noiseBuf = AC.createBuffer(1, AC.sampleRate * 2, AC.sampleRate);
+    const d = noiseBuf.getChannelData(0); let last = 0;
+    for (let i = 0; i < d.length; i++) { const w = Math.random() * 2 - 1; last = (last + 0.02 * w) / 1.02; d[i] = w * 0.5 + last * 3; }
+    // ambient water
+    const src = AC.createBufferSource(); src.buffer = noiseBuf; src.loop = true;
+    const lp = AC.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 380;
+    const g = AC.createGain(); g.gain.value = 0.035;
+    src.connect(lp); lp.connect(g); g.connect(master); src.start();
+    if (AC.state === 'suspended') AC.resume();
+  } catch (e) { AC = null; }
+}
+function noise(t0, dur, type, freq, q, gain) {
+  if (!AC) return;
+  const s = AC.createBufferSource(); s.buffer = noiseBuf;
+  const f = AC.createBiquadFilter(); f.type = type; f.frequency.value = freq; f.Q.value = q;
+  const g = AC.createGain(); g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(gain, t0 + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  s.connect(f); f.connect(g); g.connect(master); s.start(t0, Math.random() * 1.5); s.stop(t0 + dur + 0.05);
+}
+function tone(t0, f0, f1, dur, gain, type = 'sine') {
+  if (!AC) return;
+  const o = AC.createOscillator(); o.type = type; o.frequency.setValueAtTime(f0, t0); o.frequency.exponentialRampToValueAtTime(f1, t0 + dur);
+  const g = AC.createGain(); g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(gain, t0 + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  o.connect(g); g.connect(master); o.start(t0); o.stop(t0 + dur + 0.05);
+}
+const now = () => (AC ? AC.currentTime : 0);
+const SFX = {
+  dip() { const t = now(); noise(t, 0.18, 'bandpass', 900, 1.2, 0.18); tone(t, 520, 170, 0.12, 0.08); },
+  drips(n = 4) { const t = now(); for (let i = 0; i < n; i++) { const tt = t + 0.05 + Math.random() * 0.5; const f = rand(1100, 1700); tone(tt, f, f * 1.6, 0.06, 0.035); } },
+  plop(p = 1) { const t = now(); tone(t, 900 * p, 280 * p, 0.13, 0.12); noise(t, 0.1, 'bandpass', 1400, 2, 0.06); },
+  flop() { const t = now(); noise(t, 0.05, 'lowpass', 700, 1, 0.07); },
+  tear() { const t = now(); for (let i = 0; i < 3; i++) noise(t + i * 0.025, 0.05, 'highpass', 2600 + i * 500, 0.8, 0.07); },
+  splash() { const t = now(); noise(t, 0.3, 'bandpass', 700, 0.8, 0.2); tone(t, 400, 120, 0.2, 0.08); },
+  chime(n) { const t = now(); const base = [659, 784, 988, 1175]; for (let i = 0; i < Math.min(4, n + 1); i++) tone(t + i * 0.09, base[i], base[i], 0.4, 0.06, 'triangle'); },
+  nib() { const t = now(); tone(t, 1900, 1300, 0.045, 0.05); },
+  creak() { const t = now(); noise(t, 0.25, 'bandpass', 1800, 6, 0.05); tone(t, 260, 200, 0.2, 0.03, 'triangle'); },
+  cricket() { if (!AC) return; const t = now(); const f = rand(4200, 4700); for (let i = 0; i < 3; i++) tone(t + i * 0.07, f, f, 0.05, 0.008, 'sine'); },
+};
+let cricketT = 3;
+
+// ---------- paper (poi) ----------
+const N = 24, NC = N * N;
+const inside = new Uint8Array(NC), rf = new Float32Array(NC), wet = new Float32Array(NC), dmg = new Float32Array(NC), torn = new Uint8Array(NC);
+let insideCount = 0;
+for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
+  const u = (i + 0.5) / N * 2 - 1, v = (j + 0.5) / N * 2 - 1, r = Math.hypot(u, v);
+  if (r <= 1) { const k = j * N + i; inside[k] = 1; rf[k] = r; insideCount++; }
+}
+const pcv = document.createElement('canvas'); pcv.width = pcv.height = N;
+const pcx = pcv.getContext('2d'); const pimg = pcx.createImageData(N, N);
+let tearsThisFrame = 0;
+function resetPaper() { wet.fill(0); dmg.fill(0); torn.fill(0); }
+function cellAt(lx, ly) {
+  const i = Math.floor((lx / R + 1) / 2 * N), j = Math.floor((ly / R + 1) / 2 * N);
+  if (i < 0 || j < 0 || i >= N || j >= N) return -1;
+  const k = j * N + i; return inside[k] ? k : -1;
+}
+function strength(k) { return 1 - 0.6 * wet[k] + 1.5 * smooth((rf[k] - 0.74) / 0.26); }
+function hurt(k, a) {
+  if (k < 0 || torn[k]) return;
+  const i = k % N, j = (k / N) | 0; let nt = 0;
+  if (i > 0 && torn[k - 1]) nt++; if (i < N - 1 && torn[k + 1]) nt++;
+  if (j > 0 && torn[k - N]) nt++; if (j < N - 1 && torn[k + N]) nt++;
+  dmg[k] += a * (1 + 0.8 * nt) / strength(k);
+  if (dmg[k] >= 1) {
+    torn[k] = 1; tearsThisFrame++;
+    // wet paper rips on: the tear runs into weak neighbours
+    const p = 0.26 * wet[k] * wet[k];
+    if (p > 0.05) {
+      if (i > 0) hurt(k - 1, p); if (i < N - 1) hurt(k + 1, p);
+      if (j > 0) hurt(k - N, p); if (j < N - 1) hurt(k + N, p);
+    }
+  }
+}
+let innerCount = 0; for (let k = 0; k < NC; k++) if (inside[k] && rf[k] < 0.8) innerCount++;
+function intactRatio() { let c = 0; for (let k = 0; k < NC; k++) if (inside[k] && rf[k] < 0.8 && !torn[k]) c++; return c / innerCount; }
+const END_AT = 0.5;
+function healthPct() {
+  let hs = 0; for (let k = 0; k < NC; k++) if (inside[k] && rf[k] < 0.8 && !torn[k]) hs += Math.max(0, 1 - dmg[k]) * (1 - 0.6 * wet[k]);
+  return Math.round(clamp((hs / innerCount - END_AT * 0.4) / (1 - END_AT * 0.4), 0, 1) * 100);
+}
+function fishCells(f, rx, ry, ang) {
+  const out = []; const L = f.len * S;
+  for (const t of [-0.42, -0.2, 0, 0.2, 0.42]) out.push(cellAt(rx + Math.cos(ang) * L * t, ry + Math.sin(ang) * L * t));
+  return out;
+}
+function supportOf(cells) { let ok = 0; for (const k of cells) if (k >= 0 && !torn[k]) ok++; return ok / cells.length; }
+function renderPaper() {
+  const d = pimg.data;
+  for (let k = 0; k < NC; k++) {
+    const o = k * 4;
+    if (!inside[k] || torn[k]) { d[o + 3] = 0; continue; }
+    const w = wet[k], dm = Math.min(1, dmg[k]);
+    d[o] = 252 - 55 * w - 30 * dm; d[o + 1] = 250 - 40 * w - 25 * dm; d[o + 2] = 242 - 15 * w - 20 * dm;
+    d[o + 3] = clamp(238 - 150 * w - 40 * dm, 40, 255);
+  }
+  pcx.putImageData(pimg, 0, 0);
+}
+
+// ---------- fish ----------
+const TYPES = {
+  red: { len: 26, pts: 1, w: 0.6, sp: 42, curious: 0.55, body: '#f0532e', belly: '#ff9a6a' },
+  sarasa: { len: 30, pts: 2, w: 0.75, sp: 38, curious: 0.5, body: '#fbf3ea', belly: '#ffffff', patch: '#e8452a' },
+  black: { len: 30, pts: 3, w: 1.0, sp: 30, curious: 0.45, body: '#26222a', belly: '#4a4250', eyes: true },
+  big: { len: 46, pts: 6, w: 2.1, sp: 30, curious: 0.35, body: '#d8381e', belly: '#ff8a5a', deep: true },
+  gold: { len: 23, pts: 10, w: 0.55, sp: 70, curious: 0.18, body: '#ffcc33', belly: '#fff2a0', shiny: true },
+};
+let fish = [];
+function makeFish(type, x, y) {
+  const T = TYPES[type];
+  return { type, T, len: T.len * rand(0.92, 1.08), x, y, a: rand(0, Math.PI * 2), wa: rand(0, 7), turn: 0, z: rand(0.2, 1), zT: rand(0.2, 1), zTimer: rand(1, 4),
+    t: rand(0, 10), scare: 0, cRoll: 1, ripT: rand(0.5, 2), spd: T.sp };
+}
+function pickType(round) {
+  const r = Math.random();
+  if (round.score >= 10 && !fish.some((f) => f.type === 'gold') && Math.random() < 0.3) return 'gold';
+  if (r < 0.52) return 'red'; if (r < 0.78) return 'sarasa'; if (r < 0.95) return 'black'; return fish.some((f) => f.type === 'big') ? 'red' : 'big';
+}
+function spawnInitial() {
+  fish = [];
+  const list = ['red', 'red', 'red', 'red', 'red', 'red', 'red', 'red', 'red', 'sarasa', 'sarasa', 'sarasa', 'sarasa', 'black', 'black', 'big'];
+  for (const t of list) fish.push(makeFish(t, rand(30, W - 30), rand(TOP + 30, H - 140 * S)));
+}
+
+// ---------- state ----------
+let state = 'title';
+const SHAL = 0.5;
+const DBG = { lifts: 0, empty: 0, unsup: 0, drop: 0 };
+let stateT = 0, hintT = 0, msgs = [], ripples = [];
+const poi = { x: 0, y: 0, sub: false, v: 0, still: 0, px: 0, py: 0, lift: 0, home: null };
+let carry = null; // {t, T, x0,y0,x1,y1, fish:[{f,rx,ry,ang,flopT}]}
+let round = { score: 0, caught: {}, n: 0 };
+let endInfo = null, endPending = -1, restockT = 0;
+let pointerId = null;
+
+function startRound() {
+  resetPaper(); spawnInitial(); bowlFish = []; warned = false;
+  round = { score: 0, caught: {}, n: 0 };
+  poi.x = W * 0.3; poi.y = H - R - 30 * S; poi.sub = false; poi.v = 0; poi.still = 0; poi.lift = 1;
+  carry = null; endPending = -1; msgs = []; ripples = [];
+  state = 'play'; stateT = 0; hintT = 5;
+  signal('start');
+}
+
+function poiTarget(px, py) { return { x: clamp(px, R * 0.2, W - R * 0.2), y: clamp(py - 58 * S, TOP + 4, H - R * 0.3) }; }
+
+cv.addEventListener('pointerdown', (e) => {
+  e.preventDefault(); initAudio();
+  if (state === 'title') { startRound(); return; }
+  if (state === 'end') { if (stateT > 0.7) startRound(); return; }
+  if (state !== 'play' || carry || endPending >= 0 || pointerId !== null) return;
+  pointerId = e.pointerId;
+  try { cv.setPointerCapture(e.pointerId); } catch (er) {}
+  const p = poiTarget(e.clientX, e.clientY);
+  poi.home = null; poi.x = poi.px = p.x; poi.y = poi.py = p.y; poi.sub = true; poi.v = 0; poi.still = 0;
+  for (let k = 0; k < NC; k++) if (inside[k]) wet[k] = Math.min(1, wet[k] + 0.03);
+  ripples.push({ x: poi.x, y: poi.y, r: R * 0.9, max: R * 2.2, a: 0.5 });
+  SFX.dip();
+  for (const f of fish) { f.cRoll = Math.random(); const d = Math.hypot(f.x - poi.x, f.y - poi.y); if (d < R * 0.6) { f.scare = 0.25; } }
+}, { passive: false });
+cv.addEventListener('pointermove', (e) => {
+  if (e.pointerId !== pointerId || !poi.sub) return;
+  const p = poiTarget(e.clientX, e.clientY); poi.x = p.x; poi.y = p.y;
+}, { passive: false });
+function release(e) {
+  if (e.pointerId !== pointerId) return;
+  pointerId = null;
+  if (state === 'play' && poi.sub) scoop();
+}
+cv.addEventListener('pointerup', release);
+cv.addEventListener('pointercancel', release);
+
+function scoop() {
+  poi.sub = false;
+  ripples.push({ x: poi.x, y: poi.y, r: R, max: R * 1.8, a: 0.4 });
+  // weight of water on lift
+  for (let k = 0; k < NC; k++) if (inside[k]) hurt(k, 0.03 * wet[k] * (1.1 - rf[k]));
+  const got = [];
+  for (const f of fish) {
+    if (f.z > SHAL) continue;
+    const rx = f.x - poi.x, ry = f.y - poi.y;
+    if (Math.hypot(rx, ry) > R * 0.92) continue;
+    const cells = fishCells(f, rx, ry, f.a);
+    if (supportOf(cells) < 0.6) { DBG.unsup++; f.scare = 0.6; continue; }
+    for (const k of cells) hurt(k, 0.2 * f.T.w * (0.3 + (k >= 0 ? wet[k] : 0)));
+    got.push({ f, rx, ry, ang: f.a, flopT: rand(0.05, 0.2), fl: 0 });
+  }
+  if (tearsThisFrame) SFX.tear();
+  DBG.lifts++; if (!got.length) { DBG.empty++; SFX.drips(3); poi.lift = 0; return; }
+  fish = fish.filter((f) => !got.some((g) => g.f === f));
+  const x1 = bowl.x - bowl.r * 0.1, y1 = bowl.y - bowl.r * 0.55;
+  const dist = Math.hypot(x1 - poi.x, y1 - poi.y);
+  carry = { t: 0, T: 0.35 + dist / (620 * S), x0: poi.x, y0: poi.y, x1, y1, fish: got };
+  poi.lift = 0;
+  SFX.drips(5);
+}
+
+function updateCarry(dt) {
+  const c = carry; c.t += dt;
+  const u = smooth(c.t / c.T);
+  poi.x = c.x0 + (c.x1 - c.x0) * u; poi.y = c.y0 + (c.y1 - c.y0) * u - Math.sin(u * Math.PI) * 26 * S;
+  for (const g of c.fish) {
+    if (g.gone) continue;
+    g.flopT -= dt; g.fl = Math.max(0, g.fl - dt * 5);
+    if (g.flopT <= 0) {
+      g.flopT = rand(0.13, 0.28); g.fl = 1;
+      g.ang += rand(-0.5, 0.5);
+      // fish wriggles a bit on the paper
+      g.rx += rand(-3, 3) * S; g.ry += rand(-3, 3) * S;
+      const cells = fishCells(g.f, g.rx, g.ry, g.ang);
+      for (const k of cells) hurt(k, 0.16 * g.f.T.w * (0.35 + (k >= 0 ? wet[k] : 0)));
+      for (const k of cells) if (k >= 0 && !torn[k]) wet[k] = Math.min(1, wet[k] + 0.04);
+      SFX.flop();
+      if (supportOf(cells) < 0.5 || Math.hypot(g.rx, g.ry) > R * 1.02) {
+        g.gone = true; DBG.drop++; const f = g.f;
+        f.x = clamp(poi.x + g.rx, 10, W - 10); f.y = clamp(poi.y + g.ry, TOP, H - 10); f.z = 0.75; f.zT = 0.9; f.scare = 1.2; f.a = g.ang;
+        fish.push(f);
+        ripples.push({ x: f.x, y: f.y, r: 6, max: 60 * S, a: 0.6 });
+        SFX.splash();
+        msgs.push({ x: f.x, y: f.y - 20, text: TX.slip, t: 1.2, col: '#cfe8ff' });
+      }
+    }
+  }
+  if (c.t >= c.T) {
+    const landed = c.fish.filter((g) => !g.gone);
+    if (landed.length) {
+      let pts = 0;
+      for (const g of landed) {
+        pts += g.f.T.pts; round.n++; round.caught[g.f.type] = (round.caught[g.f.type] || 0) + 1;
+        bowlFish.push({ type: g.f.type, T: g.f.T, len: g.f.len * 0.55, a: rand(0, 7), r: rand(0, bowl.r * 0.55), t: rand(0, 9), w: rand(0.4, 0.9) * (Math.random() < 0.5 ? 1 : -1) });
+      }
+      const mult = 1 + 0.5 * (landed.length - 1);
+      pts = Math.round(pts * mult); round.score += pts;
+      SFX.plop(landed.length > 1 ? 1.2 : 1);
+      if (landed.length > 1) { SFX.chime(landed.length); msgs.push({ x: bowl.x, y: bowl.y - bowl.r - 40 * S, text: `${landed.length}${LANG === 'ja' ? '匹' : ''} ${TX.combo} ×${mult}`, t: 1.6, col: '#ffe08a' }); }
+      const nm = landed.length === 1 ? TX.names[landed[0].f.type] + ' ' : '';
+      msgs.push({ x: bowl.x - bowl.r * 0.3, y: bowl.y - bowl.r - 14 * S, text: `${nm}+${pts}`, t: 1.4, col: landed.some((g) => g.f.type === 'gold') ? '#ffe066' : '#fff' });
+      ripples.push({ x: bowl.x, y: bowl.y, r: 4, max: bowl.r * 0.8, a: 0.6, bowl: true });
+    }
+    poi.home = { x: c.x0, y: c.y0, t: 0 };
+    carry = null;
+    if (intactRatio() < END_AT) endPending = 0.6;
+  }
+}
+let bowlFish = [];
+let warned = false, jig = 0;
+
+function endRound() {
+  state = 'end'; stateT = 0;
+  const prevBest = save.best;
+  const newBest = round.score > prevBest;
+  if (newBest) save.best = round.score;
+  for (const k in round.caught) save.caught[k] = (save.caught[k] || 0) + round.caught[k];
+  writeSave();
+  endInfo = { score: round.score, best: save.best, newBest: newBest && round.score > 0, caught: Object.assign({}, round.caught), n: round.n };
+  SFX.tear();
+  signal('end', { score: round.score });
+}
+
+// ---------- fish update ----------
+function updateFish(f, dt) {
+  const T = f.T;
+  f.t += dt; f.zTimer -= dt; f.scare -= dt;
+  if (f.zTimer <= 0) {
+    f.zTimer = rand(3, 7);
+    const shallowP = T.deep ? 0.4 : 0.6;
+    f.zT = Math.random() < shallowP ? rand(0.05, 0.38) : rand(0.5, 1);
+  }
+  if (Math.random() < dt * 0.8) f.turn = rand(-1.4, 1.4);
+  f.wa += f.turn * dt;
+  f.wa += angDiff(f.wa, f.a) * dt * 0.5;
+  let dx = Math.cos(f.wa), dy = Math.sin(f.wa);
+  let spd = T.sp * S;
+  // walls
+  const m = 40 * S;
+  if (f.x < m) dx += (m - f.x) / m * 3; if (f.x > W - m) dx -= (f.x - (W - m)) / m * 3;
+  if (f.y < TOP + m) dy += (TOP + m - f.y) / m * 3; if (f.y > H - m) dy -= (f.y - (H - m)) / m * 3;
+  // bowl
+  { const bx = f.x - bowl.x, by = f.y - bowl.y, bd = Math.hypot(bx, by), rr = bowl.r + 34 * S;
+    if (bd < rr) { dx += bx / bd * 3 * (1 - bd / rr) * 2; dy += by / bd * 3 * (1 - bd / rr) * 2; } }
+  // separation
+  for (const o of fish) {
+    if (o === f) continue;
+    const ox = f.x - o.x, oy = f.y - o.y, d2 = ox * ox + oy * oy, rr = (f.len + o.len) * 0.6 * S;
+    if (d2 < rr * rr && d2 > 0.01) { const d = Math.sqrt(d2); dx += ox / d * 0.6; dy += oy / d * 0.6; }
+  }
+  let turnRate = 2.4;
+  if (poi.sub && state === 'play') {
+    const px = f.x - poi.x, py = f.y - poi.y, d = Math.hypot(px, py) || 1;
+    const fastNear = poi.v > 190 * S && d < R + 85 * S * (f.type === 'gold' ? 1.4 : 1);
+    if (fastNear) f.scare = Math.max(f.scare, 0.7);
+    if (f.scare > 0 && d < R + 160 * S) {
+      dx += px / d * 4; dy += py / d * 4; spd *= 2.6; turnRate = 6;
+      f.zT = Math.max(f.zT, Math.min(1, f.z + 0.25));
+    } else if (poi.still > 0.4 && d < 250 * S && f.cRoll < T.curious) {
+      const c = 0.6 * smooth((poi.still - 0.4) / 0.8);
+      if (d > R * 0.35) { dx += -px / d * c * 1.6; dy += -py / d * c * 1.6; }
+      else spd *= 0.35;
+      if (d < R * 1.2) spd *= 0.55;
+      if (c > 0.15 && Math.random() < dt * 1.2 * c) f.zT = Math.min(f.zT, rand(0.05, 0.3));
+    }
+  } else if (f.scare > 0) { spd *= 1.8; }
+  const da = Math.atan2(dy, dx);
+  f.a += clamp(angDiff(f.a, da), -turnRate * dt, turnRate * dt);
+  const wig = 0.75 + 0.25 * Math.sin(f.t * 5);
+  f.x += Math.cos(f.a) * spd * wig * dt; f.y += Math.sin(f.a) * spd * wig * dt;
+  f.x = clamp(f.x, 6, W - 6); f.y = clamp(f.y, TOP - 10, H - 6);
+  f.z += clamp(f.zT - f.z, -dt * 0.35, dt * 0.35);
+  f.spd = spd;
+  f.glow = state === 'play' && poi.sub && f.z < SHAL && Math.hypot(f.x - poi.x, f.y - poi.y) < R * 0.92;
+  if (f.glow && poi.still > 0.3) {
+    f.nib = (f.nib || rand(0.2, 0.6)) - dt;
+    if (f.nib <= 0) {
+      f.nib = rand(0.7, 1.5);
+      const hx = f.x + Math.cos(f.a) * f.len * 0.45 * S, hy = f.y + Math.sin(f.a) * f.len * 0.45 * S;
+      ripples.push({ x: hx, y: hy, r: 2, max: 12 * S, a: 0.7 });
+      jig = 0.12; SFX.nib();
+    }
+  } else f.nib = 0;
+  if (f.z < SHAL) { f.ripT -= dt; if (f.ripT <= 0) { f.ripT = rand(1.2, 2.8); ripples.push({ x: f.x + Math.cos(f.a) * f.len * 0.45 * S, y: f.y + Math.sin(f.a) * f.len * 0.45 * S, r: 2, max: 16 * S, a: 0.5 }); } }
+}
+
+// ---------- update ----------
+let lastT = 0;
+function update(dt) {
+  stateT += dt; tearsThisFrame = 0; jig -= dt;
+  cricketT -= dt; if (cricketT <= 0) { cricketT = rand(2.5, 6); SFX.cricket(); }
+  if (state === 'play') {
+    hintT -= dt;
+    if (poi.sub) {
+      const v = Math.hypot(poi.x - poi.px, poi.y - poi.py) / dt;
+      poi.px = poi.x; poi.py = poi.y;
+      poi.v += (v - poi.v) * (1 - Math.exp(-dt * 14));
+      poi.still = poi.v < 45 * S ? poi.still + dt : 0;
+      for (let k = 0; k < NC; k++) if (inside[k]) wet[k] = Math.min(1, wet[k] + dt * 0.024);
+      const V0 = 260 * S;
+      if (poi.v > V0) {
+        const s = (poi.v - V0) / (600 * S) * 1.5 * dt;
+        for (let k = 0; k < NC; k++) if (inside[k]) hurt(k, s * (1.1 - rf[k]) * (0.3 + wet[k]));
+        if (Math.random() < dt * 8) ripples.push({ x: poi.x + rand(-R, R), y: poi.y + rand(-R, R), r: 4, max: 26 * S, a: 0.4 });
+      }
+      if (tearsThisFrame) { SFX.tear(); if (navigator.vibrate) try { navigator.vibrate(12); } catch (e) {} }
+      if (intactRatio() < END_AT && endPending < 0) { endPending = 0.5; }
+      if (!warned && healthPct() < 35) { warned = true; SFX.creak(); msgs.push({ x: poi.x, y: poi.y - R - 16, text: TX.weak, t: 1.4, col: '#ffb0a0' }); }
+    } else {
+      poi.lift = Math.min(1, poi.lift + dt * 4);
+      if (poi.home && !carry) { poi.home.t += dt * 2.5; const u = smooth(poi.home.t); poi.x += (poi.home.x - poi.x) * u; poi.y += (poi.home.y - poi.y) * u; if (poi.home.t >= 1) poi.home = null; }
+    }
+    if (carry) { updateCarry(dt); if (tearsThisFrame) SFX.tear(); }
+    if (endPending >= 0 && !carry) { endPending -= dt; if (endPending <= 0) { endPending = -1; poi.sub = false; pointerId = null; endRound(); } }
+    // restock
+    restockT -= dt;
+    if (fish.length < 10 && restockT <= 0) {
+      restockT = 2.5;
+      const side = Math.random() < 0.5;
+      fish.push(Object.assign(makeFish(pickType(round), side ? -10 : W + 10, rand(TOP + 40, H * 0.6)), { a: side ? 0 : Math.PI, z: 0.8, zT: 0.8 }));
+      if (fish.length === 9) msgs.push({ x: W / 2, y: TOP + 30, text: TX.restock, t: 1.6, col: '#cfe8ff' });
+    }
+  }
+  for (const f of fish) updateFish(f, dt);
+  for (const b of bowlFish) { b.t += dt; b.a += b.w * dt; }
+  for (const r of ripples) { r.r += (r.max - r.r) * dt * 2.2 + dt * 6; r.a -= dt * 0.55; }
+  ripples = ripples.filter((r) => r.a > 0);
+  for (const m of msgs) { m.t -= dt; m.y -= dt * 18; }
+  msgs = msgs.filter((m) => m.t > 0);
+}
+
+// ---------- drawing ----------
+function mix(c1, c2, t) {
+  const a = parseInt(c1.slice(1), 16), b = parseInt(c2.slice(1), 16);
+  const r = Math.round(((a >> 16) & 255) * (1 - t) + ((b >> 16) & 255) * t);
+  const g = Math.round(((a >> 8) & 255) * (1 - t) + ((b >> 8) & 255) * t);
+  const bl = Math.round((a & 255) * (1 - t) + (b & 255) * t);
+  return `rgb(${r},${g},${bl})`;
+}
+const WATER = '#1d5f8e';
+function drawFishShape(f, x, y, ang, sc, z, flop, tt) {
+  const T = f.T, L = f.len * S * sc, m = z < SHAL ? z * 0.4 : 0.35 + (z - SHAL) * 0.75;
+  if (z < SHAL && flop === 0) {
+    cx.fillStyle = 'rgba(5,30,60,0.22)';
+    cx.beginPath(); cx.ellipse(x + 7 * S, y + 9 * S, L * 0.45, L * 0.22, ang, 0, 7); cx.fill();
+  }
+  cx.save(); cx.translate(x, y); cx.rotate(ang);
+  const sw = Math.sin(tt * (f.spd > T.sp * S * 1.5 ? 16 : 7)) * (0.35 + flop * 0.6);
+  // tail
+  cx.fillStyle = mix(T.body, WATER, m + 0.08);
+  cx.globalAlpha = 0.85;
+  cx.beginPath();
+  cx.moveTo(-L * 0.38, 0);
+  cx.quadraticCurveTo(-L * 0.62, -L * 0.05 + sw * L * 0.1, -L * 0.82, -L * 0.3 + sw * L * 0.2);
+  cx.quadraticCurveTo(-L * 0.66, sw * L * 0.12, -L * 0.82, L * 0.3 + sw * L * 0.2);
+  cx.quadraticCurveTo(-L * 0.62, L * 0.05 + sw * L * 0.1, -L * 0.38, 0);
+  cx.fill();
+  cx.globalAlpha = 1;
+  // fins
+  cx.fillStyle = mix(T.body, WATER, m + 0.2);
+  cx.beginPath(); cx.ellipse(L * 0.05, -L * 0.2, L * 0.12, L * 0.05, -0.6 + sw * 0.3, 0, 7); cx.fill();
+  cx.beginPath(); cx.ellipse(L * 0.05, L * 0.2, L * 0.12, L * 0.05, 0.6 - sw * 0.3, 0, 7); cx.fill();
+  // body
+  cx.fillStyle = mix(T.body, WATER, m);
+  cx.beginPath(); cx.ellipse(0, 0, L * 0.42, L * 0.19, 0, 0, 7); cx.fill();
+  if (T.patch) { cx.fillStyle = mix(T.patch, WATER, m); cx.beginPath(); cx.ellipse(L * 0.05, -L * 0.03, L * 0.22, L * 0.12, 0.2, 0, 7); cx.fill(); cx.beginPath(); cx.ellipse(L * 0.3, 0, L * 0.08, L * 0.08, 0, 0, 7); cx.fill(); }
+  if (T.shiny) { cx.fillStyle = `rgba(255,255,255,${0.35 + 0.3 * Math.sin(tt * 4)})`; cx.beginPath(); cx.ellipse(L * 0.05, -L * 0.06, L * 0.22, L * 0.05, 0, 0, 7); cx.fill(); }
+  if (z < SHAL) { cx.fillStyle = 'rgba(255,255,255,0.28)'; cx.beginPath(); cx.ellipse(L * 0.06, -L * 0.07, L * 0.2, L * 0.035, 0, 0, 7); cx.fill(); }
+  // eyes
+  if (T.eyes) {
+    cx.fillStyle = mix('#3a3440', WATER, m);
+    cx.beginPath(); cx.arc(L * 0.3, -L * 0.17, L * 0.085, 0, 7); cx.arc(L * 0.3, L * 0.17, L * 0.085, 0, 7); cx.fill();
+    cx.fillStyle = mix('#c9c2b0', WATER, m); cx.beginPath(); cx.arc(L * 0.32, -L * 0.19, L * 0.035, 0, 7); cx.arc(L * 0.32, L * 0.19, L * 0.035, 0, 7); cx.fill();
+  } else {
+    cx.fillStyle = mix('#1a1010', WATER, m);
+    cx.beginPath(); cx.arc(L * 0.3, -L * 0.09, L * 0.035, 0, 7); cx.arc(L * 0.3, L * 0.09, L * 0.035, 0, 7); cx.fill();
+  }
+  cx.restore();
+}
+function drawWater(t) {
+  const g = cx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, '#2a7fb8'); g.addColorStop(1, '#174f7c');
+  cx.fillStyle = g; cx.fillRect(0, 0, W, H);
+  // caustics
+  cx.save(); cx.globalCompositeOperation = 'lighter'; cx.strokeStyle = 'rgba(160,220,255,0.06)'; cx.lineWidth = 6 * S;
+  for (let i = 0; i < 9; i++) {
+    const y0 = (i / 9) * H + Math.sin(t * 0.4 + i) * 20;
+    cx.beginPath();
+    for (let x = -20; x <= W + 20; x += 30) { const y = y0 + Math.sin(x * 0.02 + t * 0.7 + i * 1.7) * 18; x === -20 ? cx.moveTo(x, y) : cx.lineTo(x, y); }
+    cx.stroke();
+  }
+  // lantern reflections
+  const L = [[0.18, 0.12, '255,170,80'], [0.55, 0.07, '255,120,70'], [0.86, 0.2, '255,200,110']];
+  for (const [lx, ly, c] of L) {
+    const x = lx * W + Math.sin(t * 0.9 + lx * 9) * 4, y = TOP + ly * H;
+    const rg = cx.createRadialGradient(x, y, 2, x, y, 60 * S);
+    rg.addColorStop(0, `rgba(${c},0.32)`); rg.addColorStop(1, `rgba(${c},0)`);
+    cx.fillStyle = rg; cx.beginPath(); cx.ellipse(x, y, 60 * S, 34 * S * (1 + Math.sin(t * 1.3 + lx * 5) * 0.08), 0, 0, 7); cx.fill();
+  }
+  cx.restore();
+  // tank rim
+  cx.strokeStyle = 'rgba(200,235,255,0.35)'; cx.lineWidth = 6; cx.strokeRect(3, 3, W - 6, H - 6);
+}
+function drawBowl(t) {
+  const b = bowl;
+  cx.fillStyle = 'rgba(0,20,40,0.25)'; cx.beginPath(); cx.ellipse(b.x + 6 * S, b.y + 8 * S, b.r * 1.05, b.r * 1.0, 0, 0, 7); cx.fill();
+  cx.fillStyle = '#f4f1ea'; cx.beginPath(); cx.arc(b.x, b.y, b.r, 0, 7); cx.fill();
+  const g = cx.createRadialGradient(b.x - b.r * 0.2, b.y - b.r * 0.2, 2, b.x, b.y, b.r * 0.86);
+  g.addColorStop(0, '#9fd4f2'); g.addColorStop(1, '#4f9ccc');
+  cx.fillStyle = g; cx.beginPath(); cx.arc(b.x, b.y, b.r * 0.84, 0, 7); cx.fill();
+  cx.strokeStyle = '#d24a3a'; cx.lineWidth = 3 * S; cx.beginPath(); cx.arc(b.x, b.y, b.r * 0.94, 0, 7); cx.stroke();
+  cx.save(); cx.beginPath(); cx.arc(b.x, b.y, b.r * 0.84, 0, 7); cx.clip();
+  for (const f of bowlFish) {
+    const x = b.x + Math.cos(f.a) * f.r, y = b.y + Math.sin(f.a) * f.r;
+    drawFishShape({ T: f.T, len: f.len, spd: 0 }, x, y, f.a + (f.w > 0 ? Math.PI / 2 : -Math.PI / 2), 1, 0.1, 0, f.t);
+  }
+  for (const r of ripples) if (r.bowl) { cx.strokeStyle = `rgba(255,255,255,${r.a})`; cx.lineWidth = 1.5; cx.beginPath(); cx.arc(r.x, r.y, r.r, 0, 7); cx.stroke(); }
+  cx.restore();
+}
+function drawPoi(t) {
+  const lifted = !poi.sub;
+  const sc = lifted ? 1.05 : 1;
+  const x = poi.x + (jig > 0 ? rand(-1.2, 1.2) * S : 0), y = poi.y + (jig > 0 ? rand(-1.2, 1.2) * S : 0), r = R * sc;
+  // handle angle
+  const ha = 1.05;
+  if (lifted) {
+    cx.fillStyle = 'rgba(0,20,40,0.22)';
+    cx.beginPath(); cx.ellipse(x + 12 * S, y + 16 * S, r, r, 0, 0, 7); cx.fill();
+  }
+  // handle
+  cx.save(); cx.translate(x, y); cx.rotate(ha);
+  cx.fillStyle = lifted ? '#e85a3c' : mix('#e85a3c', WATER, 0.3);
+  cx.beginPath(); cx.roundRect ? cx.roundRect(r * 0.95, -6 * S, r * 1.5, 12 * S, 6 * S) : cx.rect(r * 0.95, -6 * S, r * 1.5, 12 * S); cx.fill();
+  cx.fillStyle = 'rgba(255,255,255,0.35)'; cx.fillRect(r * 1.0, -4 * S, r * 1.4, 2.5 * S);
+  cx.restore();
+  // paper
+  renderPaper();
+  cx.save();
+  cx.beginPath(); cx.arc(x, y, r, 0, 7); cx.clip();
+  cx.imageSmoothingEnabled = true;
+  cx.globalAlpha = poi.sub ? 0.42 : 1;
+  cx.drawImage(pcv, x - r, y - r, r * 2, r * 2);
+  if (!poi.sub) cx.drawImage(pcv, x - r, y - r, r * 2, r * 2);
+  cx.globalAlpha = 1;
+  if (poi.sub) { cx.fillStyle = 'rgba(40,110,170,0.18)'; cx.fillRect(x - r, y - r, r * 2, r * 2); }
+  cx.restore();
+  // rim
+  cx.strokeStyle = poi.sub ? mix('#ef6040', WATER, 0.25) : '#ef6040'; cx.lineWidth = 5.5 * S;
+  cx.beginPath(); cx.arc(x, y, r, 0, 7); cx.stroke();
+  cx.strokeStyle = 'rgba(255,255,255,0.35)'; cx.lineWidth = 1.5 * S;
+  cx.beginPath(); cx.arc(x, y, r - 1.5 * S, Math.PI * 1.05, Math.PI * 1.6); cx.stroke();
+  if (poi.sub) {
+    // surface line ring
+    cx.strokeStyle = 'rgba(220,240,255,0.35)'; cx.lineWidth = 1.2;
+    cx.beginPath(); cx.arc(x, y, r + 4 * S + Math.sin(t * 6) * 1.2, 0, 7); cx.stroke();
+  }
+}
+function fitFont(text, size, weight, maxW) {
+  let s = size; cx.font = `${weight} ${s}px ${FONT}`;
+  while (s > 12 && cx.measureText(text).width > maxW) { s -= 1; cx.font = `${weight} ${s}px ${FONT}`; }
+  return s;
+}
+function textC(text, x, y, size, weight = 600, col = '#fff', maxW = W - 32) {
+  fitFont(text, size, weight, maxW); cx.fillStyle = col; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillText(text, x, y);
+}
+function drawHUD() {
+  const g = cx.createLinearGradient(0, 0, 0, TOP + 10);
+  g.addColorStop(0, 'rgba(5,25,45,0.55)'); g.addColorStop(1, 'rgba(5,25,45,0)');
+  cx.fillStyle = g; cx.fillRect(0, 0, W, TOP + 10);
+  cx.textBaseline = 'middle';
+  cx.fillStyle = '#fff'; cx.textAlign = 'left'; cx.font = `700 24px ${FONT}`;
+  const sTxt = `${round.score}`; cx.fillText(sTxt, 14, 26);
+  const sw = cx.measureText(sTxt).width;
+  cx.font = `600 14px ${FONT}`; cx.fillText(TX.pts, 18 + sw, 29);
+  cx.textAlign = 'right'; cx.font = `600 14px ${FONT}`;
+  cx.fillText(`${TX.best} ${Math.max(save.best, round.score)}`, W - 14, 18);
+  const pct = healthPct();
+  cx.fillStyle = pct < 30 ? '#ffb0a0' : '#dff2ff';
+  cx.fillText(`${TX.poi} ${pct}%`, W - 14, 38);
+}
+function drawRipples() {
+  for (const r of ripples) {
+    if (r.bowl) continue;
+    cx.strokeStyle = `rgba(230,245,255,${r.a})`; cx.lineWidth = 1.4;
+    cx.beginPath(); cx.arc(r.x, r.y, r.r, 0, 7); cx.stroke();
+  }
+}
+function draw(t) {
+  cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  drawWater(t);
+  // deep fish first
+  const sorted = fish.slice().sort((a, b) => b.z - a.z);
+  for (const f of sorted) if (f.z >= SHAL || !poi.sub) drawFishShape(f, f.x, f.y, f.a, 1.04 - f.z * 0.24, f.z, 0, f.t);
+  // shallow fish under a submerged poi are drawn before the paper
+  if (poi.sub && state === 'play') {
+    for (const f of sorted) if (f.z < SHAL) drawFishShape(f, f.x, f.y, f.a, 1.04 - f.z * 0.24, f.z, 0, f.t);
+  }
+  drawRipples();
+  drawBowl(t);
+  if (state === 'play') {
+    drawPoi(t);
+    if (poi.sub) for (const f of fish) if (f.glow) {
+      const L = f.len * S;
+      cx.strokeStyle = `rgba(255,228,120,${0.55 + 0.25 * Math.sin(t * 9)})`; cx.lineWidth = 2 * S;
+      cx.beginPath(); cx.ellipse(f.x - Math.cos(f.a) * L * 0.1, f.y - Math.sin(f.a) * L * 0.1, L * 0.6, L * 0.3, f.a, 0, 7); cx.stroke();
+    }
+    if (carry) for (const g of carry.fish) if (!g.gone) drawFishShape(g.f, poi.x + g.rx * 1.05, poi.y + g.ry * 1.05, g.ang + Math.sin(g.f.t * 30) * 0.15 * g.fl, 1.05, 0, g.fl, g.f.t += 0.016);
+  }
+  for (const m of msgs) {
+    cx.globalAlpha = clamp(m.t, 0, 1);
+    textC(m.text, clamp(m.x, 60, W - 60), m.y, 18, 700, m.col);
+    cx.globalAlpha = 1;
+  }
+  if (state === 'play') {
+    drawHUD();
+    if (hintT > 0) {
+      cx.globalAlpha = clamp(hintT, 0, 1);
+      cx.fillStyle = 'rgba(5,25,45,0.55)'; cx.fillRect(0, H - 54, W, 40);
+      textC(TX.hint, W / 2 - (bowl.r) * 0.0, H - 34, 14, 600, '#fff', W - 24);
+      cx.globalAlpha = 1;
+    }
+  } else if (state === 'title') {
+    cx.fillStyle = 'rgba(4,20,38,0.5)'; cx.fillRect(0, 0, W, H);
+    textC(TX.title, W / 2, H * 0.3, 38, 800, '#fff');
+    textC(TX.how1, W / 2, H * 0.3 + 56, 15, 500, '#e6f3ff');
+    textC(TX.how2, W / 2, H * 0.3 + 82, 15, 500, '#e6f3ff');
+    textC(TX.how3, W / 2, H * 0.3 + 108, 15, 500, '#ffe8a8');
+    const tot = Object.values(save.caught).reduce((a, b) => a + b, 0);
+    if (tot > 0) textC(`${TX.total} ${tot}${TX.hiki}  ·  ${TX.best} ${save.best}`, W / 2, H * 0.3 + 146, 14, 500, '#bcd8ee');
+    cx.globalAlpha = 0.6 + 0.4 * Math.sin(t * 3);
+    textC(TX.start, W / 2, H * 0.72, 20, 700, '#fff');
+    cx.globalAlpha = 1;
+  } else if (state === 'end' && endInfo) {
+    cx.fillStyle = 'rgba(4,20,38,0.62)'; cx.fillRect(0, 0, W, H);
+    textC(TX.torn, W / 2, H * 0.2, 22, 700, '#ffd2c4');
+    textC(`${endInfo.score} ${TX.pts}`, W / 2, H * 0.2 + 58, 50, 800, '#fff');
+    textC(endInfo.newBest ? TX.newBest : `${TX.best} ${endInfo.best}`, W / 2, H * 0.2 + 106, 18, 700, endInfo.newBest ? '#ffe08a' : '#cfe3f3');
+    textC(TX.caught, W / 2, H * 0.2 + 150, 14, 600, '#bcd8ee');
+    const order = ['red', 'sarasa', 'black', 'big', 'gold'];
+    const items = order.filter((k) => endInfo.caught[k]);
+    if (!items.length) textC(TX.none, W / 2, H * 0.2 + 180, 16, 600, '#fff');
+    const colW = Math.min(110, (W - 32) / Math.max(1, Math.min(3, items.length)));
+    items.forEach((k, i) => {
+      const row = Math.floor(i / 3), col = i % 3, nInRow = Math.min(3, items.length - row * 3);
+      const x = W / 2 + (col - (nInRow - 1) / 2) * colW, y = H * 0.2 + 186 + row * 58;
+      drawFishShape({ T: TYPES[k], len: TYPES[k].len, spd: 0 }, x, y - 6, -0.2, 0.9 / S * S, 0, 0, stateT);
+      textC(`${TX.names[k]} ×${endInfo.caught[k]}`, x, y + 18, 13, 600, '#fff', colW - 4);
+    });
+    if (stateT > 0.7) { cx.globalAlpha = 0.6 + 0.4 * Math.sin(t * 3); textC(TX.again, W / 2, H * 0.78, 18, 700, '#fff'); cx.globalAlpha = 1; }
+  }
+}
+
+function frame(ts) {
+  const t = ts / 1000;
+  let dt = lastT ? t - lastT : 0.016; lastT = t;
+  dt = clamp(dt, 0.001, 0.05);
+  if (W > 1 && H > 1) { update(dt); draw(t); }
+  requestAnimationFrame(frame);
+}
+resize();
+spawnInitial();
+poi.x = bowl.x; poi.y = bowl.y - bowl.r - R;
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

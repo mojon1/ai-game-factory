@@ -1,0 +1,408 @@
+{
+  "id": "2026-11-05-claude-1",
+  "status": "published",
+  "title": "そっと金魚すくい",
+  "genre": "癒し・ゆったり",
+  "concept": "金魚すくいの「紙が少しずつ弱る」手触りが核。ポイは水に入れている間ぬれ続け、速く動かすと破れ、金魚がはねると穴があく。縁の近くは丈夫で、穴の上の金魚は落ちる。じっと待てば金魚は寄って浮いてくるが、待つほど紙はぬれる。",
+  "howToPlay": "指をおくとポイが水に入り、はなすとすくう。浮いている金魚の下にそっと入れ、紙が破れるまでにたくさんすくう。",
+  "libraryDecision": "使わない。核は紙のぬれと破れの細かいマス目の計算と、それを透けた紙として見せることで、Canvas 2D で十分なめらかに描ける。物理演算や3Dは手触りを足さないと判断した。",
+  "soundDecision": "Web Audio で自作。水の環境音と遠くの虫の声を小さく流し、ポイを入れる「ぽちゃ」、しずく、紙が「ぴり」と裂ける音、お椀に入る「ちゃぽん」を鳴らす。破れる音が警告になり、静かな夜店の雰囲気が「そっと」の気分を作る。",
+  "improvements": [
+    {
+      "found": "水に入れた紙が白く不透明で下の金魚が見えない／いくら遊んでも紙が破れず終わらない／じっと待つと金魚が全部群がり4匹いっぺんに取れて簡単すぎる",
+      "changed": "水中の紙を半透明にした。ぬれた紙は裂け目が隣へ走るようにし、中心部が半分破れたら終わりにした。寄ってくる金魚を一部だけにし、いっぺん取りの倍率を×1.5ずつに下げた。運んだあとポイが元の場所へ戻るようにした",
+      "foundEn": "The dipped paper was opaque so fish under it were hidden / the paper never tore, so a round never ended / holding still made every fish swarm in, giving trivial 4-fish catches",
+      "changedEn": "Made underwater paper translucent; on wet paper a tear now runs into neighbours, and the round ends when half the centre is gone. Only some fish are curious, the multi-catch bonus is now x1.5 per extra fish, and the scoop returns to where you were after carrying."
+    },
+    {
+      "found": "浅い金魚と深い金魚の見分けがつかず、すくえるか分からない／ポイ100%表示のままいきなり全部破れる／じっと待つ間に手応えがない。また、もう一度遊ぶとお椀に前の金魚が残っていた",
+      "changed": "浅い金魚に影と照りを付け、深い金魚は小さく青く沈ませた。ポイの上の「今すくえる」金魚を金色の輪で示し、金魚が紙をつつく「つんつん」という音と揺れを足した。残りは紙のぬれと傷みで減るようにし、弱ってきたら「みしっ」と鳴らす。お椀は毎回空にした",
+      "foundEn": "Could not tell shallow fish from deep ones / the meter stayed at 100% and then the paper ripped all at once / nothing happened while waiting. Also the bowl kept old fish on replay",
+      "changedEn": "Shallow fish get a shadow and sheen; deep fish shrink and fade into blue. Catchable fish over the scoop get a gold ring, and they nibble the paper with a tick and a wobble. The meter now drops with wetness and wear, with a creak warning when weak. The bowl is emptied each round."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "癒し・ゆったり",
+      "en": "Relaxing / cozy",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "枯山水の砂紋: 指でなぞると熊手の跡が砂に残り、石のまわりに波紋を描いて庭を仕上げる遊び場。",
+        "ideaEn": "Zen sand garden: drag a rake to leave grooves in sand and draw ripples around stones.",
+        "fromDraw": true
+      },
+      {
+        "idea": "金魚すくい: ぬれるほど弱る紙のポイで、破れるまでに金魚をすくう。紙の弱り方とすくう位置が技になる。",
+        "ideaEn": "Goldfish scooping: a paper scoop weakens as it gets wet; catch fish before it tears.",
+        "fromDraw": false
+      },
+      {
+        "idea": "落ち葉はき: 2D物理の落ち葉をほうきで掃き集め、風に散らされる前に山にする。",
+        "ideaEn": "Leaf sweeping: sweep physics-driven leaves into a pile before the wind scatters them.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 1
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "fail",
+    "input": [
+      "drag",
+      "hold"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Gently, Goldfish",
+      "concept": "The core is the feel of a paper scoop slowly weakening. It soaks while underwater, tears if moved fast, and gets holes where fish thrash. The rim is sturdy; fish over holes fall through. Wait still and fish rise to you, but waiting soaks the paper.",
+      "howToPlay": "Touch to dip the scoop, let go to lift. Slip it under fish near the surface and catch as many as you can before the paper tears.",
+      "libraryDecision": "None. The core is a fine grid of paper wetness and tearing shown as translucent paper, which Canvas 2D draws smoothly. Physics or 3D would not add to the feel.",
+      "soundDecision": "Hand-made Web Audio: quiet water and distant crickets, a plop when dipping, drips, a papery rip as it tears, and a splash into the bowl. The rip warns you, and the hush of a night stall sets the gentle mood."
+    }
+  },
+  "createdAt": "2026-11-05T09:06:59+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-05T09:06:59+09:00",
+    "metricsFrom": "2026-11-05T00:05:28.885Z",
+    "transcript": "b73bfdf2-0145-479b-b72a-230c495a4e02.jsonl",
+    "validationRuns": 6,
+    "finishedAt": "2026-11-05T09:31:39+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-05T09:31:38+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "35.5KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=133",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=257",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=102",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=236",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 36394,
+    "lines": 695
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 3
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "すくえるかどうかが、金魚の深さと位置しだいで運に寄りやすい。じっと待つ時間が続くと単調に感じる回がある",
+    "comment": "ポイの下で金色の輪が光り、つつく音がした瞬間にはなすと、金魚がはねながら紙の上で運ばれていくのが気持ちいい。紙が灰色にぬれて傷が増え、最後にびりっと大穴があく終わり方は本物らしい。待つほど寄るがぬれる、という迷いはある。一方で何も取れない持ち上げも多く、もう1回は「次こそ金の金魚」程度の引きにとどまる。自己プレイは操作中の画面を見られない仕組みのため、水中の様子は別に撮った画面とボットの計測で確かめた",
+    "similar": [
+      {
+        "title": "金魚すくい（Goldfish scooping）",
+        "url": "https://en.wikipedia.org/wiki/Goldfish_scooping",
+        "similarity": "高",
+        "note": "夜店の金魚すくいそのものが原型。紙のポイが破れたら終わる点も同じ。違いは、ぬれと傷を紙のマス目で計算して見せ、縁は丈夫・裂け目は走るなどを技にしたこと",
+        "note_en": "The festival game itself is the root, including ending when the paper tears. Difference: wetness and wear are simulated per cell and shown, making the sturdy rim and running tears part of the skill"
+      },
+      {
+        "title": "Goldfish Scooping Game（TV Tropes）",
+        "url": "https://tvtropes.org/pmwiki/pmwiki.php/Main/GoldfishScoopingGame",
+        "similarity": "中",
+        "note": "多くのゲームに夜祭りのミニゲームとして金魚すくいがある。本作は単体の作品として、待つと寄るがぬれるという迷いを中心にした",
+        "note_en": "Many games include goldfish scooping as a festival minigame. This one stands alone and centres on the wait-draws-fish-but-soaks-paper dilemma"
+      }
+    ],
+    "research": "WebSearch で goldfish scooping kingyo sukui game poi paper tears を検索",
+    "i18n": {
+      "en": {
+        "worst": "Whether a lift catches anything leans on luck with fish depth and position, and stretches of waiting can feel monotonous",
+        "comment": "Lifting the moment a gold ring glows and a nibble ticks, then watching the fish flop on the paper all the way to the bowl, feels good. The paper greying, gathering marks and finally ripping open is convincing. Waiting draws fish but soaks the paper, a real dilemma. Still, many lifts catch nothing, and the pull to replay is mostly 'maybe the golden one next time'. The play tool cannot show frames mid-hold, so the underwater view was checked with separate screenshots and a bot.",
+        "research": "Searched the web for goldfish scooping kingyo sukui game poi paper tears"
+      }
+    },
+    "method": "スマホ縦画面で 8 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 8 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "開始",
+        "noteEn": "Start",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.30,0.55) 2600ms",
+        "note": "ポイを入れてじっと待つ。金魚が寄ってきてつつく音がしたらはなす",
+        "noteEn": "Dip and wait; lift when a fish nibbles the paper",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.60,0.45) 2600ms",
+        "note": "ポイを入れてじっと待つ。金魚が寄ってきてつつく音がしたらはなす",
+        "noteEn": "Dip and wait; lift when a fish nibbles the paper",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.50,0.75) 2600ms",
+        "note": "ポイを入れてじっと待つ。金魚が寄ってきてつつく音がしたらはなす",
+        "noteEn": "Dip and wait; lift when a fish nibbles the paper",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.25,0.40) 2600ms",
+        "note": "場所を変えて待ってすくう。紙が少しずつ灰色にぬれていく",
+        "noteEn": "Move spot, wait, lift. The paper slowly greys as it soaks",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.70,0.60) 2600ms",
+        "note": "場所を変えて待ってすくう。紙が少しずつ灰色にぬれていく",
+        "noteEn": "Move spot, wait, lift. The paper slowly greys as it soaks",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.35,0.70) 2600ms",
+        "note": "場所を変えて待ってすくう。紙が少しずつ灰色にぬれていく",
+        "noteEn": "Move spot, wait, lift. The paper slowly greys as it soaks",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.60,0.50) 2600ms",
+        "note": "場所を変えて待ってすくう。紙が少しずつ灰色にぬれていく",
+        "noteEn": "Move spot, wait, lift. The paper slowly greys as it soaks",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-05T09:31:39+09:00"
+  },
+  "publishedAt": "2026-11-05T09:31:39+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 25597,
+    "outputTokens": 42124,
+    "contextTokens": 9914290,
+    "turns": 53,
+    "toolCalls": 61,
+    "webSearches": 0,
+    "minutes": 26.3,
+    "from": "2026-11-05T00:05:28.885Z",
+    "to": "2026-11-05T00:31:45.165Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-05T09:31:45+09:00",
+    "validationRuns": 6,
+    "codeKB": 35.5
+  }
+}
