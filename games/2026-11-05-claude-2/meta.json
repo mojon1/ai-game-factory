@@ -1,0 +1,563 @@
+{
+  "id": "2026-11-05-claude-2",
+  "status": "published",
+  "title": "しのび足つまみぐい",
+  "genre": "ステルス",
+  "concept": "夜中に家族を起こさずおやつを取ってくるステルス。いびきが鳴っている間だけ足音がまぎれるので、いびきのリズムに合わせて歩き、止まる。速く歩くほど足音は大きく、きしむ板や袋の音もある。起こしたら陰に隠れてやり過ごす。",
+  "howToPlay": "画面のどこかに指を置いてずらした方向へ歩く（少しずらすとしのび足）。いびきの間に進み、おやつを取ってふとんへ戻る。",
+  "libraryDecision": "使わない。真上から見た家の間取りと音の輪で十分に読みやすく、3D・物理・画面効果は「いびきに合わせて歩く」核を強めないため。音は寝息ごとに連続して変化させたいので Web Audio で自作した。",
+  "soundDecision": "いびきを Web Audio で人ごとに合成し、近いほど大きく左右にも振り分けて鳴らす。プレイヤーが耳でいびきのリズムを聞いて動き出せることが遊びの核なので、BGM は入れず、時計のチクタクと足音・ギシッ・袋のカサッだけにして静けさを強調した。",
+  "improvements": [
+    {
+      "found": "①部屋の出入口の角に体が引っかかって止まる ②同じきしむ板の上で一歩ごとにギシッと鳴り、一瞬で父さんが起きる ③今歩いても聞こえないのかが画面から分からず、いびきの合間を待つ意味が伝わらない",
+      "changed": "角に当たると出入口の方へすべるようにした。ギシッは板に乗った瞬間だけ鳴り、ゆっくり乗れば小さくなるようにした。足元に「今の速さで歩いたら聞こえるか」を青・黄・赤で示す輪を付け、いびきの光の輪も濃くした。",
+      "foundEn": "(1) The child snagged on doorway corners. (2) A creaky board creaked on every step, waking Dad instantly. (3) Nothing showed whether a step right now would be heard, so waiting for the snore had no visible point.",
+      "changedEn": "Corners now slide you toward the doorway. A board creaks only when you step onto it, more quietly if slow. A ring at your feet shows blue/yellow/red for whether a step at your current speed would be heard, and the snore glow is stronger."
+    },
+    {
+      "found": "①ふとんの端まで戻ったのにクリアにならない ②夜2と夜4で家具が出入口をふさぎ、おやつに行けない ③台所に窓の月明かりが重なって、霧がかかったように見える",
+      "changed": "ふとんの近くに来ればクリアにした。全部の夜の道がつながっているかをプログラムで確かめ、家具の位置を直した。月明かりを弱めた。",
+      "foundEn": "(1) Reaching the edge of the futon did not count as home. (2) On nights 2 and 4 furniture blocked the doorway to the snack. (3) Moonlight from the window washed the kitchen out like fog.",
+      "changedEn": "Getting close to the futon now clears the night. Checked every map for reachability with a script and moved furniture. Dimmed the moonlight."
+    },
+    {
+      "found": "①犬のポチの夜は、いちばん遅いしのび足でもすぐ起きてしまう ②台所の入口の真下にきしむ板があり、どうやっても踏むしかない ③速足としのび足の足音の差が小さく、そっと歩く意味が薄い",
+      "changed": "いちばん遅い足音を半分以下にして、速足との差を大きくした（ゆっくりなら犬のそばも抜けられる）。きしむ板はよければ通れる場所へ移した（よけると遠回りになる）。",
+      "foundEn": "(1) On the dog night even the slowest tiptoe woke Pochi. (2) A creaky board sat right under the kitchen doorway, impossible to avoid. (3) Tiptoeing and hurrying sounded too similar, so sneaking felt pointless.",
+      "changedEn": "Cut the slowest footstep volume by more than half, widening the gap to hurrying (a patient player can now slip past the dog). Moved creaky boards where they can be avoided at the cost of a detour."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "ステルス",
+      "en": "Stealth",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "夜中にいびきのリズムに合わせてしのび足で台所のおやつを取り、ふとんへ戻る真上視点のステルス。いびきが鳴る間だけ足音がまぎれる。",
+        "ideaEn": "A top-down stealth game: sneak to the kitchen snack and back to bed at night, moving in time with the snoring that masks your footsteps.",
+        "fromDraw": true
+      },
+      {
+        "idea": "風鈴の短冊を指で揺らし、風向きと重なる音で目標の和音を作る調律パズル。",
+        "ideaEn": "A wind-chime tuning puzzle: swing the paper strips to build a target chord from wind and overlapping tones.",
+        "fromDraw": false
+      },
+      {
+        "idea": "CPU と指相撲。親指を押さえ込む力加減と、引くフェイントの読み合い。",
+        "ideaEn": "Thumb wrestling against the CPU: pressure control and feints.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Tiptoe Snack Run",
+      "concept": "Stealth at midnight: fetch a snack without waking the family. Snoring masks your footsteps only while it sounds, so you walk and freeze to its rhythm. Faster steps are louder, boards creak, wrappers crinkle. If someone wakes, hide until they settle.",
+      "howToPlay": "Put a finger anywhere and slide it to walk that way (slide a little to tiptoe). Move while they snore, grab the snack and get back to your futon.",
+      "libraryDecision": "None. A top-down floor plan with sound rings reads clearly; 3D, physics or effects would not strengthen the core of walking to the snoring. The sound needed per-sleeper continuous control, so it is hand-made Web Audio.",
+      "soundDecision": "Each sleeper's snore is synthesised live in Web Audio, louder and panned by distance, because hearing the rhythm and starting to move on it is the core. No music: just a ticking clock, footsteps, creaks and crinkles to make the silence tense."
+    }
+  },
+  "createdAt": "2026-11-05T12:09:00+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-05T12:09:00+09:00",
+    "metricsFrom": "2026-11-05T03:05:23.863Z",
+    "transcript": "95d5cf06-d84f-4bff-81f8-e3217b4372c0.jsonl",
+    "validationRuns": 5,
+    "finishedAt": "2026-11-05T12:29:45+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-05T12:29:30+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "46.5KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=120",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=124",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=109",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=103",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 47566,
+    "lines": 944
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 2
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "夜は5つだけで、間取りも1画面に収まる小さな家なので、全部の夜を越えると遊ぶ理由が月の数（起こさずに戻れたか）しか残らない。いびきに合わせて止まる・進むという核も既存作品にある。",
+    "comment": "台所から急いで戻った夜、父さんが起き上がって懐中電灯のような視線を居間に向け、それが戸口から自分の部屋の中まで伸びてきた瞬間は本当にひやっとした。足元の輪が青いうちに動き、黄色で止まるだけで、いびきのリズムに体が合っていく感覚がある。犬の夜はきしむ板を踏んでほえられ、両親がむにゃっと寝がえりを打つ連鎖が楽しかった。ただ操作は指をずらす量で速さが決まるので、最初は加減がつかみにくい。",
+    "similar": [
+      {
+        "title": "Don't Wake the House!",
+        "url": "https://playgama.com/game/dont-wake-the-house",
+        "similarity": "高",
+        "note": "眠る家族のいびきが止まったら固まる、という同じ核を持つブラウザのステルス。こちらは音の輪と足元の安全表示で読ませ、起きた家族の視線から隠れる・犬がほえて家族を起こす連鎖がある。",
+        "note_en": "Browser stealth game with the same core: freeze when the snoring stops. Mine shows sound rings and a safety ring, lets you hide from a woken sleeper’s gaze, and has a barking dog that wakes the others."
+      },
+      {
+        "title": "Don't Wake Them",
+        "url": "https://apps.apple.com/us/app/id6443588026",
+        "similarity": "中",
+        "note": "眠る人の間を音を立てずに歩くスマホゲーム。騒音バーで知らせる。こちらはいびきが足音を隠す仕組みとおやつを取って戻る構成。",
+        "note_en": "Mobile game of walking quietly among sleepers with a noise bar. Mine has snores that mask steps and a fetch-and-return structure."
+      }
+    ],
+    "research": "WebSearch で「寝ている親の横をいびきに合わせて忍び足」系のゲームを英語で1回検索した。",
+    "i18n": {
+      "en": {
+        "worst": "Only five nights, each a small one-screen house; once cleared, the only reason to replay is the moon rating. The core of moving on snores also exists in earlier games.",
+        "comment": "On the night I rushed back from the kitchen, Dad sat up and swept his gaze across the living room, and it reached through the doorway into my own room — a real jolt. Moving while the ring at my feet is blue and freezing on yellow quickly syncs you to the snoring. On the dog night a creaky board set Pochi barking and both parents stirred, a fun chain reaction. The speed-by-drag-distance control takes a moment to get used to.",
+        "research": "One English WebSearch for games about sneaking past sleeping parents in time with snoring."
+      }
+    },
+    "method": "スマホ縦画面で 15 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 15 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.85) 120ms",
+        "note": "タイトル。夜1から",
+        "noteEn": "Title, starting night 1",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "path(0.50,0.60→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65→0.50,0.65) 2600ms",
+        "note": "部屋の出口から居間の入口まで。畳の上なので少し速めでも輪は青",
+        "noteEn": "To the living-room doorway; on tatami the ring stays blue even a bit faster",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "path(0.50,0.60→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63→0.53,0.63) 400ms → path(0.50,0.60→0.58,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60) 1100ms",
+        "note": "いびきが鳴った！今のうちにギシッ板ごと速足で右へ",
+        "noteEn": "Snore! Hurry right over the creaky board while it covers me",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 1500ms",
+        "note": "ギシッで父さんのゲージが少し上がった。いびきが止んだので止まって待つ",
+        "noteEn": "The creak nudged Dad's gauge. Snoring stopped, so I freeze",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "path(0.50,0.60→0.58,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60→0.58,0.61→0.59,0.60) 1000ms → path(0.50,0.60→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54→0.50,0.54) 900ms → wait 300ms",
+        "note": "またいびき。輪が青いうちに右へ走り、台所の入口へ",
+        "noteEn": "Snoring again: run right while the ring is blue, into the kitchen doorway",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 1800ms → path(0.50,0.60→0.58,0.61→0.58,0.62→0.59,0.61→0.58,0.62→0.59,0.61→0.58,0.62→0.59,0.61→0.58,0.62→0.59,0.61→0.58,0.62→0.59,0.61→0.58,0.62→0.59,0.61→0.58,0.62→0.59,0.61→0.58,0.62→0.59,0.61→0.58,0.62→0.59,0.61→0.58,0.62→0.59,0.61→0.58,0.62→0.59,0.61→0.58,0.62→0.59,0.61→0.58,0.62→0.59,0.61→0.58,0.62→0.59,0.61→0.58,0.62→0.59,0.61) 1100ms → path(0.50,0.60→0.50,0.52→0.50,0.53→0.51,0.52→0.50,0.53→0.51,0.52→0.50,0.53→0.51,0.52→0.50,0.53→0.51,0.52→0.50,0.53→0.51,0.52→0.50,0.53→0.51,0.52→0.50,0.53→0.51,0.52→0.50,0.53→0.51,0.52→0.50,0.53→0.51,0.52→0.50,0.53→0.51,0.52→0.50,0.53→0.51,0.52→0.50,0.53→0.51,0.52→0.50,0.53→0.51,0.52→0.50,0.53→0.51,0.52→0.50,0.53→0.51,0.52) 1300ms",
+        "note": "輪が黄色の間は待つ。次のいびきで右へ、上の台所へ",
+        "noteEn": "Wait while the ring is yellow; on the next snore go right and up into the kitchen",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "path(0.50,0.60→0.53,0.56→0.53,0.57→0.53,0.56→0.53,0.57→0.53,0.56→0.53,0.57→0.53,0.56→0.53,0.57→0.53,0.56→0.53,0.57→0.53,0.56→0.53,0.57→0.53,0.56→0.53,0.57→0.53,0.56→0.53,0.57→0.53,0.56→0.53,0.57→0.53,0.56→0.53,0.57→0.53,0.56→0.53,0.57→0.53,0.56→0.53,0.57→0.53,0.56→0.53,0.57→0.53,0.56→0.53,0.57→0.53,0.56→0.53,0.57→0.53,0.56) 2600ms",
+        "note": "父さんがむにゃっと寝がえり。台所はしのび足でプリンへ",
+        "noteEn": "Dad stirred. Tiptoe to the pudding",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "path(0.50,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60→0.54,0.60) 1500ms → path(0.50,0.60→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56→0.50,0.56) 1800ms",
+        "note": "たんすをよけて右から回りこみ、プリンを取る",
+        "noteEn": "Around the cupboard on the right to the pudding",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "path(0.50,0.60→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57) 1000ms → wait 200ms",
+        "note": "プリンを取った。袋のカサッ。帰りもいびきを待つ",
+        "noteEn": "Got the pudding (crinkle). Will wait for snores on the way back too",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "path(0.50,0.60→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64→0.50,0.64) 1800ms → path(0.50,0.60→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63→0.46,0.63) 2200ms",
+        "note": "台所をしのび足で入口まで戻る",
+        "noteEn": "Tiptoe back to the kitchen doorway",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "wait 1200ms → path(0.50,0.60→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64→0.49,0.64) 700ms → path(0.50,0.60→0.41,0.60→0.41,0.61→0.42,0.60→0.41,0.61→0.42,0.60→0.41,0.61→0.42,0.60→0.41,0.61→0.42,0.60→0.41,0.61→0.42,0.60→0.41,0.61→0.42,0.60→0.41,0.61→0.42,0.60→0.41,0.61→0.42,0.60→0.41,0.61→0.42,0.60→0.41,0.61→0.42,0.60→0.41,0.61→0.42,0.60→0.41,0.61→0.42,0.60→0.41,0.61→0.42,0.60→0.41,0.61→0.42,0.60→0.41,0.61→0.42,0.60) 1400ms",
+        "note": "輪が青くなるのを待ち、いびきに合わせて左へ一気に",
+        "noteEn": "Wait for a blue ring, then dash left on the snore",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "wait 2000ms",
+        "note": "父さんのゲージが半分を超えた。息をひそめてゲージが下がるのを待つ",
+        "noteEn": "Dad's gauge passed half. Holding my breath for it to fall",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "wait 800ms → path(0.50,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60→0.43,0.60) 1000ms → path(0.50,0.60→0.49,0.52→0.49,0.53→0.50,0.52→0.49,0.53→0.50,0.52→0.49,0.53→0.50,0.52→0.49,0.53→0.50,0.52→0.49,0.53→0.50,0.52→0.49,0.53→0.50,0.52→0.49,0.53→0.50,0.52→0.49,0.53→0.50,0.52→0.49,0.53→0.50,0.52→0.49,0.53→0.50,0.52→0.49,0.53→0.50,0.52→0.49,0.53→0.50,0.52→0.49,0.53→0.50,0.52→0.49,0.53→0.50,0.52→0.49,0.53→0.50,0.52) 1600ms → wait 300ms",
+        "note": "いびきに合わせてギシッ板を越え、部屋へ駆けこむ",
+        "noteEn": "Cross the creaky board on a snore and dash into my room",
+        "image": "ai-play/step-13.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "path(0.50,0.60→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57→0.50,0.57) 1000ms → wait 400ms",
+        "note": "父さんが起きて居間を見回すが、もう部屋の中。ふとんへ",
+        "noteEn": "Dad sits up and scans the living room, but I'm already in my room. Into the futon",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "path(0.50,0.60→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58→0.50,0.58) 800ms → wait 900ms",
+        "note": "父さんの視線が戸口から部屋の中までのびてくる！あと一歩でふとん",
+        "noteEn": "Dad's gaze reaches through the doorway into my room! One more step to the futon",
+        "image": "ai-play/step-15.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "unlocked": 2,
+              "moons": [
+                1,
+                0,
+                0,
+                0,
+                0
+              ],
+              "candy": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 1
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-05T12:29:45+09:00"
+  },
+  "publishedAt": "2026-11-05T12:29:45+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 30401,
+    "outputTokens": 53643,
+    "contextTokens": 20924075,
+    "turns": 101,
+    "toolCalls": 111,
+    "webSearches": 0,
+    "minutes": 24.4,
+    "from": "2026-11-05T03:05:23.863Z",
+    "to": "2026-11-05T03:29:45.421Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-05T12:29:45+09:00",
+    "validationRuns": 5,
+    "codeKB": 46.5
+  }
+}
