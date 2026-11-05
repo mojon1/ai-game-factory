@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>縁ぎわ相撲</title>
+<style>
+*{box-sizing:border-box;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;overflow:hidden;overscroll-behavior:none;background:#142831;color:#fff0d1;font:16px system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif}
+main{position:relative;width:100vw;height:100dvh;background:radial-gradient(ellipse at 50% 44%,#2f4b4e,#142831 77%)}
+header{position:absolute;top:4%;left:6%;right:6%;display:flex;justify-content:space-between;font-weight:750}
+#message{position:absolute;top:14%;left:5%;width:90%;text-align:center}
+#hint{position:absolute;bottom:5%;width:100%;text-align:center;color:#d7cead;font-size:13px}
+#cover{position:absolute;inset:0;display:grid;place-items:center;text-align:center;background:#142831f4;padding:23px}
+h1{font-size:clamp(27px,7.5vw,42px);line-height:1.25}p{line-height:1.75;font-size:16px}.emblem{font-size:55px;color:#efbd72}
+#board{position:absolute;top:27%;left:50%;transform:translateX(-50%);width:min(90vw,52dvh,460px);aspect-ratio:1;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(5,minmax(0,1fr));gap:2px;padding:5px;background:#a87a56;border-radius:10px}
+.cell{border:0;border-radius:4px;background:#6c5444;color:#e4c9a5;font:bold clamp(18px,6vw,28px) system-ui;padding:0;display:grid;place-items:center}
+.cell:nth-child(even){background:#775c48}.cell[data-edge=true]{box-shadow:inset 0 0 0 1px #bf9870}
+.stone{width:70%;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;box-shadow:0 4px 0 #292d32;color:#152f38;background:#a7d9d3}
+.stone.cpu{background:#e6a876;color:#4a2e2a}.cell.chosen{background:#3e7772}.cell.target{outline:2px solid #eed498;outline-offset:-3px}
+.cell.reply{box-shadow:inset 0 0 0 2px #e8a877}.cell.push{outline-color:#edb679}.cell.eject{outline:3px solid #f5d57e;outline-offset:-4px}
+.cell.risk .stone{outline:3px solid #ed8c84;outline-offset:2px}.cell.rest .stone{opacity:.55}
+</style>
+<main><header><span id="score"></span><span id="left"></span></header><div id="message"></div><div id="board"></div><div id="hint"></div><div id="cover"></div></main>
+<script>
+const words={
+ ja:{title:'縁ぎわ相撲',intro:'青い駒を選び、となりへ一歩。<br>2つ押し出すか、12手後に多い方が勝ち。<br>押された駒は次の一手を休む。',start:'タップでスタート',hint:'青い駒 → となりのマス',choose:'動かす青い駒を選ぼう',move:'となりのマスをタップ',rest:'押された駒は一手休み',blocked:'そこへは押せない',cpu:'相手の手',left:'残り',score:'押し出し',win:'押し出し勝ち！',lose:'押し出し負け',draw:'引き分け',again:'タップでもう一度',blue:'青',orange:'橙'},
+ en:{title:'Rim Sumo',intro:'Select a blue stone and move one square.<br>Push two out or lead after 12 moves.<br>A pushed stone rests for its next turn.',start:'Tap to start',hint:'Blue stone → adjacent square',choose:'Choose a blue stone',move:'Tap an adjacent square',rest:'Pushed stone rests this turn',blocked:'That push is blocked',cpu:'Opponent moves',left:'Moves left',score:'Out',win:'You win!',lose:'Opponent wins',draw:'Draw',again:'Tap to play again',blue:'Blue',orange:'Orange'}
+};
+const locale = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const t = words[locale] || words.en;
+document.documentElement.lang = locale;
+document.title = t.title;
+const byId = id => document.getElementById(id);
+const cover = byId('cover'), message = byId('message');
+const signal = (agf, data={}) => parent.postMessage({agf,...data},'*');
+for (const type of ['contextmenu','selectstart','gesturestart']) addEventListener(type, e=>e.preventDefault(), {passive:false});
+let audio;
+function tone(frequency, duration=.16){
+ try {
+  audio ||= new AudioContext();
+  audio.resume();
+  const oscillator=audio.createOscillator(), gain=audio.createGain(), now=audio.currentTime;
+  oscillator.frequency.value=frequency;
+  gain.gain.setValueAtTime(.04,now);
+  gain.gain.exponentialRampToValueAtTime(.001,now+duration);
+  oscillator.connect(gain).connect(audio.destination);
+  oscillator.start(now); oscillator.stop(now+duration);
+ } catch {}
+}
+let hintTimer;
+function showHint(){
+ clearTimeout(hintTimer);
+ byId('hint').textContent=t.hint;
+ hintTimer=setTimeout(()=>byId('hint').textContent='',4400);
+}
+function showCover(mark,title,copy,action){
+ cover.innerHTML='<section><div class="emblem">'+mark+'</div><h1>'+title+'</h1><p>'+copy+'</p><p>'+action+'</p></section>';
+ cover.style.display='grid';
+}
+const size=5, limit=12, directions=[[0,-1],[-1,0],[1,0],[0,1]];
+const board=byId('board');
+let stones=[], selected=-1, state='title', played=0, guard=0, cpuTimer=0, reply=null, resting=-1;
+const onBoard=(x,y)=>x>=0&&x<size&&y>=0&&y<size;
+const at=(cells,x,y)=>onBoard(x,y)?cells[y*size+x]:null;
+function legalMoves(cells, side, restingFrom=-1){
+ const moves=[];
+ cells.forEach((stone,from)=>{
+  if(stone!==side||from===restingFrom)return;
+  const x=from%size,y=Math.floor(from/size);
+  for(const [dx,dy] of directions){
+   const nx=x+dx,ny=y+dy, next=at(cells,nx,ny);
+   if(next===null||next===side)continue;
+   const to=ny*size+nx;
+   if(next===0){moves.push({from,to,push:null});continue;}
+   const bx=nx+dx,by=ny+dy,beyond=at(cells,bx,by);
+   if(beyond===0||beyond===null)moves.push({from,to,push:beyond===null?-1:by*size+bx});
+  }
+ });
+ return moves;
+}
+function applyMove(cells,move){
+ const next=cells.slice();
+ if(move.push!==null&&move.push>=0)next[move.push]=next[move.to];
+ next[move.to]=next[move.from];next[move.from]=0;
+ return next;
+}
+const remaining=(cells,side)=>cells.filter(stone=>stone===side).length;
+function edgeDistance(i){const x=i%size,y=Math.floor(i/size);return Math.min(x,4-x,y,4-y);}
+function cpuChoice(){
+ let best=null, bestValue=-Infinity;
+ for(const move of legalMoves(stones,2,resting)){
+  const next=applyMove(stones,move);
+  const capture=move.push===-1?16:0;
+  const threats=legalMoves(next,1,move.push??-1).filter(m=>m.push===-1).length;
+  const value=capture-6*threats+edgeDistance(move.to)*.8+(move.push!==null?2:0);
+  if(value>bestValue){bestValue=value;best=move;}
+ }
+ return best;
+}
+function render(){
+ const choices=state==='player'?legalMoves(stones,1,resting).filter(m=>m.from===selected):[];
+ const threatened=legalMoves(stones,2).filter(move=>move.push===-1).map(move=>move.to);
+ for(let i=0;i<25;i++){
+  const cell=board.children[i], stone=stones[i];
+  cell.classList.toggle('chosen',selected===i);
+  cell.classList.toggle('rest',state==='player'&&resting===i);
+  cell.classList.toggle('risk',state==='player'&&threatened.includes(i));
+  const choice=choices.find(m=>m.to===i);
+  cell.classList.toggle('target',!!choice);
+  cell.classList.toggle('push',choice?.push!=null);
+  cell.classList.toggle('eject',choice?.push===-1);
+  cell.classList.toggle('reply',reply?.to===i||reply?.from===i);
+  cell.innerHTML=stone?'<span class="stone'+(stone===2?' cpu':'')+'">'+(stone===1?'●':'◆')+'</span>':'';
+  cell.setAttribute('aria-label',(stone===1?t.blue:stone===2?t.orange:'')+' '+(i%size+1)+','+(Math.floor(i/size)+1));
+ }
+ byId('score').textContent=t.score+' '+(3-remaining(stones,2))+' : '+(3-remaining(stones,1));
+ byId('left').textContent=t.left+' '+(limit-played);
+}
+function end(){
+ state='end';guard=performance.now()+700;
+ const own=remaining(stones,1),other=remaining(stones,2);
+ const result=own>other?t.win:own<other?t.lose:t.draw;
+ signal('end',{score:3-other});
+ showCover('◎',result,(3-other)+' : '+(3-own),t.again);
+ tone(own>other?690:250,.38);
+}
+function start(){
+ clearTimeout(cpuTimer);
+ stones=Array(25).fill(0);
+ for(const i of [16,17,23])stones[i]=1;
+ for(const i of [1,7,8])stones[i]=2;
+ played=0;selected=-1;reply=null;resting=-1;state='player';cover.style.display='none';
+ message.textContent=t.choose;render();showHint();signal('start');
+}
+function opponentTurn(){
+ const move=cpuChoice();reply=move;
+ if(move)stones=applyMove(stones,move);
+ resting=move?.push??-1;
+ if(remaining(stones,1)<=1||played>=limit){render();end();return;}
+ state='player';message.textContent=t.choose;render();
+ tone(move?.push===-1?240:350);
+}
+for(let i=0;i<25;i++){
+ const cell=document.createElement('button');
+ cell.className='cell';cell.dataset.index=i;cell.dataset.edge=edgeDistance(i)===0;
+ board.append(cell);
+}
+addEventListener('pointerdown',event=>{
+ if(!event.isPrimary)return;
+ event.preventDefault();
+ if(state==='title'){tone(480);start();return;}
+ if(state==='end'){if(performance.now()>=guard)start();return;}
+ if(state!=='player')return;
+ const cell=event.target.closest('.cell');
+ if(!cell)return;
+ const i=Number(cell.dataset.index);
+ if(stones[i]===1){if(i===resting){message.textContent=t.rest;return;}selected=i;message.textContent=t.move;render();tone(440);return;}
+ const move=legalMoves(stones,1,resting).find(m=>m.from===selected&&m.to===i);
+ if(!move){message.textContent=selected<0?t.choose:t.blocked;return;}
+ stones=applyMove(stones,move);resting=move.push??-1;played++;selected=-1;
+ tone(move.push===-1?690:move.push!==null?520:390);
+ if(remaining(stones,2)<=1){render();end();return;}
+ state='cpu';message.textContent=t.cpu;render();
+ cpuTimer=setTimeout(opponentTurn,500);
+},{passive:false});
+showCover('◎',t.title,t.intro,t.start);
+</script></html>
