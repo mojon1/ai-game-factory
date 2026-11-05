@@ -1,0 +1,378 @@
+{
+  "id": "2026-11-05-gpt-1",
+  "status": "published",
+  "title": "縁ぎわ相撲",
+  "genre": "ボードゲーム",
+  "concept": "青い駒を一歩動かして橙の駒を押し、盤の外へ二つ落とす。追い詰めるつもりで縁へ寄ると自分も押し返される。中央を守るか、端の一手に踏み込むかを読む対CPUの小さな相撲。",
+  "howToPlay": "青い駒を選んで隣のマスへ動かします。橙の駒を二つ押し出すか、12手後の押し出し数で勝ちます。",
+  "libraryDecision": "盤の縁と空きマスを一目で読める真上の2Dにした。隣接ルールと駒の表示に物理演算は不要なので共有ライブラリは使わない。",
+  "soundDecision": "選択、移動、押し出しを音の高さで区別する。考える時間は静かに保つ。",
+  "improvements": [
+    {
+      "found": "空の行が縮む。相手がどこを動いたか分からない。移動と押し出しの候補が同じ色。",
+      "changed": "マスを均等に固定し、相手の移動元と移動先を枠で表示。押す場所と盤外へ落とす場所を別の枠にした。",
+      "foundEn": "Empty rows shrink. The opponent's reply is hard to track. Walks and ejections look alike.",
+      "changedEn": "Fix equal grid rows, outline the opponent's move, and mark push and ejection targets."
+    },
+    {
+      "found": "即座の押し返しで同じ形に戻る。縁の危険を把握しにくい。手数切れの勝敗条件がタイトルで伝わらない。",
+      "changed": "押された駒は次の一手だけ休ませ、薄く表示。相手から直接押し出される青に赤枠を付け、12手の決着条件を明記した。",
+      "foundEn": "Immediate reversals repeat the board. Rim threats are unclear. The turn-limit result is not explained.",
+      "changedEn": "A pushed stone rests for one turn. Outline vulnerable stones and explain the 12-turn result."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "ボードゲーム",
+      "en": "Board game",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "2Dの土俵で一歩ずつ押し合い、端の危険を読む。",
+        "ideaEn": "Trade one-square pushes on an overhead sumo board.",
+        "fromDraw": true
+      },
+      {
+        "idea": "3Dで回す鍵束から、重力で必要な鍵だけを落とす。",
+        "ideaEn": "Rotate a 3D keyring to drop the right key.",
+        "fromDraw": false
+      },
+      {
+        "idea": "2Dの紙に雨を避ける道を描き、墨のにじみを残す。",
+        "ideaEn": "Draw paths around rain and leave ink traces on paper.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "limit",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Rim Sumo",
+      "concept": "Move blue stones one square and push two orange stones off the rim. Pursuing a rival near the edge exposes your own stones to a counterpush.",
+      "howToPlay": "Select a blue stone and tap an adjacent square. Push two orange stones off or lead after twelve turns.",
+      "libraryDecision": "Overhead 2D makes the rim and empty squares easy to read. Grid rules need no physics library.",
+      "soundDecision": "Distinct pitches mark selection, movement, and ejection. Planning stays quiet."
+    }
+  },
+  "createdAt": "2026-11-05T12:06:09+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-05T12:06:09+09:00",
+    "metricsFrom": "2026-11-05T03:04:22.599Z",
+    "transcript": null,
+    "validationRuns": 3,
+    "finishedAt": "2026-11-05T12:14:42+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-05T12:11:14+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "9.3KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 9555,
+    "lines": 165
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "CPUの先読みが浅く、同じ初期配置なので勝ち筋を覚えると読み合いが薄い。",
+    "comment": "右端で先に一つ落とし、青も落とされた後、角へ残った橙を横から押して2対1で勝った。休みの駒を別の駒で守る判断が面白い。画像を見て2回改善し、英語iPhoneでも勝利と再開を確認した。",
+    "similar": [
+      {
+        "title": "Abalone",
+        "url": "https://www.zygomatic-games.com/wp-content/uploads/2019/08/abalone_en_rules.pdf",
+        "similarity": "高",
+        "note": "盤の外に相手の駒を押し出す。Abaloneは六角盤で数の優位を使い、こちらは四角盤の一対一と押された駒の休みを使う。",
+        "note_en": "Both eject opposing pieces from the board. Abalone uses numerical superiority on a hex grid. Rim Sumo uses single-stone pushes and a rest turn on a square grid."
+      }
+    ],
+    "research": "ウェブで1回検索し、公式資料で仕組みを確認。",
+    "i18n": {
+      "en": {
+        "worst": "The CPU looks only one move ahead and a fixed setup gets predictable.",
+        "comment": "A right-rim ejection was answered by losing a blue stone. A sideways corner push won 2–1. Choosing another stone while one rests creates tactical decisions. Two image-guided revisions and an English iPhone replay verified the win and restart.",
+        "research": "One web search, verified against an official source."
+      }
+    },
+    "method": "スマホ縦画面で 10 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 10 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.80) 120ms",
+        "note": "休みのルールで対局を始める。",
+        "noteEn": "Start with the one-turn rest rule.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.32,0.62) 120ms → tap(0.32,0.52) 120ms",
+        "note": "左から中央へ寄り、相手を横から押せる位置に立つ。",
+        "noteEn": "Approach the center from the left.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.32,0.52) 120ms → tap(0.50,0.52) 120ms",
+        "note": "橙を右へ押し、同じ駒で押し返せないことを見る。",
+        "noteEn": "Push orange right and check that it cannot immediately reverse the push.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.50,0.52) 120ms → tap(0.67,0.52) 120ms",
+        "note": "右へ続けて押し、縁に追い込む。",
+        "noteEn": "Push again to drive orange to the right rim.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.67,0.72) 120ms → tap(0.50,0.72) 120ms",
+        "note": "下の駒を左へ。休んでいる青の先を空けて、橙を下へ誘う。",
+        "noteEn": "Move the bottom stone left and leave room for orange to push downward.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.50,0.62) 120ms → tap(0.67,0.62) 120ms",
+        "note": "橙を右端へ押す。下の赤枠の駒が残るか確かめる。",
+        "noteEn": "Push orange to the right rim and watch the threatened lower stone.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.67,0.62) 120ms → tap(0.85,0.62) 120ms",
+        "note": "右端の橙を一つ押し出す。",
+        "noteEn": "Eject one orange stone from the right rim.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.50,0.72) 120ms → tap(0.50,0.62) 120ms",
+        "note": "下端の青が赤枠。隣の青を残して押し返す場所を作る。",
+        "noteEn": "The bottom stone is threatened. Keep its neighbor in place for a counterpush.",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.67,0.72) 120ms → tap(0.85,0.72) 120ms",
+        "note": "下端から最後の橙を横へ押し出す。",
+        "noteEn": "Eject the final target sideways from the bottom rim.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 2
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 800ms → tap(0.50,0.70) 120ms",
+        "note": "2対1の勝ちから再開し、盤と残り手数を確認する。",
+        "noteEn": "Restart after a 2–1 win and verify the board and move limit.",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-05T12:14:42+09:00"
+  },
+  "publishedAt": "2026-11-05T12:14:42+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 1524,
+    "outputTokens": 8004,
+    "contextTokens": 12511545,
+    "turns": 32,
+    "toolCalls": 32,
+    "webSearches": null,
+    "minutes": 10.5,
+    "from": "2026-11-05T03:04:22.599Z",
+    "to": "2026-11-05T03:14:53.543Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-05T12:14:53+09:00",
+    "validationRuns": 3,
+    "codeKB": 9.3,
+    "evidence": "metrics-evidence.json"
+  }
+}
