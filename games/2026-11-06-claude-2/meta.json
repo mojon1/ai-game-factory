@@ -1,0 +1,393 @@
+{
+  "id": "2026-11-06-claude-2",
+  "status": "published",
+  "title": "ろくろの棚",
+  "genre": "収集",
+  "concept": "まわる粘土のふちに指をあてると壁が指についてくる手触りが核。粘土の量は変わらないので、しぼれば背がのび、広げれば低くなる。形は皿から一輪挿しまで9種に見分けられ、焼くと釉薬の窯変が運しだいで起き、棚にそろえていく。",
+  "howToPlay": "粘土のふちに指をあてて動かし、形をつくる。「焼く」で釉薬を選び、できた器を棚にならべて9種をそろえる。速く動かすとゆれて崩れる。",
+  "libraryDecision": "three.js を使う。回転体の器をなめらかな3Dで回し、光の照り返しで形の変化と釉薬の艶が分かることが「ふちを押すと形が変わる」手触りを強めるため。物理エンジンは使わず、体積を保つ簡単な計算で背がのびる感じを作った。",
+  "soundDecision": "BGMは付けず、ろくろの低いうなり、指が粘土にふれている間だけ鳴るしゅるしゅるという濡れた音（指の高さで音程が変わる）、ゆれが大きいときのきしみ、窯のごうっという炎と冷めるときのチンという貫入の音を Web Audio で作った。手元の音だけにすると、粘土にさわっている実感が強まるため。",
+  "improvements": [
+    {
+      "found": "外へ広げると裾だけ広がって帽子のような形になる／ゆれがほとんど起きず緊張がない／粘土が木目のように見える",
+      "changed": "外へ広げるときは指より上の壁もいっしょに開くようにし、皿や鉢が作れるようにした。速く動かしたときのゆれを強めた。粘土の縦すじを消し、ろくろ目の横すじにした。見込みの値段をHUDに出した。",
+      "foundEn": "Spreading outward only widened the base into a hat shape / wobble almost never happened, so no tension / the clay looked like wood",
+      "changedEn": "Spreading now opens the wall above the finger too, so plates and bowls work. Stronger wobble from fast moves. Replaced vertical streaks with horizontal throwing rings. Added an estimated value to the HUD."
+    },
+    {
+      "found": "くびれた筒が「壺」と判定され見た目と合わない／ろくろを回している間は9種の目標が見えない／しぼると粘土が上へのびて狙った所がずれる",
+      "changed": "くびれが低い位置にあり口が開いている形や、裾がいちばん広い形は壺にしないよう判定を直した。画面下に9種の見本の棚を出し、いまの形を光らせるようにした。",
+      "foundEn": "A waisted cylinder was called a jar, which didn't match its look / the nine targets were invisible while throwing / squeezing makes the clay rise so the aim drifts",
+      "changedEn": "Fixed classification so low waists with an open mouth, or forms widest at the base, are not jars. Added a sample shelf of the nine shapes at the bottom that highlights the current shape."
+    },
+    {
+      "found": "最初に焼いた器がいつも窯変になる（乱数の偏り）／口の少し上をさわっても口がつかめない／志野の模様に縦の切れ目が出る",
+      "changed": "乱数を標準のものに替えた。口のすぐ上へのタッチも口をつかむようにした。模様を一周つながるように描いた。",
+      "foundEn": "The first fired pot was always a kiln transformation (biased random) / touching just above the rim didn't grab it / Shino blotches had a vertical seam",
+      "changedEn": "Switched to the standard random source. Touches just above the mouth now grab the rim. Patterns now wrap seamlessly around."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "収集",
+      "en": "Collecting",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "ろくろで器を挽き、焼いて9種の器を棚に集める。窯変は運しだいで、棚を埋める収集が目標。",
+        "ideaEn": "Throw pots on a wheel, fire them, and collect nine pot types on a shelf, with lucky kiln transformations.",
+        "fromDraw": true
+      },
+      {
+        "idea": "潮だまりの石を指でめくり、隠れた生き物を図鑑に集める。潮が満ちる前に戻る。",
+        "ideaEn": "Flip rocks in tide pools to find creatures for a field guide, getting back before the tide returns.",
+        "fromDraw": false
+      },
+      {
+        "idea": "2本の指で毛糸のあやとりをし、決まった形を作る。指を動かす順番で糸の絡み方が変わる。",
+        "ideaEn": "String figures (cat's cradle) with two fingers; the order of moves changes how the string crosses.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "complete",
+    "ending": "other",
+    "input": [
+      "drag",
+      "hold"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Potter's Shelf",
+      "concept": "The core is the feel of the clay wall following your finger on a spinning wheel. Clay volume is conserved, so squeezing makes it tall and spreading makes it low. Shapes are recognized as nine types from plate to bud vase; firing may bring a lucky kiln transformation, and you fill a shelf.",
+      "howToPlay": "Touch the edge of the clay and move to shape it. Tap Fire, choose a glaze, and collect all nine pot types on the shelf. Moving too fast makes it wobble and collapse.",
+      "libraryDecision": "Uses three.js: a smooth 3D spinning pot whose highlights show every change of shape and the gloss of the glaze strengthens the push-the-rim feel. No physics engine; a simple volume-conserving rule makes the clay rise.",
+      "soundDecision": "No music. Web Audio makes the low hum of the wheel, a wet swishing sound only while your finger touches the clay (pitch follows finger height), a creak when it wobbles, the roar of the kiln and the tiny pings of cooling glaze. Keeping only hand-level sounds makes touching the clay feel real."
+    }
+  },
+  "createdAt": "2026-11-06T12:07:46+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-06T12:07:46+09:00",
+    "metricsFrom": "2026-11-06T03:05:24.409Z",
+    "transcript": "1f1011ee-13a5-4c19-bb4d-ca47b2ab9e75.jsonl",
+    "validationRuns": 8,
+    "finishedAt": "2026-11-06T12:29:40+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-06T12:29:24+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "49.5KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=99",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=134",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=93",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=100",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 50729,
+    "lines": 824
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "しぼると粘土が指の下で上へのびていくので、ひょうたんや一輪挿しのような細かい形は狙いどおりに作りにくく、偶然まかせになりやすい。器ができるまでの難しさの山も小さい。",
+    "comment": "ふちを押すと壁が指についてきて、しぼると背がすっと伸びる手触りは気持ちよく、下の見本の棚で「茶碗→湯呑」と形の名前が変わる瞬間が小さな発見になる。窯で赤く光ったあと緋色の志野や曜変天目が出る場面は、もう1つ焼きたくなる。一方で目標は9種そろえるだけなので、数分は楽しく遊べるが、長く通うほどの深さはまだない。自己プレイの画像はすべて見て判断した。",
+    "similar": [
+      {
+        "title": "Let's Create! Pottery",
+        "url": "https://toucharcade.com/games/lets-create-pottery",
+        "similarity": "高",
+        "note": "ろくろの粘土を指で形づくり、焼いて絵付けする点が同じ。こちらは体積を保って背がのびる手触りと、形の9種判定・窯変を棚に集める収集が中心で、販売や絵付けはない。",
+        "note_en": "Same idea of shaping clay on a wheel with a finger and firing it. This game centers on volume-conserving rise, nine recognized shapes and collecting kiln transformations on a shelf; no selling or painting."
+      }
+    ],
+    "research": "WebSearch で「Let's Create! Pottery mobile game pottery wheel shape glaze kiln」を1回検索し、スマホのろくろゲームの代表作を確認した。",
+    "i18n": {
+      "en": {
+        "worst": "Squeezing makes the clay rise under your finger, so detailed targets like the gourd or bud vase are hard to aim for and feel left to chance. There is little difficulty curve.",
+        "comment": "Pushing the rim and feeling the wall follow your finger, and watching the clay shoot up as you squeeze, feels good; the moment the name flips from tea bowl to teacup on the sample shelf is a small discovery. The kiln glow followed by a scarlet Shino or yohen tenmoku makes me want to fire one more. But the only goal is collecting nine shapes, so it is fun for a few minutes without lasting depth. I viewed every self-play screenshot.",
+        "research": "One WebSearch for 'Let's Create! Pottery mobile game pottery wheel shape glaze kiln' to confirm the best-known mobile pottery wheel game."
+      }
+    },
+    "method": "スマホ縦画面で 5 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 5 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → path(0.73,0.66→0.67,0.66→0.67,0.55) 1800ms",
+        "note": "開始。ふちを少ししぼって上へ。下の見本の棚で茶碗が光る",
+        "noteEn": "Start. Squeeze a little and slide up; the tea bowl lights up on the sample shelf",
+        "image": "ai-play/step-01.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "path(0.72,0.46→0.90,0.46) 1500ms",
+        "note": "口のすぐ上から外へ広げて、開いた茶碗に",
+        "noteEn": "From just above the rim, spread outward into an open bowl",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.80,0.94) 120ms",
+        "note": "焼く",
+        "noteEn": "Fire",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.27,0.80) 120ms → wait 1300ms",
+        "note": "志野をえらんで窯へ。赤く焼ける",
+        "noteEn": "Choose Shino; it glows in the kiln",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 3000ms",
+        "note": "焼き上がり。棚に茶碗がならぶ",
+        "noteEn": "Fired. The tea bowl joins the shelf",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "shelf": {
+                "chawan": {
+                  "p": [
+                    1.244,
+                    1.221,
+                    1.165,
+                    1.102,
+                    1.055,
+                    1.028,
+                    1.022,
+                    1.045,
+                    1.102,
+                    1.191,
+                    1.281,
+                    1.347
+                  ],
+                  "H": 2.006,
+                  "g": "shino",
+                  "y": true,
+                  "v": 141,
+                  "yy": true
+                }
+              },
+              "best": 141,
+              "fired": 1
+            }
+          },
+          {
+            "agf": "end",
+            "score": 141
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-06T12:29:40+09:00"
+  },
+  "publishedAt": "2026-11-06T12:29:40+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 28968,
+    "outputTokens": 52032,
+    "contextTokens": 13661043,
+    "turns": 68,
+    "toolCalls": 96,
+    "webSearches": 0,
+    "minutes": 24.3,
+    "from": "2026-11-06T03:05:24.409Z",
+    "to": "2026-11-06T03:29:40.972Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-06T12:29:40+09:00",
+    "validationRuns": 8,
+    "codeKB": 49.5
+  }
+}
