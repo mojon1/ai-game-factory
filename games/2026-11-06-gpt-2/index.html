@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>One Shield Delve</title>
+<style>
+*{box-sizing:border-box;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none;background:#181a28;color:#fff4d6;font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif}
+main{width:100vw;height:100dvh;padding:20px;display:flex;flex-direction:column;gap:16px;background:radial-gradient(ellipse at 50% 40%,#34384d,#181a28 75%)}
+#hud{display:flex;justify-content:space-between;font-size:16px}#stats{display:flex;justify-content:space-around;font-size:18px;padding:14px 4px;border-block:1px solid #626c85}
+#depth{text-align:center;font-size:20px;margin-top:12px}#rooms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;flex:1;min-height:0;align-items:center}
+button{font:inherit;color:inherit;background:#323d55;border:1px solid #8791aa;border-radius:18px;min-height:48px;padding:12px}
+.card{height:210px;max-height:100%;padding:12px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:linear-gradient(#44516b,#293147);box-shadow:0 8px 0 #101521}
+.symbol{font-size:44px}.card b{font-size:20px}.card small{font-size:14px;line-height:1.5}
+#log{height:44px;font-size:15px;text-align:center;color:#b9dddf}
+#controls{display:flex;gap:12px}#controls button{flex:1;font-size:15px}
+#hint{text-align:center;font-size:14px;min-height:20px;color:#bebbc8}
+#cover{position:absolute;inset:0;background:#181a28ef;display:flex;align-items:center;justify-content:center;text-align:center;padding:26px}
+h1{font-size:32px;margin:0 0 20px}p{font-size:17px;line-height:1.8}#cover small{font-size:16px;color:#a7e6de}
+</style>
+<main><div id="hud"></div><div id="stats"></div><div id="depth"></div><div id="rooms"></div><div id="log"></div><div id="controls"><button id="guard"></button><button id="leave"></button></div><div id="hint"></div></main><div id="cover"></div>
+<script>
+const LANG=new URLSearchParams(location.search).get('lang')||(/^ja/i.test(navigator.language)?'ja':'en');
+const D={
+ ja:{title:'片盾の宝さがし',help:'部屋を選んで宝を集める。<br>敵の力を剣で減らし、残りを盾で防ぐ。<br>倒れると宝は0。危なくなったら持ち帰ろう。',start:'タップでスタート',again:'タップでもう一度',loot:'宝',best:'最高',hp:'体力',sword:'剣',shield:'盾',floor:'地下',enemy:'番人',camp:'焚き火',forge:'鍛冶場',attack:'力',gain:'宝',rest:'体力+3・盾を4に',upgrade:'剣+1',cost:'宝',on:'盾を使う',off:'盾を温存',leave:'持ち帰る',hint:'力 − 剣 − 使った盾 ＝ ダメージ',hit:'受けたダメージ',safe:'無傷で通過',healed:'休息して盾を補充',forged:'剣を強化した',poor:'宝が足りない',lost:'倒れてしまった',escaped:'無事に帰還',bottom:'地下12階を踏破',kept:'持ち帰った宝',newbest:'最高更新！',damage:'体力',block:'盾',fatal:'このまま進むと倒れる'},
+ en:{title:'One Shield Delve',help:'Choose rooms to gather treasure.<br>Your sword reduces enemy power; your shield blocks the rest.<br>Falling loses all loot. Leave before you fall.',start:'Tap to start',again:'Tap to play again',loot:'Loot',best:'Best',hp:'Health',sword:'Sword',shield:'Shield',floor:'Depth',enemy:'Keeper',camp:'Campfire',forge:'Forge',attack:'Power',gain:'Loot',rest:'Health +3 · shield to 4',upgrade:'Sword +1',cost:'Cost',on:'Use shield',off:'Save shield',leave:'Take loot home',hint:'Power − sword − shield used = damage',hit:'Damage taken',safe:'Passed unharmed',healed:'Rested and refilled shield',forged:'Sword upgraded',poor:'Not enough loot',lost:'Lost in the depths',escaped:'Safely returned',bottom:'Cleared depth 12',kept:'Loot brought home',newbest:'New best!',damage:'Health',block:'Shield',fatal:'Fatal with this setting'}
+};
+const t=D[LANG]||D.en,$=s=>document.querySelector(s),hud=$('#hud'),stats=$('#stats'),rooms=$('#rooms'),cover=$('#cover'),log=$('#log'),guard=$('#guard');
+let mode='title',hp=8,sword=2,shield=4,loot=0,floor=1,best=0,useShield=true,choices=[],until=0,startTime=0,audio;
+for(const k of ['contextmenu','selectstart','gesturestart'])addEventListener(k,e=>e.preventDefault(),{passive:false});
+const signal=(agf,data={})=>{try{parent.postMessage({agf,...data},'*')}catch{}};
+signal('load');
+addEventListener('message',e=>{if(e.data?.agf==='loaded'){best=Math.max(best,Number(e.data.data?.best)||0);if(mode==='play')draw()}});
+function tone(f){
+ try{audio??=new AudioContext();audio.resume();const o=audio.createOscillator(),g=audio.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.045,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.16);o.connect(g).connect(audio.destination);o.start();o.stop(audio.currentTime+.17)}catch{}
+}
+function encounter(power){return {type:'enemy',power,gain:power+1}}
+function deal(){
+ const base=2+Math.floor((floor-1)/2);
+ choices=[encounter(base+Math.floor(Math.random()*3)),encounter(base+2+Math.floor(Math.random()*3))];
+ if(floor<12&&floor%3===0)choices[0]={type:'camp',cost:2};
+ if(floor<12&&floor%4===0)choices[1]={type:'forge',cost:4};
+ draw();
+}
+function draw(){
+ hud.innerHTML='<span>'+t.loot+' '+loot+'</span><span>'+t.best+' '+best+'</span>';
+ stats.innerHTML='<span>♥ '+hp+'</span><span>⚔ '+sword+'</span><span>⬡ '+shield+'</span>';
+ $('#depth').textContent=t.floor+' '+floor+'/12';
+ guard.textContent=useShield?t.on:t.off;guard.style.background=useShield?'#2d6b6c':'#323d55';
+ $('#leave').textContent=t.leave;$('#hint').textContent=t.hint;
+ rooms.innerHTML='';
+ choices.forEach((room,i)=>{
+  const raw=room.type==='enemy'?Math.max(0,room.power-sword):0,blocked=useShield?Math.min(shield,raw):0;const button=document.createElement('button');button.className='card';if(room.type==='enemy'&&raw-blocked>=hp){button.style.borderColor='#ff827b';button.style.background='linear-gradient(#653d4a,#382a3e)'}
+  button.innerHTML='<span class="symbol">'+({enemy:'♜',camp:'♨',forge:'⚒'}[room.type])+'</span><b>'+t[room.type]+'</b><small>'+(room.type==='enemy'?t.attack+' '+room.power+'<br>'+t.gain+' +'+room.gain+'<br>'+t.damage+' −'+(raw-blocked)+' · '+t.block+' −'+blocked+(raw-blocked>=hp?'<br>'+t.fatal:''):(room.type==='camp'?t.hp+' +'+Math.min(3,8-hp)+' · '+t.shield+' +'+(4-shield):t.upgrade)+'<br>'+t.cost+' −'+room.cost)+'</small>';
+  button.addEventListener('pointerdown',e=>{e.preventDefault();choose(i)});rooms.append(button);
+ });
+}
+function begin(){
+ hp=8;sword=2;shield=4;loot=0;floor=1;useShield=true;mode='play';startTime=performance.now();cover.style.display='none';log.textContent='';signal('start');deal();tone(330);
+}
+function finish(kind){
+ mode='end';until=performance.now()+700;const kept=kind==='lost'?0:loot,record=kept>best;best=Math.max(best,kept);
+ signal('save',{data:{best}});signal('end',{score:kept});
+ cover.innerHTML='<div><h1>'+t[kind]+'</h1><p>'+t.floor+' '+floor+'/12<br>'+t.kept+' '+kept+'<br>'+t.best+' '+best+(record?'<br>'+t.newbest:'')+'</p><small>'+t.again+'</small></div>';cover.style.display='flex';tone(kind==='lost'?130:640);
+}
+function choose(i){
+ if(mode!=='play')return;const room=choices[i];
+ if(room.type==='enemy'){
+  let damage=Math.max(0,room.power-sword),spent=0;
+  if(useShield){const blocked=Math.min(shield,damage);shield-=blocked;damage-=blocked;spent=blocked}
+  hp-=damage;loot+=room.gain;log.textContent=t.hp+' −'+damage+' · '+t.shield+' −'+spent+' · '+t.loot+' +'+room.gain;tone(damage?180:470);
+ }else{
+  if(loot<room.cost){log.textContent=t.poor;tone(120);return}
+  loot-=room.cost;
+  if(room.type==='camp'){hp=Math.min(8,hp+3);shield=4;log.textContent=t.healed}else{sword++;log.textContent=t.forged}tone(540);
+ }
+ if(hp<=0){hp=0;draw();finish('lost');return}
+ if(floor===12){draw();finish('bottom');return}
+ floor++;deal();
+}
+guard.addEventListener('pointerdown',e=>{e.preventDefault();if(mode==='play'){useShield=!useShield;draw();tone(300)}});
+$('#leave').addEventListener('pointerdown',e=>{e.preventDefault();if(mode==='play')finish('escaped')});
+cover.innerHTML='<div><h1>'+t.title+'</h1><p>'+t.help+'</p><small>'+t.start+'</small></div>';
+cover.addEventListener('pointerdown',e=>{e.preventDefault();if(mode==='title'||performance.now()>until)begin()});
+setInterval(()=>{$('#hint').style.opacity=performance.now()-startTime<5500?'1':'0'},500);
+</script></html>
