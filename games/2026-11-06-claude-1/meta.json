@@ -1,0 +1,360 @@
+{
+  "id": "2026-11-06-claude-1",
+  "status": "published",
+  "title": "ひと筆ひつじ囲い",
+  "genre": "陣取り",
+  "concept": "指でなぞった糸が柵になり、ひつじのいない土地が花畑になる陣取り。ひつじは糸の先から逃げるので、なぞりながら群れを追いやり、すき間を一気に切る。小さな囲いに追いこめば眠ってくれる。追う・切るを一本の指でやる手触りが核。",
+  "howToPlay": "ふち（花畑）から向こうのふちまで指でなぞって柵を引き、目標の割合（70〜80%）を花畑にする。ひつじが糸にさわると切れる。",
+  "libraryDecision": "使わない。描くのは格子の花畑と柵とひつじだけで Canvas 2D で十分なめらかに動き、物理や3Dを足しても「追って切る」核は強まらないため。",
+  "soundDecision": "BGMは付けず、糸がのびるたびに五音音階で一音ずつ上がるはじき音、囲えたときの和音、ぷつんと切れる音、ひつじの鳴き声を Web Audio で作った。長くひくほど旋律がのびて緊張と達成感が音で伝わるため。",
+  "improvements": [
+    {
+      "found": "ふちが細くどこから引けばいいか分かりにくい／ひつじが糸に近づかず緊張がない／「追いこむ」意味が薄い",
+      "changed": "ふちを2マスに太くし、待機中は光らせた。ひつじは毛糸玉からは逃げるが糸には寄ってくるようにして、長く引くほど危なくした。ひつじを速くした。",
+      "foundEn": "The edge was thin and hard to find / sheep never came near the yarn, so no tension / herding meant little",
+      "changedEn": "Doubled the edge width and made it glow while idle. Sheep now flee the yarn ball but drift toward the yarn, so long lines are risky. Faster sheep."
+    },
+    {
+      "found": "画面上部（HUD付近）から引きはじめると何も起きない／小さく囲うと必ず切られて「おやすみ囲い」がほぼ不可能／囲うボーナスの存在が伝わらない",
+      "changed": "ふちの少し外からでも引きはじめられるようにした。糸への寄りつきを弱め、眠る囲いの広さを6%→8%にした。ステージ2で「小さく囲うと眠る」のヒントを出すようにした。糸の速さも少し上げた。",
+      "foundEn": "Starting near the HUD did nothing / tight pens always got snapped, so the sleepy pen was almost impossible / the pen bonus was never explained",
+      "changedEn": "Touches slightly outside the field now start a line. Weaker yarn attraction, sleep-pen size 6%→8%, a stage-2 hint about pens, and slightly faster yarn."
+    },
+    {
+      "found": "得点の浮き文字が花畑の上で薄く、すぐ消える／1面目の最初の一本で大きく取れて難しさの上がり方がゆるい／どの面も目標が同じで変化が少ない",
+      "changed": "浮き文字を太い縁取りにして長く表示した。目標をステージ1は70%、2は75%、3以降は80%と段階的に上げた。",
+      "foundEn": "Floating score text was faint on the flowers and vanished fast / the first cut took a big chunk and difficulty rose slowly / same target every stage",
+      "changedEn": "Bolder outlined floating text shown longer. Targets now step up: 70% / 75% / 80% from stage 3."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "陣取り",
+      "en": "Territory control",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "指でなぞった糸で柵を引き、ひつじのいない土地を花畑にする陣取り。ひつじは糸の先から逃げるので、追いこんでから切る。",
+        "ideaEn": "Trace yarn fences; land with no sheep becomes your flower field. Sheep flee the yarn tip, so herd them, then cut.",
+        "fromDraw": true
+      },
+      {
+        "idea": "餅つきのリズムゲーム。相方が手を返す合間にきねを落とし、もちが伸びる手触りを楽しむ。",
+        "ideaEn": "A mochi-pounding rhythm game: drop the mallet between your partner’s hand turns and feel the dough stretch.",
+        "fromDraw": false
+      },
+      {
+        "idea": "波打ちぎわの砂山を3Dで作る終わりのない遊び場。波が寄せるたびに形が削れていく。",
+        "ideaEn": "An endless 3D beach sandbox: shape sand castles while each wave wears them down.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "fail",
+    "input": [
+      "draw",
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Fence the Flock",
+      "concept": "A territory game where traced yarn becomes a fence and sheep-free land becomes your flower field. Sheep flee the yarn tip, so you herd them while you trace and then cut the gap. Squeeze one into a tiny pen and it falls asleep. Herding and cutting with one finger is the core.",
+      "howToPlay": "Trace from one edge (flowers) to another to build a fence and turn the target share (70–80%) into flowers. If a sheep touches the yarn, it snaps.",
+      "libraryDecision": "None. A grid flower field, fences and sheep run smoothly in Canvas 2D; physics or 3D would not strengthen the herd-and-cut core.",
+      "soundDecision": "No BGM. Web Audio plucks rise one pentatonic step as the yarn grows, plus a chord on a claim, a snap sound and sheep bleats — the longer the line, the longer the tune, so tension and relief are heard."
+    }
+  },
+  "createdAt": "2026-11-06T10:04:05+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-06T10:04:05+09:00",
+    "metricsFrom": "2026-11-06T01:01:54.489Z",
+    "transcript": "55eec4b3-84ed-406d-829d-a53d8788a708.jsonl",
+    "validationRuns": 5,
+    "finishedAt": "2026-11-06T10:12:40+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-06T10:12:26+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "36.8KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=114",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=168",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=105",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=157",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 37705,
+    "lines": 850
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0.2,
+    "idleStarts": 2
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "ルールは古典のクィックス／ジェッツボールそのままで、序盤の数本はまっすぐ横に切るだけで大きく取れてしまう。",
+    "comment": "左上のすみへ毛糸玉でひつじを追いこみ、最後の一辺を引いた瞬間にひつじが丸まって眠ったのは気持ちよかった。糸に寄ってくるひつじのせいで、狭い囲いの最後の一本はよく切られる（自分も切られた）。もう1回はやりたくなるが、序盤はやや単調。",
+    "similar": [
+      {
+        "title": "Qix",
+        "url": "https://www.wikipedia.org/wiki/Qix",
+        "similarity": "高",
+        "note": "線を引いて面を囲い取り、引いている途中の線に敵が触れるとミス、という骨組みは同じ。こちらは指でなぞる自由な曲線、毛糸玉でひつじを追う要素、小さく囲うと眠る仕組みが違う。",
+        "note_en": "Same skeleton: draw lines to claim area; an enemy touching the line mid-draw costs a life. Differs in free-form finger curves, herding sheep with the yarn ball, and sleepy pens."
+      },
+      {
+        "title": "JezzBall",
+        "url": "https://www.Wikipedia.org/wiki/JezzBall",
+        "similarity": "中",
+        "note": "跳ね回る相手がいない部分を壁で区切って取り、75%前後で面クリアする点が近い。JezzBallは縦横の直線のみで、相手を動かすことはできない。",
+        "note_en": "Close in walling off ball-free space and clearing at about 75%. JezzBall uses only straight lines and you cannot move the balls."
+      }
+    ],
+    "research": "WebSearchで「Qix JezzBall area claiming game」を検索し、Wikipediaの記事を確認した。",
+    "i18n": {
+      "en": {
+        "worst": "The rules are classic Qix/JezzBall, and the first few straight cuts grab big chunks too easily.",
+        "comment": "Herding a sheep into the top-left corner with the yarn ball and watching it curl up asleep as I closed the last side felt great. Because sheep drift toward the yarn, the final cut of a tight pen often snaps (it happened to me). I wanted another try, but the opening is a bit flat.",
+        "research": "Searched the web for Qix/JezzBall area-claiming games and checked the Wikipedia articles."
+      }
+    },
+    "method": "スマホ縦画面で 5 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 5 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "開始。ふちが光っている",
+        "noteEn": "Start; the edge glows",
+        "image": "ai-play/step-01.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "path(0.03,0.50→0.50,0.50→0.97,0.50) 700ms",
+        "note": "速くなぞると糸が指を追いかけて伸びていく",
+        "noteEn": "Trace fast; the yarn races after the drawn path",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 1500ms",
+        "note": "柵が完成して上半分が花畑に",
+        "noteEn": "Fence done; top half blooms",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "path(0.97,0.78→0.60,0.78→0.33,0.78→0.33,0.97) 1800ms → wait 1200ms",
+        "note": "右下のすみを切り取る",
+        "noteEn": "Cut off the bottom-right corner",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "path(0.40,0.11→0.40,0.30→0.03,0.30) 1500ms → wait 1500ms",
+        "note": "左上でひつじを小さく囲う",
+        "noteEn": "Pen a sheep in the top-left",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-06T10:12:40+09:00"
+  },
+  "publishedAt": "2026-11-06T10:12:40+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 14483,
+    "outputTokens": 33406,
+    "contextTokens": 6773433,
+    "turns": 40,
+    "toolCalls": 43,
+    "webSearches": 0,
+    "minutes": 10.8,
+    "from": "2026-11-06T01:01:54.489Z",
+    "to": "2026-11-06T01:12:40.137Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-06T10:12:40+09:00",
+    "validationRuns": 5,
+    "codeKB": 36.8
+  }
+}

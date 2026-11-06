@@ -1,0 +1,849 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>ひと筆ひつじ囲い</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; margin: 0; padding: 0; height: 100%; overflow: hidden; background: #2f5a2c; }
+canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const DICT = {
+  ja: {
+    title: 'ひと筆ひつじ囲い',
+    how1: 'ふち（花畑）から指でなぞって柵を引こう。',
+    how2: 'ひつじのいない場所が、あなたの花畑になる。',
+    how3: 'ひつじは毛糸玉をこわがるが、糸には寄ってくる。',
+    start: 'タップでスタート',
+    stage: 'ステージ',
+    hint: 'ふちから指でなぞって、向こうのふちまで糸を引こう',
+    needEdge: 'ふち（花畑）からなぞりはじめてね',
+    snap: 'ぷつん！',
+    pen: 'おやすみ囲い！',
+    big: 'ごっそり！',
+    clear: 'ステージクリア！',
+    next: 'タップで次へ',
+    over: 'ひつじの勝ち',
+    again: 'タップでもう一度',
+    score: '点',
+    best: 'ベスト',
+    newBest: 'ベスト更新！',
+    reached: 'ステージ',
+    life: '糸 +1',
+    black: '黒ひつじは毛糸玉をこわがらない',
+    penHint: 'ひつじを小さく囲うと眠ってくれる（ボーナス）',
+  },
+  en: {
+    title: 'Fence the Flock',
+    how1: 'Trace a fence from the edge (the flowers).',
+    how2: 'Land with no sheep becomes your flower field.',
+    how3: 'Sheep fear the yarn ball but nibble the yarn — it snaps!',
+    start: 'Tap to start',
+    stage: 'Stage',
+    hint: 'Trace from an edge across to another edge',
+    needEdge: 'Start tracing from the edge (flowers)',
+    snap: 'Snap!',
+    pen: 'Sleepy pen!',
+    big: 'Huge cut!',
+    clear: 'Stage clear!',
+    next: 'Tap to continue',
+    over: 'The sheep win',
+    again: 'Tap to play again',
+    score: 'pts',
+    best: 'Best',
+    newBest: 'New best!',
+    reached: 'Stage',
+    life: 'Yarn +1',
+    black: 'Black sheep do not fear the yarn ball',
+    penHint: 'Fence a sheep into a tiny pen and it falls asleep (bonus)',
+  },
+};
+const L = DICT[LANG] || DICT.en;
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+
+let best = 0;
+addEventListener('message', (e) => { if (e.data && e.data.agf === 'loaded' && e.data.data) { best = e.data.data.best || 0; } });
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+const saveBest = () => { try { parent.postMessage({ agf: 'save', data: { best } }, '*'); } catch (e) {} };
+
+// ---------- audio ----------
+let AC = null, master = null;
+function initAudio() {
+  try {
+    if (!AC) {
+      AC = new (window.AudioContext || window.webkitAudioContext)();
+      master = AC.createGain(); master.gain.value = 0.45; master.connect(AC.destination);
+    }
+    if (AC.state === 'suspended') AC.resume();
+  } catch (e) { AC = null; }
+}
+function tone(f, d, type = 'sine', v = 0.18, delay = 0, slide = 0) {
+  if (!AC) return;
+  try {
+    const t = AC.currentTime + delay;
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(30, f * slide), t + d);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(v, t + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + d + 0.02);
+  } catch (e) {}
+}
+let noiseBuf = null;
+function noise(d, v = 0.2, freq = 1200, delay = 0) {
+  if (!AC) return;
+  try {
+    if (!noiseBuf) {
+      noiseBuf = AC.createBuffer(1, AC.sampleRate * 0.5, AC.sampleRate);
+      const a = noiseBuf.getChannelData(0); for (let i = 0; i < a.length; i++) a[i] = Math.random() * 2 - 1;
+    }
+    const t = AC.currentTime + delay;
+    const s = AC.createBufferSource(); s.buffer = noiseBuf;
+    const f = AC.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = 0.8;
+    const g = AC.createGain(); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    s.connect(f); f.connect(g); g.connect(master); s.start(t); s.stop(t + d + 0.02);
+  } catch (e) {}
+}
+let lastBaa = 0;
+function baa(pitch = 1, v = 0.12, delay = 0) {
+  if (!AC) return;
+  const now = performance.now();
+  if (delay === 0 && now - lastBaa < 350) return;
+  lastBaa = now;
+  try {
+    const t = AC.currentTime + delay, d = 0.5;
+    const o = AC.createOscillator(); o.type = 'sawtooth';
+    const base = 300 * pitch;
+    o.frequency.setValueAtTime(base * 1.05, t);
+    o.frequency.linearRampToValueAtTime(base, t + d);
+    const lfo = AC.createOscillator(); lfo.frequency.value = 22;
+    const lg = AC.createGain(); lg.gain.value = base * 0.06; lfo.connect(lg); lg.connect(o.frequency);
+    const f = AC.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 1000; f.Q.value = 2.2;
+    const g = AC.createGain();
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + 0.06);
+    g.gain.setValueAtTime(v, t + d * 0.6); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(f); f.connect(g); g.connect(master);
+    o.start(t); lfo.start(t); o.stop(t + d + 0.05); lfo.stop(t + d + 0.05);
+  } catch (e) {}
+}
+const PENTA = [0, 2, 4, 7, 9];
+const noteHz = (n) => 392 * Math.pow(2, (PENTA[((n % 5) + 5) % 5] + 12 * Math.floor(n / 5)) / 12);
+function pluck(n) { tone(noteHz(n), 0.22, 'triangle', 0.09); tone(noteHz(n) * 2, 0.08, 'sine', 0.03); }
+function chime(size) {
+  const k = Math.min(7, 2 + Math.floor(size / 250));
+  for (let i = 0; i < k; i++) { tone(noteHz(i * 2 + 2), 0.5, 'sine', 0.1, i * 0.07); tone(noteHz(i * 2 + 2) * 2, 0.25, 'triangle', 0.03, i * 0.07); }
+}
+function snapSound() { noise(0.18, 0.35, 2500); tone(180, 0.25, 'square', 0.06, 0, 0.4); }
+function fanfare() { [0, 2, 4, 5, 7].forEach((n, i) => tone(noteHz(n + 5), 0.4, 'triangle', 0.1, i * 0.1)); }
+
+// ---------- canvas & layout ----------
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d');
+let W = 360, H = 640, DPR = 1;
+const GW = 54;      // grid columns incl. border
+let GH = 84;        // grid rows (set per stage)
+let cell = 6, fx = 0, fy = 0;
+const HUD_H = 62, BOT = 34;
+function resize() {
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = Math.max(1, window.innerWidth || 360); H = Math.max(1, window.innerHeight || 640);
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+  layout();
+}
+function fieldArea() { return { w: Math.max(50, W - 16), h: Math.max(80, H - HUD_H - BOT) }; }
+function layout() {
+  const a = fieldArea();
+  cell = Math.max(1, Math.min(a.w / GW, a.h / GH));
+  fx = (W - GW * cell) / 2; fy = HUD_H + (a.h - GH * cell) / 2;
+}
+addEventListener('resize', resize);
+
+// ---------- grid ----------
+let g = new Uint8Array(GW * GH);
+let interior = 1, claimed = 0;
+const K = 8; // offscreen px per cell
+const fcv = document.createElement('canvas');
+const fctx = fcv.getContext('2d');
+const hash = (x, y) => { let h = (x * 374761393 + y * 668265263) ^ 0x5bd1e995; h = (h ^ (h >>> 13)) * 1274126177; h ^= h >>> 16; return (h >>> 0) / 4294967296; };
+const GRASS = ['#9ccf68', '#a3d46e', '#96c962', '#a8d873'];
+const SOIL = ['#f4dc95', '#f0d58a', '#f7e2a2', '#eed184'];
+const FLOW = ['#ff8fab', '#ffffff', '#c77dff', '#ff6b6b', '#ffd166', '#f8a5c2'];
+let seed = 1;
+function paintCell(x, y) {
+  const i = y * GW + x, h = hash(x + seed, y), px = x * K, py = y * K;
+  if (g[i]) {
+    fctx.fillStyle = SOIL[(h * 4) | 0];
+    fctx.fillRect(px, py, K, K);
+    if (h < 0.26) {
+      const c = FLOW[(h * 100 | 0) % FLOW.length];
+      const cx = px + K * 0.5, cy = py + K * 0.5, r = K * 0.2;
+      fctx.fillStyle = '#6fa84a'; fctx.fillRect(cx - 0.5, cy, 1, K * 0.5);
+      fctx.fillStyle = c;
+      for (let k = 0; k < 5; k++) { const a = k * 1.2566 + h * 9; fctx.beginPath(); fctx.arc(cx + Math.cos(a) * r, cy + Math.sin(a) * r, r * 0.85, 0, 6.283); fctx.fill(); }
+      fctx.fillStyle = '#ffd23f'; fctx.beginPath(); fctx.arc(cx, cy, r * 0.6, 0, 6.283); fctx.fill();
+    } else if (h < 0.4) {
+      fctx.fillStyle = '#e4c374'; fctx.fillRect(px + 2, py + 3, 3, 2);
+    }
+  } else {
+    fctx.fillStyle = GRASS[(h * 4) | 0];
+    fctx.fillRect(px, py, K, K);
+    if (h > 0.86) {
+      fctx.strokeStyle = '#7fb64f'; fctx.lineWidth = 1;
+      fctx.beginPath(); fctx.moveTo(px + 2, py + 7); fctx.lineTo(px + 3, py + 3); fctx.moveTo(px + 4, py + 7); fctx.lineTo(px + 6, py + 2); fctx.stroke();
+    }
+  }
+}
+function paintAll() {
+  fcv.width = GW * K; fcv.height = GH * K;
+  for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) paintCell(x, y);
+}
+const solidAt = (x, y) => {
+  const cx = Math.floor(x), cy = Math.floor(y);
+  if (cx < 0 || cy < 0 || cx >= GW || cy >= GH) return true;
+  return g[cy * GW + cx] !== 0;
+};
+
+// ---------- game state ----------
+let state = 'title';
+let stage = 1, score = 0, lives = 3, pct = 0;
+let TARGET = 70;
+let sheep = [];
+let fences = [];
+let pending = []; // {i, t}
+let particles = [], floats = [];
+let stateT = 0, now = 0, hintT = 0, msg = null;
+let shake = 0, newBestFlag = false;
+
+// rope
+let rope = null; // {pts:[], tip:{x,y}, path:[], left:false, up:false, len, tick}
+let retracting = null; // {pts, t}
+let broken = []; // falling pieces
+const ROPE_V = 34; // cells/sec
+
+function spawnSheep(n) {
+  sheep = [];
+  for (let k = 0; k < n; k++) {
+    let x, y, tries = 0;
+    do { x = 6 + Math.random() * (GW - 12); y = 8 + Math.random() * (GH - 16); tries++; }
+    while (tries < 50 && sheep.some((s) => Math.hypot(s.x - x, s.y - y) < 8));
+    const a = Math.random() * 6.283;
+    const black = stage >= 3 && k === n - 1;
+    sheep.push({ x, y, vx: Math.cos(a), vy: Math.sin(a), r: 1.55, black, sleep: false, ph: Math.random() * 6, turn: Math.random() * 2, scared: 0, face: 1 });
+  }
+}
+function baseSpeed(s) { return (8 + stage * 0.9) * (s.black ? 1.3 : 1); }
+
+function newStage() {
+  const a = fieldArea();
+  GH = Math.max(60, Math.min(120, Math.round(GW * a.h / a.w)));
+  layout();
+  g = new Uint8Array(GW * GH);
+  for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) if (x < 2 || y < 2 || x >= GW - 2 || y >= GH - 2) g[y * GW + x] = 1;
+  interior = (GW - 4) * (GH - 4);
+  TARGET = stage === 1 ? 70 : stage === 2 ? 75 : 80; claimed = 0; pct = 0;
+  seed = (Math.random() * 1000) | 0;
+  fences = []; pending = []; particles = []; floats = []; broken = [];
+  rope = null; retracting = null;
+  paintAll();
+  spawnSheep(Math.min(7, stage + 1));
+  hintT = stage <= 3 ? 6 : 0;
+}
+
+// ---------- input ----------
+function toGrid(e) {
+  return { x: (e.clientX - fx) / cell, y: (e.clientY - fy) / cell };
+}
+function nearestClaimed(p, rad) {
+  let bestD = 1e9, bp = null;
+  const r = Math.ceil(rad);
+  for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
+    const cx = Math.floor(p.x) + dx, cy = Math.floor(p.y) + dy;
+    if (cx < 0 || cy < 0 || cx >= GW || cy >= GH) continue;
+    if (!g[cy * GW + cx]) continue;
+    const qx = Math.max(cx, Math.min(cx + 1, p.x)), qy = Math.max(cy, Math.min(cy + 1, p.y));
+    const d = Math.hypot(qx - p.x, qy - p.y);
+    if (d < bestD && d <= rad) { bestD = d; bp = { x: Math.min(cx + 0.95, Math.max(cx + 0.05, p.x)), y: Math.min(cy + 0.95, Math.max(cy + 0.05, p.y)) }; }
+  }
+  return bp;
+}
+let activePointer = null;
+cv.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  initAudio();
+  if (state === 'title') { startGame(); return; }
+  if (state === 'clear') { if (stateT > 0.7) { stage++; newStage(); state = 'play'; stateT = 0; signal('start'); } return; }
+  if (state === 'over') { if (stateT > 0.7) startGame(); return; }
+  if (state !== 'play') return;
+  if (rope) return;
+  const p = toGrid(e);
+  const inside = p.x >= -6 && p.y >= -6 && p.x <= GW + 6 && p.y <= GH + 6;
+  if (!inside) return;
+  let start;
+  if (!solidAt(p.x, p.y)) start = nearestClaimed(p, 3.2);
+  else start = { x: Math.min(GW - 0.05, Math.max(0.05, p.x)), y: Math.min(GH - 0.05, Math.max(0.05, p.y)) };
+  if (!start) { msg = { text: L.needEdge, t: 1.6 }; tone(220, 0.12, 'sine', 0.06); return; }
+  activePointer = e.pointerId;
+  try { cv.setPointerCapture(e.pointerId); } catch (er) {}
+  rope = { pts: [{ x: start.x, y: start.y }], tip: { x: start.x, y: start.y }, path: [], left: false, up: false, len: 0, tick: 0, n: 0 };
+  if (!solidAt(p.x, p.y)) rope.path.push({ x: p.x, y: p.y });
+  tone(523, 0.08, 'triangle', 0.06);
+});
+cv.addEventListener('pointermove', (e) => {
+  if (!rope || rope.up || e.pointerId !== activePointer) return;
+  const p = toGrid(e);
+  p.x = Math.min(GW - 0.05, Math.max(0.05, p.x)); p.y = Math.min(GH - 0.05, Math.max(0.05, p.y));
+  const last = rope.path.length ? rope.path[rope.path.length - 1] : rope.tip;
+  const d = Math.hypot(p.x - last.x, p.y - last.y);
+  if (d > 0.35) {
+    // subdivide long jumps
+    const n = Math.ceil(d / 0.8);
+    for (let k = 1; k <= n; k++) rope.path.push({ x: last.x + (p.x - last.x) * k / n, y: last.y + (p.y - last.y) * k / n });
+  }
+});
+function release(e) {
+  if (e.pointerId !== activePointer) return;
+  activePointer = null;
+  if (rope) rope.up = true;
+}
+cv.addEventListener('pointerup', release);
+cv.addEventListener('pointercancel', release);
+
+function startGame() {
+  stage = 1; score = 0; lives = 3; newBestFlag = false;
+  newStage();
+  state = 'play'; stateT = 0;
+  signal('start');
+}
+
+// ---------- rope logic ----------
+function stepTip(dt) {
+  let remain = ROPE_V * dt;
+  while (rope && remain > 0 && rope.path.length) {
+    const t = rope.path[0];
+    const dx = t.x - rope.tip.x, dy = t.y - rope.tip.y, d = Math.hypot(dx, dy);
+    const step = Math.min(remain, d, 0.4);
+    if (d < 1e-6) { rope.path.shift(); continue; }
+    rope.tip.x += dx / d * step; rope.tip.y += dy / d * step;
+    remain -= step;
+    if (step >= d - 1e-6) rope.path.shift();
+    processTip(step);
+  }
+  if (rope && rope.up && rope.path.length === 0) {
+    // ran out of path in the open: retract
+    retracting = { pts: rope.pts.concat([{ x: rope.tip.x, y: rope.tip.y }]), t: 0 };
+    rope = null;
+    tone(330, 0.15, 'sine', 0.05, 0, 0.6);
+  }
+}
+function processTip(step) {
+  const tp = rope.tip;
+  const sol = solidAt(tp.x, tp.y);
+  if (!rope.left) {
+    if (sol) { rope.pts = [{ x: tp.x, y: tp.y }]; }
+    else { rope.left = true; rope.pts.push({ x: tp.x, y: tp.y }); }
+    return;
+  }
+  if (sol) { rope.pts.push({ x: tp.x, y: tp.y }); completeRope(); return; }
+  const last = rope.pts[rope.pts.length - 1];
+  if (Math.hypot(tp.x - last.x, tp.y - last.y) >= 0.5) rope.pts.push({ x: tp.x, y: tp.y });
+  rope.len += step; rope.tick += step;
+  if (rope.tick > 2.6) { rope.tick = 0; pluck(rope.n++); }
+}
+function segDist(px, py, ax, ay, bx, by) {
+  const dx = bx - ax, dy = by - ay, l2 = dx * dx + dy * dy;
+  let t = l2 > 0 ? ((px - ax) * dx + (py - ay) * dy) / l2 : 0;
+  t = Math.max(0, Math.min(1, t));
+  return Math.hypot(px - ax - dx * t, py - ay - dy * t);
+}
+function checkSnap() {
+  if (!rope || !rope.left) return;
+  const pts = rope.pts;
+  for (const s of sheep) {
+    if (s.sleep) continue;
+    const lim = s.r + 0.25;
+    let hit = Math.hypot(s.x - rope.tip.x, s.y - rope.tip.y) < lim;
+    for (let i = 1; !hit && i < pts.length; i++) {
+      const a = pts[i - 1], b = pts[i];
+      if (Math.abs(s.x - a.x) > 3 && Math.abs(s.x - b.x) > 3 && Math.sign(s.x - a.x) === Math.sign(s.x - b.x)) continue;
+      if (segDist(s.x, s.y, a.x, a.y, b.x, b.y) < lim) hit = true;
+    }
+    if (!hit && pts.length) { const a = pts[pts.length - 1]; if (segDist(s.x, s.y, a.x, a.y, rope.tip.x, rope.tip.y) < lim) hit = true; }
+    if (hit) { snapRope(s); return; }
+  }
+}
+function snapRope(s) {
+  const pts = rope.pts.concat([{ x: rope.tip.x, y: rope.tip.y }]);
+  for (let i = 1; i < pts.length; i += 2) {
+    broken.push({ a: pts[i - 1], b: pts[i], vx: (Math.random() - 0.5) * 3, vy: -2 - Math.random() * 3, t: 0 });
+  }
+  rope = null; activePointer = null;
+  lives--;
+  shake = 0.35;
+  snapSound(); baa(s.black ? 0.75 : 1.15, 0.14, 0.05);
+  const sp = gridToPx(s.x, s.y);
+  floats.push({ x: sp.x, y: sp.y - 18, text: L.snap + '  -1', t: 0, c: '#ff4d5a', big: true });
+  for (let k = 0; k < 12; k++) particles.push({ x: sp.x, y: sp.y, vx: (Math.random() - 0.5) * 160, vy: (Math.random() - 0.8) * 140, life: 0.7, max: 0.7, c: '#ffffff', r: 3 + Math.random() * 3 });
+  s.vx *= -1; s.vy *= -1; s.scared = 1;
+  if (lives <= 0) { state = 'dying'; stateT = 0; }
+}
+const gridToPx = (x, y) => ({ x: fx + x * cell, y: fy + y * cell });
+
+function stamp(x, y) {
+  for (const ox of [-0.45, 0.45]) for (const oy of [-0.45, 0.45]) {
+    const cx = Math.floor(x + ox), cy = Math.floor(y + oy);
+    if (cx < 0 || cy < 0 || cx >= GW || cy >= GH) continue;
+    const i = cy * GW + cx;
+    if (!g[i]) { g[i] = 1; claimed++; pending.push({ i, t: now }); }
+  }
+}
+function completeRope() {
+  const pts = rope.pts;
+  rope = null; activePointer = null;
+  const before = claimed;
+  // rasterize fence
+  for (let i = 1; i < pts.length; i++) {
+    const a = pts[i - 1], b = pts[i];
+    const d = Math.hypot(b.x - a.x, b.y - a.y), n = Math.max(1, Math.ceil(d / 0.25));
+    for (let k = 0; k <= n; k++) stamp(a.x + (b.x - a.x) * k / n, a.y + (b.y - a.y) * k / n);
+  }
+  fences.push(pts);
+  // free sheep stuck in stamped cells
+  for (const s of sheep) if (!s.sleep && solidAt(s.x, s.y)) unstick(s);
+  // flood fill regions from sheep
+  const label = new Int32Array(GW * GH).fill(-1);
+  const regions = [];
+  const stack = [];
+  for (const s of sheep) {
+    if (s.sleep) continue;
+    const si = Math.floor(s.y) * GW + Math.floor(s.x);
+    if (g[si]) continue;
+    if (label[si] >= 0) { regions[label[si]].sheep.push(s); continue; }
+    const id = regions.length;
+    const reg = { cells: [], sheep: [s] };
+    regions.push(reg);
+    label[si] = id; stack.push(si);
+    while (stack.length) {
+      const c = stack.pop(); reg.cells.push(c);
+      const cx = c % GW;
+      const nb = [c - 1, c + 1, c - GW, c + GW];
+      for (let k = 0; k < 4; k++) {
+        const q = nb[k];
+        if ((k === 0 && cx === 0) || (k === 1 && cx === GW - 1)) continue;
+        if (q < 0 || q >= GW * GH) continue;
+        if (g[q] || label[q] >= 0) continue;
+        label[q] = id; stack.push(q);
+      }
+    }
+  }
+  // compute centroid of fence for ripple
+  const mid = pts[(pts.length / 2) | 0];
+  let freeCells = 0;
+  for (let i = 0; i < GW * GH; i++) {
+    if (!g[i] && label[i] < 0) {
+      g[i] = 1; claimed++; freeCells++;
+      const x = i % GW, y = (i / GW) | 0;
+      pending.push({ i, t: now + Math.hypot(x - mid.x, y - mid.y) * 0.012 });
+    }
+  }
+  // sleepy pens
+  const penLimit = interior * 0.08;
+  let penned = 0;
+  for (const reg of regions) {
+    if (reg.cells.length <= penLimit * reg.sheep.length) {
+      for (const c of reg.cells) { if (!g[c]) { g[c] = 1; claimed++; const x = c % GW, y = (c / GW) | 0; pending.push({ i: c, t: now + 0.2 + Math.hypot(x - reg.sheep[0].x, y - reg.sheep[0].y) * 0.02 }); } }
+      for (const s of reg.sheep) { s.sleep = true; s.sleepT = 0; penned++; }
+    }
+  }
+  pending.sort((a, b) => a.t - b.t);
+  const gained = claimed - before;
+  let pts2 = gained;
+  const mp = gridToPx(mid.x, mid.y);
+  let label2 = '';
+  if (freeCells > interior * 0.2) { pts2 = Math.round(pts2 * 1.5); label2 = L.big + ' '; }
+  if (penned) { pts2 += 300 * penned * stage; }
+  pts2 = Math.round(pts2 * (1 + (stage - 1) * 0.25));
+  score += pts2;
+  floats.push({ x: mp.x, y: mp.y, text: label2 + '+' + pts2, t: 0, c: '#ffffff', big: !!label2 });
+  if (penned) {
+    const s = sheep.find((q) => q.sleep && q.sleepT === 0);
+    const sp = gridToPx(s.x, s.y);
+    floats.push({ x: sp.x, y: sp.y - 24, text: L.pen, t: -0.2, c: '#ffe066', big: true });
+    fanfare(); baa(0.8, 0.1, 0.5);
+  } else chime(gained);
+  pct = Math.min(100, claimed / interior * 100);
+  if (sheep.every((s) => s.sleep)) pct = 100;
+  if (pct >= TARGET) {
+    state = 'clearing'; stateT = 0;
+  }
+}
+function unstick(s) {
+  let bd = 1e9, bx = s.x, by = s.y;
+  for (let dy = -6; dy <= 6; dy++) for (let dx = -6; dx <= 6; dx++) {
+    const cx = Math.floor(s.x) + dx, cy = Math.floor(s.y) + dy;
+    if (cx < 2 || cy < 2 || cx >= GW - 2 || cy >= GH - 2) continue;
+    if (g[cy * GW + cx]) continue;
+    const d = dx * dx + dy * dy;
+    if (d < bd) { bd = d; bx = cx + 0.5; by = cy + 0.5; }
+  }
+  s.x = bx; s.y = by;
+}
+
+// ---------- sheep ----------
+function updateSheep(dt, title) {
+  for (const s of sheep) {
+    s.ph += dt * 10;
+    if (s.sleep) { s.sleepT += dt; continue; }
+    let flee = false;
+    if (!title && rope && !s.black) {
+      const dx = s.x - rope.tip.x, dy = s.y - rope.tip.y, d = Math.hypot(dx, dy);
+      const R = 9;
+      if (d < R && d > 0.01) {
+        const a = (R - d) / R * 90;
+        s.vx += dx / d * a * dt; s.vy += dy / d * a * dt;
+        flee = true;
+        if (d < 5 && Math.random() < dt * 1.2) baa(1.05 + Math.random() * 0.2, 0.06);
+      }
+    }
+    if (!title && rope && rope.left && rope.pts.length > 2) {
+      let bd = 1e9, bx = 0, by = 0;
+      for (let i = 0; i < rope.pts.length; i += 2) { const q = rope.pts[i]; const d = Math.hypot(q.x - s.x, q.y - s.y); if (d < bd) { bd = d; bx = q.x; by = q.y; } }
+      const tipD = Math.hypot(s.x - rope.tip.x, s.y - rope.tip.y);
+      if (bd < 13 && bd > 0.5 && tipD > 7) { s.vx += (bx - s.x) / bd * 13 * dt; s.vy += (by - s.y) / bd * 13 * dt; s.curious = 0.3; }
+    }
+    s.curious = Math.max(0, (s.curious || 0) - dt);
+    s.turn -= dt;
+    if (s.turn < 0) {
+      s.turn = 0.8 + Math.random() * 2;
+      const a = (Math.random() - 0.5) * 1.6, c = Math.cos(a), sn = Math.sin(a);
+      const vx = s.vx * c - s.vy * sn, vy = s.vx * sn + s.vy * c; s.vx = vx; s.vy = vy;
+      if (Math.random() < 0.15) baa(0.9 + Math.random() * 0.3, 0.04);
+    }
+    s.scared = Math.max(0, s.scared - dt);
+    const target = baseSpeed(s) * (flee ? 1.9 : 1) * (title ? 0.6 : 1) * (s.scared > 0 ? 1.5 : 1);
+    let sp = Math.hypot(s.vx, s.vy) || 0.001;
+    const ns = sp + (target - sp) * Math.min(1, dt * (flee ? 6 : 2));
+    s.vx = s.vx / sp * ns; s.vy = s.vy / sp * ns;
+    if (Math.abs(s.vx) > 0.2) s.face = s.vx > 0 ? 1 : -1;
+    // move with sub-steps
+    const steps = Math.max(1, Math.ceil(Math.hypot(s.vx, s.vy) * dt / 0.4));
+    const h = dt / steps, r = s.r;
+    for (let k = 0; k < steps; k++) {
+      const nx = s.x + s.vx * h;
+      const ex = nx + Math.sign(s.vx) * r;
+      if (solidAt(ex, s.y) || solidAt(ex, s.y - r * 0.7) || solidAt(ex, s.y + r * 0.7)) s.vx = -s.vx; else s.x = nx;
+      const ny = s.y + s.vy * h;
+      const ey = ny + Math.sign(s.vy) * r;
+      if (solidAt(s.x, ey) || solidAt(s.x - r * 0.7, ey) || solidAt(s.x + r * 0.7, ey)) s.vy = -s.vy; else s.y = ny;
+    }
+    if (solidAt(s.x, s.y)) unstick(s);
+  }
+  // sheep-sheep soft separation
+  for (let i = 0; i < sheep.length; i++) for (let j = i + 1; j < sheep.length; j++) {
+    const a = sheep[i], b = sheep[j];
+    if (a.sleep || b.sleep) continue;
+    const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy);
+    if (d < 3 && d > 0.01) { const p = (3 - d) * 0.5; a.vx -= dx / d * p; a.vy -= dy / d * p; b.vx += dx / d * p; b.vy += dy / d * p; }
+  }
+}
+
+// ---------- drawing ----------
+function drawSheep(s) {
+  const p = gridToPx(s.x, s.y);
+  const R = s.r * cell * 1.05;
+  ctx.save();
+  ctx.translate(p.x, p.y);
+  if (s.sleep) {
+    ctx.fillStyle = 'rgba(0,0,0,0.12)'; ctx.beginPath(); ctx.ellipse(0, R * 0.7, R * 1.1, R * 0.4, 0, 0, 6.283); ctx.fill();
+    ctx.fillStyle = s.black ? '#3b3b44' : '#ffffff';
+    for (let k = 0; k < 6; k++) { const a = k * 1.047; ctx.beginPath(); ctx.arc(Math.cos(a) * R * 0.55, Math.sin(a) * R * 0.4 + R * 0.1, R * 0.5, 0, 6.283); ctx.fill(); }
+    ctx.fillStyle = s.black ? '#1d1d22' : '#3a3030';
+    ctx.beginPath(); ctx.ellipse(R * 0.75 * s.face, R * 0.25, R * 0.38, R * 0.3, 0, 0, 6.283); ctx.fill();
+    const zt = (s.sleepT * 0.8) % 1;
+    ctx.globalAlpha = 1 - zt;
+    ctx.fillStyle = '#3a5a8c'; ctx.font = `bold ${Math.max(12, R * 0.9) | 0}px ${FONT}`;
+    ctx.fillText('z', R * 0.6, -R * 0.6 - zt * R * 1.2);
+    ctx.restore();
+    return;
+  }
+  ctx.scale(s.face, 1);
+  const bob = Math.sin(s.ph) * R * 0.08;
+  ctx.fillStyle = 'rgba(0,0,0,0.15)'; ctx.beginPath(); ctx.ellipse(0, R * 0.95, R * 1.0, R * 0.32, 0, 0, 6.283); ctx.fill();
+  // legs
+  ctx.strokeStyle = '#2b2424'; ctx.lineWidth = Math.max(1.5, R * 0.18); ctx.lineCap = 'round';
+  const lg = Math.sin(s.ph) * R * 0.25;
+  ctx.beginPath();
+  ctx.moveTo(-R * 0.45, R * 0.3); ctx.lineTo(-R * 0.45 + lg, R * 0.9);
+  ctx.moveTo(R * 0.4, R * 0.3); ctx.lineTo(R * 0.4 - lg, R * 0.9);
+  ctx.stroke();
+  // wool
+  ctx.fillStyle = s.black ? '#3b3b44' : '#ffffff';
+  ctx.strokeStyle = s.black ? '#22222a' : '#d8d8d8'; ctx.lineWidth = 1;
+  const puffs = [[-0.5, 0], [0, -0.25], [0.45, -0.05], [-0.2, 0.25], [0.25, 0.25], [-0.6, -0.3], [0.1, 0.05]];
+  for (const [ax, ay] of puffs) { ctx.beginPath(); ctx.arc(ax * R, ay * R + bob, R * 0.48, 0, 6.283); ctx.fill(); }
+  // head
+  ctx.fillStyle = s.black ? '#141418' : '#3a3030';
+  ctx.beginPath(); ctx.ellipse(R * 0.95, -R * 0.15 + bob, R * 0.36, R * 0.3, 0.3, 0, 6.283); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(R * 0.78, -R * 0.38 + bob, R * 0.16, R * 0.08, -0.6, 0, 6.283); ctx.fill();
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath(); ctx.arc(R * 1.05, -R * 0.22 + bob, Math.max(1, R * 0.08), 0, 6.283); ctx.fill();
+  if (s.scared > 0 || (rope && !s.black && Math.hypot(s.x - rope.tip.x, s.y - rope.tip.y) < 6)) {
+    ctx.fillStyle = '#e63946'; ctx.font = `bold ${Math.max(12, R) | 0}px ${FONT}`;
+    ctx.fillText('!', -R * 0.1, -R * 0.9);
+  } else if (s.curious > 0) {
+    ctx.fillStyle = '#ff6b9a'; ctx.font = `bold ${Math.max(12, R) | 0}px ${FONT}`;
+    ctx.fillText('?', -R * 0.1, -R * 0.9);
+  }
+  ctx.restore();
+}
+function strokePts(pts, extra) {
+  ctx.beginPath();
+  for (let i = 0; i < pts.length; i++) { const p = gridToPx(pts[i].x, pts[i].y); if (i) ctx.lineTo(p.x, p.y); else ctx.moveTo(p.x, p.y); }
+  if (extra) { const p = gridToPx(extra.x, extra.y); ctx.lineTo(p.x, p.y); }
+  ctx.stroke();
+}
+function drawFence(pts) {
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.strokeStyle = 'rgba(70,40,15,0.35)'; ctx.lineWidth = cell * 1.3; strokePts(pts);
+  ctx.strokeStyle = '#9a6634'; ctx.lineWidth = cell * 0.55; strokePts(pts);
+  ctx.strokeStyle = '#c48a4e'; ctx.lineWidth = cell * 0.22; strokePts(pts);
+  // posts
+  let acc = 0;
+  ctx.fillStyle = '#6b4220';
+  for (let i = 1; i < pts.length; i++) {
+    acc += Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y);
+    if (acc > 3) { acc = 0; const p = gridToPx(pts[i].x, pts[i].y); ctx.fillRect(p.x - cell * 0.4, p.y - cell * 0.4, cell * 0.8, cell * 0.8); }
+  }
+}
+function drawRope() {
+  if (rope) {
+    // planned path
+    if (rope.path.length) {
+      ctx.setLineDash([cell * 0.6, cell * 0.8]);
+      ctx.strokeStyle = 'rgba(230,57,70,0.45)'; ctx.lineWidth = Math.max(2, cell * 0.35);
+      ctx.beginPath();
+      let p = gridToPx(rope.tip.x, rope.tip.y); ctx.moveTo(p.x, p.y);
+      for (const q of rope.path) { p = gridToPx(q.x, q.y); ctx.lineTo(p.x, p.y); }
+      ctx.stroke(); ctx.setLineDash([]);
+    }
+    if (rope.left) {
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.strokeStyle = 'rgba(120,0,10,0.3)'; ctx.lineWidth = Math.max(4, cell * 0.8); strokePts(rope.pts, rope.tip);
+      ctx.strokeStyle = '#e63946'; ctx.lineWidth = Math.max(2.5, cell * 0.45); strokePts(rope.pts, rope.tip);
+    }
+    const tp = gridToPx(rope.tip.x, rope.tip.y);
+    // fear ring
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(tp.x, tp.y, 9 * cell, 0, 6.283); ctx.stroke();
+    // yarn ball
+    const rr = Math.max(7, cell * 1.3);
+    ctx.fillStyle = '#d62839'; ctx.beginPath(); ctx.arc(tp.x, tp.y, rr, 0, 6.283); ctx.fill();
+    ctx.strokeStyle = '#ff8a94'; ctx.lineWidth = 1.5;
+    for (let k = -1; k <= 1; k++) { ctx.beginPath(); ctx.arc(tp.x + k * rr * 0.3, tp.y, rr * 0.75, -1.2 + now * 3, 1.2 + now * 3); ctx.stroke(); }
+  }
+  if (retracting) {
+    const r = retracting, k = 1 - r.t / 0.35;
+    const n = Math.max(1, Math.floor(r.pts.length * k));
+    ctx.globalAlpha = Math.max(0, k);
+    ctx.strokeStyle = '#e63946'; ctx.lineWidth = Math.max(2.5, cell * 0.45); ctx.lineCap = 'round';
+    strokePts(r.pts.slice(0, n));
+    ctx.globalAlpha = 1;
+  }
+  for (const b of broken) {
+    const a = gridToPx(b.a.x, b.a.y), c = gridToPx(b.b.x, b.b.y);
+    const off = b.t * b.vx * cell, offy = (b.vy * b.t + 14 * b.t * b.t) * cell;
+    ctx.globalAlpha = Math.max(0, 1 - b.t / 0.8);
+    ctx.strokeStyle = '#e63946'; ctx.lineWidth = Math.max(2.5, cell * 0.45);
+    ctx.beginPath(); ctx.moveTo(a.x + off, a.y + offy); ctx.lineTo(c.x + off, c.y + offy); ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+}
+function fitText(text, x, y, maxW, size, weight = 'bold', align = 'center') {
+  let s = size;
+  ctx.font = `${weight} ${s}px ${FONT}`;
+  while (s > 12 && ctx.measureText(text).width > maxW) { s -= 1; ctx.font = `${weight} ${s}px ${FONT}`; }
+  ctx.textAlign = align; ctx.fillText(text, x, y);
+}
+function drawYarn(x, y, r, on) {
+  ctx.fillStyle = on ? '#e63946' : 'rgba(255,255,255,0.18)';
+  ctx.beginPath(); ctx.arc(x, y, r, 0, 6.283); ctx.fill();
+  if (on) { ctx.strokeStyle = '#ff9aa2'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(x - r * 0.2, y, r * 0.7, -1.1, 1.1); ctx.stroke(); ctx.beginPath(); ctx.arc(x + r * 0.25, y, r * 0.6, 2, 4.3); ctx.stroke(); }
+}
+function drawHUD() {
+  ctx.fillStyle = 'rgba(20,45,20,0.85)'; ctx.fillRect(0, 0, W, HUD_H - 6);
+  ctx.fillStyle = '#ffffff'; ctx.textBaseline = 'middle';
+  fitText(String(score), 12, 20, W * 0.32, 20, 'bold', 'left');
+  ctx.fillStyle = '#d8f3c0';
+  fitText(`${L.stage} ${stage}`, W / 2, 20, W * 0.3, 15, 'bold', 'center');
+  const n = Math.max(lives, 3);
+  for (let i = 0; i < n; i++) drawYarn(W - 16 - i * 20, 20, 7, i < lives);
+  // progress bar
+  const bx = 12, bw = W - 24, by = 38, bh = 12;
+  ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.fillRect(bx, by, bw, bh);
+  ctx.fillStyle = pct >= TARGET ? '#ffd166' : '#f4dc95'; ctx.fillRect(bx, by, bw * pct / 100, bh);
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(bx + bw * TARGET / 100 - 1, by - 3, 2, bh + 6);
+  ctx.fillStyle = '#1e3a1c';
+  ctx.font = `bold 11px ${FONT}`;
+  ctx.font = `bold 12px ${FONT}`; ctx.textAlign = 'left';
+  ctx.fillText(`${Math.floor(pct)}% / ${TARGET}%`, bx + 4, by + bh / 2 + 0.5);
+  ctx.textBaseline = 'alphabetic';
+}
+function overlay(alpha) { ctx.fillStyle = `rgba(15,35,15,${alpha})`; ctx.fillRect(0, 0, W, H); }
+
+function render() {
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.fillStyle = '#2f5a2c'; ctx.fillRect(0, 0, W, H);
+  ctx.save();
+  if (shake > 0) ctx.translate((Math.random() - 0.5) * 8 * shake, (Math.random() - 0.5) * 8 * shake);
+  // field
+  ctx.imageSmoothingEnabled = true;
+  ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(fx - 3, fy - 3, GW * cell + 6, GH * cell + 6);
+  ctx.drawImage(fcv, fx, fy, GW * cell, GH * cell);
+  for (const f of fences) drawFence(f);
+  if (state === 'play' && !rope) {
+    ctx.strokeStyle = `rgba(255,240,170,${0.35 + 0.3 * Math.sin(now * 5)})`; ctx.lineWidth = Math.max(3, cell * 1.6);
+    ctx.strokeRect(fx + cell, fy + cell, (GW - 2) * cell, (GH - 2) * cell);
+  }
+  // sheep sorted by y
+  const order = sheep.slice().sort((a, b) => a.y - b.y);
+  for (const s of order) drawSheep(s);
+  drawRope();
+  // particles
+  for (const p of particles) {
+    ctx.globalAlpha = Math.max(0, p.life / p.max);
+    ctx.fillStyle = p.c; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.283); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  // floats
+  ctx.textBaseline = 'middle';
+  for (const f of floats) {
+    if (f.t < 0) continue;
+    const a = Math.max(0, Math.min(1, (1.8 - f.t) / 0.6));
+    ctx.globalAlpha = a;
+    ctx.lineWidth = 6; ctx.lineJoin = 'round'; ctx.strokeStyle = '#24401f';
+    const sz = f.big ? 22 : 18;
+    ctx.font = `900 ${sz}px ${FONT}`; ctx.textAlign = 'center';
+    const x = Math.max(80, Math.min(W - 80, f.x)), y = f.y - Math.min(f.t, 1) * 30;
+    ctx.strokeText(f.text, x, y); ctx.fillStyle = f.c; ctx.fillText(f.text, x, y);
+  }
+  ctx.globalAlpha = 1; ctx.textBaseline = 'alphabetic';
+  ctx.restore();
+
+  if (state !== 'title') drawHUD();
+
+  if (state === 'play' || state === 'clearing' || state === 'dying') {
+    let line = null;
+    if (msg) line = msg.text;
+    else if (hintT > 0) line = stage === 3 ? L.black : stage === 2 ? L.penHint : L.hint;
+    if (line) {
+      const a = msg ? Math.min(1, msg.t * 2) : Math.min(1, hintT);
+      ctx.globalAlpha = a;
+      ctx.fillStyle = 'rgba(15,35,15,0.75)'; ctx.fillRect(0, H - BOT + 2, W, BOT - 2);
+      ctx.fillStyle = '#ffffff'; ctx.textBaseline = 'middle';
+      fitText(line, W / 2, H - BOT / 2 + 1, W - 20, 14, 'bold');
+      ctx.globalAlpha = 1; ctx.textBaseline = 'alphabetic';
+    }
+  }
+
+  if (state === 'title') {
+    overlay(0.45);
+    ctx.fillStyle = '#ffffff'; ctx.textBaseline = 'middle';
+    fitText(L.title, W / 2, H * 0.3, W - 32, 38, '900');
+    ctx.fillStyle = '#f4dc95';
+    fitText(L.how1, W / 2, H * 0.42, W - 32, 15, 'bold');
+    fitText(L.how2, W / 2, H * 0.42 + 26, W - 32, 15, 'bold');
+    fitText(L.how3, W / 2, H * 0.42 + 52, W - 32, 15, 'bold');
+    ctx.globalAlpha = 0.6 + 0.4 * Math.sin(now * 4);
+    ctx.fillStyle = '#ffffff';
+    fitText(L.start, W / 2, H * 0.7, W - 32, 20, 'bold');
+    ctx.globalAlpha = 1;
+    if (best > 0) { ctx.fillStyle = '#d8f3c0'; fitText(`${L.best} ${best}`, W / 2, H * 0.7 + 36, W - 32, 15, 'bold'); }
+    ctx.textBaseline = 'alphabetic';
+  } else if (state === 'clear') {
+    overlay(0.5);
+    ctx.fillStyle = '#ffd166'; ctx.textBaseline = 'middle';
+    fitText(L.clear, W / 2, H * 0.36, W - 32, 34, '900');
+    ctx.fillStyle = '#ffffff';
+    fitText(`${Math.floor(pct)}%`, W / 2, H * 0.36 + 48, W - 32, 26, 'bold');
+    fitText(`${score} ${L.score}`, W / 2, H * 0.36 + 84, W - 32, 18, 'bold');
+    if (clearBonusText) { ctx.fillStyle = '#d8f3c0'; fitText(clearBonusText, W / 2, H * 0.36 + 114, W - 32, 15, 'bold'); }
+    if (stateT > 0.7) { ctx.globalAlpha = 0.6 + 0.4 * Math.sin(now * 4); ctx.fillStyle = '#ffffff'; fitText(L.next, W / 2, H * 0.72, W - 32, 18, 'bold'); ctx.globalAlpha = 1; }
+    ctx.textBaseline = 'alphabetic';
+  } else if (state === 'over') {
+    overlay(0.55);
+    ctx.fillStyle = '#ffffff'; ctx.textBaseline = 'middle';
+    fitText(L.over, W / 2, H * 0.28, W - 32, 30, '900');
+    fitText(`${score}`, W / 2, H * 0.4, W - 32, 46, '900');
+    ctx.fillStyle = newBestFlag ? '#ffd166' : '#d8f3c0';
+    fitText(newBestFlag ? L.newBest : `${L.best} ${best}`, W / 2, H * 0.4 + 44, W - 32, 18, 'bold');
+    ctx.fillStyle = '#d8f3c0';
+    fitText(`${L.reached} ${stage}`, W / 2, H * 0.4 + 74, W - 32, 16, 'bold');
+    if (stateT > 0.7) { ctx.globalAlpha = 0.6 + 0.4 * Math.sin(now * 4); ctx.fillStyle = '#ffffff'; fitText(L.again, W / 2, H * 0.7, W - 32, 18, 'bold'); ctx.globalAlpha = 1; }
+    ctx.textBaseline = 'alphabetic';
+  }
+}
+
+let clearBonusText = '';
+function update(dt) {
+  now += dt; stateT += dt;
+  if (shake > 0) shake = Math.max(0, shake - dt);
+  if (hintT > 0) hintT -= dt;
+  if (msg) { msg.t -= dt; if (msg.t <= 0) msg = null; }
+  // paint pending claimed cells
+  let n = 0;
+  while (pending.length && pending[0].t <= now && n < 1500) {
+    const c = pending.shift(); const x = c.i % GW, y = (c.i / GW) | 0;
+    paintCell(x, y); n++;
+    if (Math.random() < 0.03) { const p = gridToPx(x + 0.5, y + 0.5); particles.push({ x: p.x, y: p.y, vx: (Math.random() - 0.5) * 40, vy: -30 - Math.random() * 40, life: 0.6, max: 0.6, c: FLOW[(Math.random() * FLOW.length) | 0], r: 2 }); }
+  }
+  if (state === 'play' && rope) { stepTip(dt); }
+  updateSheep(dt, state === 'title');
+  if (state === 'play') checkSnap();
+  if (retracting) { retracting.t += dt; if (retracting.t > 0.35) retracting = null; }
+  for (const b of broken) b.t += dt;
+  broken = broken.filter((b) => b.t < 0.8);
+  for (const p of particles) { p.life -= dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 120 * dt; }
+  particles = particles.filter((p) => p.life > 0);
+  for (const f of floats) f.t += dt;
+  floats = floats.filter((f) => f.t < 1.8);
+
+  if (state === 'clearing' && stateT > 1.1 && pending.length === 0) {
+    const over = Math.max(0, Math.floor(pct) - TARGET);
+    const bonus = over * 20 * stage;
+    score += bonus;
+    clearBonusText = bonus ? `+${bonus}` : '';
+    if (lives < 5) { lives++; clearBonusText += (clearBonusText ? '  ' : '') + L.life; }
+    state = 'clear'; stateT = 0;
+    fanfare();
+    signal('end', { score });
+  }
+  if (state === 'dying' && stateT > 1.0) {
+    state = 'over'; stateT = 0;
+    if (score > best) { best = score; newBestFlag = true; saveBest(); } else newBestFlag = false;
+    signal('end', { score });
+    tone(330, 0.4, 'triangle', 0.08); tone(262, 0.6, 'triangle', 0.08, 0.3);
+  }
+}
+
+let lastT = 0;
+function frame(t) {
+  const dt = Math.min(0.05, Math.max(0, (t - lastT) / 1000 || 0));
+  lastT = t;
+  try { update(dt); render(); } catch (e) { console.error(e); }
+  requestAnimationFrame(frame);
+}
+resize();
+newStage();
+requestAnimationFrame((t) => { lastT = t; frame(t); });
+</script>
+</body>
+</html>
