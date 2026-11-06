@@ -1,0 +1,520 @@
+{
+  "id": "2026-11-06-gpt-2",
+  "status": "published",
+  "title": "片盾の宝さがし",
+  "genre": "ローグライク",
+  "concept": "二つの部屋から進路を選び、宝と引き換えに体力や盾を消耗する。盾は後の強敵へ残せるが、今の傷は増える。焚き火と鍛冶に宝を使うか、引き返して確保するかを毎階決める小さな探索。",
+  "howToPlay": "部屋をタップして進みます。盾の使用を切り替え、焚き火や鍛冶で備えながら、倒れる前に宝を持ち帰りましょう。",
+  "libraryDecision": "共有棚を検討したが使わない。二つの選択肢と消耗の比較を主役にするため、2Dの大きな札と数値を使う。3Dの通路よりも判断材料を同時に見せることを優先した。",
+  "soundDecision": "無傷の通過、被弾、休息を音程の違う短い音で区別。考える時間を急がせないためBGMは付けない。",
+  "improvements": [
+    {
+      "found": "札を選んだ後の体力・盾の消耗を暗算する必要がある。焚き火は満タンでも固定回復量を表示。直前の盾消耗がログに残らない。",
+      "changed": "各札に盾設定に応じた消耗予告を付け、焚き火は実際の回復量を表示。戦闘結果ログに体力・盾・宝の増減をまとめた。",
+      "foundEn": "Room costs require mental arithmetic; camp shows fixed recovery even at full health; shield consumption is missing from the log.",
+      "changedEn": "Added per-room damage and shield previews, actual camp recovery, and a resource-change log."
+    },
+    {
+      "found": "倒れると全ての宝を失うことが開始時に不明。致命的な札も通常と同じ見た目。結果に到達階が残らない。",
+      "changed": "開始説明に全損ルールを明記。盾設定で致命的になる札は赤枠と警告文を表示し、結果に到達階を追加。",
+      "foundEn": "The all-loot loss rule is unclear before play; fatal rooms look ordinary; results omit reached depth.",
+      "changedEn": "Clarified the loss rule, highlighted fatal rooms under the current shield setting, and added reached depth to results."
+    },
+    {
+      "found": "最終階が焚き火と鍛冶だけになり、踏破のために宝を減らすしかない。途中帰還が常に得になり、最後の危険と報酬が消えていた。",
+      "changed": "最終階は施設の置換をせず、番人の二択にした。最後も宝を増やすために危険を引き受けるか、帰還するかを選ぶ。",
+      "foundEn": "The last floor contained only costly services, making extraction strictly better than clearing it and removing the final risk/reward choice.",
+      "changedEn": "Kept enemy rooms on the final floor so clearing it earns loot at a risk, while extraction remains available."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "ローグライク",
+      "en": "Roguelike",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "二択の部屋を下り、盾を使うか温存するか、宝を持ち帰るか選ぶローグライク。2Dの大きな札で消耗を読み、3Dの通路より判断を明快にする。",
+        "ideaEn": "A two-room roguelike about spending or saving a shield and cashing out. Large flat cards keep resource decisions clearer than 3D corridors.",
+        "fromDraw": true
+      },
+      {
+        "idea": "陶器のろくろを指で押して形を作る終わりのない工房。3Dで側面と輪郭の変化を直接見る。",
+        "ideaEn": "An open-ended 3D pottery wheel where finger pressure reshapes the rotating silhouette.",
+        "fromDraw": false
+      },
+      {
+        "idea": "氷の橋に一度ずつ足跡を付けて渡る経路パズル。2D俯瞰で割れる順番を見せる。",
+        "ideaEn": "A top-down ice-bridge route puzzle about crossing each fragile tile once.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "other",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "One Shield Delve",
+      "concept": "Choose between two rooms while managing health, sword, shield, and treasure. Spend loot on campfires and upgrades, save a shield for later, or leave before losing everything.",
+      "howToPlay": "Tap a room to advance. Toggle shield use, spend loot on supplies, and take your treasure home before falling.",
+      "libraryDecision": "No shelf library. Large 2D cards keep simultaneous resource comparisons clear; 3D corridors would distract from those choices.",
+      "soundDecision": "Short tones distinguish safe passage, damage, and recovery. No background music, allowing unhurried decisions."
+    }
+  },
+  "createdAt": "2026-11-06T12:18:49+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-06T12:18:49+09:00",
+    "metricsFrom": "2026-11-06T03:17:09.656Z",
+    "transcript": null,
+    "validationRuns": 4,
+    "finishedAt": "2026-11-06T12:28:27+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-06T12:25:35+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "8.4KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 8641,
+    "lines": 84
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "部屋は番人・回復・鍛冶の三種だけで、慣れると選択が定型化する。",
+    "comment": "地下10で高報酬を欲張る代わりに盾を残すと、最終階を体力2・宝38で踏破できた。全損と回収の駆け引きは短時間でも成立するが、装備の変化は少ない。画像で三回改良し、敗北・踏破・途中帰還・最高記録保持を確認。",
+    "similar": [
+      {
+        "title": "Dungeon Cards",
+        "url": "https://717pixels.com/DungeonCards/about.html",
+        "similarity": "中",
+        "note": "札の敵・装備・宝を数値で処理するターン制探索が近い。先方は3×3の位置関係、本作は二択と盾の温存、途中回収が中心。",
+        "note_en": "Both use numeric card encounters, equipment and treasure in turn-based delves. That game emphasizes a 3×3 grid; this emphasizes two rooms, shield spending and extraction."
+      }
+    ],
+    "research": "Dungeon Cards roguelike card puzzle official 717 pixelsで1回検索し、公式開発サイトの説明を比較。",
+    "i18n": {
+      "en": {
+        "worst": "Only three room types; decisions become routine with familiarity.",
+        "comment": "Saving defense at depth 10 instead of taking the richer route enabled clearing the last floor with health 2 and loot 38. The short risk/cash-out loop works, though equipment variety is limited. Three image-based improvement cycles checked defeat, clearing, extraction, and best-score retention.",
+        "research": "One web search for Dungeon Cards roguelike card puzzle official 717 pixels; compared the developer's official description."
+      }
+    },
+    "method": "スマホ縦画面で 11 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 11 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.60) 120ms",
+        "note": "最終階の修正版を開始。最初は同じ力4と5の札。",
+        "noteEn": "Starting the final-floor revision; initial rooms still show power 4 and 5.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.73,0.51) 120ms → tap(0.27,0.51) 120ms",
+        "note": "前回確認した右・左の道を進み、宝9で焚き火へ。",
+        "noteEn": "Repeated the verified right–left route, reaching camp with 9 loot.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.27,0.51) 120ms → tap(0.73,0.51) 120ms",
+        "note": "休息して剣3に強化。宝は3、体力と盾は満タン。",
+        "noteEn": "Rested and forged sword 3, retaining full health and shield.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.73,0.51) 120ms → tap(0.27,0.51) 120ms",
+        "note": "盾を使い切ってから補充し、地下7で宝9。",
+        "noteEn": "Spent then replenished shield, reaching depth 7 with 9 loot.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.73,0.51) 120ms → tap(0.73,0.51) 120ms",
+        "note": "前回同様に剣4へ。致命的な右と回復の左が分かれて見える。",
+        "noteEn": "Upgraded to sword 4 again; the fatal right room is clearly distinct from camp.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.27,0.51) 120ms → tap(0.27,0.51) 120ms",
+        "note": "今回は地下10で欲張らず左へ。体力8と盾2が残り、最後までの備えになった。",
+        "noteEn": "This time took the safer left room at depth 10, retaining health 8 and shield 2.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.27,0.51) 120ms",
+        "note": "左を抜けて宝29、体力6。最終階は番人二択になり、右の力11は致命的だが左なら踏破できる。",
+        "noteEn": "Reached the final enemy pair with 29 loot and health 6; power 11 is fatal but the left room is survivable.",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.27,0.51) 120ms",
+        "note": "前画面の右の力は11でなく10。左へ進み体力2で地下12階を踏破、宝38を持ち帰れた。",
+        "noteEn": "Correction: the right power was 10, not 11. The left room clears depth 12 with health 2 and 38 loot.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 38
+            }
+          },
+          {
+            "agf": "end",
+            "score": 38
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.50,0.60) 120ms",
+        "note": "再開後、最高38が残り、体力と装備は初期値へ戻った。",
+        "noteEn": "Restart retains best 38 while resetting health and equipment.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 38
+            }
+          },
+          {
+            "agf": "end",
+            "score": 38
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.73,0.51) 120ms",
+        "note": "二回目は右で宝5。初回と札の力が変わり、再プレイの差がある。",
+        "noteEn": "The second run earns 5 loot on a different initial pair.",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 38
+            }
+          },
+          {
+            "agf": "end",
+            "score": 38
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.73,0.87) 120ms",
+        "note": "地下2で途中帰還し宝5を確保。最高38は上書きされず、早めの帰還も動いた。",
+        "noteEn": "Extracted at depth 2 with 5 loot; best 38 remains intact.",
+        "image": "ai-play/step-11.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 38
+            }
+          },
+          {
+            "agf": "end",
+            "score": 38
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 38
+            }
+          },
+          {
+            "agf": "end",
+            "score": 5
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-06T12:28:27+09:00"
+  },
+  "publishedAt": "2026-11-06T12:28:27+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 1131,
+    "outputTokens": 8330,
+    "contextTokens": 5097467,
+    "turns": 45,
+    "toolCalls": 45,
+    "webSearches": null,
+    "minutes": 11.3,
+    "from": "2026-11-06T03:17:09.656Z",
+    "to": "2026-11-06T03:28:30.120Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-06T12:28:30+09:00",
+    "validationRuns": 4,
+    "codeKB": 8.4,
+    "evidence": "metrics-evidence.json"
+  }
+}

@@ -1,0 +1,487 @@
+{
+  "id": "2026-11-06-gpt-1",
+  "status": "published",
+  "title": "星飾りのつりあい",
+  "genre": "物理おもちゃ",
+  "concept": "重さの違う星を天秤に掛け替え、夜空の飾りを水平にする。重い星を遠くへ置くほど棒が傾くので、重さだけでなく支点からの距離を読む。左右対称ではない三つ目の飾りで、釣り合いの別の形を探す。",
+  "howToPlay": "星をタップして選び、別の星をタップして掛け替えます。棒が水平になったら「飾る」で次の飾りへ。",
+  "libraryDecision": "共有棚を検討したが使わない。支点と重さの距離を読む遊びには2D正面図が合い、棒の減衰振動は短いばね運動で表せる。3Dの奥行きは距離の比較を妨げる。",
+  "soundDecision": "掛け替えは短い木琴風の音、水平になった時は高い音で知らせる。静かな夜空に集中できるようBGMは入れない。",
+  "improvements": [
+    {
+      "found": "支点からの距離が数えづらい。左右の力を比較できない。傾いていても完成ボタンが同じに見える。",
+      "changed": "掛け位置に距離の数字を付け、左右のモーメントを表示。完成ボタンは水平時に緑で点灯する。",
+      "foundEn": "Lever distances are hard to count; side moments cannot be compared; the finish button looks equally available while tilted.",
+      "changedEn": "Added distance labels, side moments, and a green finish button only when balanced."
+    },
+    {
+      "found": "二問目も一手で解けて変化が乏しい。選択後の案内がない。失敗した交換を戻せず試しにくい。",
+      "changed": "二問目を一手では解けない配置に変更。交換相手を選ぶ案内と一手戻すボタンを追加。",
+      "foundEn": "The second stage is also solved in one swap; selection lacks guidance; experiments cannot be undone.",
+      "changedEn": "Changed the second layout to require multiple swaps, and added selection guidance plus undo."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "物理おもちゃ",
+      "en": "Physics toy",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "重さと支点までの距離で星の天秤を水平にする物理おもちゃ。2D正面の揺れで力を見せ、3Dの遠近は使わない。",
+        "ideaEn": "A physics toy balancing weighted stars. A front view makes lever distances readable; depth would obscure them.",
+        "fromDraw": true
+      },
+      {
+        "idea": "窓を開閉して風鈴の旋律を作る音の遊び場。3Dの室内で風の通り道を空間として聴く。",
+        "ideaEn": "Open windows in a 3D room to conduct wind chimes; hear the paths of air.",
+        "fromDraw": false
+      },
+      {
+        "idea": "列車の行き先を次々変更して同じ色の駅へ送る分岐パズル。2Dの線路を俯瞰し先の衝突を読む。",
+        "ideaEn": "Redirect trains toward matching stations on a flat overhead network, anticipating collisions.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Star Mobile",
+      "concept": "Swap weighted stars on a beam and read both mass and lever distance. Three mobiles include an asymmetric final arrangement.",
+      "howToPlay": "Tap a star, then a partner to swap. When the beam is level, tap Hang it up.",
+      "libraryDecision": "No shelf library. A front-facing 2D view makes lever distances clear; a small damped spring models the beam movement. Perspective would impede comparison.",
+      "soundDecision": "Soft chime-like swap tones and a higher balance tone provide feedback; no background music to preserve the quiet sky."
+    }
+  },
+  "createdAt": "2026-11-06T12:08:01+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-06T12:08:01+09:00",
+    "metricsFrom": "2026-11-06T03:06:59.137Z",
+    "transcript": null,
+    "validationRuns": 4,
+    "finishedAt": "2026-11-06T12:17:00+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-06T12:14:01+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "8.2KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=32",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=85",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=25",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=77",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 8424,
+    "lines": 88
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 2,
+    "works": "ok",
+    "worst": "固定三問だけで、解を覚えると繰り返す動機が弱い。",
+    "comment": "距離と重さを見比べ、最後に17対17で非対称の飾りを水平にできた。ただし全体が短く、算数の小問を越える驚きは少ない。画像を見て二回改良し、全問と再開を確認した。",
+    "similar": [
+      {
+        "title": "Mobile Balance Studio",
+        "url": "https://bunbunpark.com/en/games/mobile-balance/",
+        "similarity": "高",
+        "note": "重さ×距離で飾りを水平にする核と星のモチーフが近い。先方は支点を移す多段構造、本作は固定支点の一段で星を交換する。",
+        "note_en": "Same weight-times-distance balancing core and star motif. That game moves pivots in nested mobiles; this swaps stars on a single fixed-pivot beam."
+      }
+    ],
+    "research": "balance weights distance lever puzzle game mobiles Balanxで1回検索し、開発サイトの説明で比較した。",
+    "i18n": {
+      "en": {
+        "worst": "Only three fixed puzzles; replay motivation fades after learning the solutions.",
+        "comment": "The final asymmetric mobile reaches 17–17 through weight and distance. However, the experience is brief and offers little beyond a small arithmetic exercise. Two image-based improvement cycles, all stages, and restart were checked.",
+        "research": "One web search for balance weights distance lever puzzle game mobiles Balanx, comparing the developer site's description."
+      }
+    },
+    "method": "スマホ縦画面で 11 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 11 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.60) 120ms",
+        "note": "最終版を最初から遊ぶ。戻すボタンも見える。",
+        "noteEn": "Starting the final version; the undo button is visible.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.27,0.54) 120ms → tap(0.38,0.54) 120ms",
+        "note": "内側へ2を寄せて水平。入門として短く終えられる。",
+        "noteEn": "Bringing the 2 inward balances the introductory mobile.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.50,0.85) 120ms → tap(0.50,0.60) 120ms",
+        "note": "二問目は力9対16。どの交換で差を減らすか考える。",
+        "noteEn": "The second mobile starts at 9–16; choose swaps to reduce the difference.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.14,0.51) 120ms → tap(0.62,0.55) 120ms",
+        "note": "先ほどの左の力は9ではなく7。外側の1と右内側の3を交換し13対14へ近づいた。",
+        "noteEn": "Correction: the previous left moment was 7. Swapping outer 1 with inner-right 3 narrows it to 13–14.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.50,0.75) 120ms",
+        "note": "一手戻すと元の配置と掛け替え0に戻った。",
+        "noteEn": "Undo restores the original arrangement and swap count.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.14,0.51) 120ms → tap(0.62,0.55) 120ms → tap(0.27,0.54) 120ms → tap(0.38,0.54) 120ms",
+        "note": "元の交換に続けて左の1と2を替え、14対14になった。力の差を段階的に消す読みができる。",
+        "noteEn": "Repeating the swap and switching the left 1 and 2 reaches 14–14; the moment difference guides the sequence.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.50,0.85) 120ms → tap(0.50,0.60) 120ms",
+        "note": "最後の飾りは左右で重さの種類が違う。5の置き場所が鍵になる。",
+        "noteEn": "The final mobile has different weights on each side; positioning the 5 matters.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.14,0.57) 120ms → tap(0.73,0.51) 120ms",
+        "note": "5を右の距離2に掛け替えると16対17。左右対称にしなくてもよいと分かる。",
+        "noteEn": "Moving the 5 to right distance 2 produces 16–17, without symmetry.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.27,0.54) 120ms → tap(0.38,0.54) 120ms",
+        "note": "左の2と3を交換し17対17。重さ5を支える側を距離で補える場面が良い。",
+        "noteEn": "Swapping the left 2 and 3 reaches 17–17. Lever distance offsets the heavy 5.",
+        "image": "ai-play/step-09.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.50,0.85) 120ms",
+        "note": "三つの飾りを完了。問題は短く、解を覚えると再プレイの動機は弱い。",
+        "noteEn": "All three mobiles are complete. Fixed short puzzles have limited replay value.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 2
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.50,0.60) 120ms",
+        "note": "最初の飾りへ戻り、掛け替え数も0。再開が動くことを確認。",
+        "noteEn": "Restart returns to the first mobile with zero swaps.",
+        "image": "ai-play/step-11.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-06T12:17:00+09:00"
+  },
+  "publishedAt": "2026-11-06T12:17:00+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 1199,
+    "outputTokens": 8172,
+    "contextTokens": 2759604,
+    "turns": 34,
+    "toolCalls": 34,
+    "webSearches": null,
+    "minutes": 10.1,
+    "from": "2026-11-06T03:06:59.137Z",
+    "to": "2026-11-06T03:17:03.183Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-06T12:17:03+09:00",
+    "validationRuns": 4,
+    "codeKB": 8.2,
+    "evidence": "metrics-evidence.json"
+  }
+}
