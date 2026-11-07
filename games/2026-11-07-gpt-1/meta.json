@@ -1,0 +1,380 @@
+{
+  "id": "2026-11-07-gpt-1",
+  "status": "published",
+  "title": "二色の版合わせ",
+  "genre": "その他",
+  "concept": "朱と藍の小さな版を一枚ずつずらし、紙に残る色と重なりを見本に合わせる。濃い混色がどのマスにできるかを目印に、形全体の位置を推理して三枚の版画を刷り上げる。",
+  "howToPlay": "朱か藍の版を選び、左上を置くマスをタップします。見本の色と一致したら刷り上げます。",
+  "libraryDecision": "格子上の色の差を読み取るため、奥行きのない平面とDOMを使う。共有ライブラリは使わない。",
+  "soundDecision": "色の差に集中する静かな刷り物として無音にした。",
+  "improvements": [
+    {
+      "found": "版の基準位置が見えない。置けないマスを事前に判断しづらい。完成ボタンが一致時に変化しない。",
+      "changed": "基準位置に角印と枠、置けないマスに小さな×、一致時のボタンに緑を付けた。",
+      "foundEn": "The anchor, illegal squares, and readiness were unclear.",
+      "changedEn": "Marked the anchor and illegal squares and turned the finish button green on a match."
+    },
+    {
+      "found": "一致済みの点が残って進捗が見えにくい。混色と単色の点を見分けにくい。結果画面で図柄が隠れる。",
+      "changed": "一致した印は消し、不一致は色と形を併記。結果画面に完成図を表示。",
+      "foundEn": "Guide dots obscure progress, mixed ink is hard to distinguish, and the result hides the print.",
+      "changedEn": "Hide matched marks, use distinct guide shapes, and show a proof in the result."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "その他",
+      "en": "Other",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "二色の版を格子で重ね、混色の位置を合わせる。平面でズレを読み取る。",
+        "ideaEn": "Align two flat printing plates and read the overlap colors.",
+        "fromDraw": true
+      },
+      {
+        "idea": "地下鉄の音だけで出口を当てる、立体音響の推理。",
+        "ideaEn": "Use spatial audio to deduce a subway exit.",
+        "fromDraw": false
+      },
+      {
+        "idea": "紙の船を見えない流れに乗せる、俯瞰の漂流遊び。",
+        "ideaEn": "Guide a paper boat on hidden currents in an overhead view.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Two Ink Press",
+      "concept": "Slide coral and indigo plates on a grid and reason about where their inks overlap to finish three prints.",
+      "howToPlay": "Choose an ink plate and tap its top-left square. Pull the print when the colors match.",
+      "libraryDecision": "A flat DOM grid makes ink offsets easy to see. No shared library.",
+      "soundDecision": "Silent printing keeps attention on subtle color differences."
+    }
+  },
+  "createdAt": "2026-11-07T12:08:52+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-07T12:08:52+09:00",
+    "metricsFrom": "2026-11-07T03:07:13.703Z",
+    "transcript": null,
+    "validationRuns": 3,
+    "finishedAt": "2026-11-07T12:14:47+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-07T12:12:48+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "6.8KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 6962,
+    "lines": 95
+  },
+  "sound": {
+    "uses": false
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 2,
+    "works": "ok",
+    "worst": "三枚とも配置が各二手で済み、繰り返し遊ぶ理由が少ない。",
+    "comment": "朱と藍が合うと印が消え、完成図が見える。画像を見て二回改良し、全三問の完成を確認した。",
+    "similar": [
+      {
+        "title": "Canvas",
+        "url": "https://www.asmodee.co.uk/products/canvas01-canvas",
+        "similarity": "中",
+        "note": "絵を層で組み立てる点が近い。先方は透明カードと得点条件、本作は二版の位置と混色見本の一致。",
+        "note_en": "Both compose artwork in layers; Canvas scores transparent cards, while this matches ink positions to a guide."
+      }
+    ],
+    "research": "透明カードの重ね合わせで検索し、販売元の作品説明を比較。",
+    "i18n": {
+      "en": {
+        "worst": "Each print takes only two placements, leaving little replay value.",
+        "comment": "Guide marks clear as inks align. Two image-based revisions and all three prints were verified.",
+        "research": "Searched transparent card layering and compared the distributor’s description."
+      }
+    },
+    "method": "スマホ縦画面で 7 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 7 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "見本の色を形でも区別できる。",
+        "noteEn": "Guide colors also have distinct shapes.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.33,0.33) 120ms → tap(0.65,0.75) 120ms → tap(0.67,0.33) 120ms",
+        "note": "二色を置き、印が消えた。",
+        "noteEn": "Placed both inks and all marks cleared.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.50,0.86) 120ms",
+        "note": "結果に完成図が残る。",
+        "noteEn": "The result shows the finished proof.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.50,0.50) 120ms → tap(0.50,0.33) 120ms",
+        "note": "二枚目は混色の菱形が二か所。朱を先に合わせた。",
+        "noteEn": "The second print has two mixed diamonds; coral goes first.",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.65,0.75) 120ms → tap(0.67,0.33) 120ms → tap(0.50,0.86) 120ms → tap(0.50,0.50) 120ms",
+        "note": "混色を合わせて三枚目へ。見本から版の輪郭を読む。",
+        "noteEn": "Matched the overlap and moved to the final print.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.17,0.33) 120ms → tap(0.65,0.75) 120ms → tap(0.33,0.33) 120ms",
+        "note": "三枚目は隣接した基準位置で、菱形が重なった。",
+        "noteEn": "Neighboring anchors align the final mixed square.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.50,0.86) 120ms",
+        "note": "三枚の完成を確認。配置が各二手で済むので短い。",
+        "noteEn": "All three prints finish, though each takes only two placements.",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-07T12:14:47+09:00"
+  },
+  "publishedAt": "2026-11-07T12:14:47+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 364,
+    "outputTokens": 5417,
+    "contextTokens": 4749099,
+    "turns": 28,
+    "toolCalls": 28,
+    "webSearches": null,
+    "minutes": 7.6,
+    "from": "2026-11-07T03:07:13.703Z",
+    "to": "2026-11-07T03:14:51.048Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-07T12:14:51+09:00",
+    "validationRuns": 3,
+    "codeKB": 6.8,
+    "evidence": "metrics-evidence.json"
+  }
+}

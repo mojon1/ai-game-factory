@@ -1,0 +1,222 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-11-07T03:20:54.361Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.5
+          ],
+          "wait": 100
+        }
+      ],
+      "desc": "tap(0.50,0.50) 120ms",
+      "note": "残りの下りを三つ確認し、序盤から脚を配分する。",
+      "noteEn": "Three descents are visible in the route forecast.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.8
+          ],
+          "wait": 100
+        },
+        {
+          "tap": [
+            0.19,
+            0.8
+          ],
+          "wait": 100
+        }
+      ],
+      "desc": "tap(0.50,0.80) 120ms → tap(0.19,0.80) 120ms",
+      "note": "平地を中間、上りを軽くして脚4で下りへ。",
+      "noteEn": "Middle on flat and low uphill leave four energy for the descent.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "tap": [
+            0.81,
+            0.8
+          ],
+          "wait": 100
+        }
+      ],
+      "desc": "tap(0.81,0.80) 120ms",
+      "note": "下りで踏み込み、差がプラス3になった。",
+      "noteEn": "High gear on the descent opens a three-point lead.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "tap": [
+            0.19,
+            0.8
+          ],
+          "wait": 100
+        },
+        {
+          "tap": [
+            0.19,
+            0.8
+          ],
+          "wait": 100
+        }
+      ],
+      "desc": "tap(0.19,0.80) 120ms → tap(0.19,0.80) 120ms",
+      "note": "一度差が縮むが、二手の温存で次の下りに脚3を残せた。",
+      "noteEn": "The lead shrinks, but two recovery gears leave enough for the next descent.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": [
+        {
+          "tap": [
+            0.81,
+            0.8
+          ],
+          "wait": 100
+        },
+        {
+          "tap": [
+            0.19,
+            0.8
+          ],
+          "wait": 100
+        }
+      ],
+      "desc": "tap(0.81,0.80) 120ms → tap(0.19,0.80) 120ms",
+      "note": "最後の下りで使える最速は中間。相手との差は3。",
+      "noteEn": "Middle is the fastest available for the final descent, with a lead of three.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.8
+          ],
+          "wait": 100
+        }
+      ],
+      "desc": "tap(0.50,0.80) 120ms",
+      "note": "最後に1差で先着。平地で脚を使い切らない効果が出た。",
+      "noteEn": "Won by one after saving energy for the descents.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 35
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.5
+          ],
+          "wait": 100
+        }
+      ],
+      "desc": "tap(0.50,0.50) 120ms",
+      "note": "再開で初期値に戻る。固定コースなので最適手を覚えた後の変化は小さい。",
+      "noteEn": "Restart resets the race. The fixed course limits replay after learning a route.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 35
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": [
+        {
+          "wait": 800
+        },
+        {
+          "tap": [
+            0.5,
+            0.5
+          ]
+        }
+      ],
+      "desc": "wait 800ms → tap(0.50,0.50) 120ms",
+      "note": "誤タップ防止の時間を過ぎると再開でき、距離と脚が初期値に戻る。",
+      "noteEn": "After the tap guard, restart resets distance and energy.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 35
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}

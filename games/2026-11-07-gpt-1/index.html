@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Two Ink Press</title>
+<style>
+*{box-sizing:border-box;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;overflow:hidden;overscroll-behavior:none;font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;background:#efe4cd;color:#292742}
+main{width:100vw;height:100dvh;padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:8px}
+header{width:100%;display:flex;justify-content:space-between;font-weight:bold;font-size:16px}
+#board{width:min(86vw,52dvh,380px);aspect-ratio:1;display:grid;grid-template:repeat(5,minmax(0,1fr))/repeat(5,minmax(0,1fr));gap:2px;background:#5b4867;padding:5px;border-radius:10px;box-shadow:0 6px #9e7c78}
+button{font:inherit;color:inherit;min-height:44px;border:0;border-radius:9px;background:#fff6df;padding:6px 14px}
+.cell{position:relative;border-radius:2px;min-height:0;padding:0;font-size:19px}.cell.anchor{outline:2px solid #292742;outline-offset:-3px}.cell.anchor::after{content:'⌜';position:absolute;top:2px;left:5px;color:#292742;font-weight:bold}.cell.blocked::before{content:'×';position:absolute;bottom:2px;right:5px;color:#5a4c64;font-size:13px}
+#controls{display:flex;gap:10px}#controls button{min-width:100px;border:2px solid transparent}
+#status,#hint{font-size:15px;text-align:center;min-height:22px}
+#seal{background:#292742;color:#fff6df;min-width:145px}
+#cover{position:absolute;inset:0;background:#292742f5;color:#fff6df;display:grid;place-items:center;text-align:center;padding:24px}
+ .proof{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;width:110px;margin:0 auto 18px;padding:4px;background:#fff6df;border-radius:4px}.proof i{aspect-ratio:1;border-radius:1px}h1{font-size:clamp(24px,8vw,35px)}p{line-height:1.7}small{font-size:16px;color:#ffd183}
+</style>
+<main><header><span id="page"></span><span id="moves"></span></header><div id="status"></div><div id="board"></div><div id="controls"><button id="a"></button><button id="b"></button></div><button id="seal"></button><div id="hint"></div></main><div id="cover"></div>
+<script>
+const lang=new URLSearchParams(location.search).get('lang')||(/^ja/i.test(navigator.language)?'ja':'en');
+const words={
+ ja:{title:'二色の版合わせ',help:'版を選び、盤のマスをタップして置く。<br>二色を重ね、見本の模様に合わせよう。',start:'タップでスタート',next:'タップで次へ',again:'タップでもう一度',page:'版画',moves:'置き直し',a:'朱の版',b:'藍の版',seal:'刷り上げる',hint:'選んだ版の左上を置くマスをタップ',ready:'見本と一致',seek:'● 朱　■ 藍　◆ 混色',invalid:'版が紙からはみ出します',complete:'三枚、刷り上がり',printed:'刷り上がり'},
+ en:{title:'Two Ink Press',help:'Choose a plate, then tap a square to place it.<br>Layer both inks to match the guide.',start:'Tap to start',next:'Tap to continue',again:'Tap to play again',page:'Print',moves:'Placements',a:'Coral plate',b:'Indigo plate',seal:'Pull print',hint:'Tap the square for the chosen plate’s top left',ready:'Matches guide',seek:'● Coral　■ Indigo　◆ Mixed',invalid:'The plate extends past the paper',complete:'Three prints finished',printed:'Print finished'}
+};
+const t=words[lang]||words.en;
+const byId=id=>document.getElementById(id);
+const palette=['#fff6df','#e2836c','#7775bc','#905981'];
+const guides=['','#a53625','#303181','#54234f'];
+const levels=[
+ {shapes:[[0,1,5],[0,1,6]],goal:[6,8],initial:[0,2]},
+ {shapes:[[0,1,2,6],[0,5,6,10]],goal:[7,8],initial:[1,5]},
+ {shapes:[[0,1,5,10,11],[0,1,2,6,11]],goal:[5,6],initial:[0,2]}
+];
+let mode='title',level=0,selected=0,placements=0,anchors=[],goal=[],guard=0,hintTimer;
+const signal=agf=>parent.postMessage({agf},'*');
+for(const event of ['contextmenu','selectstart','gesturestart'])addEventListener(event,e=>e.preventDefault(),{passive:false});
+function cells(shape,anchor){
+ const x=anchor%5,y=Math.floor(anchor/5);
+ if(shape.some(i=>x+i%5>=5||y+Math.floor(i/5)>=5))return null;
+ return shape.map(i=>anchor+i);
+}
+function inks(positions){
+ const result=Array(25).fill(0);
+ levels[level].shapes.forEach((shape,i)=>cells(shape,positions[i]).forEach(p=>result[p]|=1<<i));
+ return result;
+}
+function cover(title,body,footer){
+ const panel=byId('cover');
+ panel.innerHTML='<div><h1>'+title+'</h1><p>'+body+'</p><small>'+footer+'</small></div>';
+ panel.style.display='grid';
+}
+function begin(){
+ const data=levels[level];
+ anchors=[...data.initial];goal=inks(data.goal);placements=0;selected=0;mode='play';
+ byId('cover').style.display='none';
+ byId('hint').textContent=t.hint;
+ clearTimeout(hintTimer);hintTimer=setTimeout(()=>byId('hint').textContent='',4200);
+ signal('start');draw();
+}
+function matches(ink){return ink.every((v,i)=>v===goal[i])}
+function draw(){
+ const ink=inks(anchors),board=byId('board');
+ byId('page').textContent=t.page+' '+(level+1)+'/3';
+ byId('moves').textContent=t.moves+' '+placements;
+ byId('status').textContent=matches(ink)?t.ready:t.seek;
+ byId('seal').textContent=t.seal;byId('seal').style.background=matches(ink)?'#21664e':'#736779';
+ ['a','b'].forEach((id,i)=>{const b=byId(id);b.textContent=t[id];b.style.background=palette[i+1];b.style.borderColor=selected===i?'#292742':'transparent'});
+ board.replaceChildren();
+ ink.forEach((value,i)=>{
+  const cell=document.createElement('button');
+  cell.className='cell';cell.classList.toggle('anchor',i===anchors[selected]);cell.classList.toggle('blocked',!cells(levels[level].shapes[selected],i));cell.style.background=palette[value];cell.style.color=guides[goal[i]]||'#292742';
+  cell.textContent=value===goal[i]?'':(['·','●','■','◆'][goal[i]]);
+  cell.addEventListener('pointerdown',e=>{e.preventDefault();place(i)});
+  board.append(cell);
+ });
+}
+function place(i){
+ if(mode!=='play')return;
+ if(!cells(levels[level].shapes[selected],i)){byId('status').textContent=t.invalid;return}
+ anchors[selected]=i;placements++;draw();
+}
+byId('cover').addEventListener('pointerdown',e=>{
+ e.preventDefault();
+ if(mode==='title')begin();
+ else if(mode==='end'&&performance.now()>=guard){level=(level+1)%levels.length;begin()}
+});
+['a','b'].forEach((id,i)=>byId(id).addEventListener('pointerdown',e=>{e.preventDefault();if(mode==='play'){selected=i;draw()}}));
+byId('seal').addEventListener('pointerdown',e=>{
+ e.preventDefault();
+ if(mode!=='play'||!matches(inks(anchors)))return;
+ mode='end';guard=performance.now()+700;signal('end');
+ const proof='<div class="proof">'+goal.map(value=>'<i style="background:'+palette[value]+'"></i>').join('')+'</div>';cover(level===2?t.complete:t.printed,proof+t.moves+' '+placements,level===2?t.again:t.next);
+});
+cover(t.title,t.help,t.start);
+</script></html>
