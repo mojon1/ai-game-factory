@@ -1,0 +1,444 @@
+{
+  "id": "2026-11-07-claude-2",
+  "status": "published",
+  "title": "くるり卵焼き",
+  "genre": "料理",
+  "concept": "卵焼きの「傾けて流す・半熟で巻く」手触りが核。なぞると卵焼き器が傾いて卵液が流れ、指を置いている間は火から上がる。まん中は早く焼け、すみは遅い。広げる・火から上げる・巻くの間合いを重ね、最後に切ると焼き方がうずまきの断面に残る。",
+  "howToPlay": "なぞってフライパンを傾け、卵液を隅まで広げる。半熟になったら上のはしから下へなぞって巻く。全部巻いたら包丁でたてに切る。",
+  "libraryDecision": "使わない。卵液の流れは14×20の小さな格子の自作シミュレーションで十分なめらかに動き、真上から見る2Dが「どこまで広がったか・どこが焼けたか」を一番読みやすいため。",
+  "soundDecision": "BGMは付けない。ジュウジュウという焼ける音を、熱い所にある生の卵液の量に合わせて鳴らし、傾けて火から離すと小さくなる。音がそのまま火加減の手がかりになり、台所の雰囲気も出る。",
+  "improvements": [
+    {
+      "found": "卵液が勝手にほぼ全面へ広がり傾ける意味が薄い／「巻きどき」を待って巻くだけで判断がない／卵の輪郭がカクカクで断面の層に継ぎ目が出る",
+      "changed": "卵液を広がりにくくして量も減らし、すみまで届けるには傾ける必要があるようにした。火のまん中を強くし、指を置いて火から上げると熱がならされてまん中だけ焼けすぎるのを防げる仕組みにした。卵を細かく補間して描き、断面を四角いうずまきにして継ぎ目を消した",
+      "foundEn": "The egg spread over almost the whole pan by itself / you just waited for \"Roll now\" with no decisions / blocky egg outlines and seams in the cross-section",
+      "changedEn": "Egg spreads less and there is less of it, so tilting is needed to reach the corners. The flame is hotter in the middle, and lifting the pan evens out the heat so the middle does not overcook. Smooth upsampled egg rendering and a seamless, squarish swirl in the cross-section"
+    },
+    {
+      "found": "まん中がこげても警告が出ず「巻きどき」のまま／巻いた卵にこげ目が見えない／ふちの段々が目立つ",
+      "changed": "こげ・焼きすぎが一定量を超えると「こげそう！」に変わり、火から上げるヒントを出すようにした。巻いた卵とまな板の卵焼きにこげ目を描いた。卵の厚みをならしてから輪郭を描き、ふちを丸くした",
+      "foundEn": "No warning when the middle burned — it still said \"Roll now\" / no brown marks on the roll / stair-step edges",
+      "changedEn": "A \"Burning!\" warning with a hint to lift the pan; brown spots on the roll and the finished log; smoothed thickness before drawing the outline"
+    },
+    {
+      "found": "講評がいつも「うすい所に穴」で実際の失点理由と合わない／講評の文字が読みにくい／巻きどきからこげるまでが約1.5秒しかなく忙しすぎる",
+      "changed": "失点を原因（届かない穴・うすすぎ・生焼け・焼きすぎ・厚みむら・こげ・すき間）ごとに集計し、一番大きい原因を講評に出すようにした。文字色を濃く太くした。焼ける速さを2割ほど落として、巻くまでの判断の余裕を作った",
+      "foundEn": "The verdict always said \"holes\", not the real cause / verdict text was hard to read / only ~1.5 s from \"Roll now\" to burning",
+      "changedEn": "Points lost are tallied by cause (holes, too thin, raw, dry, lumpy, burnt, gap) and the biggest one is shown; darker bold text; cooking slowed by about 20% to give time to decide"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "料理",
+      "en": "Cooking",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "卵焼き器を指で傾けて卵液を広げ、半熟で巻き重ねる。最後に切ると焼き方がうずまきの断面に残る。",
+        "ideaEn": "Tilt a tamagoyaki pan to spread the egg, roll it when half-set, layer after layer; slicing reveals your cooking as a swirl.",
+        "fromDraw": true
+      },
+      {
+        "idea": "雨の窓ガラスに指で絵を描くと、しずくが流れて絵が少しずつ崩れていく、目標のない遊び場。",
+        "ideaEn": "A goal-less toy: draw on a rainy window and watch the drops run through your picture.",
+        "fromDraw": false
+      },
+      {
+        "idea": "雪の坂を転がる雪玉を指で導き、雪を巻き込んで大きくしながら麓の雪だるままで届ける3Dの坂下り。",
+        "ideaEn": "Guide a rolling snowball down a 3D slope, growing it as it picks up snow, to the snowman at the bottom.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "goal",
+    "input": [
+      "drag",
+      "swipe"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Roll the Tamagoyaki",
+      "concept": "The core is the feel of tamagoyaki: tilt to let the egg flow, roll it when half-set. Dragging tilts the pan and a resting finger lifts it off the flame. The middle cooks fast, the corners slowly. Spread, lift, roll, repeat — and when you slice it, your cooking shows up in the swirl.",
+      "howToPlay": "Drag to tilt the pan and spread the egg to the corners. When half-set, swipe from the top edge down to roll. After the last layer, swipe down to slice.",
+      "libraryDecision": "None. A tiny hand-written 14×20 fluid grid flows smoothly enough, and a top-down 2D view reads best for where the egg has spread and set.",
+      "soundDecision": "No music. A sizzle follows how much raw egg sits on the hot part of the pan and drops when you lift it, so the sound itself tells you the heat, and it sets the kitchen mood."
+    }
+  },
+  "createdAt": "2026-11-07T15:07:15+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-07T15:07:15+09:00",
+    "metricsFrom": "2026-11-07T06:05:28.456Z",
+    "transcript": "0a6e4592-b6c1-4ab2-9d6e-f5172733c28c.jsonl",
+    "validationRuns": 6,
+    "finishedAt": "2026-11-07T15:30:57+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-07T15:27:33+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "42.2KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=147",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=160",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=111",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=146",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 43162,
+    "lines": 871
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "広げる・待つ・巻くの流れが3まいとも同じで、慣れると変化が少ない。卵の輪郭も少し粗い",
+    "comment": "傾けると卵液がとろっと流れ、指を置いて火から上げると焼けが遅くなる手触りは気持ちいい。まん中が先に焼けて『こげそう！』が出る中、すみの生の所を待つか巻くかで迷う場面があり、切った断面に『生焼け』『焼きすぎ』が層ごとに残るのでもう1回やり直したくなった。ただ注文3種以外の変化は少ない。",
+    "similar": [
+      {
+        "title": "卵焼きの作り方（実際の調理法）",
+        "url": "https://www.justonecookbook.com/wprm_print/classic-tamagoyaki",
+        "similarity": "高",
+        "note": "卵焼き器を傾けて薄く広げ、下が固まり上が半熟のうちに巻くという実際の手順そのものが遊びのルーツ。ゲームでは火加減のむらと切り口の採点を加えた",
+        "note_en": "The real technique — tilt to coat the pan thinly, roll when the bottom is set and the top still soft — is the root of the game; the game adds uneven heat and a graded cross-section"
+      },
+      {
+        "title": "クッキングママ（料理ミニゲーム集）",
+        "similarity": "中",
+        "note": "タッチ操作で料理の工程を手触りよく再現する点が近い。こちらは一つの料理を流体の流れと焼け方のシミュレーションで深く遊ぶ",
+        "note_en": "Close in turning cooking steps into tactile touch actions; this game goes deep on one dish with simulated flow and cooking"
+      }
+    ],
+    "research": "WebSearchで tamagoyaki rolling game を検索。卵焼き専用のゲームは見つからず、傾けて球を転がすゲームと調理法の記事が出た。調理法の記事と、よく知られたクッキングママ（自分の知識）を挙げた",
+    "i18n": {
+      "en": {
+        "worst": "Spread, wait, roll is the same for every layer, so it gets samey once learned; the egg outline is still a bit coarse",
+        "comment": "Tilting makes the egg flow nicely, and holding a finger to lift the pan slows the cooking. With the middle cooking first and Burning! appearing, I had to choose between waiting for the raw corners and rolling now, and the slice shows raw or dry layer by layer, which made me want another go. Beyond the three orders, though, there is little variety.",
+        "research": "Searched the web for a tamagoyaki rolling game. No dedicated game was found, only tilt-ball games and recipes. Listed a recipe page and the well-known Cooking Mama (from my own knowledge)"
+      }
+    },
+    "method": "スマホ縦画面で 9 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 9 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 900ms",
+        "note": "開始。注文は基本の卵焼き。卵液がまん中にたまる",
+        "noteEn": "Start: basic tamagoyaki; the egg pools in the middle",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "path(0.50,0.50→0.15,0.30→0.85,0.30→0.50,0.15) 1500ms → path(0.50,0.40→0.15,0.80→0.85,0.80→0.50,0.60) 1600ms",
+        "note": "なぞって傾け、奥と手前の四すみへ流す",
+        "noteEn": "Tilted the pan to send the egg to all four corners",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 3200ms",
+        "note": "火にかけて待つと、まん中から色が変わってくる",
+        "noteEn": "On the flame the middle changes color first",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "path(0.40,0.40→0.85,0.85) 600ms → swipe(0.50,0.13→0.50,0.95) 1500ms → wait 1400ms",
+        "note": "右下の穴を埋めてすぐ巻く。2まい目が注がれる",
+        "noteEn": "Filled the lower-right gap and rolled; layer 2 is poured",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "path(0.50,0.60→0.20,0.35→0.80,0.35→0.50,0.18) 1500ms → path(0.50,0.30→0.85,0.80→0.15,0.80→0.50,0.60) 1400ms",
+        "note": "巻いた卵の下へ流しこみ、手前にも広げる",
+        "noteEn": "Let the egg run under the roll, then spread it toward me",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "path(0.60,0.40→0.15,0.85) 600ms → wait 3500ms",
+        "note": "左下の空きにも流し、焼けるのを待つ",
+        "noteEn": "Sent egg to the empty lower-left, then waited",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.50,0.60) 1500ms → swipe(0.50,0.17→0.50,0.95) 1500ms → wait 1400ms → path(0.50,0.60→0.20,0.35→0.80,0.35→0.50,0.18) 1500ms → path(0.50,0.30→0.85,0.80→0.15,0.80→0.50,0.60) 1400ms → wait 3000ms",
+        "note": "少し火から上げてから2まい目を巻き、3まい目を広げて待つ",
+        "noteEn": "Lifted briefly, rolled layer 2; spread layer 3 and waited",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "swipe(0.50,0.20→0.50,0.95) 1500ms → wait 1800ms",
+        "note": "3まい目を巻くと、まな板の上に卵焼きが出る",
+        "noteEn": "Rolled layer 3; the tamagoyaki moves to the cutting board",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "swipe(0.45,0.30→0.45,0.60) 300ms → wait 1500ms",
+        "note": "包丁でたてに切ると断面と講評が出る",
+        "noteEn": "Slicing down shows the cross-section and the verdict",
+        "image": "ai-play/step-09.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": {
+                "plain": 77
+              },
+              "next": 1
+            }
+          },
+          {
+            "agf": "end",
+            "score": 77
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-07T15:30:57+09:00"
+  },
+  "publishedAt": "2026-11-07T15:30:57+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 32483,
+    "outputTokens": 51357,
+    "contextTokens": 13182765,
+    "turns": 65,
+    "toolCalls": 78,
+    "webSearches": 0,
+    "minutes": 25.6,
+    "from": "2026-11-07T06:05:28.456Z",
+    "to": "2026-11-07T06:31:03.226Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-07T15:31:03+09:00",
+    "validationRuns": 6,
+    "codeKB": 42.2
+  }
+}

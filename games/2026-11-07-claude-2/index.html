@@ -1,0 +1,870 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>くるり卵焼き</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; margin: 0; height: 100%; overflow: hidden; background: #1a1412; }
+canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+
+const DICT = {
+  ja: {
+    title: 'くるり卵焼き',
+    how: ['なぞるとフライパンが傾き、卵液が流れる', '半熟になったら、上のはしから下へなぞって巻く', '何まいも重ねて、最後に切り口を見よう'],
+    tap: 'タップでスタート', again: 'タップでもう一度',
+    order: '注文', next: 'つぎの注文', best: 'ベスト', pts: '点', newBest: 'ベスト更新！',
+    layer: (k, n) => `${k} / ${n} まい目`,
+    hintTilt: '指でなぞると傾く（そのあいだ火から離れる）',
+    hintRoll: '上のはしから 下へなぞって 巻く',
+    hintUnder: '巻いた卵の下にも 卵液を流しこもう',
+    hintKeep: '指を下までなぞり切ると 1まい完成',
+    hintLift: '指を置いたまま＝火から上げる。まん中のこげを防げる',
+    lifted: '火から上げ中',
+    ready: '巻きどき！', burn: 'こげそう！', raw: 'まだ生',
+    cutHint: '包丁で切る：たてになぞる',
+    grades: ['料亭の味', 'お店に出せる', 'おうちの味', 'ちょっといびつ', 'ほぼ炒り卵'],
+    faults: { good: 'きれいに巻けた', hole: '届かなかった所に穴', thin: 'うすすぎて破れやすい', raw: '生焼けでとろとろ', burnt: 'こげ目が強い', lump: '厚みがむら', gap: '前の層とすき間', dry: '焼きすぎでぱさぱさ' },
+    nth: (k) => `${k}まい目`,
+    recipes: { plain: ['基本の卵焼き', 'ふつうの焼け方・3まい'], sweet: ['甘い卵焼き', 'さとう入り・こげやすい・3まい'], dashi: ['だし巻き', 'ゆるくて広がる・焼けにくい・4まい'] },
+  },
+  en: {
+    title: 'Roll the Tamagoyaki',
+    how: ['Drag to tilt the pan and let the egg flow', 'When half-set, swipe from the top edge down to roll', 'Stack the layers, then slice to see the swirl'],
+    tap: 'Tap to start', again: 'Tap to play again',
+    order: 'Order', next: 'Next order', best: 'Best', pts: 'pts', newBest: 'New best!',
+    layer: (k, n) => `Layer ${k} / ${n}`,
+    hintTilt: 'Drag to tilt (it also lifts the pan off the flame)',
+    hintRoll: 'Swipe from the top edge down to roll',
+    hintUnder: 'Let the egg flow under the roll too',
+    hintKeep: 'Swipe all the way down to finish the layer',
+    hintLift: 'Hold a finger down to lift the pan and save the middle',
+    lifted: 'Off the flame',
+    ready: 'Roll now!', burn: 'Burning!', raw: 'Still raw',
+    cutHint: 'Slice it: swipe down across',
+    grades: ['Master chef', 'Restaurant-worthy', 'Home-style', 'A bit wonky', 'Basically scrambled'],
+    faults: { good: 'Neatly rolled', hole: 'Holes where egg never reached', thin: 'Too thin, tears easily', raw: 'Raw and runny', burnt: 'Too browned', lump: 'Uneven thickness', gap: 'Gap from the layer below', dry: 'Overcooked and dry' },
+    nth: (k) => `Layer ${k}`,
+    recipes: { plain: ['Basic tamagoyaki', 'Normal cooking · 3 layers'], sweet: ['Sweet tamagoyaki', 'Sugar · browns fast · 3 layers'], dashi: ['Dashi roll', 'Runny · cooks slowly · 4 layers'] },
+  },
+};
+const T = DICT[LANG] || DICT.en;
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+
+// ---------- recipes ----------
+const RECIPES = [
+  { id: 'plain', layers: 3, sr: 0.025, br: 0.075, k: 14, front: 0.30, vol: 0.15, raw: [250, 186, 40], set: [255, 224, 118] },
+  { id: 'sweet', layers: 3, sr: 0.025, br: 0.150, k: 13, front: 0.30, vol: 0.15, raw: [248, 176, 46], set: [255, 214, 110] },
+  { id: 'dashi', layers: 4, sr: 0.018, br: 0.058, k: 20, front: 0.21, vol: 0.14, raw: [246, 196, 70], set: [255, 232, 140] },
+];
+
+// ---------- canvas ----------
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d');
+let W = 360, H = 640, DPR = 1;
+const NX = 14, NY = 20, N = NX * NY;
+let cell = 20, px0 = 0, py0 = 0, pw = 0, ph = 0;
+function layout() {
+  W = Math.max(1, innerWidth || 360); H = Math.max(1, innerHeight || 640);
+  DPR = Math.min(2, devicePixelRatio || 1);
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+  const top = 62, bottom = 112;
+  cell = Math.max(4, Math.min((W - 34) / NX, (H - top - bottom) / NY));
+  pw = cell * NX; ph = cell * NY;
+  px0 = (W - pw) / 2; py0 = top + Math.max(0, (H - top - bottom - ph) * 0.35);
+}
+addEventListener('resize', layout);
+layout();
+
+// ---------- simulation state ----------
+const L = new Float32Array(N), S = new Float32Array(N), B = new Float32Array(N), HEAT = new Float32Array(N);
+const ETA = new Float32Array(N), DL = new Float32Array(N);
+for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) {
+  const dx = (i + 0.5) / NX - 0.5, dy = (j + 0.5) / NY - 0.52;
+  HEAT[j * NX + i] = 0.16 + 0.84 * Math.exp(-(dx * dx / (2 * 0.24 * 0.24) + dy * dy / (2 * 0.22 * 0.22)));
+}
+const FILM = 0.05, HOLE = 0.045;
+let rec = RECIPES[0], recIdx = 0;
+let phase = 'title', phaseT = 0, time = 0;
+let k = 0;                 // current layer index
+let layers = [];           // finished layers
+let layer = null;          // current layer {rows, bond, started}
+let front = 0, nextRow = 0, collected = 0, rolling = false, rollTarget = 0;
+let pourT = 0, pourI = 6.5, pourJ = 10;
+let tx = 0, ty = 0, liftAmt = 0;
+let sheet = { cov: 0, s: 0, b: 0, status: 'none' }, sheetT = 0;
+let popups = [], bubbles = [];
+let hint = '', hintT = 0, banner = 0;
+let finalScore = 0, isNewBest = false, cutX = 0, cutT = 0, resultT = 0;
+let save = { best: {}, next: 0 };
+let shownRollHint = false, shownUnderHint = false, shownLiftHint = false;
+
+addEventListener('message', (e) => {
+  if (e.data && e.data.agf === 'loaded' && e.data.data) {
+    const d = e.data.data;
+    if (d.best && typeof d.best === 'object') save.best = d.best;
+    if (Number.isInteger(d.next)) save.next = d.next % RECIPES.length;
+    if (phase === 'title') { recIdx = save.next; rec = RECIPES[recIdx]; }
+  }
+});
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+function persist() { try { parent.postMessage({ agf: 'save', data: save }, '*'); } catch (e) {} }
+
+const rollD = () => 0.85 + 0.5 * collected / NY;
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+
+function clearPan() { L.fill(0); S.fill(0); B.fill(0); }
+
+function startGame() {
+  recIdx = save.next % RECIPES.length; rec = RECIPES[recIdx];
+  clearPan(); layers = []; k = 0; front = 0; collected = 0; rolling = false;
+  popups = []; bubbles = []; tx = ty = 0;
+  banner = 3.2; shownRollHint = false; shownUnderHint = false;
+  setHint(T.hintTilt, 4.5);
+  signal('start');
+  startLayer();
+}
+function startLayer() {
+  layer = { rows: [], bond: 1, started: false, score: 0, fault: 'good', loss: { hole: 0, thin: 0, raw: 0, dry: 0, lump: 0, burnt: 0, gap: 0 } };
+  nextRow = 0; rolling = false;
+  if (k === 0) { front = 0; pourJ = NY * 0.5; }
+  else { front = rollD(); pourJ = (front + NY) / 2 + 0.5; }
+  pourI = NX / 2 - 0.5;
+  pourT = 0; phase = 'pour'; phaseT = 0;
+  if (k === 1 && !shownUnderHint) { shownUnderHint = true; setHint(T.hintUnder, 4.5); }
+  sfx.pour();
+}
+function setHint(s, t) { hint = s; hintT = t; }
+
+const LOSS = { hole: 0, thin: 0, raw: 0, dry: 0, lump: 0, burnt: 0 };
+function cellQ(h, s, b, acc) {
+  let fs, fh = 1, fb = 1;
+  if (s < 0.3) fs = 0.12 + s / 0.3 * 0.38;
+  else if (s < 0.52) fs = 0.5 + (s - 0.3) / 0.22 * 0.5;
+  else if (s <= 0.955) fs = 1;
+  else fs = 1 - (s - 0.955) / 0.045 * 0.22;
+  if (h < 0.08) fh = 0.7 + (h - HOLE) / (0.08 - HOLE) * 0.3;
+  else if (h > 0.38) fh = Math.max(0.5, 1 - (h - 0.38) * 0.9);
+  if (b > 0.3) fb = Math.max(0.3, 1 - (b - 0.3) * 1.1);
+  const q = fs * fh * fb;
+  if (acc) {
+    const l1 = 1 - fs, l2 = 1 - fh, l3 = 1 - fb, sum = l1 + l2 + l3;
+    if (sum > 0) {
+      const loss = 1 - q;
+      acc[s < 0.52 ? 'raw' : 'dry'] += loss * l1 / sum;
+      acc[h < 0.08 ? 'thin' : 'lump'] += loss * l2 / sum;
+      acc.burnt += loss * l3 / sum;
+    }
+  }
+  return q;
+}
+function collectRow(j) {
+  let cov = 0, hs = 0, ss = 0, bs = 0, q = 0, h2 = 0;
+  for (let i = 0; i < NX; i++) {
+    const c = j * NX + i, h = L[c] + S[c];
+    if (h >= HOLE) { cov++; hs += h; h2 += h * h; const s = S[c] / h; ss += s; bs += B[c]; q += cellQ(h, s, B[c], layer.loss); } else layer.loss.hole += 1;
+    L[c] = 0; S[c] = 0; B[c] = 0;
+  }
+  const row = { cov: cov / NX, h: cov ? hs / cov : 0, h2: cov ? h2 / cov : 0, s: cov ? ss / cov : 0, b: cov ? bs / cov : 0, q: q / NX, layer: k };
+  layer.rows.push(row);
+  collected++;
+  return row;
+}
+function beginRoll() {
+  rolling = true;
+  if (!layer.started) {
+    layer.started = true;
+    nextRow = 0;
+    if (k > 0) {
+      const n = Math.max(1, Math.floor(front));
+      let bc = 0;
+      for (let j = 0; j < n; j++) { const r = collectRow(j); bc += r.cov; }
+      layer.bond = bc / n;
+      nextRow = n;
+    }
+    rollTarget = front;
+  }
+}
+function finishLayer() {
+  while (nextRow < NY) collectRow(nextRow++);
+  rolling = false;
+  const rows = layer.rows;
+  let q = 0, cov = 0, sm = 0, bm = 0, hm = 0, hv = 0, nc = 0;
+  for (const r of rows) { q += r.q; cov += r.cov; if (r.cov > 0) { sm += r.s; bm += r.b; hm += r.h; hv += r.h2; nc++; } }
+  q /= rows.length; cov /= rows.length;
+  if (nc) { sm /= nc; bm /= nc; hm /= nc; hv /= nc; }
+  const bondF = k > 0 ? 0.72 + 0.28 * layer.bond : 1;
+  layer.score = Math.round(clamp(q * bondF, 0, 1) * 100);
+  const ls = layer.loss;
+  ls.gap = (1 - bondF) * q * rows.length * NX;
+  let worst = 'good', wv = 0;
+  for (const key in ls) if (ls[key] > wv) { wv = ls[key]; worst = key; }
+  layer.fault = layer.score >= 90 || wv < rows.length * NX * 0.03 ? 'good' : worst;
+  layers.push(layer);
+  popups.push({ x: W / 2, y: py0 + ph * 0.45, text: '+' + layer.score, t: 0, good: layer.score >= 75 });
+  sfx.rollEnd(layer.score);
+  phaseT = 0;
+  phase = (k + 1 < rec.layers) ? 'slide' : 'toBoard';
+}
+
+function sim(dt) {
+  const sub = 4, h = dt / sub, G = 0.075, K = rec.k, FR = rec.front;
+  const cx = (NX - 1) / 2, cy = (NY - 1) / 2;
+  for (let s = 0; s < sub; s++) {
+    for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) {
+      const c = j * NX + i;
+      ETA[c] = L[c] + S[c] - (tx * (i - cx) + ty * (j - cy)) * G;
+    }
+    DL.fill(0);
+    for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) {
+      const c = j * NX + i;
+      if (i + 1 < NX) pair(c, c + 1, h, K, FR);
+      if (j + 1 < NY) pair(c, c + NX, h, K, FR);
+    }
+    for (let c = 0; c < N; c++) { L[c] += DL[c]; if (L[c] < 0) L[c] = 0; }
+  }
+  const SR = rec.sr, BR = rec.br;
+  for (let c = 0; c < N; c++) {
+    const hh = L[c] + S[c];
+    if (hh < 1e-4) continue;
+    const heat = HEAT[c] * (1 - 0.85 * liftAmt) + 0.22 * liftAmt;
+    if (L[c] > 0) { let d = dt * heat * SR * (0.6 / (0.25 + hh)); if (d > L[c]) d = L[c]; L[c] -= d; S[c] += d; }
+    const sf = S[c] / hh;
+    if (sf > 0.6) B[c] += dt * heat * BR * (sf - 0.6) / 0.4;
+  }
+}
+function pair(a, b, h, K, FR) {
+  let d = ETA[a] - ETA[b], src = a, dst = b;
+  if (d < 0) { d = -d; src = b; dst = a; }
+  if (L[dst] + S[dst] < 0.02 && d < FR) return;
+  const avail = L[src] - FILM;
+  if (avail <= 0) return;
+  let f = K * h * d * Math.min(1, L[src] / 0.1);
+  if (f > avail * 0.24) f = avail * 0.24;
+  DL[src] -= f; DL[dst] += f;
+}
+function measureSheet() {
+  let n = 0, s = 0, b = 0, cov = 0, tot = 0, hot = 0;
+  const j0 = Math.floor(front);
+  for (let j = j0; j < NY; j++) for (let i = 0; i < NX; i++) {
+    const c = j * NX + i, hh = L[c] + S[c]; tot++;
+    if (hh >= HOLE) { n++; s += S[c] / hh; b += B[c]; cov++; if (B[c] > 0.2 || S[c] / hh > 0.97) hot++; }
+  }
+  sheet.cov = tot ? cov / tot : 0;
+  sheet.s = n ? s / n : 0; sheet.b = n ? b / n : 0;
+  sheet.status = n < 4 ? 'none' : (sheet.b > 0.26 || hot > n * 0.18) ? 'burn' : sheet.s >= 0.52 ? 'ready' : 'raw';
+}
+
+// ---------- audio ----------
+let AC = null, master = null, sizzleG = null, noiseBuf = null;
+function initAudio() {
+  if (AC) { if (AC.state !== 'running') AC.resume().catch(() => {}); return; }
+  try {
+    AC = new (window.AudioContext || window.webkitAudioContext)();
+    master = AC.createGain(); master.gain.value = 0.55; master.connect(AC.destination);
+    noiseBuf = AC.createBuffer(1, AC.sampleRate * 2, AC.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    const src = AC.createBufferSource(); src.buffer = noiseBuf; src.loop = true;
+    const hp = AC.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 2200;
+    const pk = AC.createBiquadFilter(); pk.type = 'peaking'; pk.frequency.value = 5500; pk.gain.value = 5; pk.Q.value = 0.8;
+    sizzleG = AC.createGain(); sizzleG.gain.value = 0;
+    src.connect(hp); hp.connect(pk); pk.connect(sizzleG); sizzleG.connect(master); src.start();
+    if (AC.state !== 'running') AC.resume().catch(() => {});
+  } catch (e) { AC = null; }
+}
+function noiseHit(dur, f0, f1, vol, type = 'bandpass', q = 1.2, when = 0) {
+  if (!AC) return;
+  try {
+    const t = AC.currentTime + when;
+    const s = AC.createBufferSource(); s.buffer = noiseBuf;
+    const f = AC.createBiquadFilter(); f.type = type; f.Q.value = q;
+    f.frequency.setValueAtTime(f0, t); f.frequency.exponentialRampToValueAtTime(Math.max(40, f1), t + dur);
+    const g = AC.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(f); f.connect(g); g.connect(master); s.start(t, Math.random() * 1.5); s.stop(t + dur + 0.05);
+  } catch (e) {}
+}
+function tone(freq, dur, vol, type = 'sine', when = 0, to = 0) {
+  if (!AC) return;
+  try {
+    const t = AC.currentTime + when;
+    const o = AC.createOscillator(); o.type = type; o.frequency.setValueAtTime(freq, t);
+    if (to) o.frequency.exponentialRampToValueAtTime(to, t + dur);
+    const g = AC.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.05);
+  } catch (e) {}
+}
+const sfx = {
+  pour() { noiseHit(0.9, 7000, 3000, 0.22, 'highpass', 0.7); noiseHit(0.25, 400, 150, 0.12, 'lowpass', 1); },
+  tick() { tone(320 + Math.random() * 60, 0.06, 0.05, 'triangle'); noiseHit(0.05, 900, 500, 0.04); },
+  rollEnd(sc) { tone(180, 0.18, 0.12, 'sine', 0, 110); tone(sc >= 75 ? 784 : sc >= 50 ? 587 : 392, 0.25, 0.06, 'triangle', 0.08); },
+  cut() { noiseHit(0.22, 5000, 1800, 0.16, 'bandpass', 2); tone(140, 0.12, 0.18, 'sine', 0.18, 70); noiseHit(0.08, 300, 120, 0.12, 'lowpass', 1, 0.18); },
+  result(sc) {
+    const notes = sc >= 90 ? [523, 659, 784, 1047] : sc >= 75 ? [523, 659, 784] : sc >= 55 ? [523, 659] : [392, 349];
+    notes.forEach((f, i) => tone(f, 0.35, 0.07, 'triangle', 0.25 + i * 0.12));
+  },
+};
+let sizzleLevel = 0;
+function updateSizzle(dt) {
+  let target = 0;
+  if (phase === 'pour' || phase === 'cook' || phase === 'slide') {
+    let a = 0;
+    for (let c = 0; c < N; c++) a += (L[c] * 1.0 + S[c] * 0.18) * HEAT[c];
+    target = clamp(a / (N * 0.06), 0, 1) * (1 - 0.7 * liftAmt) * 0.2;
+  }
+  sizzleLevel += (target - sizzleLevel) * Math.min(1, dt * 6);
+  if (sizzleG) { try { sizzleG.gain.setTargetAtTime(sizzleLevel * (0.6 + Math.random() * 0.8), AC.currentTime, 0.02); } catch (e) {} }
+}
+
+// ---------- input ----------
+let act = null;
+function inRollZone(x, y) {
+  if (x < px0 - 24 || x > px0 + pw + 24) return false;
+  if (k === 0 && !layer.started) return y < py0 + cell * 3.2 && y > py0 - 40;
+  return y < py0 + front * cell + cell * 1.8 && y > py0 - 40;
+}
+cv.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  initAudio();
+  if (act) return;
+  const x = e.clientX, y = e.clientY;
+  act = { id: e.pointerId, sx: x, sy: y, x, y, mode: 'none' };
+  try { cv.setPointerCapture(e.pointerId); } catch (er) {}
+  if (phase === 'title') { if (phaseT > 0.3) startGame(); act.mode = 'none'; }
+  else if (phase === 'pour' || phase === 'cook' || phase === 'slide') {
+    if (phase === 'cook' && inRollZone(x, y)) { act.mode = 'roll'; beginRoll(); }
+    else act.mode = 'tilt';
+  } else if (phase === 'board') act.mode = 'cut';
+  else if (phase === 'result') { if (resultT > 0.7) { phase = 'title'; startGame(); } }
+}, { passive: false });
+cv.addEventListener('pointermove', (e) => {
+  if (!act || e.pointerId !== act.id) return;
+  act.x = e.clientX; act.y = e.clientY;
+  if (act.mode === 'cut' && phase === 'board') tryCut();
+}, { passive: false });
+function endPointer(e) {
+  if (!act || e.pointerId !== act.id) return;
+  if (act.mode === 'roll') { rolling = false; if (layer && layer.started && nextRow < NY && phase === 'cook' && !shownRollHint) { shownRollHint = true; setHint(T.hintKeep, 3); } }
+  act = null;
+}
+cv.addEventListener('pointerup', endPointer);
+cv.addEventListener('pointercancel', endPointer);
+
+// ---------- board / cut ----------
+let logBox = { x: 0, y: 0, w: 0, h: 0 };
+function tryCut() {
+  const dy = act.y - act.sy;
+  if (Math.abs(dy) > 50 && Math.min(act.y, act.sy) < logBox.y + logBox.h * 0.3 && Math.max(act.y, act.sy) > logBox.y + logBox.h * 0.7) {
+    cutX = clamp(act.x, logBox.x + logBox.w * 0.2, logBox.x + logBox.w * 0.8);
+    phase = 'cut'; phaseT = 0; act.mode = 'none';
+    sfx.cut();
+  }
+}
+function finishGame() {
+  let tot = 0; for (const l of layers) tot += l.score;
+  finalScore = Math.round(tot / layers.length);
+  const prev = save.best[rec.id] || 0;
+  isNewBest = finalScore > prev;
+  if (isNewBest) save.best[rec.id] = finalScore;
+  save.next = (recIdx + 1) % RECIPES.length;
+  persist();
+  signal('end', { score: finalScore });
+  sfx.result(finalScore);
+  phase = 'result'; resultT = 0;
+}
+
+// ---------- update ----------
+function update(dt) {
+  time += dt; phaseT += dt;
+  if (hintT > 0) hintT -= dt;
+  if (banner > 0) banner -= dt;
+  let ttx = 0, tty = 0;
+  const tilting = act && act.mode === 'tilt';
+  if (tilting) { ttx = clamp((act.x - act.sx) / (cell * 4), -1, 1); tty = clamp((act.y - act.sy) / (cell * 4), -1, 1); }
+  tx += (ttx - tx) * Math.min(1, dt * 10); ty += (tty - ty) * Math.min(1, dt * 10);
+  liftAmt += ((tilting ? 1 : 0) - liftAmt) * Math.min(1, dt * 8);
+
+  if (phase === 'pour' || phase === 'cook' || phase === 'slide') {
+    if (phase === 'pour') {
+      const dur = 0.8, st = Math.min(dt, Math.max(0, dur - pourT));
+      pourT += dt;
+      if (st > 0) {
+        const vol = rec.vol * NX * (NY - (k ? front : 0)) * st / dur;
+        let wsum = 0; const ws = [];
+        for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) {
+          const dx = i - pourI, dy = j - pourJ; const w = Math.exp(-(dx * dx + dy * dy) / (2 * 1.6 * 1.6)); ws.push(w); wsum += w;
+        }
+        for (let c = 0; c < N; c++) L[c] += vol * ws[c] / wsum;
+      }
+      if (pourT >= 0.8) { phase = 'cook'; phaseT = 0; }
+    }
+    sim(dt);
+    if (phase === 'cook') {
+      sheetT -= dt;
+      if (sheetT <= 0) { measureSheet(); sheetT = 0.15; }
+      if (rolling && act && act.mode === 'roll') {
+        const fr = (act.y - py0) / cell + 0.4;
+        rollTarget = Math.max(rollTarget, fr);
+      }
+      if (rolling) {
+        const maxV = 14 * dt;
+        front = Math.min(rollTarget, front + maxV, NY + 0.01);
+        while (nextRow < NY && Math.floor(front) > nextRow) { collectRow(nextRow++); if (nextRow % 3 === 0) sfx.tick(); }
+        if (front >= NY - 0.15) { front = NY; finishLayer(); }
+      }
+      if (!shownLiftHint && sheet.status === 'burn') { shownLiftHint = true; setHint(T.hintLift, 4.5); }
+      if (!shownRollHint && !rolling && sheet.status === 'ready' && phaseT > 2) { shownRollHint = true; setHint(T.hintRoll, 4); }
+    }
+    if (phase === 'slide') {
+      const D = rollD();
+      const p = Math.min(1, phaseT / 0.7);
+      const e = p * p * (3 - 2 * p);
+      front = NY + (D - NY) * e;
+      if (p >= 1) { k++; startLayer(); }
+    }
+    // bubbles
+    if (Math.random() < sizzleLevel * 3) {
+      const c = (Math.random() * N) | 0;
+      if (L[c] > 0.06 && HEAT[c] > 0.45) bubbles.push({ i: c % NX + Math.random(), j: ((c / NX) | 0) + Math.random(), t: 0, m: 0.12 + Math.random() * 0.14 });
+    }
+  } else if (phase === 'toBoard') {
+    if (phaseT > 0.9) { phase = 'board'; phaseT = 0; setHint(T.cutHint, 99); }
+  } else if (phase === 'cut') {
+    if (phaseT > 0.75) finishGame();
+  } else if (phase === 'result') {
+    resultT += dt;
+  }
+  for (const b of bubbles) b.t += dt;
+  bubbles = bubbles.filter((b) => b.t < 0.7 && L[(Math.min(NY - 1, b.j | 0)) * NX + Math.min(NX - 1, b.i | 0)] > 0.03);
+  for (const p of popups) p.t += dt;
+  popups = popups.filter((p) => p.t < 1.4);
+  updateSizzle(dt);
+}
+
+// ---------- drawing helpers ----------
+function setFont(size, weight = 600) { ctx.font = `${weight} ${size}px ${FONT}`; }
+function fitText(str, x, y, maxW, size, weight = 600, align = 'center') {
+  let s = size; setFont(s, weight);
+  while (s > 12 && ctx.measureText(str).width > maxW) { s -= 1; setFont(s, weight); }
+  ctx.textAlign = align; ctx.fillText(str, x, y);
+}
+function rr(x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+const UP = 5, EW = NX * UP, EH = NY * UP;
+const eggC = document.createElement('canvas'); eggC.width = EW; eggC.height = EH;
+const eggX = eggC.getContext('2d'); const eggImg = eggX.createImageData(EW, EH);
+const glC = document.createElement('canvas'); glC.width = EW; glC.height = EH;
+const glX = glC.getContext('2d'); const glImg = glX.createImageData(EW, EH);
+const FH = new Float32Array(N), FS = new Float32Array(N), FB = new Float32Array(N), FLq = new Float32Array(N);
+function paintEgg() {
+  for (let c = 0; c < N; c++) { const h = L[c] + S[c]; FS[c] = h > 1e-4 ? S[c] / h : 0; FB[c] = B[c]; FLq[c] = h > 1e-4 ? L[c] / h : 0; }
+  for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) {
+    const c = j * NX + i; let a = 0, n = 0;
+    if (i > 0) { a += L[c - 1] + S[c - 1]; n++; } if (i < NX - 1) { a += L[c + 1] + S[c + 1]; n++; }
+    if (j > 0) { a += L[c - NX] + S[c - NX]; n++; } if (j < NY - 1) { a += L[c + NX] + S[c + NX]; n++; }
+    const h = L[c] + S[c]; FH[c] = h > 0.03 ? Math.max(h * 0.6 + 0.4 * a / n, 0.031) : h * 0.5 + 0.5 * a / n * 0.45;
+  }
+  const d = eggImg.data, g = glImg.data, R = rec.raw, Sx = rec.set;
+  for (let y = 0; y < EH; y++) {
+    const fy = (y + 0.5) / UP - 0.5, j0 = Math.max(0, Math.min(NY - 1, Math.floor(fy))), j1 = Math.min(NY - 1, j0 + 1), wy = clamp(fy - j0, 0, 1);
+    for (let x = 0; x < EW; x++) {
+      const fx = (x + 0.5) / UP - 0.5, i0 = Math.max(0, Math.min(NX - 1, Math.floor(fx))), i1 = Math.min(NX - 1, i0 + 1), wx = clamp(fx - i0, 0, 1);
+      const c00 = j0 * NX + i0, c10 = j0 * NX + i1, c01 = j1 * NX + i0, c11 = j1 * NX + i1;
+      const w00 = (1 - wx) * (1 - wy), w10 = wx * (1 - wy), w01 = (1 - wx) * wy, w11 = wx * wy;
+      const h = FH[c00] * w00 + FH[c10] * w10 + FH[c01] * w01 + FH[c11] * w11;
+      const o = (y * EW + x) * 4;
+      if (h < 0.03) { d[o + 3] = 0; g[o + 3] = 0; continue; }
+      const q00 = FH[c00] * w00 / h, q10 = FH[c10] * w10 / h, q01 = FH[c01] * w01 / h, q11 = FH[c11] * w11 / h;
+      const s = FS[c00] * q00 + FS[c10] * q10 + FS[c01] * q01 + FS[c11] * q11;
+      const b = Math.min(1, (FB[c00] * q00 + FB[c10] * q10 + FB[c01] * q01 + FB[c11] * q11) * 1.5);
+      const lq = FLq[c00] * q00 + FLq[c10] * q10 + FLq[c01] * q01 + FLq[c11] * q11;
+      let r = R[0] + (Sx[0] - R[0]) * s, gg = R[1] + (Sx[1] - R[1]) * s, bb = R[2] + (Sx[2] - R[2]) * s;
+      const dep = Math.min(1, h / 0.4) * (1 - s) * 0.22;
+      r *= 1 - dep * 0.3; gg *= 1 - dep; bb *= 1 - dep;
+      r += (170 - r) * b; gg += (98 - gg) * b; bb += (34 - bb) * b;
+      const a = clamp((h - 0.03) / 0.02, 0, 1);
+      d[o] = r; d[o + 1] = gg; d[o + 2] = bb; d[o + 3] = a * 252;
+      g[o] = 255; g[o + 1] = 252; g[o + 2] = 235; g[o + 3] = a * Math.pow(lq, 1.4) * Math.min(1, h / 0.14) * 200;
+    }
+  }
+  eggX.putImageData(eggImg, 0, 0); glX.putImageData(glImg, 0, 0);
+}
+
+function drawStove() {
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, '#221a17'); g.addColorStop(1, '#120d0b');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  const cx = px0 + pw / 2, cy = py0 + ph * 0.52;
+  const on = phase === 'pour' || phase === 'cook' || phase === 'slide' || phase === 'title';
+  const fl = on ? (1 - 0.7 * liftAmt) * (0.85 + 0.15 * Math.sin(time * 13) * Math.sin(time * 7.3)) : 0.15;
+  const rg = ctx.createRadialGradient(cx, cy, pw * 0.2, cx, cy, Math.max(pw, ph) * 0.75);
+  rg.addColorStop(0, `rgba(255,120,30,${0.42 * fl})`); rg.addColorStop(0.6, `rgba(255,70,20,${0.16 * fl})`); rg.addColorStop(1, 'rgba(255,60,10,0)');
+  ctx.fillStyle = rg; ctx.fillRect(0, 0, W, H);
+}
+function drawPan(showEgg) {
+  const cx = px0 + pw / 2, cy = py0 + ph / 2;
+  ctx.save();
+  const sc = 1 + liftAmt * 0.025;
+  ctx.translate(cx + tx * 3 * liftAmt, cy + ty * 3 * liftAmt); ctx.scale(sc, sc); ctx.translate(-cx, -cy);
+  // shadow
+  ctx.fillStyle = `rgba(0,0,0,${0.35 + 0.15 * liftAmt})`;
+  rr(px0 - 10 + 6 + liftAmt * 10, py0 - 10 + 10 + liftAmt * 14, pw + 20, ph + 20, 12); ctx.fill();
+  // handle
+  const hw = Math.max(26, pw * 0.13), hy = py0 + ph + 8;
+  ctx.fillStyle = '#5a5a5e'; ctx.fillRect(cx - hw * 0.25, hy - 4, hw * 0.5, 22);
+  const hg = ctx.createLinearGradient(cx - hw / 2, 0, cx + hw / 2, 0);
+  hg.addColorStop(0, '#6d4526'); hg.addColorStop(0.5, '#a8743f'); hg.addColorStop(1, '#6d4526');
+  ctx.fillStyle = hg; rr(cx - hw / 2, hy + 14, hw, Math.max(30, H - hy - 14 + 40), hw / 2); ctx.fill();
+  // rim (copper)
+  const cg = ctx.createLinearGradient(px0, py0, px0 + pw, py0 + ph);
+  cg.addColorStop(0, '#d98a55'); cg.addColorStop(0.5, '#a75a2e'); cg.addColorStop(1, '#7d3e1c');
+  ctx.fillStyle = cg; rr(px0 - 10, py0 - 10, pw + 20, ph + 20, 12); ctx.fill();
+  // inner surface
+  const ig = ctx.createLinearGradient(px0, py0, px0, py0 + ph);
+  ig.addColorStop(0, '#34302e'); ig.addColorStop(1, '#262321');
+  ctx.fillStyle = ig; rr(px0, py0, pw, ph, 5); ctx.fill();
+  const on = phase === 'pour' || phase === 'cook' || phase === 'slide';
+  if (on) {
+    const hr = ctx.createRadialGradient(cx, py0 + ph * 0.52, 0, cx, py0 + ph * 0.52, pw * 0.7);
+    hr.addColorStop(0, `rgba(255,90,30,${0.12 * (1 - 0.7 * liftAmt)})`); hr.addColorStop(1, 'rgba(255,90,30,0)');
+    ctx.fillStyle = hr; ctx.fillRect(px0, py0, pw, ph);
+  }
+  ctx.save(); rr(px0, py0, pw, ph, 5); ctx.clip();
+  if (showEgg) {
+    paintEgg();
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(eggC, px0, py0, pw, ph);
+    ctx.globalAlpha = 0.42;
+    ctx.drawImage(glC, px0 - 2 - tx * 3, py0 - 3 - ty * 3, pw, ph);
+    ctx.globalAlpha = 1;
+    // bubbles
+    ctx.strokeStyle = 'rgba(255,250,225,0.7)'; ctx.lineWidth = 1;
+    for (const b of bubbles) {
+      const r = cell * b.m * Math.min(1, b.t / 0.5);
+      ctx.beginPath(); ctx.arc(px0 + b.i * cell, py0 + b.j * cell, Math.max(0.5, r), 0, 6.283); ctx.stroke();
+    }
+  }
+  // tilt shading
+  if (liftAmt > 0.02) {
+    const m = Math.hypot(tx, ty);
+    if (m > 0.02) {
+      const ux = tx / m, uy = ty / m;
+      const lg = ctx.createLinearGradient(cx - ux * pw / 2, cy - uy * ph / 2, cx + ux * pw / 2, cy + uy * ph / 2);
+      lg.addColorStop(0, `rgba(255,255,255,${0.07 * m})`); lg.addColorStop(1, `rgba(0,0,0,${0.2 * m})`);
+      ctx.fillStyle = lg; ctx.fillRect(px0, py0, pw, ph);
+    }
+  }
+  ctx.restore();
+  drawRoll();
+  ctx.restore();
+}
+function rollColors() {
+  let b = 0, n = 0;
+  for (const l of layers) for (const r of l.rows) { b += r.b; n++; }
+  if (layer) for (const r of layer.rows) { b += r.b; n++; }
+  return n ? b / n : 0;
+}
+const SPOTS = Array.from({ length: 26 }, (_, i) => [((i * 0.618) % 1), ((i * 0.377 + 0.2) % 1), 0.5 + ((i * 0.731) % 1)]);
+function browns(x, y, w, h) {
+  const bb = rollColors();
+  const n = Math.round(clamp((bb - 0.08) * 70, 0, SPOTS.length));
+  ctx.save(); rr(x, y, w, h, h * 0.3); ctx.clip();
+  for (let i = 0; i < n; i++) {
+    const [u, v, z] = SPOTS[i];
+    ctx.fillStyle = `rgba(140,72,22,${clamp(0.15 + bb * 0.9, 0, 0.7)})`;
+    ctx.beginPath(); ctx.ellipse(x + w * (0.05 + u * 0.9), y + h * (0.2 + v * 0.6), w * 0.04 * z, h * 0.12 * z, 0, 0, 6.283); ctx.fill();
+  }
+  ctx.restore();
+}
+function drawRoll() {
+  if (!(collected > 0 || k > 0) || phase === 'title') return;
+  const D = rollD();
+  const y1 = py0 + front * cell, y0 = y1 - D * cell;
+  const x0 = px0 + cell * 0.25, x1 = px0 + pw - cell * 0.25;
+  ctx.fillStyle = 'rgba(0,0,0,0.35)'; rr(x0 + 2, y0 + 5, x1 - x0, D * cell, D * cell * 0.3); ctx.fill();
+  const g = ctx.createLinearGradient(0, y0, 0, y1);
+  const bb = Math.min(1, rollColors() * 1.3);
+  const mix = (a, b2) => Math.round(a + (b2 - a) * bb * 0.7);
+  g.addColorStop(0, `rgb(${mix(214, 160)},${mix(150, 92)},${mix(48, 30)})`);
+  g.addColorStop(0.38, `rgb(${mix(255, 214)},${mix(226, 150)},${mix(130, 70)})`);
+  g.addColorStop(1, `rgb(${mix(196, 140)},${mix(132, 80)},${mix(40, 25)})`);
+  ctx.fillStyle = g; rr(x0, y0, x1 - x0, D * cell, D * cell * 0.3); ctx.fill();
+  browns(x0, y0, x1 - x0, D * cell);
+  // wrap lines
+  ctx.strokeStyle = 'rgba(150,90,30,0.35)'; ctx.lineWidth = 1;
+  const nl = Math.min(6, 1 + layers.length);
+  for (let i = 1; i <= nl; i++) { const yy = y0 + D * cell * (0.15 + 0.7 * i / (nl + 1)); ctx.beginPath(); ctx.moveTo(x0 + 6, yy); ctx.lineTo(x1 - 6, yy); ctx.stroke(); }
+  // chopsticks
+  if (rolling || (act && act.mode === 'roll')) {
+    ctx.lineCap = 'round';
+    for (let s = 0; s < 2; s++) {
+      ctx.strokeStyle = s ? '#3b2416' : '#4e3020'; ctx.lineWidth = 5;
+      const bx = px0 + pw * (0.62 + s * 0.08), by = y1 - 2;
+      ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx + pw * 0.5, by + ph * 0.34); ctx.stroke();
+    }
+    ctx.lineCap = 'butt';
+  }
+}
+function drawRollCue() {
+  if (phase !== 'cook' || rolling) return;
+  const st = sheet.status;
+  if (st === 'none') return;
+  const y = (k === 0 && !layer.started) ? py0 + cell * 1.2 : py0 + front * cell + cell * 0.7;
+  const pulse = 0.5 + 0.5 * Math.sin(time * 6);
+  let col = 'rgba(255,255,255,0.55)', label = T.raw;
+  if (st === 'ready') { col = `rgba(150,255,170,${0.65 + 0.35 * pulse})`; label = T.ready; }
+  if (st === 'burn') { col = `rgba(255,110,80,${0.65 + 0.35 * pulse})`; label = T.burn; }
+  // arrows
+  ctx.fillStyle = col;
+  for (const fx of [0.22, 0.5, 0.78]) {
+    const ax = px0 + pw * fx, ay = y + (st === 'ready' ? pulse * 6 : 0);
+    ctx.beginPath(); ctx.moveTo(ax - 9, ay - 5); ctx.lineTo(ax + 9, ay - 5); ctx.lineTo(ax, ay + 6); ctx.closePath(); ctx.fill();
+  }
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  setFont(15, 700);
+  const tw = ctx.measureText(label).width + 20;
+  rr(px0 + pw / 2 - tw / 2, y + 10, tw, 24, 12); ctx.fill();
+  ctx.fillStyle = col; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(label, px0 + pw / 2, y + 22.5); ctx.textBaseline = 'alphabetic';
+}
+function drawHUD() {
+  ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fillRect(0, 0, W, 50);
+  ctx.fillStyle = '#ffe9b8'; ctx.textBaseline = 'middle';
+  let avg = '—';
+  if (layers.length) { let s = 0; for (const l of layers) s += l.score; avg = String(Math.round(s / layers.length)); }
+  setFont(20, 800); ctx.textAlign = 'left'; ctx.fillText(`${avg} ${T.pts}`, 14, 25);
+  fitText(T.layer(Math.min(k + 1, rec.layers), rec.layers), W / 2, 25, W * 0.36, 16, 700);
+  ctx.fillStyle = '#d8c39a'; setFont(14, 600); ctx.textAlign = 'right';
+  ctx.fillText(`${T.best} ${save.best[rec.id] || '—'}`, W - 14, 25);
+  ctx.textBaseline = 'alphabetic';
+  if (banner > 0) {
+    const a = Math.min(1, banner / 0.4, (3.2 - banner) / 0.3 + 0.01);
+    ctx.globalAlpha = clamp(a, 0, 1);
+    const nm = T.recipes[rec.id];
+    ctx.fillStyle = 'rgba(30,20,14,0.85)'; const by = py0 + ph * 0.78;
+    rr(W / 2 - Math.min(W * 0.42, 170), by, Math.min(W * 0.84, 340), 54, 12); ctx.fill();
+    ctx.fillStyle = '#ffd97a'; fitText(`${T.order}: ${nm[0]}`, W / 2, by + 23, W * 0.78, 18, 800);
+    ctx.fillStyle = '#e6d3b0'; fitText(nm[1], W / 2, by + 44, W * 0.78, 13, 500);
+    ctx.globalAlpha = 1;
+  }
+}
+function drawHint() {
+  if (hintT <= 0 || !hint) return;
+  ctx.globalAlpha = clamp(hintT / 0.5, 0, 1);
+  ctx.fillStyle = 'rgba(0,0,0,0.55)';
+  rr(12, H - 46, W - 24, 34, 17); ctx.fill();
+  ctx.fillStyle = '#fff3d6'; ctx.textBaseline = 'middle'; fitText(hint, W / 2, H - 29, W - 44, 15, 600); ctx.textBaseline = 'alphabetic';
+  ctx.globalAlpha = 1;
+}
+function drawPopups() {
+  for (const p of popups) {
+    ctx.globalAlpha = clamp(1.4 - p.t, 0, 1);
+    ctx.fillStyle = p.good ? '#b8ffbf' : '#ffe6a8';
+    setFont(34, 900); ctx.textAlign = 'center';
+    ctx.strokeStyle = 'rgba(0,0,0,0.6)'; ctx.lineWidth = 5;
+    ctx.strokeText(p.text, p.x, p.y - p.t * 40); ctx.fillText(p.text, p.x, p.y - p.t * 40);
+  }
+  ctx.globalAlpha = 1;
+}
+
+// cross-section
+function sectionGeom(lays) {
+  const segs = [];
+  let r = 0.34, th = -Math.PI / 2;
+  for (const l of lays) {
+    for (let ri = 0; ri < l.rows.length; ri++) {
+      const row = l.rows[ri];
+      const t = row.cov < 0.35 ? 0 : Math.max(0.03, row.h * Math.min(1, row.cov * 1.1)) * 1.5;
+      for (let s = 0; s < 3; s++) {
+        const dth = (0.9 / 3) / Math.max(r, 0.35);
+        segs.push({ r, t, th, dth, row, l, first: ri < 2 });
+        th += dth; r += t * dth / (Math.PI * 2);
+      }
+    }
+  }
+  let rmax = 0.5; for (const s of segs) rmax = Math.max(rmax, s.r + s.t);
+  return { segs, rmax };
+}
+function drawSection(cx, cy, R, lays) {
+  const { segs, rmax } = sectionGeom(lays);
+  const sc = R / rmax, ex = 1.18;
+  const se = (v) => Math.sign(v) * Math.pow(Math.abs(v), 0.55);
+  const P = (r, a) => [cx + se(Math.cos(a)) * r * sc * ex, cy + se(Math.sin(a)) * r * sc];
+  // plate shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.25)'; rr(cx - R * ex * 1.02 + 5, cy - R * 1.02 + 8, R * ex * 2.04, R * 2.04, R * 0.45); ctx.fill();
+  ctx.fillStyle = 'rgb(255,226,128)'; ctx.beginPath(); for (let a = 0; a < 6.3; a += 0.2) { const q = P(0.34, a); if (a === 0) ctx.moveTo(...q); else ctx.lineTo(...q); } ctx.fill();
+  for (const s of segs) {
+    if (s.t <= 0) continue;
+    const row = s.row; const li = lays.indexOf(s.l);
+    let col;
+    const shade = li % 2 ? 0.93 : 1;
+    if (row.s < 0.4) col = [250, 178, 40];
+    else col = [255, 222 * shade, 118 * shade];
+    const a1 = P(s.r, s.th), a2 = P(s.r, s.th + s.dth * 1.04), b2 = P(s.r + s.t, s.th + s.dth * 1.04), b1 = P(s.r + s.t, s.th);
+    ctx.fillStyle = ctx.strokeStyle = `rgb(${col[0]},${col[1] | 0},${col[2] | 0})`; ctx.lineWidth = 1.2; ctx.lineJoin = 'round';
+    ctx.beginPath(); ctx.moveTo(...a1); ctx.lineTo(...a2); ctx.lineTo(...b2); ctx.lineTo(...b1); ctx.closePath(); ctx.fill(); ctx.stroke();
+    // browned skin on the bottom side
+    const bw = clamp(row.b * 1.4, 0, 1);
+    if (bw > 0.05) {
+      ctx.strokeStyle = `rgba(150,80,25,${0.25 + 0.7 * bw})`; ctx.lineWidth = Math.max(1, sc * s.t * 0.35 * bw + 0.8);
+      ctx.beginPath(); ctx.moveTo(...b1); ctx.lineTo(...b2); ctx.stroke();
+    }
+    if (row.s < 0.4) {
+      ctx.fillStyle = 'rgba(255,255,230,0.35)'; ctx.beginPath(); ctx.arc(...P(s.r + s.t * 0.5, s.th + s.dth / 2), Math.max(1, s.t * sc * 0.18), 0, 6.283); ctx.fill();
+    }
+    if (s.first && li > 0 && s.l.bond < 0.6) {
+      ctx.strokeStyle = `rgba(40,25,15,${0.9 * (1 - s.l.bond)})`; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(...a1); ctx.lineTo(...a2); ctx.stroke();
+    }
+  }
+  // fine layer lines
+  ctx.strokeStyle = 'rgba(180,120,40,0.28)'; ctx.lineWidth = 0.8;
+  ctx.beginPath();
+  for (let i = 0; i < segs.length; i++) { const s = segs[i]; const p = P(s.r, s.th); if (i === 0) ctx.moveTo(...p); else ctx.lineTo(...p); }
+  ctx.stroke();
+}
+const DEMO = (() => {
+  const lays = [];
+  for (let l = 0; l < 3; l++) {
+    const rows = [];
+    for (let i = 0; i < NY; i++) rows.push({ cov: 1, h: 0.2 + 0.03 * Math.sin(i * 1.3 + l), s: 0.7, b: i > 15 ? 0.25 : 0.08, q: 1 });
+    lays.push({ rows, bond: 1 });
+  }
+  return lays;
+})();
+
+function drawTitle() {
+  drawStove();
+  const R = Math.min(W * 0.3, H * 0.17);
+  const cy = H * 0.3;
+  ctx.save(); ctx.translate(W / 2, cy); ctx.rotate(Math.sin(time * 0.8) * 0.05); ctx.translate(-W / 2, -cy);
+  drawSection(W / 2, cy, R, DEMO);
+  ctx.restore();
+  ctx.fillStyle = '#ffe2a0'; ctx.strokeStyle = 'rgba(0,0,0,0.5)'; ctx.lineWidth = 6;
+  let s = Math.min(46, W * 0.11); setFont(s, 900);
+  while (s > 16 && ctx.measureText(T.title).width > W - 30) { s--; setFont(s, 900); }
+  ctx.textAlign = 'center'; ctx.strokeText(T.title, W / 2, H * 0.54); ctx.fillText(T.title, W / 2, H * 0.54);
+  ctx.fillStyle = '#f2e4c8';
+  T.how.forEach((l, i) => fitText(l, W / 2, H * 0.62 + i * 24, W - 30, 15, 500));
+  const nm = T.recipes[RECIPES[save.next % RECIPES.length].id];
+  ctx.fillStyle = '#ffd97a'; fitText(`${T.next}: ${nm[0]}`, W / 2, H * 0.62 + 3 * 24 + 14, W - 30, 16, 700);
+  ctx.fillStyle = '#cdb894'; fitText(nm[1], W / 2, H * 0.62 + 3 * 24 + 34, W - 30, 13, 500);
+  ctx.globalAlpha = 0.6 + 0.4 * Math.sin(time * 4);
+  ctx.fillStyle = '#ffffff'; fitText(T.tap, W / 2, H * 0.92, W - 30, 20, 800);
+  ctx.globalAlpha = 1;
+}
+function drawBoardBg() {
+  const g = ctx.createLinearGradient(0, 0, W, H);
+  g.addColorStop(0, '#c99a62'); g.addColorStop(1, '#a87a47');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  ctx.strokeStyle = 'rgba(110,70,35,0.18)'; ctx.lineWidth = 2;
+  for (let i = 0; i < 14; i++) { const y = (i + 0.5) * H / 14; ctx.beginPath(); ctx.moveTo(0, y); ctx.bezierCurveTo(W * 0.3, y + 8, W * 0.6, y - 8, W, y + 4); ctx.stroke(); }
+}
+function drawLog(x, y, w, h, alpha = 1) {
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = 'rgba(60,30,10,0.3)'; rr(x + 4, y + 8, w, h, h * 0.3); ctx.fill();
+  const g = ctx.createLinearGradient(0, y, 0, y + h);
+  const bb = Math.min(1, rollColors() * 1.3);
+  const m = (a, b) => Math.round(a + (b - a) * bb * 0.7);
+  g.addColorStop(0, `rgb(${m(222, 170)},${m(160, 100)},${m(56, 32)})`); g.addColorStop(0.4, `rgb(${m(255, 222)},${m(228, 160)},${m(134, 74)})`); g.addColorStop(1, `rgb(${m(200, 146)},${m(136, 84)},${m(44, 26)})`);
+  ctx.fillStyle = g; rr(x, y, w, h, h * 0.3); ctx.fill();
+  browns(x, y, w, h);
+  ctx.globalAlpha = 1;
+}
+function drawBoard() {
+  drawBoardBg();
+  const w = Math.min(W * 0.84, 360), h = Math.min(w * 0.36, 120);
+  logBox = { x: (W - w) / 2, y: H * 0.44 - h / 2, w, h };
+  const a = phase === 'toBoard' ? clamp(phaseT / 0.6, 0, 1) : 1;
+  if (phase === 'cut') {
+    const p = clamp(phaseT / 0.35, 0, 1), gap = p * 18;
+    ctx.save(); ctx.beginPath(); ctx.rect(0, 0, cutX, H); ctx.clip(); ctx.translate(-gap, 0); drawLog(logBox.x, logBox.y, w, h); ctx.restore();
+    ctx.save(); ctx.beginPath(); ctx.rect(cutX, 0, W - cutX, H); ctx.clip(); ctx.translate(gap, 0); drawLog(logBox.x, logBox.y, w, h); ctx.restore();
+    ctx.fillStyle = `rgba(255,255,255,${1 - p})`; ctx.fillRect(cutX - 1, logBox.y - 30, 2, h + 60);
+  } else {
+    drawLog(logBox.x, logBox.y, w, h, a);
+    if (phase === 'board') {
+      // knife hint
+      const kx = logBox.x + w * 0.5, ky = logBox.y - 40 + Math.sin(time * 3) * 8;
+      ctx.fillStyle = '#e8eef2'; ctx.beginPath(); ctx.moveTo(kx - 8, ky - 40); ctx.lineTo(kx + 8, ky - 40); ctx.lineTo(kx + 8, ky + 14); ctx.lineTo(kx - 8, ky + 24); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#3a2618'; rr(kx - 6, ky - 76, 12, 38, 5); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.setLineDash([6, 8]); ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(kx, logBox.y - 10); ctx.lineTo(kx, logBox.y + h + 24); ctx.stroke(); ctx.setLineDash([]);
+    }
+  }
+  if (act && act.mode === 'cut') {
+    ctx.strokeStyle = 'rgba(255,255,255,0.8)'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(act.sx, act.sy); ctx.lineTo(act.x, act.y); ctx.stroke();
+  }
+}
+function drawResult() {
+  drawBoardBg();
+  const R = Math.min(W * 0.3, H * 0.165);
+  const cy = H * 0.24;
+  const p = clamp(resultT / 0.5, 0, 1), e = 1 - Math.pow(1 - p, 3);
+  drawSection(W / 2, cy, R * (0.6 + 0.4 * e), layers);
+  const gi = finalScore >= 90 ? 0 : finalScore >= 75 ? 1 : finalScore >= 55 ? 2 : finalScore >= 35 ? 3 : 4;
+  let y = cy + R + 38;
+  ctx.fillStyle = '#3b230f'; fitText(T.grades[gi], W / 2, y, W - 30, 22, 800);
+  y += 52;
+  ctx.fillStyle = '#2a170a'; setFont(52, 900); ctx.textAlign = 'center';
+  ctx.fillText(`${finalScore}`, W / 2 - 14, y); setFont(20, 800); ctx.textAlign = 'left'; ctx.fillText(T.pts, W / 2 + ctx.measureText(`${finalScore}`).width * 0 + 34, y);
+  y += 26;
+  ctx.fillStyle = isNewBest ? '#a3240f' : '#5a3a1e';
+  fitText(isNewBest ? T.newBest : `${T.best} ${save.best[rec.id] || 0}`, W / 2, y, W - 30, 16, 800);
+  y += 30;
+  setFont(14, 600);
+  for (let i = 0; i < layers.length; i++) {
+    const l = layers[i];
+    ctx.fillStyle = 'rgba(60,35,15,0.12)'; rr(24, y - 15, W - 48, 24, 8); ctx.fill();
+    ctx.fillStyle = '#3b230f'; ctx.textAlign = 'left'; setFont(14, 700); ctx.fillText(T.nth(i + 1), 34, y + 2);
+    ctx.textAlign = 'right'; ctx.fillText(String(l.score), W - 34, y + 2);
+    ctx.fillStyle = l.fault === 'good' ? '#1f5e22' : '#8a2a0a';
+    fitText(T.faults[l.fault], W / 2 + 6, y + 2, W - 150, 14, 800);
+    y += 28;
+  }
+  ctx.fillStyle = '#3b230f'; fitText(`${T.recipes[rec.id][0]}`, W / 2, Math.min(H - 52, y + 10), W - 30, 13, 600);
+  if (resultT > 0.7) {
+    ctx.globalAlpha = 0.6 + 0.4 * Math.sin(time * 4);
+    ctx.fillStyle = '#2a170a'; fitText(T.again, W / 2, H - 22, W - 30, 18, 800);
+    ctx.globalAlpha = 1;
+  }
+}
+
+function draw() {
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  if (phase === 'title') { drawTitle(); return; }
+  if (phase === 'board' || phase === 'cut' || (phase === 'toBoard' && phaseT > 0.45)) { drawBoard(); drawHint(); return; }
+  if (phase === 'result') { drawResult(); return; }
+  drawStove();
+  drawPan(true);
+  drawRollCue();
+  drawHUD();
+  drawPopups();
+  if (liftAmt > 0.5 && hintT <= 0 && phase !== 'toBoard') { ctx.fillStyle = 'rgba(255,220,160,0.85)'; fitText(T.lifted, W / 2, H - 24, W - 40, 14, 700); }
+  drawHint();
+  if (phase === 'toBoard') { ctx.fillStyle = `rgba(200,150,95,${clamp(phaseT / 0.45, 0, 1)})`; ctx.fillRect(0, 0, W, H); }
+}
+
+let last = 0;
+function frame(ts) {
+  const dt = last ? Math.min(0.05, Math.max(0, (ts - last) / 1000)) : 0.016;
+  last = ts;
+  try { update(dt); draw(); } catch (e) { console.error(e); }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
