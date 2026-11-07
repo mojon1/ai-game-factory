@@ -1,0 +1,462 @@
+{
+  "id": "2026-11-07-claude-1",
+  "status": "published",
+  "title": "マッチあかりの脱出",
+  "genre": "脱出",
+  "concept": "明るいと見えるものと、暗いときだけ光るもの。マッチの火を指で運んで部屋を照らし、火を消して蓄光の数字を読む。光と闇を行き来する手触りと、限られたマッチの使いどころ（ろうそくに火を移す・紙をあぶる）が核。",
+  "howToPlay": "マッチ箱をタップして火をつけ、指で火を運んで部屋を調べる。手がかりを集めて扉の番号をあわせ、3つの部屋から脱出する。",
+  "libraryDecision": "使わない。核は暗やみに浮かぶ小さな光の輪と蓄光の数字の読みやすさで、Canvas 2D の光のマスクで十分になめらかに作れるため。",
+  "soundDecision": "BGMは入れず、マッチをする音・火のぱちぱち・柱時計のような小さな秒の音・ダイヤルのカチカチを Web Audio で作った。静けさと時計の音が、マッチが尽きる緊張を強めるため。",
+  "improvements": [
+    {
+      "found": "1部屋目の番号が最初から光っていて、火を使わずに解けてしまう／暗やみが明るく、火がなくても部屋が見える／ろうそくを灯したままでも壁の光る数字が読め、吹き消す意味がない",
+      "changed": "1部屋目の蓄光は最初は光らせず「照らしてから暗くすると浮かぶ」を体験させた。暗さを強め、ろうそくの光を壁まで届かせて蓄光を消すようにし、吹き消した直後に再点火する不具合も直した",
+      "foundEn": "Room 1 code glowed from the start so the flame was unnecessary / the dark was too bright to need light / the wall numbers were readable with the candle lit, so blowing it out was pointless",
+      "changedEn": "Room 1 paint now starts uncharged, teaching 'light it, then go dark'. Darker room, candle light now reaches and washes out the paint, and fixed instant relighting after blowing out"
+    },
+    {
+      "found": "掛け軸が光で白飛びし、あぶり出しの文字が薄くて読めない／火を通過させただけで焦げてしまう／茶室の蓄光が行灯から遠すぎて充電されない",
+      "changed": "紙の色と暖色の重ねを抑え、墨を濃く、浮かぶ速さを上げた。焦げるのは火を紙に押しつけて留めたときだけにした。行灯の光を広げ蓄光の位置を近づけ、炎のゆらぎで蓄光がちらつかないよう判定に余裕を持たせた",
+      "foundEn": "The scroll was blown out by the light and the ink too faint / merely passing the flame scorched it / the tea-room paint was too far from the lantern to charge",
+      "changedEn": "Toned down paper and warm tint, darker ink, faster reveal; scorching only when the flame lingers on the paper; wider lantern light and closer paint, with margin so flicker no longer makes the paint blink"
+    },
+    {
+      "found": "脱出したあと、次に何を目指せばよいかがない／マッチを節約しても報われる感じが薄い／結果画面が数字だけで余韻がない",
+      "changed": "どの部屋もマッチ1本で抜けられることを確かめ、1本で抜けると「マッチ一本で脱出！」と音と★で褒め、夜明けの画面に部屋ごとの記録とその目標を出した（番号は毎回変わる）",
+      "foundEn": "Nothing to aim for after escaping / saving matches felt unrewarded / the result screen was just numbers",
+      "changedEn": "Verified each room is solvable with one match; a one-match escape now earns a chime and a star, and the dawn screen shows per-room results and that goal (codes change every play)"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "脱出",
+      "en": "Escape room",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "マッチの火を指で運ぶ暗やみの脱出。火で見える手がかりと、火を消すと光る蓄光の数字を組み合わせて扉を開ける。",
+        "ideaEn": "A dark escape room where you carry a match flame with your finger; clues visible in light combine with glow-in-the-dark numbers that show only when the flame is out.",
+        "fromDraw": true
+      },
+      {
+        "idea": "枯山水の砂を熊手でなぞって波紋を描く、終わりのない遊び場。石を置くと波紋が石を避けて流れる。",
+        "ideaEn": "An endless zen-garden playground: rake ripples into sand with your finger; placed stones bend the ripples around them.",
+        "fromDraw": false
+      },
+      {
+        "idea": "竹とんぼを両手の指でこすり合わせて回し、風に乗せて的の枝にとまらせる。",
+        "ideaEn": "Spin a bamboo dragonfly by rubbing two fingers, then ride the wind to land it on target branches.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "tap",
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Matchlight Escape",
+      "concept": "Some things show only in light, others glow only in the dark. Carry a match flame with your finger to light the room, then put it out to read glow-in-the-dark numbers. The core is the back-and-forth between light and dark and deciding how to spend a few matches (lighting a candle, warming invisible ink).",
+      "howToPlay": "Tap the matchbox to strike a match and drag the flame to search the room. Gather clues, set the door code, and escape three rooms.",
+      "libraryDecision": "None. The core is a small circle of light in the dark and readable glowing numbers, which Canvas 2D light masks handle smoothly.",
+      "soundDecision": "No music. Match strikes, crackling flames, a quiet clock tick and dial clicks are made with Web Audio; the silence and ticking heighten the tension of running out of matches."
+    }
+  },
+  "createdAt": "2026-11-07T12:11:28+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-07T12:11:28+09:00",
+    "metricsFrom": "2026-11-07T03:08:28.331Z",
+    "transcript": "a426192d-f3b7-4c1c-a01f-7b3c8c7672e8.jsonl",
+    "validationRuns": 4,
+    "finishedAt": "2026-11-07T12:26:10+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-07T12:26:09+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "42.3KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=140",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=71",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=135",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=67",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 43275,
+    "lines": 780
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 2
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "部屋が3つだけで、謎も1部屋に1〜2個と少なく、慣れると数分で終わる。火とろうそくが重なると、吹き消す対象を取り違えやすい",
+    "comment": "1部屋目で壁の白い跡を照らしてから火を吹き消した瞬間、真っ暗な中に緑の数字がふっと浮かぶのが一番気持ちよかった。書斎で本の色と印、ろうそくを消して読む数字をつなぐ二段の推理も手応えがある。茶室であぶり出しの3と4が茶色く浮かんだのも楽しい。一方で謎の量は少なく、★4にはボリュームが足りない",
+    "similar": [
+      {
+        "title": "蓄光塗料で錠の番号を天井に書く手作り脱出ゲームの例",
+        "url": "https://thegamegal.com/?p=9420",
+        "similarity": "中",
+        "note": "明かりを消すと蓄光の番号が現れる仕掛けが同じ。こちらは火を運んで照らす・充電する・あぶるという光の操作が遊びの中心",
+        "note_en": "Same trick of a glow-paint code appearing when the lights go off; here the play centers on carrying a flame to light, charge and warm things"
+      },
+      {
+        "title": "クリムゾンルーム（Flash脱出ゲーム）",
+        "similarity": "低",
+        "note": "部屋を調べて番号錠を開ける脱出ゲームの型のルーツ。明るい部屋をタップで調べる点が違う",
+        "note_en": "Root of the point-and-click escape room with code locks; differs in that the room is fully lit"
+      }
+    ],
+    "research": "WebSearch で「escape room match light darkness glow in the dark clues」を検索し、蓄光塗料を使った脱出ゲームの手作り例を確認。脱出ゲームの型のルーツは知識から挙げた",
+    "i18n": {
+      "en": {
+        "worst": "Only three rooms with one or two clues each, so it is over in minutes once learned. When the flame sits on the candle, tapping can blow out the wrong one",
+        "comment": "Best moment: lighting the pale marks in room 1, blowing out the match, and green numbers floating up in total darkness. The study's two-step chain (book color and mark, then numbers read after blowing out the candle) feels good, and the ink rising on the tea-room scroll is fun. But there are too few puzzles for 4 stars",
+        "research": "Searched the web for escape rooms with glow-in-the-dark clues and found DIY examples; the genre root is cited from knowledge"
+      }
+    },
+    "method": "スマホ縦画面で 10 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 10 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "スタート",
+        "noteEn": "Start",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "path(0.50,0.92→0.40,0.70→0.30,0.40) 900ms → tap(0.30,0.30) 120ms",
+        "note": "壁の跡を照らして吹き消すと6 9 1が浮かぶ",
+        "noteEn": "Light the marks, blow out: 6 9 1 appears",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.75,0.50) 120ms → tap(0.30,0.56) 120ms → tap(0.30,0.56) 120ms → tap(0.30,0.56) 120ms → tap(0.30,0.56) 120ms → tap(0.50,0.56) 120ms → tap(0.70,0.45) 120ms → wait 3500ms → tap(0.50,0.50) 120ms",
+        "note": "手さぐりで691。書斎へ",
+        "noteEn": "691 by feel; into the study",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "path(0.50,0.92→0.70,0.75→0.83,0.56) 800ms → path(0.83,0.62→0.50,0.62→0.25,0.60) 700ms",
+        "note": "ろうそくを灯し、火を本棚へ。色の本に印。ろうそくが灯っていると壁の数字は見えない",
+        "noteEn": "Light the candle, carry the flame to the shelf: colored books have marks; with the candle lit the wall numbers stay hidden",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.25,0.50) 120ms → tap(0.83,0.54) 120ms → wait 600ms",
+        "note": "マッチとろうそくを吹き消す",
+        "noteEn": "Blow out the match and the candle",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.50,0.45) 120ms → tap(0.20,0.56) 120ms → tap(0.40,0.45) 120ms → tap(0.60,0.45) 120ms → tap(0.60,0.45) 120ms → tap(0.80,0.56) 120ms → tap(0.80,0.56) 120ms → tap(0.80,0.56) 120ms → tap(0.80,0.56) 120ms → tap(0.80,0.56) 120ms → wait 3500ms → tap(0.50,0.50) 120ms",
+        "note": "9125で開けて茶室へ",
+        "noteEn": "9125 opens; into the tea room",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "path(0.50,0.92→0.60,0.75→0.72,0.36→0.72,0.46→0.72,0.56→0.72,0.66→0.72,0.56→0.72,0.46→0.72,0.36) 3200ms",
+        "note": "掛け軸の前で火をゆっくり上下させてあぶる",
+        "noteEn": "Slowly sweep the flame up and down over the scroll",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "path(0.72,0.50→0.40,0.65→0.18,0.71) 800ms → wait 2500ms → tap(0.18,0.50) 120ms → tap(0.18,0.64) 120ms → wait 500ms",
+        "note": "行灯に火を移し、しばらく待ってからマッチと行灯を消す",
+        "noteEn": "Light the lantern, wait, then blow out match and lantern",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.18,0.66) 120ms → wait 500ms",
+        "note": "行灯を消す",
+        "noteEn": "Blow out the lantern",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.47,0.47) 120ms → tap(0.20,0.45) 120ms → tap(0.20,0.45) 120ms → tap(0.20,0.45) 120ms → tap(0.40,0.45) 120ms → tap(0.40,0.45) 120ms → tap(0.40,0.45) 120ms → tap(0.40,0.45) 120ms → tap(0.60,0.56) 120ms → tap(0.80,0.56) 120ms → tap(0.80,0.56) 120ms → tap(0.80,0.56) 120ms → tap(0.80,0.56) 120ms → tap(0.80,0.56) 120ms → wait 4000ms",
+        "note": "3495で脱出",
+        "noteEn": "3495 escapes",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": {
+                "m": 3,
+                "t": 27
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 7
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-07T12:26:10+09:00"
+  },
+  "publishedAt": "2026-11-07T12:26:10+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 25414,
+    "outputTokens": 43898,
+    "contextTokens": 10582827,
+    "turns": 56,
+    "toolCalls": 63,
+    "webSearches": 0,
+    "minutes": 17.8,
+    "from": "2026-11-07T03:08:28.331Z",
+    "to": "2026-11-07T03:26:15.771Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-07T12:26:15+09:00",
+    "validationRuns": 4,
+    "codeKB": 42.3
+  }
+}
