@@ -1,0 +1,485 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-11-08T14:03:01.447Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.85
+        ],
+        "hold": 80,
+        "wait": 100
+      },
+      "desc": "tap(0.50,0.85) 80ms",
+      "note": "タップで開始。緑の輪が列の先端",
+      "noteEn": "Tap to start; the ring marks the tip",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": {
+        "path": [
+          [
+            0.5,
+            0.42
+          ],
+          [
+            0.45,
+            0.34
+          ],
+          [
+            0.5,
+            0.3
+          ]
+        ],
+        "hold": 1400
+      },
+      "desc": "path(0.50,0.42→0.45,0.34→0.50,0.30) 1400ms",
+      "note": "列の先へなぞると、指についてドミノが立っていく",
+      "noteEn": "Dominoes stand up following my finger",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": {
+        "path": [
+          [
+            0.5,
+            0.34
+          ],
+          [
+            0.62,
+            0.3
+          ],
+          [
+            0.4,
+            0.3
+          ]
+        ],
+        "hold": 2400
+      },
+      "desc": "path(0.50,0.34→0.62,0.30→0.40,0.30) 2400ms",
+      "note": "波が動き出した。枚数が減ると置けない",
+      "noteEn": "Wave starts; stock limits how far I can lay",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": {
+        "path": [
+          [
+            0.4,
+            0.3
+          ],
+          [
+            0.55,
+            0.32
+          ],
+          [
+            0.62,
+            0.3
+          ],
+          [
+            0.55,
+            0.3
+          ]
+        ],
+        "hold": 2500
+      },
+      "desc": "path(0.40,0.30→0.55,0.32→0.62,0.30→0.55,0.30) 2500ms",
+      "note": "左の紫のボールを避けて右へ流す",
+      "noteEn": "Steer right around the purple ball",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": {
+        "path": [
+          [
+            0.55,
+            0.32
+          ],
+          [
+            0.48,
+            0.3
+          ],
+          [
+            0.5,
+            0.3
+          ]
+        ],
+        "hold": 2500
+      },
+      "desc": "path(0.55,0.32→0.48,0.30→0.50,0.30) 2500ms",
+      "note": "枚数の範囲で先を読みながら進む",
+      "noteEn": "Read ahead within the stock limit",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": {
+        "path": [
+          [
+            0.5,
+            0.3
+          ],
+          [
+            0.48,
+            0.25
+          ],
+          [
+            0.47,
+            0.24
+          ]
+        ],
+        "hold": 1500
+      },
+      "desc": "path(0.50,0.30→0.48,0.25→0.47,0.24) 1500ms",
+      "note": "ベルをまたいで通す。おもちゃの車が右から来ている",
+      "noteEn": "Route through the bell; a toy car comes from the right",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": {
+        "path": [
+          [
+            0.47,
+            0.4
+          ],
+          [
+            0.38,
+            0.44
+          ],
+          [
+            0.3,
+            0.5
+          ],
+          [
+            0.34,
+            0.52
+          ]
+        ],
+        "hold": 2800
+      },
+      "desc": "path(0.47,0.40→0.38,0.44→0.30,0.50→0.34,0.52) 2800ms",
+      "note": "指を下げて波に近づく。点の増え方が変わるはず",
+      "noteEn": "Lower the finger toward the wave for more points",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "best": 65,
+            "bestZone": 0
+          }
+        },
+        {
+          "agf": "end",
+          "score": 65
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": {
+        "path": [
+          [
+            0.34,
+            0.55
+          ],
+          [
+            0.5,
+            0.55
+          ],
+          [
+            0.62,
+            0.56
+          ],
+          [
+            0.6,
+            0.56
+          ]
+        ],
+        "hold": 2500
+      },
+      "desc": "path(0.34,0.55→0.50,0.55→0.62,0.56→0.60,0.56) 2500ms",
+      "note": "ぎりぎりを続ける",
+      "noteEn": "Stay close",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "best": 65,
+            "bestZone": 0
+          }
+        },
+        {
+          "agf": "end",
+          "score": 65
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": {
+        "path": [
+          [
+            0.6,
+            0.55
+          ],
+          [
+            0.45,
+            0.5
+          ],
+          [
+            0.5,
+            0.48
+          ]
+        ],
+        "hold": 2500
+      },
+      "desc": "path(0.60,0.55→0.45,0.50→0.50,0.48) 2500ms",
+      "note": "やり直しの2回目。もう操作は分かっている",
+      "noteEn": "Second run; the controls are clear now",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "best": 65,
+            "bestZone": 0
+          }
+        },
+        {
+          "agf": "end",
+          "score": 65
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "action": {
+        "path": [
+          [
+            0.5,
+            0.5
+          ],
+          [
+            0.6,
+            0.52
+          ],
+          [
+            0.45,
+            0.5
+          ]
+        ],
+        "hold": 3000
+      },
+      "desc": "path(0.50,0.50→0.60,0.52→0.45,0.50) 3000ms",
+      "note": "波の近くで蛇行",
+      "noteEn": "Weaving close to the wave",
+      "image": "ai-play/step-10.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "best": 320,
+            "bestZone": 0
+          }
+        },
+        {
+          "agf": "end",
+          "score": 320
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "action": {
+        "wait": 4000
+      },
+      "desc": "wait 4000ms",
+      "note": "手を離して波に追いつかれる",
+      "noteEn": "Let the wave catch up",
+      "image": "ai-play/step-11.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "best": 65,
+            "bestZone": 0
+          }
+        },
+        {
+          "agf": "end",
+          "score": 65
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "best": 65,
+            "bestZone": 0
+          }
+        },
+        {
+          "agf": "end",
+          "score": 53
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}

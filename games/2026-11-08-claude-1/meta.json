@@ -1,0 +1,555 @@
+{
+  "id": "2026-11-08-claude-1",
+  "status": "published",
+  "title": "どこまでドミノ",
+  "genre": "エンドレスラン",
+  "concept": "倒れてくる波に追われながら、指でドミノを先へ先へ並べ続ける。指の高さがそのまま波との距離になり、近いほど点が増える。ねこに当たればそこから倒れ始める。倒れた跡は色の帯になり、最後に上空から全行程を眺められる。",
+  "howToPlay": "指でなぞるとドミノが先へ伸びます。倒れる波が先端に追いついたら終わり。波のすぐ前に並べるほど倍率が上がり、ベルを通すと置ける枚数が増えます。",
+  "libraryDecision": "three.js を使用。手前から奥へ倒れていく列の迫力と、最後に上空へ引いて走った道すじを見せる演出に奥行きが要るため。物理演算は使わず、倒れる速さと音を確実に合わせるため角度を数式で動かした。",
+  "soundDecision": "BGMは付けず、倒れる1枚ごとの木の音にマリンバの音程を付け、波の速さそのものが旋律になるようにした。倍率が上がると音域が広がり、波が迫ると低い鼓動が鳴る。音を遊びの状態と一体にするため。",
+  "improvements": [
+    {
+      "found": "指を先端より手前に置くと列が渦を巻いて枚数を使い切る／障害物に正面から当たると横へ抜けられず詰む／波の光が白飛びして倒れる様子が見えない",
+      "changed": "先端より手前の指では置かないようにし、障害物に沿って真横まで曲がれるようにした。光を小さく弱くし、倒れた跡の色を濃くした",
+      "foundEn": "A finger behind the tip curled the line and wasted all stock / head-on obstacles left no way sideways / the wave glow blew out and hid the fall",
+      "changedEn": "Ignored fingers behind the tip, allowed turning fully sideways along obstacles, shrank the glow and deepened the ribbon colors"
+    },
+    {
+      "found": "開始時に置ける枚数が6枚しかない／次に何を目指すかが見えない／長い記録だと終了画面の帯が糸のように細い",
+      "changed": "最初の列を短くして枚数に余裕を持たせ、「次の場所まで○m」を表示した。終了画面は全体を縮めず、上空から道のりをたどって飛ぶ演出にした",
+      "foundEn": "Only 6 dominoes available at the start / no visible next goal / on long runs the ending ribbon became a hairline",
+      "changedEn": "Shortened the opening line, added a distance-to-next-place readout, and made the ending camera fly along the route instead of shrinking it"
+    },
+    {
+      "found": "列が止まった理由が分からない／序盤に動くものが出ず単調／追いつかれる瞬間があっけなく惜しさが残らない",
+      "changed": "枚数切れの文字と、障害物に当たったときの赤い輪・音を足した。序盤に必ずおもちゃの車を出し、追いつかれる直前だけ波を遅くして粘れるようにし、次の場所が近かったときは「あと○m」と出すようにした",
+      "foundEn": "Unclear why the line stopped / nothing moved early on / being caught felt abrupt with no sense of a near miss",
+      "changedEn": "Added an out-of-stock message and a red ring with sound when blocked, guaranteed an early toy car, slowed the wave just before it catches you, and show how close the next place was"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "街づくり",
+      "en": "City building",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "街づくり: 指で川を一筆引くと、水辺に家や畑がひとりでに生えていく箱庭。3Dの小さな島が育っていくのを眺める。",
+        "ideaEn": "City building: draw a single river and houses and fields sprout along its banks on a small 3D island.",
+        "fromDraw": true
+      },
+      {
+        "idea": "倒れてくるドミノの波に追いつかれないよう、指で先へ先へ並べ続ける追いかけっこ。3Dで部屋から町まで走り抜ける。",
+        "ideaEn": "Keep drawing a domino line ahead of the falling wave, running in 3D from a kid's room out across town.",
+        "fromDraw": false
+      },
+      {
+        "idea": "坂を転がる雪玉を左右に操り、大きくなるほど速くなるが狭い道を通れなくなる3Dのレース。",
+        "ideaEn": "Steer a snowball rolling downhill in 3D; it grows faster but no longer fits through narrow gaps.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 1
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "fail",
+    "input": [
+      "draw",
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Domino Runaway",
+      "concept": "Chased by a falling wave, you keep drawing dominoes ahead with your finger. Finger height equals distance from the wave, and closer scores more. A passing cat starts a new fall right where it hits. The fallen line becomes a ribbon of color you see from above at the end.",
+      "howToPlay": "Draw to extend the domino line. It ends when the falling wave reaches the tip. Staying close raises the multiplier, and routing through bells gives you more dominoes.",
+      "libraryDecision": "Uses three.js: the line toppling away into the distance and the final pull-up to view your whole route need depth. No physics engine; fall angles are computed so the timing and sound stay exact.",
+      "soundDecision": "No BGM. Each falling domino is a wooden click with a marimba pitch, so the wave's speed itself becomes the melody. The range widens with the multiplier and a low heartbeat plays as the wave closes in, tying sound to the state of play."
+    }
+  },
+  "createdAt": "2026-11-08T22:43:01+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-08T22:43:01+09:00",
+    "metricsFrom": "2026-11-08T13:40:59.371Z",
+    "transcript": "9d324c9d-9074-4729-a87b-043dbf51130e.jsonl",
+    "validationRuns": 5,
+    "finishedAt": "2026-11-08T23:09:56+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-08T23:09:56+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "50.1KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=124",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=279",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=113",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=190",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 51291,
+    "lines": 630
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0.6,
+    "idleStarts": 32
+  },
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "障害物と枚数切れが重なると、原因を理解する前に波に追いつかれて終わることがあり、最初の数回は短い失敗が続きやすい。音は実機で聞いて確かめられていない。",
+    "comment": "蛇行させた列を波がたどって色の帯に変わる場面と、終わったあと上空から自分の道のりを眺める場面は、もう1回やりたくなった。指を下げると倍率が付く緊張感もある。一方、同じ部屋の前半は変化が少なく、★4と言い切れる驚きまでは届かなかった。自己プレイは操作の再生に揺れがあり、途中で別の回に切り替わった記録が混じる。難易度はボットの計測（生存約20〜70秒）も参考にした。",
+    "similar": [
+      {
+        "title": "Domino Theory",
+        "url": "https://apps.apple.com/us/app/domino-theory/id573964745",
+        "similarity": "中",
+        "note": "指でなぞってドミノの列を作り倒す点が同じ。こちらは倒れている最中に並べ続ける追いかけっこで、置いてから倒す作品ではない。",
+        "note_en": "Also draws domino lines with a finger. This game is a chase where you keep laying them during the fall, rather than building first and toppling after."
+      },
+      {
+        "title": "Push-Over",
+        "url": "https://en.wikipedia.org/wiki/Push-Over_(video_game)",
+        "similarity": "低",
+        "note": "ドミノの連鎖を題材にした1992年のパズル。配置を考えて一押しする作りで、実時間で逃げる要素はない。",
+        "note_en": "A 1992 domino chain puzzle built on planning placement and one push, with no real-time chase."
+      }
+    ],
+    "research": "ウェブ検索を2回行い、指で描くドミノのスマホ作品とドミノ連鎖の古典パズルを確認した。倒れる波に追われながら並べ続ける作品は検索範囲では見つからなかった。",
+    "i18n": {
+      "en": {
+        "worst": "When an obstacle and running out of stock coincide, the wave can catch you before you grasp why, so the first few runs tend to end quickly. I could not listen to the sound on a real device.",
+        "comment": "Watching the wave follow my winding line and turn it into a ribbon, then flying over my route at the end, made me want another run. Lowering the finger for a multiplier adds tension. The first room changes little, though, and it fell short of the surprise a 4 needs. Replay in self-play varied, so the log includes a switch to a later run. Difficulty was also checked with a bot (about 20-70 seconds of survival).",
+        "research": "Two web searches covered finger-drawn domino mobile games and classic domino chain puzzles. None found in that scope has you laying dominoes while chased by the falling wave."
+      }
+    },
+    "method": "スマホ縦画面で 11 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 11 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.85) 80ms",
+        "note": "タップで開始。緑の輪が列の先端",
+        "noteEn": "Tap to start; the ring marks the tip",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "path(0.50,0.42→0.45,0.34→0.50,0.30) 1400ms",
+        "note": "列の先へなぞると、指についてドミノが立っていく",
+        "noteEn": "Dominoes stand up following my finger",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "path(0.50,0.34→0.62,0.30→0.40,0.30) 2400ms",
+        "note": "波が動き出した。枚数が減ると置けない",
+        "noteEn": "Wave starts; stock limits how far I can lay",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "path(0.40,0.30→0.55,0.32→0.62,0.30→0.55,0.30) 2500ms",
+        "note": "左の紫のボールを避けて右へ流す",
+        "noteEn": "Steer right around the purple ball",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "path(0.55,0.32→0.48,0.30→0.50,0.30) 2500ms",
+        "note": "枚数の範囲で先を読みながら進む",
+        "noteEn": "Read ahead within the stock limit",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "path(0.50,0.30→0.48,0.25→0.47,0.24) 1500ms",
+        "note": "ベルをまたいで通す。おもちゃの車が右から来ている",
+        "noteEn": "Route through the bell; a toy car comes from the right",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "path(0.47,0.40→0.38,0.44→0.30,0.50→0.34,0.52) 2800ms",
+        "note": "指を下げて波に近づく。点の増え方が変わるはず",
+        "noteEn": "Lower the finger toward the wave for more points",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 65,
+              "bestZone": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 65
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "path(0.34,0.55→0.50,0.55→0.62,0.56→0.60,0.56) 2500ms",
+        "note": "ぎりぎりを続ける",
+        "noteEn": "Stay close",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 65,
+              "bestZone": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 65
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "path(0.60,0.55→0.45,0.50→0.50,0.48) 2500ms",
+        "note": "やり直しの2回目。もう操作は分かっている",
+        "noteEn": "Second run; the controls are clear now",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 65,
+              "bestZone": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 65
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "path(0.50,0.50→0.60,0.52→0.45,0.50) 3000ms",
+        "note": "波の近くで蛇行",
+        "noteEn": "Weaving close to the wave",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 320,
+              "bestZone": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 320
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "wait 4000ms",
+        "note": "手を離して波に追いつかれる",
+        "noteEn": "Let the wave catch up",
+        "image": "ai-play/step-11.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 65,
+              "bestZone": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 65
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 65,
+              "bestZone": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 53
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-08T23:09:56+09:00"
+  },
+  "publishedAt": "2026-11-08T23:09:56+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 40396,
+    "outputTokens": 48509,
+    "contextTokens": 6856045,
+    "turns": 32,
+    "toolCalls": 48,
+    "webSearches": 0,
+    "minutes": 29,
+    "from": "2026-11-08T13:40:59.371Z",
+    "to": "2026-11-08T14:09:56.998Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-08T23:09:57+09:00",
+    "validationRuns": 5,
+    "codeKB": 50.1
+  }
+}
