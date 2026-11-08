@@ -1,0 +1,325 @@
+{
+  "id": "2026-11-08-gpt-1",
+  "status": "published",
+  "title": "こもれび発電所",
+  "genre": "放置・クリッカー",
+  "concept": "小川の手回し発電で電気をため、増設する水車と手回しを強くする歯車のどちらへ投資するか決める。貯めた電気で小屋の窓が順に灯り、70で完成する。",
+  "howToPlay": "手回しをタップし、水車と歯車で発電を強めます。電気70で小屋が灯ります。",
+  "libraryDecision": "窓と水車を平面のSVGで描き、発電量の変化を同時に読めるようにした。共有ライブラリは使わない。",
+  "soundDecision": "連打の音が重ならないよう無音とし、窓と水車で反応を伝える。",
+  "improvements": [
+    {
+      "found": "設備の効果を買うまで読めない。買えない札も同じ色。手回しの反応が数字だけ。",
+      "changed": "毎秒・一回の増分を設備札に表示し、購入不可を暗くして、手回しに短い点滅を付けた。",
+      "foundEn": "Equipment effects were hidden, unavailable items looked active, and cranking only changed the number.",
+      "changedEn": "Show equipment effects, dim unaffordable items, and pulse the crank button."
+    },
+    {
+      "found": "点灯までの進捗が数字中心。増設台数が分からない。購入結果が一般メッセージのまま。",
+      "changed": "進捗バー、設備数と回転速度、購入直後の設備名を表示。",
+      "foundEn": "Progress is numeric, the number installed is unclear, and purchases show generic feedback.",
+      "changedEn": "Show a progress meter, equipment counts and wheel speed, and name the purchased upgrade."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "放置・クリッカー",
+      "en": "Idle / clicker",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "小川の発電所を育てるクリッカー。水車と点灯を平面の風景で見せる。",
+        "ideaEn": "A brookside clicker with a flat landscape that lights up.",
+        "fromDraw": true
+      },
+      {
+        "idea": "雲の切れ目で航路を探す立体飛行。",
+        "ideaEn": "A 3D flight game reading gaps in clouds.",
+        "fromDraw": false
+      },
+      {
+        "idea": "影絵の足跡から動物を当てる平面推理。",
+        "ideaEn": "A flat deduction game about animals’ shadow tracks.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Brooklight Station",
+      "concept": "Choose between passive wheels and stronger cranks as a cabin lights up. Store 70 power to finish.",
+      "howToPlay": "Tap to crank and buy wheels or gears. Light the cabin by storing 70 power.",
+      "libraryDecision": "A flat SVG scene shows the spinning wheel and lit windows without a shared library.",
+      "soundDecision": "Silent taps avoid stacked sounds; wheels and windows provide visual feedback."
+    }
+  },
+  "createdAt": "2026-11-08T22:26:38+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-08T22:26:38+09:00",
+    "metricsFrom": "2026-11-08T13:24:59.186Z",
+    "transcript": null,
+    "validationRuns": 3,
+    "finishedAt": "2026-11-08T22:31:16+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-08T22:29:53+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "7.0KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 7204,
+    "lines": 104
+  },
+  "sound": {
+    "uses": false
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 2,
+    "works": "ok",
+    "worst": "設備を揃えると待ち時間が長く、次の判断が少ない。",
+    "comment": "水車二台と歯車一つで24.6秒で点灯。増設と手回しの違いは読めるが、成長の幅は小さい。画像自己プレイで二回改良。",
+    "similar": [
+      {
+        "title": "Cookie Clicker",
+        "url": "https://cookieclicker.com/",
+        "similarity": "高",
+        "note": "手動で資源を得て自動生産に投資する流れが共通。本作は70で点灯する短い区切りがある。",
+        "note_en": "Both use manual production to invest in automation. This game ends at a short target of 70 power."
+      }
+    ],
+    "research": "Cookie Clickerを検索し、公式サイトと公式ブラウザ版で比較。",
+    "i18n": {
+      "en": {
+        "worst": "Once equipment is installed, waiting dominates and choices become scarce.",
+        "comment": "Two wheels and a gear lit the cabin in 24.6 seconds. The upgrade choices are clear but progression is shallow. Two revisions followed screenshot-based play.",
+        "research": "Searched for Cookie Clicker and checked its official site and browser edition."
+      }
+    },
+    "method": "スマホ縦画面で 6 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 6 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → tap(0.50,0.71) 120ms → tap(0.50,0.71) 120ms → tap(0.50,0.71) 120ms → tap(0.50,0.71) 120ms",
+        "note": "進捗バーで手回し四回分の増加が見える。",
+        "noteEn": "The meter shows the gain from four cranks.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.26,0.83) 120ms → wait 8000ms",
+        "note": "水車1台の設置が表示され、待つ間に16まで増える。",
+        "noteEn": "The installed wheel is shown, and passive generation reaches 16.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.74,0.83) 120ms → tap(0.50,0.71) 120ms → tap(0.50,0.71) 120ms → tap(0.50,0.71) 120ms",
+        "note": "歯車を設置して手回しを5にし、電気を積み直す。",
+        "noteEn": "A gear raises manual output to five and the battery refills.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.50,0.71) 120ms → tap(0.26,0.83) 120ms → wait 8000ms",
+        "note": "二台目の水車を入れ、毎秒4で窓が一つ灯る。",
+        "noteEn": "Two wheels generate four per second and light the first window.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 5500ms",
+        "note": "待って二つ目の窓が灯る。最後は手回しも使う。",
+        "noteEn": "Waiting lights a second window; finish with the crank.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.50,0.71) 120ms → tap(0.50,0.71) 120ms → tap(0.50,0.71) 120ms",
+        "note": "三つの窓を灯して完成。発電が軌道に乗った後は待つ比重が大きい。",
+        "noteEn": "All three windows light. Once generation is established, much of the play is waiting.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 70
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-08T22:31:16+09:00"
+  },
+  "publishedAt": "2026-11-08T22:31:16+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 161,
+    "outputTokens": 6147,
+    "contextTokens": 6137694,
+    "turns": 26,
+    "toolCalls": 26,
+    "webSearches": null,
+    "minutes": 6.3,
+    "from": "2026-11-08T13:24:59.186Z",
+    "to": "2026-11-08T13:31:19.131Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-08T22:31:19+09:00",
+    "validationRuns": 3,
+    "codeKB": 7,
+    "evidence": "metrics-evidence.json"
+  }
+}

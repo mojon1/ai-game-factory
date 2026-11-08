@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Brooklight Station</title>
+<style>
+*{box-sizing:border-box;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;overflow:hidden;overscroll-behavior:none;background:#102d32;color:#f6f2cf;font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif}
+main{height:100dvh;display:flex;flex-direction:column;justify-content:space-between;gap:8px;padding:16px}
+header{display:flex;justify-content:space-between;font-size:16px;font-weight:bold}
+#scene{width:100%;height:min(38dvh,240px);border-radius:18px;background:#203e45}
+#meter{width:100%;height:9px;appearance:none;border:0;border-radius:8px;overflow:hidden;background:#35585c}#meter::-webkit-progress-bar{background:#35585c}#meter::-webkit-progress-value{background:#ffc976}#notice,#hint{text-align:center;min-height:21px;font-size:14px}
+#controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button{font:inherit;border:0;border-radius:12px;background:#b8e8c9;color:#173438;min-height:60px;padding:5px}
+button small{display:block;font-size:13px;color:inherit}.unavailable{background:#647e77}.pulse{animation:pulse .25s ease-out}@keyframes pulse{50%{filter:brightness(1.3);transform:scale(.98)}}#crank{grid-column:span 2;min-height:68px;font-size:20px;font-weight:bold}
+#cover{position:absolute;inset:0;background:#102d32f5;display:grid;place-items:center;text-align:center;padding:24px}
+h1{font-size:clamp(24px,8vw,37px)}p{line-height:1.7}small{font-size:16px;color:#ffc976}
+.wheel{transform-box:fill-box;transform-origin:center;animation:spin 2s linear infinite;animation-play-state:paused}@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+<main><header><span id="power"></span><span id="rate"></span></header>
+<svg id="scene" viewBox="0 0 320 230" aria-hidden="true">
+ <path fill="#365653" d="M0 136 60 52 120 135 205 31 320 147V230H0Z"/>
+ <path fill="#488a8f" d="M0 162Q80 128 160 168T320 162V230H0Z"/>
+ <path fill="none" stroke="#9bdbce" stroke-width="3" d="M0 188Q80 153 160 193T320 188M0 213Q80 178 160 218T320 213"/>
+ <path fill="#784e43" d="M205 101 252 65 297 101V164H205Z"/>
+ <path fill="#262a34" d="M198 102 251 59 305 102Z"/>
+ <g id="lamps" fill="#303343"><rect x="218" y="112" width="15" height="22"/><rect x="244" y="112" width="15" height="22"/><rect x="270" y="112" width="15" height="22"/></g>
+ <g class="wheel" id="wheel" stroke="#eac38e" stroke-width="5" fill="none"><circle cx="105" cy="158" r="35"/><path d="M70 158h70M105 123v70M80 133l50 50M80 183l50-50"/></g>
+</svg>
+<div style="width:100%"><progress id="meter" max="70" value="0"></progress><div id="notice"></div></div><div id="controls"><button id="crank"></button><button id="buy"></button><button id="upgrade"></button></div><div id="hint"></div></main><div id="cover"></div>
+<script>
+const language=new URLSearchParams(location.search).get('lang')||(/^ja/i.test(navigator.language)?'ja':'en');
+const dictionary={
+ ja:{title:'こもれび発電所',help:'手回しで電気をため、水車で自動発電。<br>電気を70までためて小屋を照らそう。',start:'タップでスタート',again:'タップでもう一度',power:'電気',rate:'自動',crank:'手回し',buy:'水車',upgrade:'歯車',hint:'水車は待つ間も発電します',ready:'発電中',poor:'電気が足りません',done:'小屋に灯りがともった',seconds:'秒',cost:'必要',perTap:'手回し +2',installed:'設置'},
+ en:{title:'Brooklight Station',help:'Crank for power and buy wheels for passive output.<br>Store 70 power to light the cabin.',start:'Tap to start',again:'Tap to play again',power:'Power',rate:'Passive',crank:'Crank',buy:'Wheel',upgrade:'Gear',hint:'Wheels generate power while you wait',ready:'Generating',poor:'Not enough power',done:'The cabin is lit',seconds:'s',cost:'Cost',perTap:'Crank +2',installed:'Installed'}
+};
+const t=dictionary[language]||dictionary.en;
+const byId=id=>document.getElementById(id);
+let mode='title',power=0,wheels=0,gear=0,started=0,last=0,guard=0;
+const goal=70;
+const signal=(agf,data={})=>parent.postMessage({agf,...data},'*');
+for(const event of ['contextmenu','selectstart','gesturestart'])addEventListener(event,e=>e.preventDefault(),{passive:false});
+function cover(title,body,footer){
+ const panel=byId('cover');
+ panel.innerHTML='<div><h1>'+title+'</h1><p>'+body+'</p><small>'+footer+'</small></div>';
+ panel.style.display='grid';
+}
+function wheelCost(){return 12+8*wheels}
+function gearCost(){return 15+10*gear}
+function draw(){
+ byId('meter').value=power;byId('meter').setAttribute('aria-label',t.power);
+ byId('power').textContent=t.power+' '+Math.floor(power)+' / '+goal;
+ byId('rate').textContent=t.rate+' +'+2*wheels+'/'+t.seconds;
+ byId('crank').textContent=t.crank+' +'+(3+2*gear);
+ updateShop('buy',t.buy+' ×'+wheels,wheelCost(),t.rate+' +2/'+t.seconds);
+ updateShop('upgrade',t.upgrade+' ×'+gear,gearCost(),t.perTap);
+ byId('wheel').style.animationPlayState=wheels?'running':'paused';
+ byId('wheel').style.animationDuration=(2.4/Math.max(1,wheels))+'s';
+ [...byId('lamps').children].forEach((lamp,i)=>lamp.style.fill=power>=goal*(i+1)/3?'#ffdc87':'#303343');
+}
+function updateShop(id,label,cost,effect){
+ const button=byId(id);
+ const description=label+' · '+cost+'<small>'+effect+'</small>';
+ if(button.innerHTML!==description)button.innerHTML=description;
+ button.classList.toggle('unavailable',power<cost);
+}
+function finish(){
+ mode='end';guard=performance.now()+700;
+ const seconds=((performance.now()-started)/1000).toFixed(1);
+ signal('end',{score:goal});cover(t.done,seconds+' '+t.seconds,t.again);
+}
+function refresh(){
+ if(power>=goal){power=goal;draw();finish();return}
+ draw();
+}
+function begin(){
+ power=0;wheels=0;gear=0;mode='play';started=performance.now();last=started;
+ byId('cover').style.display='none';byId('notice').textContent=t.ready;
+ byId('hint').textContent=t.hint;signal('start');draw();
+}
+byId('cover').addEventListener('pointerdown',e=>{
+ e.preventDefault();
+ if(mode==='title'||(mode==='end'&&performance.now()>=guard))begin();
+});
+byId('crank').addEventListener('pointerdown',e=>{
+ e.preventDefault();
+ if(mode!=='play')return;
+ const button=byId('crank');button.classList.remove('pulse');void button.offsetWidth;button.classList.add('pulse');
+ power+=3+2*gear;byId('notice').textContent=t.ready;refresh();
+});
+function purchase(cost,label,apply){
+ if(mode!=='play')return;
+ if(power<cost){byId('notice').textContent=t.poor;return}
+ power-=cost;apply();byId('notice').textContent=t.installed+' · '+label;draw();
+}
+byId('buy').addEventListener('pointerdown',e=>{e.preventDefault();purchase(wheelCost(),t.buy,()=>wheels++)});
+byId('upgrade').addEventListener('pointerdown',e=>{e.preventDefault();purchase(gearCost(),t.upgrade,()=>gear++)});
+setInterval(()=>{
+ if(mode!=='play')return;
+ const now=performance.now(),dt=Math.min(.25,(now-last)/1000);
+ last=now;power+=2*wheels*dt;
+ if(now-started>5000)byId('hint').textContent='';
+ refresh();
+},100);
+cover(t.title,t.help,t.start);
+</script></html>

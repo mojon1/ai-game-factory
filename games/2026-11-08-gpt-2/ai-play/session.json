@@ -1,0 +1,180 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-11-08T13:36:06.675Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.5
+          ],
+          "wait": 350
+        }
+      ],
+      "desc": "tap(0.50,0.50) 120ms",
+      "note": "明日の雨と西4・東1が見える。今日は西3・東1を狙う。",
+      "noteEn": "Tomorrow’s rain and target are visible; today’s target is west 3, east 1.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": [
+        {
+          "tap": [
+            0.18,
+            0.83
+          ],
+          "wait": 350
+        }
+      ],
+      "desc": "tap(0.18,0.83) 120ms",
+      "note": "鳥が左右に現れた。今日は西へ移すと西4・東1だが、水があふれて翌日の分が減る。",
+      "noteEn": "Birds appear in both ponds. Moving west would match 4/1 but overflow loses water for tomorrow.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "tap": [
+            0.82,
+            0.83
+          ],
+          "wait": 350
+        }
+      ],
+      "desc": "tap(0.82,0.83) 120ms",
+      "note": "今日の来訪を見送り、両池3を残す。翌日は乾燥後に1/3へ動かせる。",
+      "noteEn": "Passed up today’s visitors to preserve 3/3, which can become 1/3 after tomorrow’s drying.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "tap": [
+            0.82,
+            0.83
+          ],
+          "wait": 350
+        },
+        {
+          "tap": [
+            0.5,
+            0.83
+          ],
+          "wait": 350
+        }
+      ],
+      "desc": "tap(0.82,0.83) 120ms → tap(0.50,0.83) 120ms",
+      "note": "乾燥を見越して東へ移し、曇りの日は維持。二日で4羽を呼べた。",
+      "noteEn": "Shifted east before drying, then held through clouds, attracting four over two days.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": [
+        {
+          "tap": [
+            0.18,
+            0.83
+          ],
+          "wait": 350
+        },
+        {
+          "tap": [
+            0.18,
+            0.83
+          ],
+          "wait": 350
+        }
+      ],
+      "desc": "tap(0.18,0.83) 120ms → tap(0.18,0.83) 120ms",
+      "note": "雨と乾燥の二日で西へ二回移し、10羽まで増えた。",
+      "noteEn": "Two west transfers through rain and drying bring the total to ten.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.83
+          ],
+          "wait": 350
+        }
+      ],
+      "desc": "tap(0.50,0.83) 120ms",
+      "note": "雨で西4・東2になり12羽。最後は乾燥と東への移動で2/2にできる。",
+      "noteEn": "Rain reaches 4/2 and twelve visitors. One eastward transfer plus drying can reach 2/2.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "tap": [
+            0.82,
+            0.83
+          ],
+          "wait": 350
+        }
+      ],
+      "desc": "tap(0.82,0.83) 120ms",
+      "note": "最終結果は14羽。鳥が結果の文字に重ならなくなった。",
+      "noteEn": "The final result is fourteen; birds no longer overlap its text.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 14
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}
