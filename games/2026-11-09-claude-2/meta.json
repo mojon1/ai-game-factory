@@ -1,0 +1,471 @@
+{
+  "id": "2026-11-09-claude-2",
+  "status": "published",
+  "title": "つなげてぴったり10",
+  "genre": "数字・計算",
+  "concept": "数字の玉をなぞって合計10で消す。玉は数が大きいほど大きく重く、9はびんの場所を食う。小さい玉で長くつないで稼ぐか、大きい玉を減らすかの迷いと、消した衝撃で隣が入れ替わる物理が核。",
+  "howToPlay": "となりあう玉を指でなぞり、合計が10（20、30でも可）になったら指をはなす。びんからあふれたら終わり。",
+  "libraryDecision": "matter-js を使用。大きさと重さの違う玉が転がる・すき間に入る・消した衝撃で隣が入れ替わることが遊びの核そのものだから。再考で、数字に比例した大きさと、つないだ数で強まる爆風を足した。描画は玉数が少ないので Canvas2D で十分と判断し、three.js・PixiJS は使わない。",
+  "soundDecision": "Web Audio で木琴の音を自作。合計がそのまま音階になり、9が導音、10で主音に解決するので、耳でも「あと少し」が分かる。この音を聞かせるためBGMは入れず、玉のカチッという音と、あふれそうな時の鼓動だけにした。",
+  "improvements": [
+    {
+      "found": "①ボットで測ると上手な人はいつまでも終わらず、びんが空いて隣接が減る ②合計の札が次につなぐ玉を隠す ③開始直後のびんが空きすぎて選択肢が少ない",
+      "changed": "玉の落下間隔をレベルで大きく縮め、石玉も増やした。合計はHUD中央の札と玉のふちの小さなチップに分けた。開始時の玉を14個から22個に増やした。",
+      "foundEn": "(1) A bot showed skilled play never ended and the jar went empty (2) The sum badge hid the next balls (3) Too few balls at the start",
+      "changedEn": "Steepened the drop curve and added more stones; moved the sum to a HUD badge plus a small chip on the ball; start with 22 balls instead of 14."
+    },
+    {
+      "found": "①★や20まで伸ばすダブルの仕組みが伝わらない ②レベルの帯が盤面を大きく隠す ③マイナス玉が背景に沈み、合計を外した時に理由が分からない",
+      "changed": "レベルごとに一つずつ仕組みを細い帯で教えるようにし、帯を一行に縮めた。マイナス玉に明るい縁を付け、失敗時に「あと2」と出すようにした。",
+      "foundEn": "(1) Stars and Doubles were not explained (2) The level banner covered the board (3) Minus balls vanished into the background and misses gave no reason",
+      "changedEn": "Each level teaches one rule in a slim one-line strip; minus balls got a bright rim; a miss now shows how much was missing."
+    },
+    {
+      "found": "①終わったあと数字だけで「もう1回」の理由が弱い ②レベルが上がっても見た目が変わらない ③コンボが音で伝わらず、説明文と得点の文字が重なる",
+      "changed": "結果画面に今回いちばんのつなぎを式（3+7+5+5=20）で残し、ベストまでの差も出した。レベルで背景の色が変わり、コンボで和音が上がる。★の説明を帯に移して重なりを解消した。",
+      "foundEn": "(1) The result was just numbers, a weak reason to retry (2) Levels looked the same (3) Combos had no sound and texts overlapped",
+      "changedEn": "The result shows your best link as an equation plus the gap to your best; background color changes with level; combos raise the chord; the star tip moved to the strip."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "数字・計算",
+      "en": "Number game",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "数字の玉をなぞって合計10で消す。玉は数が大きいほど大きく、びんの中を物理で転がる。",
+        "ideaEn": "Trace numbered balls to total 10. Bigger numbers are bigger balls rolling in a jar with physics.",
+        "fromDraw": true
+      },
+      {
+        "idea": "3D物理のだるま落とし。はじく速さと高さで胴だけを抜き、塔の揺れを読む。",
+        "ideaEn": "A 3D physics daruma-otoshi: strike out one block by speed and height while reading the tower sway.",
+        "fromDraw": false
+      },
+      {
+        "idea": "目標なしの遊び場。指でミルクをかき混ぜ、流体でラテアートを描いて眺める。",
+        "ideaEn": "A goalless playground: stir milk with your finger and draw latte art with fluid.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "fail",
+    "input": [
+      "draw",
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Link to Exactly 10",
+      "concept": "Trace numbered balls to total ten. Bigger numbers are bigger, heavier balls, so 9s eat the jar. The core is choosing long links for score or clearing big balls for space, while each blast reshuffles the pile.",
+      "howToPlay": "Trace touching balls and lift your finger when the sum is 10 (or 20, 30). The game ends when the jar overflows.",
+      "libraryDecision": "Uses matter-js, because balls of different size and weight rolling, slipping into gaps and being reshuffled by blasts is the core of the game. The rethink added number-proportional size and a blast that grows with link length. Canvas2D is enough for this ball count, so no three.js or PixiJS.",
+      "soundDecision": "A marimba made with Web Audio. The running sum is the melody: 9 is the leading tone and 10 resolves to the tonic, so your ear hears how close you are. No BGM, so those notes stay clear; only ball clinks and a heartbeat near overflow."
+    }
+  },
+  "createdAt": "2026-11-09T15:07:25+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-09T15:07:25+09:00",
+    "metricsFrom": "2026-11-09T06:05:17.918Z",
+    "transcript": "bcd2f912-fc74-4e14-aede-c87f886995ea.jsonl",
+    "validationRuns": 5,
+    "finishedAt": "2026-11-09T15:24:47+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-09T15:24:32+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "40.8KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=125",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=667",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=110",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=586",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 41786,
+    "lines": 777
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0.5,
+    "idleStarts": 42
+  },
+  "libraries": [
+    {
+      "name": "matter-js",
+      "version": "0.20.0",
+      "file": "matter-0.20.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "「なぞって合計10で消す玉」自体は既存作（Calc Ball、Tashitama）とほぼ同じ発想で、新鮮さは玉の大きさと物理の部分に限られる。序盤の1分はやや単調。",
+    "comment": "3,7,5,5と10を越えて20まで引っぱり、ダブルで★が生まれて周りの玉が吹き飛んだ場面は気持ちよかった。結果に3+7+5+5=20と式が残るのも、次はもっと長くと思わせる。ただ手を動かす作業が同じなので、数分で区切りたくなり★4には届かない。音は耳で確かめられず波形の設計のみ、実機での操作感も未確認。難易度はボットの計測で調整した。",
+    "similar": [
+      {
+        "title": "Tashitama - Calc Ball Puzzle",
+        "url": "https://mikocode-site.pages.dev/tashitama-en/",
+        "similarity": "高",
+        "note": "数字の玉をなぞって合計10で消す点が同じ。こちらは数字で玉の大きさが変わり、物理で転がり、20・30まで伸ばせる。",
+        "note_en": "Same trace-to-total-ten rule. Here ball size follows the number, balls roll with physics, and sums can stretch to 20 or 30."
+      },
+      {
+        "title": "Calc Ball",
+        "url": "https://apps.apple.com/sb/app/calc-ball/id1539312512",
+        "similarity": "高",
+        "note": "玉をつないで合計10にする点が同じ。あちらの玉は1〜5で、こちらは1〜9に★・石・マイナスがある。",
+        "note_en": "Same linking of balls to ten. Its balls are 1-5; this one has 1-9 plus stars, stones and minus balls."
+      }
+    ],
+    "research": "WebSearchで「数字の玉をつないで合計10」系と、数字を落として消す系を2回検索した。発想は制作前に知らず、調べて近い先行作があると分かった。",
+    "i18n": {
+      "en": {
+        "worst": "Tracing balls to total ten is nearly the same idea as existing games (Calc Ball, Tashitama); freshness is limited to ball size and physics. The first minute is a little plain.",
+        "comment": "Stretching 3,7,5,5 past ten to twenty, getting a Double and a star while the neighbors flew away felt great, and the equation on the result screen makes me want a longer one. The motion stays the same though, so a few minutes is enough and it falls short of 4 stars. I could not hear the audio (designed only), and did not test on a real phone. Difficulty was tuned with a bot.",
+        "research": "Two WebSearch queries for sum-to-ten ball linking and number-drop games. I did not know these before building; the search revealed close prior works."
+      }
+    },
+    "method": "スマホ縦画面で 9 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 9 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 3000ms",
+        "note": "開始。玉がびんに積もり、白い輪が最初の組を教えてくれる",
+        "noteEn": "Started; white rings show a first pair",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "path(0.11,0.62→0.11,0.71) 300ms",
+        "note": "光る5と5で10。はじけて周りが揺れる",
+        "noteEn": "Linked 5 and 5; neighbors shake",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "path(0.09,0.80→0.25,0.78→0.27,0.88→0.10,0.88) 700ms",
+        "note": "3,7,5,5で10を越えて20。ダブルを狙う",
+        "noteEn": "3,7,5,5 past 10 to 20 for a Double",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 700ms",
+        "note": "ダブルで★が生まれ、周りの玉が吹き飛んだ。かなり気持ちいい",
+        "noteEn": "The Double made a star and blew neighbors away; very satisfying",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "path(0.23,0.89→0.36,0.90→0.43,0.82) 500ms",
+        "note": "★→1→8。★が足りない分をうめて消えた",
+        "noteEn": "Star, 1, 8: the star filled the gap",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 1000ms",
+        "note": "別の組を探す。大きい8と9が残って場所をふさいでいる",
+        "noteEn": "Looking for pairs; big 8s and 9s clog the jar",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 5000ms → wait 5000ms → wait 5000ms → wait 5000ms → wait 5000ms → wait 5000ms → wait 5000ms → wait 5000ms → wait 5000ms → wait 5000ms → wait 5000ms → wait 5000ms → wait 5000ms → wait 5000ms → wait 5000ms → wait 5000ms → wait 5000ms → wait 5000ms → wait 5000ms → wait 5000ms → wait 5000ms → wait 5000ms",
+        "note": "何もせず待ってみる。玉が積もり続けてどうなるか",
+        "noteEn": "Waiting without touching to see the jar fill",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 575
+            }
+          },
+          {
+            "agf": "end",
+            "score": 575
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 1500ms",
+        "note": "床が抜けて玉がこぼれたあと、いちばんのつなぎが式で残る。もっと長い式を作りたくなる",
+        "noteEn": "After the floor drops, the best link stays as an equation; I want a longer one",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 575
+            }
+          },
+          {
+            "agf": "end",
+            "score": 575
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.50,0.50) 120ms → wait 3000ms",
+        "note": "タップで再開。読み込み直しなしで続けて遊べる",
+        "noteEn": "Tap restarts without reloading",
+        "image": "ai-play/step-09.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 575
+            }
+          },
+          {
+            "agf": "end",
+            "score": 575
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-09T15:24:47+09:00"
+  },
+  "publishedAt": "2026-11-09T15:24:47+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 27844,
+    "outputTokens": 41080,
+    "contextTokens": 5599771,
+    "turns": 30,
+    "toolCalls": 51,
+    "webSearches": 0,
+    "minutes": 19.5,
+    "from": "2026-11-09T06:05:17.918Z",
+    "to": "2026-11-09T06:24:47.377Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-09T15:24:47+09:00",
+    "validationRuns": 5,
+    "codeKB": 40.8
+  }
+}
