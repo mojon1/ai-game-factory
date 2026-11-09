@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>The Last Carriage</title>
+<style>
+*{box-sizing:border-box;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;overflow:hidden;overscroll-behavior:none;background:#192239;color:#fff3d8;font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif}
+main{height:100dvh;padding:16px;display:flex;flex-direction:column;justify-content:space-between;gap:8px}
+header{display:flex;justify-content:space-between;font-weight:bold;font-size:15px}
+#window{position:relative;overflow:hidden;background:linear-gradient(#1d2449,#a36e80);border:6px solid #424a62;border-radius:20px;height:min(23dvh,148px)}
+#moon{position:absolute;left:66%;top:16%;border-radius:50%;width:32px;height:32px;background:#ffe4a1;box-shadow:0 0 20px #ffe4a177}
+#town{position:absolute;inset:52% -5% 0;background:repeating-linear-gradient(90deg,#292943 0 12px,#f2b07a 12px 15px,#292943 15px 33px);clip-path:polygon(0 40%,9% 40%,9% 20%,20% 20%,20% 52%,31% 52%,31% 10%,44% 10%,44% 36%,59% 36%,59% 0,75% 0,75% 55%,88% 55%,88% 27%,100% 27%,100% 100%,0 100%);transition:transform .3s}
+#voice,#reply{margin:0;line-height:1.5;font-size:16px}
+#voice{background:#303954;padding:12px;border-radius:12px;border-left:4px solid #f0b783}
+#notes{margin:0;min-height:18px;text-align:center;font-size:13px;color:#f0b783}#reply{min-height:24px;color:#b9c8e0;font-size:14px}
+#choices{display:grid;gap:8px}
+button{font:inherit;border:1px solid #77849f;background:#29364e;color:inherit;min-height:54px;border-radius:12px;padding:7px 12px}
+#hint{text-align:center;min-height:19px;font-size:13px}
+#cover{position:absolute;inset:0;background:#192239f5;display:grid;place-items:center;text-align:center;padding:24px}
+h1{font-size:clamp(24px,8vw,36px)}p{line-height:1.65}small{color:#f0b783;font-size:16px}
+</style>
+<main><header><span id="label"></span><span id="stop"></span></header><div id="window"><div id="moon"></div><div id="town"></div></div><p id="notes"></p><p id="reply"></p><p id="voice"></p><div id="choices"><button id="a"></button><button id="b"></button></div><div id="hint"></div></main><div id="cover"></div>
+<script>
+const lang=new URLSearchParams(location.search).get('lang')||(/^ja/i.test(navigator.language)?'ja':'en');
+const words={
+ ja:{title:'終電の聞き書き',help:'向かいの乗客に、ひとこと返す。<br>六つの駅を過ぎると、会話は手紙になる。',start:'タップでスタート',again:'タップでもう一度',label:'夜行線',passenger:'乗客',waiting:'向かいの席から、声がした。',notes:'聞き書き',stop:'駅',hint:'気になった言葉を拾ってみよう',letter:'預かった手紙',postcard:'窓辺の葉書',goodbye:'短い別れ',deep:'「帰るのが遅くなった。庭の灯り、まだ点くかな」',middle:'「窓から見える町を、いつか一緒に歩こう」',quiet:'「聞いてくれてありがとう。おやすみなさい」'},
+ en:{title:'The Last Carriage',help:'Reply to the passenger across from you.<br>After six stops, the conversation becomes a letter.',start:'Tap to start',again:'Tap to play again',label:'Night line',passenger:'Passenger',waiting:'A voice comes from the seat across from you.',notes:'Notes',stop:'Stop',hint:'Follow a word that catches your attention',letter:'A letter to carry',postcard:'A window postcard',goodbye:'A brief goodbye',deep:'“I’m late coming home. I wonder if the garden light still works.”',middle:'“One day, let’s walk through the towns outside this window.”',quiet:'“Thanks for listening. Good night.”'}
+};
+const scenes={
+ ja:[
+ ['「この切符、去年も買ったんです」','去年も同じ駅へ？','窓側、空いていますよ','「ええ。去年は途中で引き返して」','「ありがとう。窓の灯りが好きで」',0],
+ ['「ホームの端に、古い時計があって」','何時の列車ですか？','その時計に思い出が？','「もう時刻表にはない列車でね」','「父と待ち合わせる場所でした」',1],
+ ['「父とは、庭の話ばかりでした」','どんな庭だったんですか？','庭の話、私も好きです','「夜になると灯りが一つだけ」','「季節の話なら、いくらでもできて」',0],
+ ['「一度、帰ろうとしてやめました」','今夜はどうして？','無理に話さなくて大丈夫','「今夜は、とにかく切符を買えた」','「……そう言ってもらえると助かる」',1],
+ ['「駅に着いたら、電話をしようかな」','庭の灯りのことを？','もうすぐ着きますね','「そう、まだ点くか聞きたい」','「はい。もう町の灯りが見える」',0],
+ ['「手紙を書いたけれど、言葉が重くて」','私なら短く書きます','最初の一行だけ、残しませんか','「短いほうが、渡しやすいですね」','「一行なら、書ける気がします」',1]
+ ],
+ en:[
+ ['“I bought this ticket last year, too.”','To the same stop?','The window seat is free.','“Yes. I turned back halfway.”','“Thanks. I like watching the lights.”',0],
+ ['“There’s an old clock at the end of the platform.”','What time is the train?','Does the clock mean something to you?','“That train isn’t on the schedule anymore.”','“It’s where I used to meet my father.”',1],
+ ['“Dad and I mostly talked about the garden.”','What was the garden like?','I like talking about gardens, too.','“At night there was just one lamp.”','“We could always talk about the seasons.”',0],
+ ['“I once tried to go back, and changed my mind.”','What made you go tonight?','You don’t have to explain.','“Tonight, I managed to buy the ticket.”','“It helps to hear that.”',1],
+ ['“Maybe I’ll call when we reach the station.”','About the garden lamp?','We’re almost there.','“Yes. I want to ask if it still works.”','“Yes. I can see the town lights now.”',0],
+ ['“I wrote a letter, but the words felt heavy.”','I’d write something short.','What if you kept just the first line?','“A shorter letter would be easier to give.”','“I think I could write one line.”',1]
+ ]
+};
+const t=words[lang]||words.en,story=scenes[lang]||scenes.en;
+const byId=id=>document.getElementById(id);
+const topics=(lang==='ja'?['引き返した駅','窓の灯り','時刻表','父の時計','庭の灯り','季節','今夜の切符','話す余白','庭への電話','町の灯り','短い手紙','最初の一行']:['Turning back','Window lights','Timetable','Father’s clock','Garden lamp','Seasons','Tonight’s ticket','Room to speak','Calling home','Town lights','Short letter','First line']);
+const skies=['#a36e80','#876986','#66668f','#595685','#655571','#bc825e'];
+let mode='title',stop=0,connection=0,reply='',guard=0,hintTimer,notes=[];
+const signal=agf=>parent.postMessage({agf},'*');
+for(const event of ['contextmenu','selectstart','gesturestart'])addEventListener(event,e=>e.preventDefault(),{passive:false});
+function overlay(title,body,footer){
+ const cover=byId('cover');cover.innerHTML='<div><h1>'+title+'</h1><p>'+body+'</p><small>'+footer+'</small></div>';
+ cover.style.display='grid';
+}
+function begin(){
+ mode='play';stop=0;connection=0;reply='';notes=[];byId('cover').style.display='none';
+ byId('hint').textContent=t.hint;clearTimeout(hintTimer);hintTimer=setTimeout(()=>byId('hint').textContent='',5000);
+ signal('start');draw();
+}
+function draw(){
+ const scene=story[stop];
+ byId('label').textContent=t.label;
+ byId('stop').textContent=t.stop+' '+(stop+1)+'/6';
+ byId('town').style.transform='translateX(-'+(stop*3)+'%)';
+ byId('window').style.background='linear-gradient(#1d2449,'+skies[stop]+')';
+ byId('notes').textContent=notes.length?t.notes+' · '+notes.slice(-2).join(' / '):'';
+ byId('voice').textContent=t.passenger+' · '+scene[0];byId('a').textContent=scene[1];byId('b').textContent=scene[2];
+ byId('reply').textContent=reply||t.waiting;
+}
+function answer(index){
+ if(mode!=='play')return;
+ const scene=story[stop],close=index===scene[5];
+ if(close)connection++;
+ reply=scene[3+index];notes.push(topics[stop*2+index]);
+ if(stop===story.length-1){
+  mode='end';guard=performance.now()+700;signal('end');
+  overlay(connection>=5?t.letter:connection>=3?t.postcard:t.goodbye,reply+'<br><br>'+(connection>=5?t.deep:connection>=3?t.middle:t.quiet),t.again);
+  return;
+ }
+ stop++;draw();
+}
+['a','b'].forEach((id,index)=>byId(id).addEventListener('pointerdown',e=>{e.preventDefault();answer(index)}));
+byId('cover').addEventListener('pointerdown',e=>{
+ e.preventDefault();
+ if(mode==='title'||(mode==='end'&&performance.now()>=guard))begin();
+});
+overlay(t.title,t.help,t.start);
+</script></html>
