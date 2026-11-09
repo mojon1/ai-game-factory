@@ -1,0 +1,372 @@
+{
+  "id": "2026-11-09-gpt-2",
+  "status": "published",
+  "title": "氷上の小包",
+  "genre": "物理おもちゃ",
+  "concept": "氷を滑る小包の強さと角度を選び、円の中で止める。摩擦で減速する小包は壁で反射するので、最後は直接狙う代わりに壁の向こうの位置を思い浮かべて配達する。",
+  "howToPlay": "強さを選び、滑らせる方向の氷をタップします。小包が緑の輪の中で止まるように狙います。",
+  "libraryDecision": "小包一つの減速と壁反射なので、自前の速度計算と平面SVGで十分。共有ライブラリは使わない。",
+  "soundDecision": "無音にし、滑りと跳ね返りを目で追う。",
+  "improvements": [
+    {
+      "found": "強さから距離が読めない。滑走経路が残らない。外した停止位置が消える。",
+      "changed": "強さに距離を表示し、軌跡と失敗時の着地点を次の投げまで残す。",
+      "foundEn": "Travel distance is unclear; the route and missed landing disappear.",
+      "changedEn": "Show range and retain a trail and missed landing point until the next throw."
+    },
+    {
+      "found": "結果で盤と軌跡が暗くなる。滑走中の強さが選べそうに見える。最後に壁を使う手がかりがない。",
+      "changed": "結果を盤の下へ寄せ、滑走中の強さを無効にし、最後は左壁に目印とヒントを付けた。",
+      "foundEn": "The result hides the route, power buttons appear usable while sliding, and the final bank shot lacks a cue.",
+      "changedEn": "Keep the board visible, disable power during a shot, and mark the left rail on the final delivery."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "物理おもちゃ",
+      "en": "Physics toy",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "摩擦と反射を使う氷上の配達。俯瞰で止まる場所を狙う。",
+        "ideaEn": "Use friction and reflections to deliver parcels on an overhead ice sheet.",
+        "fromDraw": true
+      },
+      {
+        "idea": "二重に映る星座を読む立体観測。",
+        "ideaEn": "Read doubled constellations in 3D.",
+        "fromDraw": false
+      },
+      {
+        "idea": "見えない動物の鳴き交わしを追う空間音響遊び。",
+        "ideaEn": "Follow hidden animal calls in a spatial-audio game.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Ice Parcel",
+      "concept": "Choose power and direction to stop a parcel inside a ring. The final delivery calls for a bank shot.",
+      "howToPlay": "Choose power and tap the ice to aim. Stop the parcel in the green ring.",
+      "libraryDecision": "One sliding parcel only needs local friction and reflection math plus SVG. No shared library.",
+      "soundDecision": "Silent play keeps attention on sliding and rebounds."
+    }
+  },
+  "createdAt": "2026-11-09T12:50:48+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-09T12:50:48+09:00",
+    "metricsFrom": "2026-11-09T03:49:39.378Z",
+    "transcript": null,
+    "validationRuns": 3,
+    "finishedAt": "2026-11-09T12:55:49+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-09T12:54:17+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "7.7KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 7877,
+    "lines": 107
+  },
+  "sound": {
+    "uses": false
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 2,
+    "works": "ok",
+    "worst": "固定の三面で、強さと反射角を覚えると再挑戦の幅が小さい。",
+    "comment": "直線二面のあと、左壁で折り返して最後の輪に止まった。軌跡を見て角度を修正するのは楽しいが、短い。画像自己プレイで二回改良。",
+    "similar": [
+      {
+        "title": "Curling On Line",
+        "url": "https://store.steampowered.com/app/1372840/Curling_On_Line/",
+        "similarity": "中",
+        "note": "氷を滑る物体を輪に止める点が近い。先方は掃く操作と対戦、本作は壁反射を使う一人用の配達。",
+        "note_en": "Both slide an object on ice toward a ring. Curling On Line uses sweeping and matches; this uses rail rebounds for solo deliveries."
+      }
+    ],
+    "research": "World Curlingの競技説明とCurling On Lineの開発元による作品説明を二回の検索で比較。",
+    "i18n": {
+      "en": {
+        "worst": "Three fixed deliveries leave little variety after learning the range and bank angle.",
+        "comment": "After two straight shots, a left-wall bank stops in the final ring. Correcting aim from the trail is satisfying but brief. Two revisions followed screenshot-based play.",
+        "research": "Compared World Curling’s rules overview with the developer’s Steam description in two searches."
+      }
+    },
+    "method": "スマホ縦画面で 6 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 6 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "盤の位置を確認し、弱で真上に狙う。",
+        "noteEn": "The first ring is straight above the parcel; use low power.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.50,0.40) 120ms",
+        "note": "結果が下に出て、輪の中の小包と直線が残る。",
+        "noteEn": "The result sits below the board, keeping the parcel and straight trail visible.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.50,0.50) 120ms → tap(0.50,0.84) 120ms → tap(0.76,0.31) 120ms",
+        "note": "中で遠い輪に届く。着地の線を確認できた。",
+        "noteEn": "Mid power reaches the farther ring and leaves the delivery trail visible.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "左壁に目印。輪に直接向けず、目印の中央へ向ける。",
+        "noteEn": "The left rail is marked. Aim toward it rather than straight at the ring.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.81,0.84) 120ms → tap(0.19,0.56) 120ms",
+        "note": "強で左へ滑らせ、壁で折り返した。滑走中の強さは暗くなる。",
+        "noteEn": "High power banks off the left wall; power buttons dim during the slide.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 2000ms",
+        "note": "反射した小包が緑の輪に止まり、三つとも配達できた。",
+        "noteEn": "The bank shot stops in the ring and completes all three deliveries.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-09T12:55:49+09:00"
+  },
+  "publishedAt": "2026-11-09T12:55:49+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 842,
+    "outputTokens": 5835,
+    "contextTokens": 7868885,
+    "turns": 26,
+    "toolCalls": 26,
+    "webSearches": null,
+    "minutes": 6.2,
+    "from": "2026-11-09T03:49:39.378Z",
+    "to": "2026-11-09T03:55:52.751Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-09T12:55:52+09:00",
+    "validationRuns": 3,
+    "codeKB": 7.7,
+    "evidence": "metrics-evidence.json"
+  }
+}

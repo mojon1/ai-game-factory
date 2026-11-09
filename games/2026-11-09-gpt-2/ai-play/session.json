@@ -1,0 +1,195 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-11-09T03:54:22.705Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.5
+        ]
+      },
+      "desc": "tap(0.50,0.50) 120ms",
+      "note": "盤の位置を確認し、弱で真上に狙う。",
+      "noteEn": "The first ring is straight above the parcel; use low power.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": {
+        "tap": [
+          0.5,
+          0.403
+        ],
+        "wait": 2400
+      },
+      "desc": "tap(0.50,0.40) 120ms",
+      "note": "結果が下に出て、輪の中の小包と直線が残る。",
+      "noteEn": "The result sits below the board, keeping the parcel and straight trail visible.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.837
+          ]
+        },
+        {
+          "tap": [
+            0.756,
+            0.307
+          ],
+          "wait": 2500
+        }
+      ],
+      "desc": "tap(0.50,0.50) 120ms → tap(0.50,0.84) 120ms → tap(0.76,0.31) 120ms",
+      "note": "中で遠い輪に届く。着地の線を確認できた。",
+      "noteEn": "Mid power reaches the farther ring and leaves the delivery trail visible.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": {
+        "tap": [
+          0.5,
+          0.5
+        ]
+      },
+      "desc": "tap(0.50,0.50) 120ms",
+      "note": "左壁に目印。輪に直接向けず、目印の中央へ向ける。",
+      "noteEn": "The left rail is marked. Aim toward it rather than straight at the ring.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": [
+        {
+          "tap": [
+            0.81,
+            0.837
+          ]
+        },
+        {
+          "tap": [
+            0.187,
+            0.557
+          ],
+          "wait": 520
+        }
+      ],
+      "desc": "tap(0.81,0.84) 120ms → tap(0.19,0.56) 120ms",
+      "note": "強で左へ滑らせ、壁で折り返した。滑走中の強さは暗くなる。",
+      "noteEn": "High power banks off the left wall; power buttons dim during the slide.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": {
+        "wait": 2000
+      },
+      "desc": "wait 2000ms",
+      "note": "反射した小包が緑の輪に止まり、三つとも配達できた。",
+      "noteEn": "The bank shot stops in the ring and completes all three deliveries.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}

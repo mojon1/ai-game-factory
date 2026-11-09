@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Ice Parcel</title>
+<style>
+*{box-sizing:border-box;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;overflow:hidden;overscroll-behavior:none;background:#142c43;color:#f5f2d9;font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif}
+main{height:100dvh;padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:6px}
+header{width:100%;display:flex;justify-content:space-between;font-size:16px;font-weight:bold}
+#rink{width:min(100%,60dvh);aspect-ratio:1;border-radius:18px;display:block}
+#info,#hint{min-height:22px;text-align:center;font-size:14px}
+#powers{width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+button{font:inherit;color:inherit;background:#2a4660;border:2px solid transparent;border-radius:12px;min-height:54px;padding:5px;font-size:15px}
+button:disabled{opacity:.45}button.selected{border-color:#ffe18e;background:#47616e}
+#cover{position:absolute;inset:0;background:#142c43f5;display:grid;place-items:center;text-align:center;padding:24px}
+#cover.result{background:linear-gradient(transparent 68%,#142c43 83%);align-items:end;padding:16px 16px 22px}#cover.result h1{font-size:24px;margin:0}#cover.result p{margin:6px 0}h1{font-size:clamp(24px,8vw,36px)}p{line-height:1.6}small{font-size:16px;color:#ffe18e}
+</style>
+<main><header><span id="stage"></span><span id="tries"></span></header><div id="info"></div>
+<svg id="rink" viewBox="0 0 320 320">
+ <rect width="320" height="320" rx="17" fill="#abcfd8"/>
+ <rect x="14" y="14" width="292" height="292" rx="10" fill="#d0e9eb" stroke="#72a8bd" stroke-width="2"/>
+ <path d="M16 80h288M16 160h288M16 240h288M80 16v288M160 16v288M240 16v288" fill="none" stroke="#a7ccd7" stroke-dasharray="4 5"/>
+ <path id="bank" d="M14 152v92" fill="none" stroke="#a56532" stroke-width="4" visibility="hidden"/><polyline id="trail" fill="none" stroke="#6d849e" stroke-width="2" stroke-dasharray="4 4"/><circle id="landing" r="5" fill="#ac5745" visibility="hidden"/><circle id="target" r="18" fill="#84b8ad" stroke="#326d70" stroke-width="3"/>
+ <circle id="launch" cx="160" cy="255" r="10" fill="none" stroke="#a36d5b" stroke-width="2"/>
+ <rect id="parcel" x="-8" y="-8" width="16" height="16" rx="4" fill="#ac5745" stroke="#f4a87c" stroke-width="3"/>
+</svg>
+<div id="powers"><button id="low"></button><button id="mid"></button><button id="high"></button></div><div id="hint"></div></main><div id="cover"></div>
+<script>
+const lang=new URLSearchParams(location.search).get('lang')||(/^ja/i.test(navigator.language)?'ja':'en');
+const words={
+ ja:{title:'氷上の小包',help:'強さを選び、氷をタップして小包を滑らせる。<br>緑の輪に止まれば配達。壁では跳ね返ります。',start:'タップでスタート',again:'タップでもう一度',next:'タップで次へ',stage:'配達',tries:'投げた数',low:'弱',mid:'中',high:'強',hint:'小包からタップした点の方向に滑ります',ready:'輪の中に止めよう',bank:'左壁で折り返す角度を探そう',moving:'滑走中',miss:'輪の外。もう一度投げよう',done:'配達できました',all:'三つの配達が完了'},
+ en:{title:'Ice Parcel',help:'Choose power and tap the ice to slide a parcel.<br>Stop in the green ring. Rails bounce the parcel.',start:'Tap to start',again:'Tap to play again',next:'Tap to continue',stage:'Delivery',tries:'Throws',low:'Low',mid:'Mid',high:'High',hint:'The parcel slides from the start toward your tap',ready:'Stop inside the ring',bank:'Find a bank shot off the left rail',moving:'Sliding',miss:'Outside the ring. Try again',done:'Parcel delivered',all:'All three parcels delivered'}
+};
+const t=words[lang]||words.en;
+const byId=id=>document.getElementById(id);
+const origin={x:160,y:255},targets=[{x:160,y:115},{x:250,y:55},{x:130,y:151}];
+const strengths=[140,220,282],buttons=['low','mid','high'];
+const friction=3.5,stopSpeed=10,min=14,max=306;
+let trail=[];
+let state='title',stage=0,power=0,throws=0,position={...origin},vx=0,vy=0,last=0,guard=0,hintTimer;
+const signal=agf=>parent.postMessage({agf},'*');
+for(const event of ['contextmenu','selectstart','gesturestart'])addEventListener(event,e=>e.preventDefault(),{passive:false});
+function cover(title,body,footer){
+ const panel=byId('cover');
+ panel.innerHTML='<div><h1>'+title+'</h1><p>'+body+'</p><small>'+footer+'</small></div>';
+ panel.classList.toggle('result',state==='end');panel.style.display='grid';
+}
+function begin(){
+ state='ready';power=0;throws=0;position={...origin};trail=[];
+ byId('trail').setAttribute('points','');byId('landing').setAttribute('visibility','hidden');
+ byId('cover').style.display='none';byId('info').textContent=stage===2?t.bank:t.ready;
+ byId('bank').setAttribute('visibility',stage===2?'visible':'hidden');
+ byId('hint').textContent=t.hint;clearTimeout(hintTimer);hintTimer=setTimeout(()=>byId('hint').textContent='',5000);
+ signal('start');draw();
+}
+function draw(){
+ const target=targets[stage];
+ byId('target').setAttribute('cx',target.x);byId('target').setAttribute('cy',target.y);
+ byId('parcel').setAttribute('transform','translate('+position.x+' '+position.y+')');
+ byId('stage').textContent=t.stage+' '+(stage+1)+'/3';byId('tries').textContent=t.tries+' '+throws;
+ buttons.forEach((id,i)=>{const b=byId(id);b.textContent=t[id]+' · '+strengths[i];b.classList.toggle('selected',power===i);b.disabled=state!=='ready'});
+}
+function shoot(x,y){
+ if(state!=='ready')return;
+ const dx=x-origin.x,dy=y-origin.y,length=Math.hypot(dx,dy);
+ if(length<12)return;
+ const speed=strengths[power]*friction+stopSpeed;
+ trail=[{...origin}];byId('trail').setAttribute('points','');byId('landing').setAttribute('visibility','hidden');
+ vx=speed*dx/length;vy=speed*dy/length;throws++;state='slide';
+ byId('info').textContent=t.moving;draw();
+}
+function frame(now){
+ const dt=Math.min(.04,(now-last)/1000||0);last=now;
+ if(state==='slide'){
+  const decay=Math.exp(-friction*dt),travel=(1-decay)/friction;
+  position.x+=vx*travel;position.y+=vy*travel;vx*=decay;vy*=decay;
+  if(position.x<min||position.x>max){position.x=position.x<min?2*min-position.x:2*max-position.x;vx=-vx}
+  if(position.y<min||position.y>max){position.y=position.y<min?2*min-position.y:2*max-position.y;vy=-vy}
+  const previous=trail.at(-1);
+  if(Math.hypot(position.x-previous.x,position.y-previous.y)>5){
+   trail.push({...position});byId('trail').setAttribute('points',trail.map(p=>p.x+','+p.y).join(' '));
+  }
+  if(Math.hypot(vx,vy)<stopSpeed)settle();
+  draw();
+ }
+ requestAnimationFrame(frame);
+}
+function settle(){
+ const target=targets[stage];
+ if(Math.hypot(position.x-target.x,position.y-target.y)>18){
+  const mark=byId('landing');mark.setAttribute('cx',position.x);mark.setAttribute('cy',position.y);mark.setAttribute('visibility','visible');
+  position={...origin};state='ready';byId('info').textContent=t.miss;return;
+ }
+ state='end';byId('info').textContent=t.done;guard=performance.now()+700;signal('end');
+ cover(stage===2?t.all:t.done,t.tries+' '+throws,stage===2?t.again:t.next);
+}
+byId('rink').addEventListener('pointerdown',e=>{
+ e.preventDefault();const r=byId('rink').getBoundingClientRect();
+ shoot((e.clientX-r.left)*320/r.width,(e.clientY-r.top)*320/r.height);
+});
+buttons.forEach((id,i)=>byId(id).addEventListener('pointerdown',e=>{e.preventDefault();if(state==='ready'){power=i;draw()}}));
+byId('cover').addEventListener('pointerdown',e=>{
+ e.preventDefault();
+ if(state==='title')begin();
+ else if(state==='end'&&performance.now()>=guard){stage=(stage+1)%targets.length;begin()}
+});
+cover(t.title,t.help,t.start);requestAnimationFrame(frame);
+</script></html>
