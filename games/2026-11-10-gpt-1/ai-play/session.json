@@ -1,0 +1,283 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-11-10T03:06:50.738Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.5
+        ],
+        "wait": 250
+      },
+      "desc": "tap(0.50,0.50) 120ms",
+      "note": "最初の畑は中央にも植えられる。",
+      "noteEn": "The first field allows planting in the center.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.4828125
+          ],
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.5,
+            0.3203125
+          ],
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.2111111111111111,
+            0.3203125
+          ],
+          "wait": 300
+        }
+      ],
+      "desc": "tap(0.50,0.48) 120ms → tap(0.50,0.32) 120ms → tap(0.21,0.32) 120ms",
+      "note": "かぼちゃの唯一の隣の空き地が点線になった。",
+      "noteEn": "A dashed outline identifies the squash’s only remaining open neighbor.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "tap": [
+            0.2111111111111111,
+            0.4828125
+          ],
+          "wait": 300
+        }
+      ],
+      "desc": "tap(0.21,0.48) 120ms",
+      "note": "印の場所に置くとかぼちゃは実らなくなる。戻すボタンで比較する。",
+      "noteEn": "Filling the marked plot makes the squash unripe. Compare with undo.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.872
+          ],
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.7888888888888889,
+            0.4828125
+          ],
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.7888888888888889,
+            0.6453125
+          ],
+          "wait": 300
+        }
+      ],
+      "desc": "tap(0.50,0.87) 120ms → tap(0.79,0.48) 120ms → tap(0.79,0.65) 120ms",
+      "note": "左中の空き地を取り戻し、右の豆ととうもろこしを隣接させた。",
+      "noteEn": "Undo frees the middle-left soil, and the right-side bean and corn pair up.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": [
+        {
+          "tap": [
+            0.2111111111111111,
+            0.6453125
+          ],
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.5,
+            0.6453125
+          ],
+          "wait": 300
+        }
+      ],
+      "desc": "tap(0.21,0.65) 120ms → tap(0.50,0.65) 120ms",
+      "note": "左中を残し、二つのかぼちゃも実って7つ収穫できた。",
+      "noteEn": "Leaving the middle-left plot open ripens both squash for seven crops.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 7
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "wait": 800
+        },
+        {
+          "tap": [
+            0.5,
+            0.5
+          ]
+        }
+      ],
+      "desc": "wait 800ms → tap(0.50,0.50) 120ms",
+      "note": "次の畑は中央が石。かぼちゃ二つで空き地を共有する必要がある。",
+      "noteEn": "The next field has a central rock, so both squash must share one empty plot.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 7
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "tap": [
+            0.7888888888888889,
+            0.3203125
+          ],
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.5,
+            0.3203125
+          ],
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.2111111111111111,
+            0.3203125
+          ],
+          "wait": 300
+        }
+      ],
+      "desc": "tap(0.79,0.32) 120ms → tap(0.50,0.32) 120ms → tap(0.21,0.32) 120ms",
+      "note": "右上で豆ととうもろこしを組ませ、左上のかぼちゃに左中を残した。",
+      "noteEn": "Paired the upper-right corn and bean, leaving the middle-left plot for squash.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 7
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": [
+        {
+          "tap": [
+            0.7888888888888889,
+            0.4828125
+          ],
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.7888888888888889,
+            0.6453125
+          ],
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.2111111111111111,
+            0.6453125
+          ],
+          "wait": 300
+        },
+        {
+          "tap": [
+            0.5,
+            0.6453125
+          ],
+          "wait": 300
+        }
+      ],
+      "desc": "tap(0.79,0.48) 120ms → tap(0.79,0.65) 120ms → tap(0.21,0.65) 120ms → tap(0.50,0.65) 120ms",
+      "note": "左中を二つのかぼちゃで共有し、石のある畑でも7つ収穫できた。",
+      "noteEn": "Both squash share the middle-left opening; the rocky field also yields seven.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 7
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 7
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}

@@ -1,0 +1,343 @@
+{
+  "id": "2026-11-10-gpt-2",
+  "status": "published",
+  "title": "雲間の風レース",
+  "genre": "レース",
+  "concept": "飛行船が通る三つの高度は、四秒ごとに風が変わる。追い風の高度へ移ると伸びるが、移動直後は少し失速する。二十四秒でライバルより遠くへ飛ぶ短いレース。",
+  "howToPlay": "高度をタップして飛行船を移し、風の速い高度に乗ります。24秒間で相手より遠くへ進みます。",
+  "libraryDecision": "高度と速さを一目で比べるため横長の平面レーンを使う。共有ライブラリは使わない。",
+  "soundDecision": "風の強さを表示で読み取れるよう無音にした。",
+  "improvements": [
+    {
+      "found": "風の切替と次の追い風が見えない。移動時の失速が読めない。相手の位置が数値だけ。",
+      "changed": "次の高度と秒数を予報し、失速中の速さを表示。相手の位置を丸印で併記。",
+      "foundEn": "Upcoming wind and timing, switch penalties, and the rival position are unclear.",
+      "changedEn": "Forecast the next lane and time, show speed loss, and add a rival marker."
+    },
+    {
+      "found": "最速の風を読み比べるのに時間がかかる。差は引き算が必要。いつも最速レーンへ動けばよく変化が乏しい。",
+      "changed": "追い風を色と文字で明示し、差を常時表示。弱い風差の区間を作り、二つの風順を交互にした。",
+      "foundEn": "Fastest lanes and gaps take comparison, and always switching is repetitive.",
+      "changedEn": "Mark the tailwind, show the gap, add narrow wind margins, and alternate two routes."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "レース",
+      "en": "Racing",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "飛行船で追い風に乗る時間制レース。高度の違いを平面レーンで示す。",
+        "ideaEn": "Race a timed airship course, reading wind across flat altitude lanes.",
+        "fromDraw": true
+      },
+      {
+        "idea": "消えかけた色を混ぜ直す平面の修復遊び。",
+        "ideaEn": "Restore fading colors in a flat painting puzzle.",
+        "fromDraw": false
+      },
+      {
+        "idea": "割れた鐘の音程から元の形を考える立体の音遊び。",
+        "ideaEn": "Infer a cracked bell’s shape in a 3D sound game.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "time",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Wind Lane Derby",
+      "concept": "Wind changes at three altitudes every four seconds. Changing altitude costs a little speed; use tailwinds to beat your rival over 24 seconds.",
+      "howToPlay": "Tap an altitude to move your airship to faster winds. Travel farther than the rival in 24 seconds.",
+      "libraryDecision": "Flat lanes expose all altitude speeds at once. No shared library.",
+      "soundDecision": "Wind is read visually; the game is silent."
+    }
+  },
+  "createdAt": "2026-11-10T12:09:36+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-10T12:09:36+09:00",
+    "metricsFrom": "2026-11-10T03:08:37.239Z",
+    "transcript": null,
+    "validationRuns": 3,
+    "finishedAt": "2026-11-10T12:14:54+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-10T12:13:11+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "6.6KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 6711,
+    "lines": 90
+  },
+  "sound": {
+    "uses": false
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 2,
+    "works": "ok",
+    "worst": "航路は二つだけで、風の並びを覚えると判断が定型化する。",
+    "comment": "速さ4と4.2の区間で移らず、次の追い風を待って110対98で先着。予報と失速の判断は効くが短い。画像自己プレイで二回改良。",
+    "similar": [
+      {
+        "title": "FYI Balloon Cup",
+        "url": "https://targaciej.itch.io/fyi-balloon-cup",
+        "similarity": "高",
+        "note": "高度別の風を読む飛行レースが共通。先方は方向と通過地点、本作は三高度の速さと24秒の距離勝負。",
+        "note_en": "Both race using winds at different altitudes. FYI Balloon Cup uses headings and turnpoints; this uses three speeds and a 24-second distance contest."
+      }
+    ],
+    "research": "高度別の風を使うレースを検索し、開発者の説明を比較。",
+    "i18n": {
+      "en": {
+        "worst": "Only two routes; decisions become routine once their wind patterns are known.",
+        "comment": "Staying in speed 4 instead of switching to 4.2 before the next tailwind led to a 110–98 win. The tradeoff works but is brief. Two screenshot-based revisions.",
+        "research": "Searched for altitude-wind racing games and compared the developer’s description."
+      }
+    },
+    "method": "スマホ縦画面で 7 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 7 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 3900ms",
+        "note": "航路1の最初は中ほどで待ち、次の高い雲へ備える。",
+        "noteEn": "Hold the middle lane on Route 1 and prepare for the high tailwind.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.50,0.43) 120ms",
+        "note": "高い雲に移って先行。次は低い雲に切り替わる。",
+        "noteEn": "The high lane extends the lead before low clouds become fastest.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.50,0.79) 120ms",
+        "note": "低い雲へ。次の風は中ほど4.2、今いる高度は4で差が小さい。",
+        "noteEn": "Moved low. In the next segment, middle is 4.2 versus 4 in the current lane.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 3900ms",
+        "note": "小さな差なら失速を避けて低い雲に留まり、次の高い雲を待つ。",
+        "noteEn": "Stayed low to avoid a switching penalty for only a small speed gain.",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 200ms → tap(0.50,0.43) 120ms",
+        "note": "風が変わってから高い雲に移ると、差をさらに広げられた。",
+        "noteEn": "Moved high after the wind changed and widened the lead.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.50,0.79) 120ms",
+        "note": "最後は低い雲に移って先着。留まる判断を一度挟んだ。",
+        "noteEn": "Moved low for the final tailwind and won, after choosing to stay through a narrow margin.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 110
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 800ms → tap(0.50,0.50) 120ms",
+        "note": "再開で航路2へ。最初の風と次の追い風が変わった。",
+        "noteEn": "Restart opens Route 2 with different starting and forecast winds.",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 110
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-10T12:14:54+09:00"
+  },
+  "publishedAt": "2026-11-10T12:14:54+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 762,
+    "outputTokens": 5626,
+    "contextTokens": 9002048,
+    "turns": 26,
+    "toolCalls": 26,
+    "webSearches": null,
+    "minutes": 6.3,
+    "from": "2026-11-10T03:08:37.239Z",
+    "to": "2026-11-10T03:14:57.892Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-10T12:14:58+09:00",
+    "validationRuns": 3,
+    "codeKB": 6.6,
+    "evidence": "metrics-evidence.json"
+  }
+}
