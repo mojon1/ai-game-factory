@@ -1,0 +1,707 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>ありんこ行列合戦 / Ant Line Wars</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #3b2f22; }
+canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script src="../../lib/zzfx-1.4.0.min.js"></script>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const TX = {
+  ja: {
+    title: 'ありんこ行列合戦', how1: '自分の巣（黒）から指でなぞると', how2: '巣の半分のありが、その道を行進する', how3: '行列はぶつかると戦う。赤い巣をぜんぶ取ろう', how4: '何もない所で指を離すと、そこで待ちぶせる', camp: '待ちぶせ',
+    tap: 'タップでスタート', stage: 'ステージ', time: 'タイム', best: 'ベスト', newBest: 'ベスト更新！',
+    clear: 'ステージクリア！', lose: '巣をすべて失った…', next: 'タップで次へ', again: 'タップでもう一度', all: 'ぜんぶの巣を制覇！',
+    water: 'ありは水を渡れない。よけてなぞろう', stageOf: (a, b) => `ステージ ${a}/${b}`,
+    hints: [
+      '黒い巣から、まわりの巣まで指でなぞろう',
+      '水たまりはよけて。途中の自分の巣を通ると合流する',
+      '灰色の巣は、中の数より多く送ると取れる',
+      'すき間まで線を引いて離すと、通る敵を待ちぶせできる',
+      '大きい巣はありが早く増える。先に取ろう',
+      '赤と黄も仲が悪い。つぶし合いを待つのも手',
+    ],
+  },
+  en: {
+    title: 'Ant Line Wars', how1: 'Drag a line from your black nest:', how2: 'half of its ants march along it', how3: 'Lines that meet will fight. Take every red nest', how4: 'Let go on open ground to set an ambush there', camp: 'Ambush',
+    tap: 'Tap to start', stage: 'Stage', time: 'Time', best: 'Best', newBest: 'New best!',
+    clear: 'Stage clear!', lose: 'All your nests are lost…', next: 'Tap to continue', again: 'Tap to play again', all: 'Every colony conquered!',
+    water: "Ants can't cross water. Draw around it", stageOf: (a, b) => `Stage ${a}/${b}`,
+    hints: [
+      'Drag from a black nest to a nearby nest',
+      'Go around puddles. Pass your own nests to gather them',
+      'Grey nests fall when you send more ants than they hold',
+      'Draw to the gap and let go to ambush passing enemies',
+      'Big nests breed faster. Grab them first',
+      'Red and yellow hate each other too. Let them clash',
+    ],
+  },
+}[LANG === 'ja' ? 'ja' : 'en'];
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+
+// ---------- sound ----------
+let audioOn = false;
+const SND = {
+  send: [0.5, 0.05, 520, 0.005, 0.03, 0.06, 1, 1.8, , , , , , , , , , 0.6],
+  tick: [0.12, 0.4, 1500, , 0.004, 0.008, 4, 0, , , , , , , , , , 0.3],
+  fight: [0.22, 0.15, 220, , 0.01, 0.03, 4, 2, , , , , , , 1, , , 0.3],
+  cap: [0.55, , 660, 0.01, 0.07, 0.22, 1, 1.6, , , 330, 0.06, , , , , , 0.7],
+  neut: [0.4, , 520, 0.01, 0.05, 0.16, 1, 1.6, , , 260, 0.05, , , , , , 0.6],
+  lost: [0.5, , 140, 0.02, 0.12, 0.3, 1, 0.6, -2, , , , , , , , , 0.5],
+  win: [0.6, , 523, 0.02, 0.25, 0.4, 1, 1.4, , , 262, 0.12, 0.1, , , , , 0.8],
+  bad: [0.35, , 180, , 0.05, 0.12, 2, 1, -3],
+};
+let lastSnd = {};
+function snd(name, minGap = 0) {
+  if (!audioOn || typeof zzfx !== 'function') return;
+  const now = performance.now();
+  if (minGap && lastSnd[name] && now - lastSnd[name] < minGap) return;
+  lastSnd[name] = now;
+  try { const p = SND[name].slice(); if (name === 'tick' || name === 'fight') p[2] *= 0.85 + Math.random() * 0.3; zzfx(...p); } catch (e) {}
+}
+function initAudio() {
+  if (audioOn) return;
+  try { if (window.ZZFX) { ZZFX.volume = 0.22; ZZFX.audioContext && ZZFX.audioContext.resume && ZZFX.audioContext.resume(); } audioOn = true; } catch (e) {}
+}
+
+// ---------- canvas ----------
+const cv = document.getElementById('c');
+const cx = cv.getContext('2d');
+const FW = 360, FH = 600, HUD = 50;
+let W = 1, H = 1, DPR = 1, S = 1, OX = 0, OY = 0, bgDirty = true;
+function resize() {
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = Math.max(1, window.innerWidth || 1); H = Math.max(1, window.innerHeight || 1);
+  cv.width = Math.max(1, Math.round(W * DPR)); cv.height = Math.max(1, Math.round(H * DPR));
+  S = Math.max(0.1, Math.min(W / FW, (H - HUD - 4) / FH));
+  OX = (W - FW * S) / 2; OY = HUD + Math.max(0, (H - HUD - FH * S) / 2);
+  bgDirty = true;
+}
+addEventListener('resize', resize);
+resize();
+
+// ---------- stages ----------
+const OWN = { N: 0, P: 1, R: 2, Y: 3 };
+const COL = { 0: '#7d766b', 1: '#1d1714', 2: '#c33a2b', 3: '#d9a21b' };
+const BADGE = { 0: '#9b9384', 1: '#1d1714', 2: '#c33a2b', 3: '#e8b52a' };
+const ANTC = { 1: '#17110d', 2: '#b8301f', 3: '#c98d0e' };
+// n:[x,y,owner,count,big]
+const STAGES = [
+  { cpu: 6.0, grace: 6, nests: [[180, 530, 1, 20, 1], [80, 360, 0, 5, 0], [280, 360, 0, 5, 0], [180, 250, 0, 12, 1], [180, 80, 2, 14, 0]], pud: [] },
+  { cpu: 4.8, grace: 5, nests: [[180, 535, 1, 18, 1], [55, 430, 0, 5, 0], [305, 430, 0, 5, 0], [55, 175, 0, 8, 0], [305, 175, 0, 8, 0], [180, 70, 2, 20, 1]], pud: [[180, 300, 115, 42]] },
+  { cpu: 4.2, grace: 4, nests: [[70, 530, 1, 14, 0], [290, 530, 1, 14, 0], [70, 75, 2, 14, 0], [290, 75, 2, 14, 0], [180, 300, 0, 15, 1], [35, 300, 0, 6, 0], [325, 300, 0, 6, 0], [180, 455, 0, 4, 0], [180, 150, 0, 10, 0]], pud: [[108, 300, 42, 30], [252, 300, 42, 30]] },
+  { cpu: 3.6, grace: 4, nests: [[180, 545, 1, 18, 1], [60, 465, 1, 8, 0], [300, 465, 0, 6, 0], [60, 135, 0, 6, 0], [180, 205, 0, 10, 0], [180, 400, 0, 10, 0], [180, 60, 2, 24, 1], [300, 135, 2, 10, 0]], pud: [[55, 300, 100, 26], [305, 300, 100, 26]] },
+  { cpu: 3.8, grace: 3, nests: [[50, 550, 1, 20, 0], [180, 300, 0, 20, 1], [55, 300, 0, 5, 0], [180, 470, 0, 5, 0], [300, 520, 0, 8, 0], [180, 140, 0, 8, 0], [310, 60, 2, 25, 1], [55, 60, 2, 12, 0], [310, 320, 2, 12, 0]], pud: [[115, 405, 40, 28], [250, 205, 48, 28]] },
+  { cpu: 2.6, grace: 3, nests: [[180, 545, 1, 20, 1], [55, 70, 2, 20, 1], [305, 70, 3, 20, 1], [180, 80, 0, 10, 0], [55, 300, 0, 8, 0], [305, 300, 0, 8, 0], [180, 330, 0, 14, 1], [95, 455, 0, 5, 0], [265, 455, 0, 5, 0], [180, 195, 0, 8, 0]], pud: [[105, 190, 34, 24], [255, 190, 34, 24]] },
+];
+const SPEED = 54, SPAWN = 0.085;
+
+// ---------- state ----------
+let state = 'title', stageIdx = 0, unlocked = 0, best = {}, demo = false;
+let camps = [], corpses = [], nests = [], puds = [], ants = [], routes = [], spawners = [], fx = [], paths = [];
+let tGame = 0, tStage = 0, cpuTimers = {}, resultAt = 0, result = null, hintT = 0, msg = null;
+let drag = null, ended = false;
+
+addEventListener('message', (e) => {
+  if (e.data && e.data.agf === 'loaded' && e.data.data) {
+    const d = e.data.data;
+    unlocked = Math.max(0, Math.min(STAGES.length - 1, d.unlocked | 0));
+    best = d.best || {};
+    if (state === 'title' && stageIdx !== unlocked) { stageIdx = unlocked; loadStage(stageIdx, true); }
+  }
+});
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+function persist() { try { parent.postMessage({ agf: 'save', data: { unlocked, best } }, '*'); } catch (e) {} }
+
+function insidePud(x, y, m = 0) {
+  for (const p of puds) { const dx = (x - p.x) / (p.rx + m), dy = (y - p.y) / (p.ry + m); if (dx * dx + dy * dy < 1) return true; }
+  return false;
+}
+function segClear(a, b, m = 0) {
+  const d = Math.hypot(b.x - a.x, b.y - a.y), n = Math.max(1, Math.ceil(d / 3));
+  for (let i = 1; i <= n; i++) { const t = i / n; if (insidePud(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t, m)) return false; }
+  return true;
+}
+
+function loadStage(i, isDemo) {
+  demo = !!isDemo;
+  const st = STAGES[i];
+  nests = st.nests.map((n, k) => ({ i: k, x: n[0], y: n[1], owner: n[2], n: n[3], big: !!n[4], r: n[4] ? 24 : 17, rate: n[4] ? 1.35 : 0.8, cap: n[4] ? 80 : 45, pulse: 0, flash: 0 }));
+  puds = st.pud.map((p) => ({ x: p[0], y: p[1], rx: p[2], ry: p[3] }));
+  ants = []; routes = []; spawners = []; fx = []; corpses = []; camps = []; drag = null; msg = null;
+  tStage = 0; ended = false; result = null; hintT = demo ? 0 : 6;
+  cpuTimers = {}; for (const o of [1, 2, 3]) cpuTimers[o] = st.grace + Math.random() * 1.5;
+  computePaths();
+  bgDirty = true;
+}
+
+// grid A* for CPU routes
+function computePaths() {
+  const C = 10, GW = Math.ceil(FW / C), GH = Math.ceil(FH / C);
+  const blocked = new Uint8Array(GW * GH);
+  for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) blocked[y * GW + x] = insidePud(x * C + C / 2, y * C + C / 2, 9) ? 1 : 0;
+  paths = nests.map(() => []);
+  for (const a of nests) for (const b of nests) {
+    if (a === b) continue;
+    let pts;
+    if (segClear(a, b, 6)) pts = [{ x: a.x, y: a.y }, { x: b.x, y: b.y }];
+    else {
+      const sx = Math.min(GW - 1, a.x / C | 0), sy = Math.min(GH - 1, a.y / C | 0), gx = Math.min(GW - 1, b.x / C | 0), gy = Math.min(GH - 1, b.y / C | 0);
+      const N = GW * GH, g = new Float32Array(N).fill(1e9), from = new Int32Array(N).fill(-1), closed = new Uint8Array(N);
+      const open = [sy * GW + sx]; g[open[0]] = 0;
+      const goal = gy * GW + gx;
+      const h = (k) => Math.hypot((k % GW) - gx, ((k / GW) | 0) - gy);
+      let found = false;
+      while (open.length) {
+        let bi = 0, bf = 1e9;
+        for (let q = 0; q < open.length; q++) { const f = g[open[q]] + h(open[q]); if (f < bf) { bf = f; bi = q; } }
+        const k = open[bi]; open[bi] = open[open.length - 1]; open.pop();
+        if (k === goal) { found = true; break; }
+        if (closed[k]) continue; closed[k] = 1;
+        const kx = k % GW, ky = (k / GW) | 0;
+        for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+          if (!dx && !dy) continue;
+          const nx = kx + dx, ny = ky + dy; if (nx < 0 || ny < 0 || nx >= GW || ny >= GH) continue;
+          const nk = ny * GW + nx; if (blocked[nk] && nk !== goal) continue;
+          const ng = g[k] + (dx && dy ? 1.414 : 1);
+          if (ng < g[nk]) { g[nk] = ng; from[nk] = k; open.push(nk); }
+        }
+      }
+      if (!found) { paths[a.i][b.i] = null; continue; }
+      const raw = []; for (let k = goal; k !== -1; k = from[k]) raw.push({ x: (k % GW) * C + C / 2, y: ((k / GW) | 0) * C + C / 2 });
+      raw.reverse(); raw[0] = { x: a.x, y: a.y }; raw[raw.length - 1] = { x: b.x, y: b.y };
+      pts = [raw[0]]; let i = 0;
+      while (i < raw.length - 1) { let j = raw.length - 1; while (j > i + 1 && !segClear(raw[i], raw[j], 5)) j--; pts.push(raw[j]); i = j; }
+    }
+    paths[a.i][b.i] = makeRoute(pts, 0, null, true);
+  }
+}
+function makeRoute(pts, owner, target, proto) {
+  const cum = [0];
+  for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y));
+  const r = { pts, cum, len: cum[cum.length - 1], owner, target, alive: 0, alpha: 0, t: 0 };
+  if (!proto) routes.push(r);
+  return r;
+}
+function cloneRoute(p, owner, target) { return makeRoute(p.pts, owner, target, false); }
+function routeAt(r, s, o) {
+  const c = r.cum; let lo = 0, hi = c.length - 1;
+  if (s <= 0) { lo = 0; } else if (s >= r.len) { lo = c.length - 2; } else { while (hi - lo > 1) { const m = (lo + hi) >> 1; if (c[m] <= s) lo = m; else hi = m; } }
+  lo = Math.max(0, Math.min(c.length - 2, lo));
+  const a = r.pts[lo], b = r.pts[lo + 1], sl = c[lo + 1] - c[lo] || 1, t = Math.max(0, Math.min(1, (s - c[lo]) / sl));
+  o.x = a.x + (b.x - a.x) * t; o.y = a.y + (b.y - a.y) * t; o.a = Math.atan2(b.y - a.y, b.x - a.x);
+  return o;
+}
+
+function send(src, route, s0, owner) {
+  const k = src.camp ? Math.floor(src.n) : Math.floor(src.n / 2);
+  if (k < 1) return 0;
+  spawners.push({ nest: src, route, s0, owner, left: k, t: 0 });
+  src.pulse = 1;
+  return k;
+}
+
+// ---------- CPU ----------
+function pending() {
+  const pend = {}; // pend[owner][nestIndex]
+  for (const o of [1, 2, 3]) pend[o] = new Float32Array(nests.length);
+  for (const a of ants) if (a.route.target) pend[a.owner][a.route.target.i] += 1;
+  for (const sp of spawners) if (sp.route.target) pend[sp.owner][sp.route.target.i] += sp.left;
+  return pend;
+}
+function cpuThink(f) {
+  const mine = nests.filter((n) => n.owner === f);
+  if (!mine.length) return;
+  const pend = pending();
+  const enemyInc = (t) => { let s = 0; for (const o of [1, 2, 3]) if (o !== t.owner) s += pend[o][t.i]; return s; };
+  // defend
+  for (const t of mine) {
+    const inc = enemyInc(t) - pend[f][t.i];
+    if (inc > t.n + 2 && Math.random() < 0.7) {
+      let bs = null, bl = 1e9;
+      for (const s of mine) { if (s === t || s.n < 6) continue; const P = paths[s.i][t.i]; if (P && P.len < bl) { bl = P.len; bs = s; } }
+      if (bs) { send(bs, cloneRoute(paths[bs.i][t.i], f, t), 0, f); return; }
+    }
+  }
+  let best = null;
+  for (const t of nests) {
+    if (t.owner === f) continue;
+    const opts = [];
+    for (const s of mine) { const P = paths[s.i][t.i]; const k = Math.floor(s.n / 2); if (P && k >= 3) opts.push({ s, P, k }); }
+    if (!opts.length) continue;
+    opts.sort((a, b) => a.P.len - b.P.len);
+    let sum = pend[f][t.i], len = 0, used = [];
+    for (const o of opts) {
+      used.push(o); sum += o.k; len = Math.max(len, o.P.len);
+      const time = len / SPEED + o.k * SPAWN;
+      const def = t.n + (t.owner ? t.rate * time : 0) + enemyInc(t) * 0.3 - (t.owner === 0 ? 0 : 0);
+      if (sum > def + 2) {
+        let sc = 1000 / (len + 80) / used.length * (t.big ? 1.35 : 1) * (t.owner === 1 ? 1.25 : 1) * (t.owner === 0 ? 1.1 : 1);
+        sc *= 0.85 + Math.random() * 0.3;
+        if (!best || sc > best.sc) best = { sc, t, used: used.slice() };
+        break;
+      }
+      if (used.length >= 3) break;
+    }
+  }
+  if (best) { for (const o of best.used) send(o.s, cloneRoute(o.P, f, best.t), 0, f); return; }
+  // pressure: a crowded nest (or a long standoff) attacks the nearest rival anyway
+  const pressure = Math.min(0.6, Math.max(0, (tStage - 35) / 120));
+  for (const s of mine) {
+    if (!(s.n >= s.cap * 0.85 || Math.random() < pressure) || s.n < 10) continue;
+    let bt = null, bl = 1e9;
+    for (const t of nests) { if (t.owner === f || t.owner === 0 && Math.random() < 0.5) continue; const P = paths[s.i][t.i]; if (P && P.len < bl) { bl = P.len; bt = t; } }
+    if (bt) { send(s, cloneRoute(paths[s.i][bt.i], f, bt), 0, f); return; }
+  }
+}
+
+// ---------- input ----------
+function toWorld(e) { return { x: (e.clientX - OX) / S, y: (e.clientY - OY) / S }; }
+function nestAt(p, pad = 16) { let b = null, bd = 1e9; for (const n of nests.concat(camps)) { const d = Math.hypot(n.x - p.x, n.y - p.y); if (d < n.r + pad && d < bd) { bd = d; b = n; } } return b; }
+let activePointer = null, downAt = 0;
+cv.addEventListener('pointerdown', (e) => {
+  e.preventDefault(); initAudio();
+  if (state === 'title') {
+    const bx = e.clientX, by = e.clientY, ay = H * 0.82;
+    if (Math.abs(by - ay) < 32) {
+      if (Math.abs(bx - (W / 2 - 110)) < 30) { stageIdx = Math.max(0, stageIdx - 1); loadStage(stageIdx, true); snd('tick'); return; }
+      if (Math.abs(bx - (W / 2 + 110)) < 30) { stageIdx = Math.min(unlocked, stageIdx + 1); loadStage(stageIdx, true); snd('tick'); return; }
+    }
+    startStage(stageIdx); return;
+  }
+  if (state === 'result') {
+    if (tGame - resultAt < 0.7) return;
+    if (result.win) stageIdx = (stageIdx + 1) % STAGES.length;
+    startStage(stageIdx); return;
+  }
+  if (state !== 'play' || activePointer !== null) return;
+  const p = toWorld(e), n = nestAt(p, 14);
+  if (n && n.owner === 1) {
+    activePointer = e.pointerId;
+    try { cv.setPointerCapture(e.pointerId); } catch (er) {}
+    drag = { src: n, pts: [{ x: n.x, y: n.y }], joins: [], cur: p, blocked: false, len: 0 };
+    n.flash = 1;
+  }
+});
+cv.addEventListener('pointermove', (e) => {
+  if (!drag || e.pointerId !== activePointer) return;
+  const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+  for (const ev of (evs.length ? evs : [e])) extendDrag(toWorld(ev));
+});
+function extendDrag(p) {
+  p.x = Math.max(4, Math.min(FW - 4, p.x)); p.y = Math.max(4, Math.min(FH - 4, p.y));
+  drag.cur = p;
+  const last = drag.pts[drag.pts.length - 1];
+  const d = Math.hypot(p.x - last.x, p.y - last.y);
+  if (d < 6) return;
+  if (!segClear(last, p)) { if (!drag.blocked) snd('bad', 300); drag.blocked = true; drag.wasBlocked = true; return; }
+  drag.blocked = false;
+  drag.pts.push({ x: p.x, y: p.y }); drag.len += d;
+  for (const n of nests) {
+    if (n.owner !== 1 || n === drag.src || drag.joins.some((j) => j.nest === n)) continue;
+    if (Math.hypot(n.x - p.x, n.y - p.y) < n.r) { drag.joins.push({ nest: n, s: drag.len }); n.flash = 1; snd('tick'); }
+  }
+}
+function endDrag(e) {
+  if (!drag || e.pointerId !== activePointer) return;
+  activePointer = null;
+  const dg = drag; drag = null;
+  const last = dg.pts[dg.pts.length - 1];
+  const t = nestAt(last, 12);
+  let tg = t;
+  if ((!t || t === dg.src) && dg.len >= 45 && !dg.blocked && camps.filter((c) => c.owner === 1).length < 4) {
+    tg = { camp: true, i: -1, x: last.x, y: last.y, r: 11, owner: 1, n: 0, rate: 0, cap: 999, big: false, pulse: 0, flash: 0, armed: false, route: null };
+    camps.push(tg);
+  } else if (!t || t === dg.src || dg.pts.length < 2) {
+    if (dg.blocked || dg.wasBlocked) { msg = { text: TX.water, t: 2.2 }; }
+    return;
+  }
+  const pts = dg.pts.slice();
+  if (!tg.camp || tg !== camps[camps.length - 1] || t) pts.push({ x: tg.x, y: tg.y });
+  if (pts.length < 2) pts.push({ x: tg.x + 0.1, y: tg.y });
+  const r = makeRoute(pts, 1, tg, false);
+  if (tg.camp && !tg.route) tg.route = r;
+  let k = send(dg.src, r, 0, 1);
+  for (const j of dg.joins) if (j.nest !== tg) k += send(j.nest, r, j.s, 1);
+  if (k > 0) { snd('send'); fx.push({ type: 'num', x: dg.src.x, y: dg.src.y - dg.src.r - 8, text: '→' + k, t: 0, c: '#fff' }); hintT = Math.min(hintT, 0.6); }
+}
+cv.addEventListener('pointerup', endDrag);
+cv.addEventListener('pointercancel', (e) => { if (drag && e.pointerId === activePointer) { drag = null; activePointer = null; } });
+
+function startStage(i) {
+  stageIdx = i; loadStage(i, false); state = 'play'; signal('start');
+}
+
+// ---------- update ----------
+const tmp = { x: 0, y: 0, a: 0 };
+function update(dt) {
+  tGame += dt;
+  if (state === 'play' || state === 'title' || (state === 'result')) sim(dt);
+}
+function sim(dt) {
+  if (state !== 'result') tStage += dt;
+  if (hintT > 0) hintT -= dt;
+  if (msg) { msg.t -= dt; if (msg.t <= 0) msg = null; }
+  // growth
+  for (const n of nests) {
+    if (n.owner) { if (n.n < n.cap) n.n = Math.min(n.cap, n.n + n.rate * dt); else n.n = Math.max(n.cap, n.n - dt * 0.5); }
+    n.pulse = Math.max(0, n.pulse - dt * 2); n.flash = Math.max(0, n.flash - dt * 2);
+  }
+  // spawners
+  for (const sp of spawners) {
+    sp.t -= dt;
+    while (sp.t <= 0 && sp.left > 0) {
+      if (sp.nest.owner !== sp.owner || sp.nest.n < 1) { sp.left = 0; break; }
+      sp.nest.n -= 1; sp.left -= 1; sp.t += SPAWN;
+      ants.push({ route: sp.route, s: sp.s0 - sp.t * SPEED * 0, owner: sp.owner, ofs: (Math.random() - 0.5) * 6, ph: Math.random() * 6.28, x: sp.nest.x, y: sp.nest.y, a: 0, dead: false });
+      if (sp.owner === 1 && !demo) snd('tick', 55);
+    }
+  }
+  spawners = spawners.filter((s) => s.left > 0);
+  // move
+  for (const r of routes) r.alive = 0;
+  for (const a of ants) {
+    a.s += SPEED * dt;
+    if (a.s >= a.route.len) { arrive(a); a.dead = true; continue; }
+    routeAt(a.route, a.s, tmp);
+    const w = a.ofs + Math.sin(tStage * 7 + a.ph) * 0.7;
+    a.x = tmp.x - Math.sin(tmp.a) * w; a.y = tmp.y + Math.cos(tmp.a) * w; a.a = tmp.a;
+    a.route.alive++;
+  }
+  // fights
+  const G = 8, gw = Math.ceil(FW / G) + 2, grid = new Map();
+  for (const a of ants) { if (a.dead) continue; const k = ((a.y / G) | 0) * gw + ((a.x / G) | 0); let l = grid.get(k); if (!l) grid.set(k, l = []); l.push(a); }
+  for (const a of ants) {
+    if (a.dead) continue;
+    const gx = (a.x / G) | 0, gy = (a.y / G) | 0;
+    let hit = null;
+    for (let dy = -1; dy <= 1 && !hit; dy++) for (let dx = -1; dx <= 1 && !hit; dx++) {
+      const l = grid.get((gy + dy) * gw + gx + dx); if (!l) continue;
+      for (const b of l) if (!b.dead && b.owner !== a.owner && Math.abs(b.x - a.x) < 6.5 && Math.abs(b.y - a.y) < 6.5) { hit = b; break; }
+    }
+    if (hit) {
+      a.dead = hit.dead = true;
+      fx.push({ type: 'puff', x: (a.x + hit.x) / 2, y: (a.y + hit.y) / 2, t: 0, c: a.owner === 1 || hit.owner === 1 ? 1 : 0 });
+      if (corpses.length < 400) { corpses.push({ x: a.x, y: a.y, a: a.a + 1.2, o: a.owner, t: 0 }, { x: hit.x, y: hit.y, a: hit.a - 1.2, o: hit.owner, t: 0 }); }
+      if (!demo && (a.owner === 1 || hit.owner === 1)) snd('fight', 70);
+    }
+  }
+  // ambush squads bite any rival ant that walks past
+  for (const c of camps) {
+    c.pulse = Math.max(0, c.pulse - dt * 2); c.flash = Math.max(0, c.flash - dt * 2);
+    if (c.n < 1) continue;
+    for (const a of ants) {
+      if (a.dead || a.owner === c.owner) continue;
+      if (Math.abs(a.x - c.x) < 24 && Math.abs(a.y - c.y) < 24 && Math.hypot(a.x - c.x, a.y - c.y) < 24) {
+        a.dead = true; c.n -= 0.5; c.pulse = 1;
+        fx.push({ type: 'puff', x: a.x, y: a.y, t: 0, c: 1 });
+        if (corpses.length < 400) corpses.push({ x: a.x, y: a.y, a: a.a + 1.2, o: a.owner, t: 0 });
+        if (!demo) snd('fight', 70);
+        if (c.n < 1) break;
+      }
+    }
+  }
+  ants = ants.filter((a) => !a.dead);
+  camps = camps.filter((c) => c.n >= 1 || ants.some((a) => a.route.target === c) || spawners.some((sp) => sp.route.target === c || sp.nest === c));
+  for (const r of routes) { const target = r.alive > 0 || spawners.some((s) => s.route === r) ? 1 : 0; r.alpha += (target - r.alpha) * Math.min(1, dt * (target ? 6 : 1.5)); }
+  routes = routes.filter((r) => r.alpha > 0.02 || r.alive > 0 || spawners.some((s) => s.route === r));
+  for (const c of corpses) c.t += dt;
+  if (corpses.length && corpses[0].t > 5) corpses = corpses.filter((c) => c.t < 5);
+  for (const f of fx) f.t += dt;
+  fx = fx.filter((f) => f.t < (f.type === 'puff' ? 0.5 : f.type === 'ring' ? 0.8 : 1.0));
+  // cpu
+  const st = STAGES[stageIdx];
+  for (const o of [1, 2, 3]) {
+    if (o === 1 && !demo) continue;
+    if (!nests.some((n) => n.owner === o)) continue;
+    cpuTimers[o] -= dt;
+    if (cpuTimers[o] <= 0) { cpuThink(o); cpuTimers[o] = (demo ? 2.2 : st.cpu) * (0.7 + Math.random() * 0.6); }
+  }
+  // end check
+  if (state === 'play' && !ended) {
+    const alive = (o) => nests.some((n) => n.owner === o) || camps.some((n) => n.owner === o && n.n >= 1) || ants.some((a) => a.owner === o) || spawners.some((s) => s.owner === o);
+    const cpuAlive = alive(2) || alive(3), meAlive = alive(1);
+    if (!cpuAlive || !meAlive) { ended = true; setTimeout(() => finish(!cpuAlive), 900); }
+  }
+  if (demo && tStage > 40) loadStage(stageIdx, true);
+}
+function arrive(a) {
+  const t = a.route.target; if (!t) return;
+  if (t.camp) { if (t.owner === a.owner) { t.n += 1; t.armed = true; } return; }
+  if (t.owner === a.owner) { t.n += 1; return; }
+  t.n -= 1;
+  if (t.n < 0) {
+    const prev = t.owner;
+    t.owner = a.owner; t.n = 1; t.pulse = 1;
+    fx.push({ type: 'ring', x: t.x, y: t.y, r: t.r, t: 0, c: COL[a.owner] });
+    if (!demo) { if (a.owner === 1) snd(prev === 0 ? 'neut' : 'cap'); else if (prev === 1) snd('lost'); }
+  }
+}
+function finish(win) {
+  if (state !== 'play') return;
+  state = 'result'; resultAt = tGame;
+  const time = tStage;
+  let nb = false;
+  if (win) {
+    const b = best[stageIdx];
+    if (!b || time < b) { best[stageIdx] = Math.round(time * 10) / 10; nb = !!b; }
+    if (stageIdx + 1 > unlocked && stageIdx + 1 < STAGES.length) unlocked = stageIdx + 1;
+    persist(); snd('win');
+  } else snd('lost');
+  result = { win, time, best: best[stageIdx], nb, all: win && stageIdx === STAGES.length - 1 };
+  signal('end', { score: win ? (stageIdx + 1) * 1000 - Math.min(999, Math.round(time)) : stageIdx * 1000 });
+}
+
+// ---------- draw ----------
+let bg = null;
+function buildBg() {
+  bg = document.createElement('canvas');
+  bg.width = Math.max(1, Math.round(FW * S * DPR)); bg.height = Math.max(1, Math.round(FH * S * DPR));
+  const g = bg.getContext('2d');
+  g.setTransform(S * DPR, 0, 0, S * DPR, 0, 0);
+  const gr = g.createLinearGradient(0, 0, 0, FH); gr.addColorStop(0, '#c6a473'); gr.addColorStop(1, '#b8945f');
+  g.fillStyle = gr; g.fillRect(0, 0, FW, FH);
+  let seed = 7 + stageIdx * 13; const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  for (let i = 0; i < 900; i++) { g.fillStyle = rnd() < 0.5 ? 'rgba(90,60,30,0.10)' : 'rgba(255,240,210,0.10)'; const s = 0.6 + rnd() * 1.6; g.fillRect(rnd() * FW, rnd() * FH, s, s); }
+  for (let i = 0; i < 26; i++) { const x = rnd() * FW, y = rnd() * FH, r = 2 + rnd() * 4; g.fillStyle = 'rgba(70,55,40,0.25)'; g.beginPath(); g.ellipse(x + 1, y + 1.5, r, r * 0.75, 0, 0, 7); g.fill(); g.fillStyle = `rgb(${150 + rnd() * 40 | 0},${135 + rnd() * 30 | 0},${115 + rnd() * 25 | 0})`; g.beginPath(); g.ellipse(x, y, r, r * 0.75, rnd(), 0, 7); g.fill(); }
+  // grass tufts at edges
+  for (let i = 0; i < 40; i++) {
+    const side = rnd() < 0.5, x = side ? rnd() * 14 : FW - rnd() * 14, y = rnd() * FH;
+    g.strokeStyle = `rgba(${70 + rnd() * 30 | 0},${110 + rnd() * 40 | 0},50,0.8)`; g.lineWidth = 1.4;
+    for (let k = 0; k < 4; k++) { g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + (rnd() - 0.5) * 6, y - 5, x + (rnd() - 0.5) * 12, y - 8 - rnd() * 6); g.stroke(); }
+  }
+  for (const p of puds) {
+    g.fillStyle = 'rgba(80,55,30,0.35)'; g.beginPath(); g.ellipse(p.x, p.y + 2, p.rx + 4, p.ry + 4, 0, 0, 7); g.fill();
+    const wg = g.createRadialGradient(p.x - p.rx * 0.3, p.y - p.ry * 0.4, 2, p.x, p.y, Math.max(p.rx, p.ry));
+    wg.addColorStop(0, '#9fd0e6'); wg.addColorStop(1, '#4f8fb3');
+    g.fillStyle = wg; g.beginPath(); g.ellipse(p.x, p.y, p.rx, p.ry, 0, 0, 7); g.fill();
+    g.strokeStyle = 'rgba(255,255,255,0.5)'; g.lineWidth = 1.5; g.beginPath(); g.ellipse(p.x - p.rx * 0.2, p.y - p.ry * 0.35, p.rx * 0.45, p.ry * 0.25, 0, 3.6, 5.4); g.stroke();
+  }
+  bgDirty = false;
+}
+function drawAnts(list, owner) {
+  const c = ANTC[owner];
+  cx.fillStyle = c; cx.beginPath();
+  for (const a of list) {
+    const ca = Math.cos(a.a), sa = Math.sin(a.a), x = a.x, y = a.y;
+    cx.moveTo(x + ca * 4.3 + 2, y + sa * 4.3); cx.arc(x + ca * 4.3, y + sa * 4.3, 2, 0, 6.29);
+    cx.moveTo(x + 1.6, y); cx.arc(x, y, 1.6, 0, 6.29);
+    cx.moveTo(x - ca * 4.6 + 3, y - sa * 4.6); cx.ellipse(x - ca * 4.6, y - sa * 4.6, 3, 2.3, a.a, 0, 6.29);
+  }
+  cx.fill();
+  cx.strokeStyle = c; cx.lineWidth = 1; cx.beginPath();
+  for (const a of list) {
+    const ca = Math.cos(a.a), sa = Math.sin(a.a), sw = Math.sin(a.s * 0.9 + a.ph) * 1.8;
+    for (let k = -1; k <= 1; k++) {
+      const bx = a.x + ca * k * 1.4, by = a.y + sa * k * 1.4, f = (k === 0 ? -sw : sw);
+      const l1 = k * 2.3 + f, l2 = k * 2.3 - f;
+      cx.moveTo(bx, by); cx.lineTo(bx + ca * l1 - sa * 4.6, by + sa * l1 + ca * 4.6);
+      cx.moveTo(bx, by); cx.lineTo(bx + ca * l2 + sa * 4.6, by + sa * l2 - ca * 4.6);
+    }
+  }
+  cx.stroke();
+}
+function fitFont(text, maxW, size, weight = 'bold') {
+  let s = size; cx.font = `${weight} ${s}px ${FONT}`;
+  while (s > 12 && cx.measureText(text).width > maxW) { s -= 1; cx.font = `${weight} ${s}px ${FONT}`; }
+  return s;
+}
+function drawNest(n) {
+  const r = n.r * (1 + n.pulse * 0.12);
+  cx.fillStyle = 'rgba(60,40,20,0.3)'; cx.beginPath(); cx.ellipse(n.x + 2, n.y + 3, r + 4, r * 0.85 + 3, 0, 0, 7); cx.fill();
+  const g = cx.createRadialGradient(n.x - r * 0.3, n.y - r * 0.4, 1, n.x, n.y, r + 4);
+  g.addColorStop(0, '#b98a58'); g.addColorStop(1, '#7a5432');
+  cx.fillStyle = g; cx.beginPath(); cx.ellipse(n.x, n.y, r + 3, r * 0.9 + 2, 0, 0, 7); cx.fill();
+  // ownership ring with fill amount
+  cx.lineWidth = n.owner === 1 ? 4.5 : 4;
+  cx.strokeStyle = 'rgba(0,0,0,0.18)'; cx.beginPath(); cx.arc(n.x, n.y, r, 0, 7); cx.stroke();
+  cx.strokeStyle = COL[n.owner];
+  const frac = n.owner ? Math.min(1, n.n / n.cap) : 1;
+  cx.beginPath(); cx.arc(n.x, n.y, r, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.max(0.06, frac)); cx.stroke();
+  if (n.flash > 0) { cx.strokeStyle = `rgba(255,255,255,${n.flash})`; cx.lineWidth = 3; cx.beginPath(); cx.arc(n.x, n.y, r + 5, 0, 7); cx.stroke(); }
+}
+function drawNestTop(n) {
+  const r = n.r * (1 + n.pulse * 0.12);
+  cx.fillStyle = BADGE[n.owner]; cx.beginPath(); cx.arc(n.x, n.y, r * 0.66, 0, 7); cx.fill();
+  cx.strokeStyle = n.owner === 1 ? '#f4e6c8' : 'rgba(255,255,255,0.35)'; cx.lineWidth = n.owner === 1 ? 2 : 1; cx.stroke();
+  const num = String(Math.floor(n.n));
+  cx.font = `bold ${n.big ? 17 : 14}px ${FONT}`; cx.textAlign = 'center'; cx.textBaseline = 'middle';
+  cx.fillStyle = n.owner === 3 ? '#3a2a00' : '#fff';
+  cx.fillText(num, n.x, n.y + 1);
+}
+function render() {
+  cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  cx.fillStyle = '#3b2f22'; cx.fillRect(0, 0, W, H);
+  if (bgDirty || !bg) buildBg();
+  cx.drawImage(bg, OX, OY, FW * S, FH * S);
+  cx.setTransform(DPR * S, 0, 0, DPR * S, DPR * OX, DPR * OY);
+  // routes (pheromone)
+  cx.lineCap = 'round'; cx.lineJoin = 'round';
+  for (const r of routes) {
+    if (r.alpha < 0.02) continue;
+    cx.globalAlpha = r.alpha * 0.35; cx.strokeStyle = COL[r.owner]; cx.lineWidth = 7;
+    cx.setLineDash([1, 7]); cx.lineDashOffset = -tStage * 20;
+    cx.beginPath(); cx.moveTo(r.pts[0].x, r.pts[0].y); for (const p of r.pts) cx.lineTo(p.x, p.y); cx.stroke();
+  }
+  cx.setLineDash([]); cx.globalAlpha = 1;
+  // fallen ants
+  for (const c of corpses) { cx.globalAlpha = 0.55 * Math.min(1, (5 - c.t) / 1.5); cx.fillStyle = ANTC[c.o]; const ca = Math.cos(c.a), sa = Math.sin(c.a); cx.beginPath(); cx.arc(c.x + ca * 3, c.y + sa * 3, 1.6, 0, 7); cx.arc(c.x - ca * 2, c.y - sa * 2, 2.2, 0, 7); cx.fill(); }
+  cx.globalAlpha = 1;
+  // nests
+  for (const n of nests) drawNest(n);
+  // ants
+  const by = { 1: [], 2: [], 3: [] }; for (const a of ants) by[a.owner].push(a);
+  for (const o of [2, 3, 1]) if (by[o].length) drawAnts(by[o], o);
+  for (const n of nests) drawNestTop(n);
+  for (const c of camps) {
+    cx.strokeStyle = COL[c.owner]; cx.globalAlpha = 0.45; cx.lineWidth = 2; cx.setLineDash([3, 4]); cx.lineDashOffset = tStage * 8;
+    cx.beginPath(); cx.arc(c.x, c.y, 24, 0, 7); cx.stroke(); cx.setLineDash([]); cx.globalAlpha = 1;
+    // little flag
+    cx.strokeStyle = '#3a2a1c'; cx.lineWidth = 1.5; cx.beginPath(); cx.moveTo(c.x + 7, c.y - 4); cx.lineTo(c.x + 7, c.y - 22); cx.stroke();
+    cx.fillStyle = '#f4e6c8'; cx.beginPath(); cx.moveTo(c.x + 7, c.y - 22); cx.lineTo(c.x + 18, c.y - 18.5); cx.lineTo(c.x + 7, c.y - 15); cx.fill();
+    if (c.n >= 1) {
+      const rr = 9 * (1 + c.pulse * 0.2);
+      cx.fillStyle = BADGE[c.owner]; cx.beginPath(); cx.arc(c.x, c.y, rr, 0, 7); cx.fill(); cx.strokeStyle = '#f4e6c8'; cx.lineWidth = 1.5; cx.stroke();
+      cx.fillStyle = '#fff'; cx.font = `bold 12px ${FONT}`; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillText(String(Math.floor(c.n)), c.x, c.y + 1);
+    }
+  }
+  // fx
+  for (const f of fx) {
+    if (f.type === 'puff') { const k = f.t / 0.5; cx.fillStyle = `rgba(${f.c ? '255,250,230' : '240,220,190'},${0.7 * (1 - k)})`; cx.beginPath(); cx.arc(f.x, f.y, 2 + k * 6, 0, 7); cx.fill(); }
+    else if (f.type === 'ring') { const k = f.t / 0.8; cx.strokeStyle = f.c; cx.globalAlpha = 1 - k; cx.lineWidth = 4 * (1 - k) + 1; cx.beginPath(); cx.arc(f.x, f.y, f.r + k * 30, 0, 7); cx.stroke(); cx.globalAlpha = 1; }
+    else if (f.type === 'num') { const k = f.t; cx.globalAlpha = Math.max(0, 1 - k); cx.font = `bold 15px ${FONT}`; cx.textAlign = 'center'; cx.fillStyle = '#000'; cx.fillText(f.text, f.x + 1, f.y - k * 18 + 1); cx.fillStyle = f.c; cx.fillText(f.text, f.x, f.y - k * 18); cx.globalAlpha = 1; }
+  }
+  // drag preview
+  if (drag) {
+    const pts = drag.pts;
+    cx.strokeStyle = 'rgba(255,255,255,0.85)'; cx.lineWidth = 4; cx.setLineDash([8, 6]); cx.lineDashOffset = -tGame * 30;
+    cx.beginPath(); cx.moveTo(pts[0].x, pts[0].y); for (const p of pts) cx.lineTo(p.x, p.y); cx.stroke();
+    const last = pts[pts.length - 1];
+    cx.strokeStyle = drag.blocked ? 'rgba(220,60,40,0.9)' : 'rgba(255,255,255,0.45)'; cx.lineWidth = 3;
+    cx.beginPath(); cx.moveTo(last.x, last.y); cx.lineTo(drag.cur.x, drag.cur.y); cx.stroke(); cx.setLineDash([]);
+    const t = nestAt(last, 12);
+    if (t && t !== drag.src) { cx.strokeStyle = '#fff'; cx.lineWidth = 3; cx.beginPath(); cx.arc(t.x, t.y, t.r + 7 + Math.sin(tGame * 10) * 1.5, 0, 7); cx.stroke(); }
+    let k = Math.floor(drag.src.n / 2); for (const j of drag.joins) k += Math.floor(j.nest.n / 2);
+    cx.font = `bold 16px ${FONT}`; cx.textAlign = 'center'; cx.textBaseline = 'middle';
+    const tx = Math.max(20, Math.min(FW - 20, drag.cur.x)), ty = Math.max(16, drag.cur.y - 34);
+    let lab = '×' + k, col = '#fff';
+    if ((!t || t === drag.src) && drag.len >= 45) { lab = TX.camp + ' ×' + k; col = '#f4e6c8'; }
+    if (t && t !== drag.src && t.owner !== 1) { lab = k + ' vs ' + Math.floor(t.n); col = k > t.n ? '#9ef59a' : '#ffb08a'; }
+    cx.font = `bold 16px ${FONT}`; const lw = Math.max(44, cx.measureText(lab).width + 18);
+    cx.fillStyle = 'rgba(0,0,0,0.6)'; cx.beginPath(); cx.roundRect ? cx.roundRect(tx - lw / 2, ty - 12, lw, 24, 12) : cx.rect(tx - lw / 2, ty - 12, lw, 24); cx.fill();
+    cx.fillStyle = col; cx.fillText(lab, tx, ty + 1);
+  }
+  cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  if (state === 'play' || state === 'result') drawHud();
+  if (state === 'play') drawHints();
+  if (state === 'title') drawTitle();
+  if (state === 'result') drawResult();
+}
+function drawHud() {
+  cx.fillStyle = 'rgba(30,22,15,0.92)'; cx.fillRect(0, 0, W, HUD);
+  cx.textBaseline = 'middle';
+  cx.fillStyle = '#fff'; cx.textAlign = 'left'; fitFont(TX.stageOf(stageIdx + 1, STAGES.length), W * 0.3, 16); cx.fillText(TX.stageOf(stageIdx + 1, STAGES.length), 12, HUD / 2);
+  const sec = Math.floor(tStage), ts = `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
+  cx.textAlign = 'right'; cx.font = `bold 16px ${FONT}`; cx.fillText(ts, W - 12, HUD / 2);
+  // power bar
+  const tot = { 1: 0, 2: 0, 3: 0 };
+  for (const n of nests) if (n.owner) tot[n.owner] += n.n;
+  for (const c of camps) tot[c.owner] += Math.max(0, c.n);
+  for (const a of ants) tot[a.owner] += 1;
+  for (const s of spawners) { /* already counted in nests */ }
+  const sum = tot[1] + tot[2] + tot[3] || 1;
+  const bw = Math.min(150, W * 0.38), bx = W / 2 - bw / 2 + 6, bh = 14, byy = HUD / 2 - bh / 2;
+  let x = bx;
+  for (const o of [1, 3, 2]) { const w = bw * tot[o] / sum; if (w <= 0) continue; cx.fillStyle = o === 1 ? '#f1e9dc' : COL[o]; cx.fillRect(x, byy, w, bh); x += w; }
+  cx.strokeStyle = 'rgba(255,255,255,0.5)'; cx.lineWidth = 1; cx.strokeRect(bx, byy, bw, bh);
+  cx.fillStyle = '#1d1714'; cx.font = `bold 12px ${FONT}`; cx.textAlign = 'left';
+  if (tot[1] / sum * bw > 24) cx.fillText(String(Math.floor(tot[1])), bx + 3, HUD / 2 + 1);
+}
+function drawHints() {
+  let text = null;
+  if (msg) text = msg.text; else if (hintT > 0) text = TX.hints[stageIdx];
+  if (!text) return;
+  const a = msg ? Math.min(1, msg.t * 2) : Math.min(1, hintT * 2);
+  cx.globalAlpha = a;
+  const s = fitFont(text, W - 40, 15);
+  const y = H - 22;
+  cx.fillStyle = msg ? 'rgba(120,30,20,0.85)' : 'rgba(25,18,12,0.78)';
+  const tw = cx.measureText(text).width;
+  cx.beginPath(); cx.roundRect ? cx.roundRect(W / 2 - tw / 2 - 14, y - s, tw + 28, s * 2, s) : cx.rect(W / 2 - tw / 2 - 14, y - s, tw + 28, s * 2); cx.fill();
+  cx.fillStyle = '#fff'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillText(text, W / 2, y + 1);
+  cx.globalAlpha = 1;
+  // first-stage guide arrow
+  if (!msg && stageIdx === 0 && !routes.some((r) => r.owner === 1) && !drag) {
+    const src = nests[0], dst = nests[1];
+    if (src.owner === 1) {
+      const k = (tGame * 0.7) % 1;
+      const x = OX + (src.x + (dst.x - src.x) * k) * S, y2 = OY + (src.y + (dst.y - src.y) * k) * S;
+      cx.globalAlpha = Math.sin(k * Math.PI);
+      cx.fillStyle = 'rgba(255,255,255,0.9)'; cx.beginPath(); cx.arc(x, y2, 11, 0, 7); cx.fill();
+      cx.strokeStyle = 'rgba(0,0,0,0.4)'; cx.lineWidth = 2; cx.stroke();
+      cx.globalAlpha = 1;
+    }
+  }
+}
+function drawTitle() {
+  cx.fillStyle = 'rgba(25,18,12,0.55)'; cx.fillRect(0, 0, W, H);
+  cx.textAlign = 'center'; cx.textBaseline = 'middle';
+  const ty = H * 0.26;
+  fitFont(TX.title, W - 30, 38);
+  cx.fillStyle = '#000'; cx.fillText(TX.title, W / 2 + 2, ty + 3);
+  cx.fillStyle = '#fff3dc'; cx.fillText(TX.title, W / 2, ty);
+  cx.fillStyle = '#fff';
+  for (const [i, t] of [TX.how1, TX.how2, TX.how3, TX.how4].entries()) { fitFont(t, W - 36, 16, '600'); cx.fillText(t, W / 2, H * 0.4 + i * 28); }
+  const a = 0.55 + 0.45 * Math.sin(tGame * 4);
+  cx.globalAlpha = a; fitFont(TX.tap, W - 40, 22); cx.fillStyle = '#ffe9b8'; cx.fillText(TX.tap, W / 2, H * 0.66); cx.globalAlpha = 1;
+  // stage select
+  const ay = H * 0.82;
+  cx.fillStyle = 'rgba(0,0,0,0.45)'; cx.beginPath(); cx.roundRect ? cx.roundRect(W / 2 - 140, ay - 26, 280, 52, 26) : cx.rect(W / 2 - 140, ay - 26, 280, 52); cx.fill();
+  cx.font = `bold 18px ${FONT}`; cx.fillStyle = '#fff';
+  cx.fillText(TX.stageOf(stageIdx + 1, STAGES.length), W / 2, ay - (best[stageIdx] ? 7 : 0));
+  if (best[stageIdx]) { cx.font = `13px ${FONT}`; cx.fillStyle = '#ffe9b8'; cx.fillText(`${TX.best} ${fmt(best[stageIdx])}`, W / 2, ay + 12); }
+  cx.font = `bold 24px ${FONT}`;
+  cx.fillStyle = stageIdx > 0 ? '#fff' : 'rgba(255,255,255,0.25)'; cx.fillText('◀', W / 2 - 110, ay);
+  cx.fillStyle = stageIdx < unlocked ? '#fff' : 'rgba(255,255,255,0.25)'; cx.fillText('▶', W / 2 + 110, ay);
+}
+function fmt(t) { const s = Math.floor(t); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; }
+function drawResult() {
+  const k = Math.min(1, (tGame - resultAt) * 3);
+  cx.fillStyle = `rgba(20,14,10,${0.6 * k})`; cx.fillRect(0, HUD, W, H - HUD);
+  cx.globalAlpha = k; cx.textAlign = 'center'; cx.textBaseline = 'middle';
+  const r = result, cy = H * 0.42;
+  const head = r.all ? TX.all : r.win ? TX.clear : TX.lose;
+  fitFont(head, W - 30, 34); cx.fillStyle = r.win ? '#ffe9b8' : '#ffc4b8'; cx.fillText(head, W / 2, cy - 40);
+  if (r.win) {
+    cx.font = `bold 30px ${FONT}`; cx.fillStyle = '#fff'; cx.fillText(`${TX.time} ${fmt(r.time)}`, W / 2, cy + 8);
+    cx.font = `bold 17px ${FONT}`; cx.fillStyle = r.nb ? '#ffd76a' : '#e8dccb';
+    cx.fillText(r.nb ? TX.newBest : `${TX.best} ${fmt(r.best)}`, W / 2, cy + 44);
+  }
+  if (tGame - resultAt > 0.7) { cx.globalAlpha = k * (0.6 + 0.4 * Math.sin(tGame * 4)); fitFont(r.win ? TX.next : TX.again, W - 40, 20); cx.fillStyle = '#fff'; cx.fillText(r.win ? TX.next : TX.again, W / 2, H * 0.68); }
+  cx.globalAlpha = 1;
+}
+
+// ---------- loop ----------
+let lastT = 0;
+function frame(ts) {
+  const dt = Math.min(0.05, Math.max(0, (ts - (lastT || ts)) / 1000)); lastT = ts;
+  if ((window.innerWidth || 1) !== W || (window.innerHeight || 1) !== H) resize();
+  update(dt); render();
+  requestAnimationFrame(frame);
+}
+loadStage(0, true);
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

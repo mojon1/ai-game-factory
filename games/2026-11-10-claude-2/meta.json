@@ -1,0 +1,631 @@
+{
+  "id": "2026-11-10-claude-2",
+  "status": "published",
+  "title": "ありんこ行列合戦",
+  "genre": "ストラテジー",
+  "concept": "指でなぞった道を、ありが一列に行進する陣取り戦。水たまりをよけ、途中の巣を通って合流させ、何もない所で指を離せば旗を立てて待ちぶせる。道の引き方そのものが作戦になる手触りが核。",
+  "howToPlay": "自分の黒い巣から指でなぞると、巣の半分のありがその道を進む。行列どうしはぶつかると相打ち。何もない所で離すと待ちぶせ。赤（と黄）の巣をすべて取ればクリア。",
+  "libraryDecision": "効果音だけ ZzFX を使う。描画は2Dキャンバスで十分（数百匹のありの行列を上から見る絵が一番読みやすく、3Dの奥行きは作戦の読み取りを邪魔する）。物理演算は、ありが道に沿って進むだけなので不要。",
+  "soundDecision": "BGMは付けず、自分のありが巣を出るときの小さなカチカチ音、ぶつかり合いのパチパチ音、巣を取ったときのチャイムだけ鳴らす。行列が進む音そのものが戦況の手応えになり、曲で緊張感を薄めないため。",
+  "improvements": [
+    {
+      "found": "背景の土と水たまりが巣の位置からずれて下が切れていた／灰色の中立と黒い自分の巣の見分けがつきにくい／送るありが足りるのか、なぞっている間に分からない",
+      "changed": "背景の描画位置を直した。巣の中央を持ち主の色の円にした。なぞっている間は「送る数 vs 相手の数」を緑・橙で出す。ありを少し大きく速くした",
+      "foundEn": "The soil and puddle background was misaligned and cut off at the bottom / grey neutral and black own nests looked alike / while drawing you could not tell if you were sending enough",
+      "changedEn": "Fixed the background offset. Nest centres are now discs in the owner colour. While drawing, a label shows 'sending vs defenders' in green or orange. Ants are a bit bigger and faster"
+    },
+    {
+      "found": "巣に入るありが数字を隠す／戦った場所に何も残らず、ぶつかり合いの手応えが薄い／AI同士の試合では、巣が満杯のまま誰も攻めない膠着が多く、ヒントが下の巣と重なっていた",
+      "changed": "ありは巣の数字の下にもぐるように描く。倒れたありを数秒残す。満杯の巣や長引いた試合ではCPUが攻めに出る。ヒントを画面のさらに下へ。ステージ5の初期数とステージ6の速さを調整",
+      "foundEn": "Ants walking into a nest hid its number / fights left no trace, so clashes felt weak / AI-vs-AI runs showed long stalemates with full nests nobody spent, and the hint covered the bottom nest",
+      "changedEn": "Ants now slip under the nest badge. Fallen ants stay for a few seconds. The CPU attacks from full nests and in long standoffs. The hint moved lower. Tuned stage 5 start counts and stage 6 pace"
+    },
+    {
+      "found": "行列を交差させての迎え撃ちが、タイミング次第の運になっていた／道の終点が巣に限られ、すき間で待つ作戦が取れない／敵の巣を取り返しに行くと、相手の援軍に負けがち",
+      "changed": "何もない所で指を離すと、そこに旗を立てて待ちぶせ隊が陣取る。近くを通る敵のありを、1匹で2匹ぶん止める。待ちぶせ隊からもう一度なぞれば全員で突撃できる。タイトルとステージ4のヒントに説明を足した",
+      "foundEn": "Intercepting by crossing columns came down to lucky timing / routes had to end on a nest, so you could not hold a gap / retaking a nest often lost to enemy reinforcements",
+      "changedEn": "Let go on open ground to plant a flag and dig in an ambush squad. It stops passing enemy ants, each squad ant stopping two. Drag from the squad again to send all of it. Added the rule to the title and the stage 4 hint"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "ストラテジー",
+      "en": "Strategy",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "ありの巣どうしの陣取り戦。指でなぞった道をありが行列で進み、行列どうしがぶつかると戦う。道の引き方で待ちぶせや合流ができる。",
+        "ideaEn": "Ant-colony territory war: ants march in a column along the path you draw; columns that meet fight. Routing lets you ambush and merge.",
+        "fromDraw": true
+      },
+      {
+        "idea": "3Dの砂場で、指で溝を掘って水を流し、すべての田んぼに水を行き渡らせる遊び場（終わりなし）。",
+        "ideaEn": "A 3D sandbox: dig channels with your finger and let water flow to every paddy (no ending).",
+        "fromDraw": false
+      },
+      {
+        "idea": "紙ひこうきを折り目の位置で性格づけして投げる。折り方で曲がり方が変わり、窓から庭の的まで届かせる。",
+        "ideaEn": "Fold a paper plane where you like; the folds decide how it flies. Throw it from the window to targets in the garden.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "draw",
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Ant Line Wars",
+      "concept": "A territory war where ants march single-file along the path you draw. Route around puddles, pass your own nests to merge them, or let go on open ground to plant a flag and lie in ambush. How you draw the route is the strategy.",
+      "howToPlay": "Drag from your black nest: half its ants march along your line. Opposing ants trade one-for-one; let go on open ground to set an ambush. Take every red (and yellow) nest to clear.",
+      "libraryDecision": "Only ZzFX for sound effects. Plain 2D canvas fits best: a top-down view of hundreds of marching ants reads clearly, and 3D depth would hurt reading the battle. No physics needed since ants just follow paths.",
+      "soundDecision": "No music. Tiny clicks as your ants leave a nest, crackles where lines clash, and a chime when you take a nest. The sound of the march itself is the feedback on the battle, and music would dull the tension."
+    }
+  },
+  "createdAt": "2026-11-10T12:06:11+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-10T12:06:11+09:00",
+    "metricsFrom": "2026-11-10T03:05:24.029Z",
+    "transcript": "03316d88-ca6c-4476-9f6f-7ae7b2b6f5fc.jsonl",
+    "validationRuns": 9,
+    "finishedAt": "2026-11-10T12:25:06+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-10T12:24:52+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "38.7KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=112",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=156",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=92",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=139",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 39668,
+    "lines": 708
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "ZzFX",
+      "version": "1.4.0",
+      "file": "zzfx-1.4.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "攻めたい巣ごとに毎回なぞる必要があり、後半のステージで巣が増えると操作が忙しくなる。CPUの援軍の読みが見えないので、足りるはずの攻撃が負けたときに理由が分かりにくい",
+    "comment": "ステージ1で、右の巣を赤に取られ、左の巣から下の巣を通って合流させた20匹で取り返しに行ったら、赤の援軍で守り切られた。次は巣が育つのを待って再挑戦し、取り返せた。最後は下の巣から左の巣で合流し、旗の待ちぶせ隊も突撃させて赤の巣になだれこみ、1:05でクリア。道の引き方で合流・迂回・待ちぶせを選べるのはこの作品ならでは。ただ、陣取り型のよくある遊びの延長で、数分は面白いが「もう1回」の引きはまだ★3止まり",
+    "similar": [
+      {
+        "title": "Galcon",
+        "url": "https://en.wikipedia.com/wiki/Galcon",
+        "similarity": "高",
+        "note": "拠点から割合で兵を送り、数で拠点を奪い合う基本の仕組みがほぼ同じ。こちらは指でなぞった道を一列に進み、途中で合流・待ちぶせができる",
+        "note_en": "Nearly the same core: send a share of units from a base and take bases by numbers. Here units march single-file along a drawn path and can merge or lie in ambush"
+      },
+      {
+        "title": "Tentacle Wars",
+        "url": "https://toucharcade.com/2012/04/24/tentacle-wars-hd-for-ipad-review/",
+        "similarity": "中",
+        "note": "線を引いて拠点をつなぎ、線どうしがぶつかる所で押し合う。こちらは線が道すじになり、交差や待ちぶせで迎え撃つ",
+        "note_en": "Draw links between cells; links that meet push against each other. Here the line is a marching route, and you intercept by crossing or ambushing"
+      }
+    ],
+    "research": "陣取り型（拠点から兵を送る）RTSの代表作を2回ウェブ検索して確認した",
+    "i18n": {
+      "en": {
+        "worst": "You must draw a fresh line for every attack, so later stages with many nests get busy. CPU reinforcements are invisible until they arrive, so an attack that looked big enough can fail without a clear reason",
+        "comment": "In stage 1 red took my right nest. I merged 20 ants from the left nest through the bottom nest to retake it, but red reinforced and held. After letting my nests grow I tried again and won it back. To finish, I merged at the left nest, sent the flagged ambush squad in as well, flooded the red nest and cleared in 1:05. Choosing between merging, detouring and ambushing by how you draw is this game's own twist. Still, it extends a familiar territory formula: fun for a few minutes, but the pull to replay stays at 3 stars",
+        "research": "Two web searches on base-to-base 'send troops' RTS games"
+      }
+    },
+    "method": "スマホ縦画面で 19 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 19 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 400ms",
+        "note": "タイトルで遊び方4行。タップで開始。下の黒い巣(20)が自分",
+        "noteEn": "Title shows 4 short lines. Tap to start; the black nest (20) at the bottom is mine",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "path(0.50,0.89→0.36,0.78→0.23,0.63) 400ms → wait 300ms",
+        "note": "左の灰色の巣(5)へなぞる。行列が出発",
+        "noteEn": "Drag to the left grey nest (5); a column sets out",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "path(0.50,0.89→0.64,0.78→0.77,0.63) 400ms → wait 3500ms",
+        "note": "続けて右の巣(5)へ",
+        "noteEn": "Then the right nest (5)",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 2500ms",
+        "note": "両方取れた。赤も動き出した",
+        "noteEn": "Both taken; red starts moving",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "path(0.50,0.89→0.36,0.72→0.31,0.54→0.42,0.34) 700ms → wait 300ms",
+        "note": "赤の巣の前の空き地で指を離し、待ちぶせ隊を置く",
+        "noteEn": "Let go on open ground before the red nest to post an ambush squad",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 5000ms",
+        "note": "旗の所に待ちぶせ隊が陣取った",
+        "noteEn": "The squad has dug in at the flag",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 5000ms",
+        "note": "赤の行列が待ちぶせにかかるか",
+        "noteEn": "Will a red column walk into it?",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "path(0.23,0.60→0.35,0.80→0.50,0.89→0.64,0.78→0.77,0.63) 800ms → wait 300ms",
+        "note": "右の巣を赤に取られた(14)。左の巣から下の巣を通って合流させ、19匹で取り返す",
+        "noteEn": "Red took my right nest (14). From the left nest through the bottom nest, 19 ants merge to retake it",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 5000ms",
+        "note": "取り返せたか",
+        "noteEn": "Retaken?",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 4000ms",
+        "note": "赤の次の手を見る",
+        "noteEn": "Watch red's next move",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "path(0.23,0.60→0.35,0.80→0.50,0.89→0.64,0.78→0.77,0.63) 800ms → wait 5500ms",
+        "note": "赤が援軍を送って守り切った(10)。もう一度、合流させて20匹で",
+        "noteEn": "Red reinforced and held (10). Again: merge for 20 ants",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "wait 3000ms",
+        "note": "今度は取れたか",
+        "noteEn": "Taken this time?",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "wait 6000ms",
+        "note": "巣が育つのを待つ",
+        "noteEn": "Let the nests grow",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "path(0.50,0.89→0.30,0.75→0.23,0.60→0.33,0.40→0.50,0.20) 900ms → path(0.42,0.34→0.50,0.20) 200ms → wait 300ms",
+        "note": "下の巣→左の巣で合流→赤の巣へ。旗の待ちぶせ隊も全員突撃",
+        "noteEn": "Bottom nest, merge at the left nest, on to red. The ambush squad charges too",
+        "image": "ai-play/step-14.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "wait 5000ms",
+        "note": "赤の巣は落ちたか",
+        "noteEn": "Did the red nest fall?",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "wait 3000ms",
+        "note": "結果",
+        "noteEn": "Result",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 17,
+        "action": "wait 3000ms",
+        "note": "赤の巣に行列がなだれこむ",
+        "noteEn": "My column pours into the red nest",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 18,
+        "action": "path(0.50,0.89→0.50,0.70→0.50,0.48) 400ms → path(0.77,0.63→0.60,0.52→0.50,0.48) 400ms → wait 6000ms",
+        "note": "最後に残った中央の赤い巣へ、下と右から挟みうち",
+        "noteEn": "Pincer the last red nest in the middle from bottom and right",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 19,
+        "action": "wait 3000ms",
+        "note": "決着",
+        "noteEn": "Finish",
+        "image": "ai-play/step-19.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "unlocked": 1,
+              "best": {
+                "0": 65.9
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 934
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-10T12:25:06+09:00"
+  },
+  "publishedAt": "2026-11-10T12:25:06+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 23144,
+    "outputTokens": 47075,
+    "contextTokens": 11602961,
+    "turns": 61,
+    "toolCalls": 76,
+    "webSearches": 0,
+    "minutes": 19.7,
+    "from": "2026-11-10T03:05:24.029Z",
+    "to": "2026-11-10T03:25:06.262Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-10T12:25:06+09:00",
+    "validationRuns": 9,
+    "codeKB": 38.7
+  }
+}
