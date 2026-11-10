@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Wind Lane Derby</title>
+<style>
+*{box-sizing:border-box;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;overflow:hidden;overscroll-behavior:none;background:#233452;color:#fff4dd;font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif}
+main{height:100dvh;width:100vw;padding:16px;display:flex;flex-direction:column;justify-content:space-between;gap:8px}
+header{display:flex;justify-content:space-between;font-size:16px;font-weight:bold}
+#clock,#forecast,#hint{text-align:center;font-size:14px;min-height:20px}
+#clock{font-size:24px;font-weight:bold}
+#lanes{display:grid;grid-template-rows:repeat(3,minmax(0,1fr));gap:8px;height:min(52dvh,338px)}
+.lane{font:inherit;border:2px solid #7995ac;border-radius:13px;color:#18344c;background:#c0dce8;position:relative;text-align:left;padding:8px 10px;overflow:hidden;min-height:44px}
+.lane.fast{border-left:8px solid #359e9e}.lane.active{border-color:#ffd687;background:#e4e3ca}
+.wind{font-size:14px;float:right}.track{position:absolute;left:10px;right:10px;bottom:12px;height:18px;border-bottom:1px dashed #7995ac}
+.ship{position:absolute;left:0;bottom:0;transform:translateX(-40%);font-size:22px;color:#a34d43}
+#lanes .rival-ship{position:absolute;bottom:0;color:#45688e;font-size:18px;transform:translateX(-40%)}.lane.changing .ship{opacity:.45}#cover{position:absolute;inset:0;background:#233452f5;display:grid;place-items:center;text-align:center;padding:24px}
+h1{font-size:clamp(24px,8vw,37px)}p{line-height:1.7}small{font-size:16px;color:#ffcf80}
+</style>
+<main><header><span id="you"></span><span id="rival"></span></header><div id="clock"></div><div id="forecast"></div><div id="lanes"></div><div id="hint"></div></main><div id="cover"></div>
+<script>
+const lang=new URLSearchParams(location.search).get('lang')||(/^ja/i.test(navigator.language)?'ja':'en');
+const words={
+ ja:{title:'雲間の風レース',help:'高度をタップして飛行船を移す。<br>風は4秒ごとに変化。追い風で相手を抜こう。',start:'タップでスタート',again:'タップでもう一度',you:'自分',rival:'相手',seconds:'秒',lane:['高い雲','中ほど','低い雲'],wind:'速さ',hint:'速さの大きい高度にタップで移動',win:'追い風で先着！',tie:'同着',lose:'相手が先着',forecast:'風の区間',next:'次の追い風',changing:'高度変更中',gap:'差',fast:'追い風',course:'航路'},
+ en:{title:'Wind Lane Derby',help:'Tap an altitude to move your airship.<br>Wind shifts every four seconds. Ride tailwinds to win.',start:'Tap to start',again:'Tap to play again',you:'You',rival:'Rival',seconds:'s',lane:['High clouds','Mid clouds','Low clouds'],wind:'Speed',hint:'Tap an altitude with a higher speed',win:'Tailwind victory!',tie:'Dead heat',lose:'Rival wins',forecast:'Wind segment',next:'Next tailwind',changing:'Changing altitude',gap:'Gap',fast:'Tailwind',course:'Route'}
+};
+const t=words[lang]||words.en;
+const byId=id=>document.getElementById(id);
+const courses=[[[3,5,2],[5,2,3],[2,3,5],[3,4.2,4],[5,3,2],[2,3,5]],[[4,4.2,2],[2,3,5],[3,5,2],[5,3,2],[4,4.2,3],[3,2,5]]];
+let route=0,winds=courses[0];
+const length=24,rivalSpeed=4.1;
+let state='title',lane=1,distance=0,elapsed=0,last=0,switchUntil=0,guard=0;
+const signal=(agf,data={})=>parent.postMessage({agf,...data},'*');
+for(const event of ['contextmenu','selectstart','gesturestart'])addEventListener(event,e=>e.preventDefault(),{passive:false});
+const lanes=t.lane.map((name,i)=>{
+ const button=document.createElement('button');
+ button.className='lane';button.innerHTML='<b>'+name+'</b><span class="wind"></span><span class="track"><span class="rival-ship">●</span><span class="ship">◆</span></span>';
+ button.addEventListener('pointerdown',e=>{e.preventDefault();shift(i)});
+ byId('lanes').append(button);return button;
+});
+function overlay(title,body,footer){
+ const cover=byId('cover');cover.innerHTML='<div><h1>'+title+'</h1><p>'+body+'</p><small>'+footer+'</small></div>';
+ cover.style.display='grid';
+}
+function segment(){return Math.min(5,Math.floor(elapsed/4))}
+function draw(){
+ const leg=segment(),course=winds[leg],next=winds[leg+1];
+ const changing=elapsed<switchUntil;
+ byId('you').textContent=t.you+' '+Math.floor(distance);
+ byId('rival').textContent=t.rival+' '+Math.floor(elapsed*rivalSpeed);
+ const gap=Math.floor(distance)-Math.floor(elapsed*rivalSpeed);
+ byId('clock').textContent=Math.ceil(length-elapsed)+' '+t.seconds+' · '+t.gap+' '+(gap>0?'+':'')+gap;
+ byId('forecast').textContent=t.course+' '+(route+1)+' · '+(leg+1)+'/6'+(next?' · '+t.next+' '+t.lane[next.indexOf(Math.max(...next))]+' '+Math.ceil((leg+1)*4-elapsed)+t.seconds:'');
+ byId('hint').textContent=elapsed<5?t.hint:'';
+ lanes.forEach((button,i)=>{
+  button.classList.toggle('active',i===lane);
+  button.classList.toggle('fast',course[i]===Math.max(...course));
+  button.classList.toggle('changing',i===lane&&changing);
+  button.querySelector('.wind').textContent=i===lane&&changing?t.changing+' · '+Math.max(1,course[i]-2).toFixed(1):(course[i]===Math.max(...course)?t.fast:t.wind)+' '+course[i];
+  const other=button.querySelector('.rival-ship');other.style.visibility=i===lane?'visible':'hidden';other.style.left=(4+elapsed*rivalSpeed*.75)+'%';
+  const ship=button.querySelector('.ship');
+  ship.style.visibility=i===lane?'visible':'hidden';ship.style.left=(4+Math.min(90,distance*.75))+'%';
+ });
+}
+function shift(i){
+ if(state!=='play'||elapsed<switchUntil||lane===i)return;
+ lane=i;switchUntil=elapsed+.65;draw();
+}
+function begin(){
+ state='play';lane=1;distance=0;elapsed=0;switchUntil=0;last=performance.now();
+ byId('cover').style.display='none';signal('start');draw();
+}
+function finish(){
+ const mine=Math.floor(distance),other=Math.floor(length*rivalSpeed);
+ state='end';guard=performance.now()+700;signal('end',{score:mine});
+ overlay(mine>other?t.win:mine===other?t.tie:t.lose,t.you+' '+mine+' · '+t.rival+' '+other,t.again);
+}
+setInterval(()=>{
+ if(state!=='play')return;
+ const now=performance.now(),dt=Math.min(.2,(now-last)/1000,length-elapsed);last=now;
+ const speed=winds[segment()][lane];
+ distance+=dt*(elapsed<switchUntil?Math.max(1,speed-2):speed);
+ elapsed+=dt;draw();if(elapsed>=length)finish();
+},50);
+byId('cover').addEventListener('pointerdown',e=>{
+ e.preventDefault();
+ if(state==='title')begin();
+ else if(state==='end'&&performance.now()>=guard){route=1-route;winds=courses[route];begin()}
+});
+overlay(t.title,t.help,t.start);
+</script></html>

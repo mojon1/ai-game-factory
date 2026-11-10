@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Between the Rows</title>
+<style>
+*{box-sizing:border-box;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;overflow:hidden;overscroll-behavior:none;background:#284333;color:#fff1d3;font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif}
+main{width:100vw;height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:16px;gap:8px}
+header{width:100%;display:flex;justify-content:space-between;font-size:16px;font-weight:bold}
+#field{width:min(88vw,53dvh,390px);aspect-ratio:1;display:grid;grid-template:repeat(3,minmax(0,1fr))/repeat(3,minmax(0,1fr));gap:6px;padding:6px;background:#5d633e;border-radius:16px}
+button{font:inherit;color:inherit;border:1px solid #aa916a;background:#604636;border-radius:12px;min-height:44px;padding:4px}
+.plot{min-height:0;font-size:15px}
+.plot.ripe{background:#456b47;border-color:#d3dd92}.plot small{display:block;font-size:12px;color:#f4d5a1}.plot.reserve{outline:2px dashed #ffc888;outline-offset:-5px}.plot.rock{background:#4a514d}.plot.empty{background:repeating-linear-gradient(0deg,#654d3b 0 12px,#765841 12px 15px)}
+.symbol{display:block;font-size:30px;line-height:1.25}
+#queue,#delta{text-align:center;min-height:18px;font-size:13px;color:#f4d5a1}#seed{text-align:center;font-size:17px;min-height:48px}#seed small{display:block;color:#f4d5a1;font-size:14px}
+#hint{min-height:20px;text-align:center;font-size:14px}
+#cover{position:absolute;inset:0;background:#284333f7;display:grid;place-items:center;text-align:center;padding:24px}
+h1{font-size:clamp(24px,8vw,36px)}p{line-height:1.65}small{font-size:16px;color:#f6c378}
+</style>
+<main><header><span id="harvest"></span><span id="step"></span></header><div><div id="seed"></div><div id="queue"></div></div><div id="field"></div><div id="delta"></div><button id="undo"></button><div id="hint"></div></main><div id="cover"></div>
+<script>
+const lang=new URLSearchParams(location.search).get('lang')||(/^ja/i.test(navigator.language)?'ja':'en');
+const words={
+ ja:{title:'畝のとなり',help:'空いた畝にタップで種をまく。<br>豆ととうもろこしは隣同士、かぼちゃには空き地。<br>七つの種で収穫を増やそう。',start:'タップでスタート',again:'タップでもう一度',harvest:'収穫',step:'種',corn:'とうもろこし',bean:'豆',pumpkin:'かぼちゃ',cornRule:'上下左右に豆があれば実る',beanRule:'上下左右にとうもろこしがあれば実る',pumpkinRule:'上下左右に空き地があれば実る',hint:'空いた畝をタップして種をまく',done:'収穫の日',ripe:'実った',wait:'まだ',queue:'次から',delta:'収穫の変化',undo:'一手戻す',reserve:'空き地を残す',rock:'石',next:'タップで次の畑',field:'畑'},
+ en:{title:'Between the Rows',help:'Tap an empty plot to plant the next seed.<br>Pair beans with corn and leave space for squash.<br>Grow the largest harvest in seven plantings.',start:'Tap to start',again:'Tap to play again',harvest:'Harvest',step:'Seed',corn:'Corn',bean:'Bean',pumpkin:'Squash',cornRule:'Grows beside a bean',beanRule:'Grows beside corn',pumpkinRule:'Grows beside an empty plot',hint:'Tap an empty plot to plant',done:'Harvest day',ripe:'Ripe',wait:'Waiting',queue:'Coming next',delta:'Harvest change',undo:'Undo planting',reserve:'Leave open',rock:'Rock',next:'Tap for the next field',field:'Field'}
+};
+const t=words[lang]||words.en;
+const byId=id=>document.getElementById(id);
+const seeds=['corn','bean','pumpkin','bean','corn','pumpkin','bean'];
+const symbols={corn:'🌽',bean:'🫘',pumpkin:'🎃'};
+const soil=Array(9).fill(null);
+let state='title',step=0,guard=0,hintTimer,fieldNumber=0;
+const planted=[];
+const signal=(agf,data={})=>parent.postMessage({agf,...data},'*');
+for(const event of ['contextmenu','selectstart','gesturestart'])addEventListener(event,e=>e.preventDefault(),{passive:false});
+function neighbors(index){
+ const x=index%3,y=Math.floor(index/3);
+ return [[x-1,y],[x+1,y],[x,y-1],[x,y+1]].filter(([a,b])=>a>=0&&a<3&&b>=0&&b<3).map(([a,b])=>b*3+a);
+}
+function ripe(crop,index){
+ if(!crop||crop==='rock')return false;
+ const needs={corn:'bean',bean:'corn',pumpkin:null};
+ return neighbors(index).some(i=>soil[i]===needs[crop]);
+}
+function score(){return soil.filter(ripe).length}
+function overlay(title,body,footer){
+ const cover=byId('cover');cover.innerHTML='<div><h1>'+title+'</h1><p>'+body+'</p><small>'+footer+'</small></div>';
+ cover.style.display='grid';
+}
+function begin(){
+ soil.fill(null);if(fieldNumber===1)soil[4]='rock';planted.length=0;step=0;byId('delta').textContent='';state='play';byId('cover').style.display='none';
+ byId('hint').textContent=t.hint;clearTimeout(hintTimer);hintTimer=setTimeout(()=>byId('hint').textContent='',4500);
+ signal('start');draw();
+}
+function draw(){
+ byId('harvest').textContent=t.harvest+' '+score()+'/7';
+ byId('step').textContent=t.field+' '+(fieldNumber+1)+' · '+t.step+' '+Math.min(step+1,7)+'/7';
+ const seed=seeds[step];
+ byId('seed').innerHTML=seed?symbols[seed]+' '+t[seed]+'<small>'+t[seed+'Rule']+'</small>':t.done;
+ const upcoming=seeds.slice(step+1);
+ byId('queue').textContent=upcoming.length?t.queue+' '+upcoming.map(crop=>symbols[crop]).join(' '):'';
+ const field=byId('field');field.replaceChildren();
+ const reserve=new Set();
+ soil.forEach((crop,i)=>{if(crop==='pumpkin'){const open=neighbors(i).filter(j=>!soil[j]);if(open.length===1)reserve.add(open[0])}});
+ byId('undo').textContent=t.undo;byId('undo').disabled=!planted.length;
+ soil.forEach((crop,i)=>{
+  const plot=document.createElement('button');plot.className='plot'+(crop?'':' empty');
+  if(reserve.has(i)){plot.classList.add('reserve');plot.textContent=t.reserve;}
+  if(crop==='rock'){plot.classList.add('rock');plot.textContent='◆ '+t.rock;}
+  else if(crop){const ready=ripe(crop,i);plot.classList.toggle('ripe',ready);plot.innerHTML='<span class="symbol">'+symbols[crop]+'</span>'+t[crop]+'<small>'+t[ready?'ripe':'wait']+'</small>';}
+  plot.addEventListener('pointerdown',e=>{e.preventDefault();plant(i)});field.append(plot);
+ });
+}
+function plant(index){
+ if(state!=='play'||soil[index])return;
+ const before=score();soil[index]=seeds[step++];planted.push(index);draw();
+ const delta=score()-before;
+ byId('delta').textContent=t.delta+' '+(delta>0?'+':'')+delta;
+ if(step===seeds.length){
+  state='end';guard=performance.now()+700;signal('end',{score:score()});
+  overlay(t.done,t.harvest+' '+score()+'/7',fieldNumber===0?t.next:t.again);
+ }
+}
+byId('undo').addEventListener('pointerdown',e=>{e.preventDefault();if(state!=='play'||!planted.length)return;soil[planted.pop()]=null;step--;byId('delta').textContent='';draw()});
+byId('cover').addEventListener('pointerdown',e=>{
+ e.preventDefault();
+ if(state==='title')begin();
+ else if(state==='end'&&performance.now()>=guard){fieldNumber=1-fieldNumber;begin()}
+});
+overlay(t.title,t.help,t.start);
+</script></html>

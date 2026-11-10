@@ -1,0 +1,172 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-11-10T03:13:19.671Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "wait": 3900
+        }
+      ],
+      "desc": "tap(0.50,0.50) 120ms → wait 3900ms",
+      "note": "航路1の最初は中ほどで待ち、次の高い雲へ備える。",
+      "noteEn": "Hold the middle lane on Route 1 and prepare for the high tailwind.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.435
+          ],
+          "wait": 3800
+        }
+      ],
+      "desc": "tap(0.50,0.43) 120ms",
+      "note": "高い雲に移って先行。次は低い雲に切り替わる。",
+      "noteEn": "The high lane extends the lead before low clouds become fastest.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.79
+          ],
+          "wait": 3800
+        }
+      ],
+      "desc": "tap(0.50,0.79) 120ms",
+      "note": "低い雲へ。次の風は中ほど4.2、今いる高度は4で差が小さい。",
+      "noteEn": "Moved low. In the next segment, middle is 4.2 versus 4 in the current lane.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": {
+        "wait": 3900
+      },
+      "desc": "wait 3900ms",
+      "note": "小さな差なら失速を避けて低い雲に留まり、次の高い雲を待つ。",
+      "noteEn": "Stayed low to avoid a switching penalty for only a small speed gain.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": [
+        {
+          "wait": 200
+        },
+        {
+          "tap": [
+            0.5,
+            0.435
+          ],
+          "wait": 3800
+        }
+      ],
+      "desc": "wait 200ms → tap(0.50,0.43) 120ms",
+      "note": "風が変わってから高い雲に移ると、差をさらに広げられた。",
+      "noteEn": "Moved high after the wind changed and widened the lead.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": {
+        "tap": [
+          0.5,
+          0.79
+        ],
+        "wait": 4700
+      },
+      "desc": "tap(0.50,0.79) 120ms",
+      "note": "最後は低い雲に移って先着。留まる判断を一度挟んだ。",
+      "noteEn": "Moved low for the final tailwind and won, after choosing to stay through a narrow margin.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 110
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "wait": 800
+        },
+        {
+          "tap": [
+            0.5,
+            0.5
+          ]
+        }
+      ],
+      "desc": "wait 800ms → tap(0.50,0.50) 120ms",
+      "note": "再開で航路2へ。最初の風と次の追い風が変わった。",
+      "noteEn": "Restart opens Route 2 with different starting and forecast winds.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 110
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}
