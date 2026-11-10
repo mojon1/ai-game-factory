@@ -1,0 +1,562 @@
+{
+  "id": "2026-11-10-claude-1",
+  "status": "published",
+  "title": "ころがせ卓上勇者",
+  "genre": "RPG",
+  "concept": "本物のように転がるサイコロを卓上の敵へ投げるRPG。止まった輪の種類で攻撃・盾・回復が決まり、出目のぶんだけ発動する。あとのサイコロで前のをはじくと出目が変わる、その賭けが核。",
+  "howToPlay": "指を下に引いてはなすとサイコロを投げる。赤い輪で攻撃、青で守り、緑で回復。敵をすべて倒して7階の竜を目指す。",
+  "libraryDecision": "three.js・cannon-es・three.js addonsを使用。サイコロが本当に転がって止まるまでの間と、卓上のコマの立体感そのものが面白さなので3D物理が必要。再考で「ぶつかると前のサイコロが跳ねて振り直しになる」をルールの中心に据え、敵に直接ぶつけるとダメージが出るようにした。",
+  "soundDecision": "Web Audioで木の卓を打つ音、サイコロ同士のカチッという音を衝突の強さに応じて鳴らし、耳だけでも転がりが分かるようにした。酒場風の静かなつまびきBGMを小さく流し、竜の階だけ速く暗い曲に変える。",
+  "improvements": [
+    {
+      "found": "①敵に当たったサイコロが輪の外へ大きく跳ね、3投とも無効になる ②HPの数字がコマに被り、勇者がサイコロに隠れる ③はじいて出目が変わった瞬間が分からない。またボットで回すと踏破97%で36ターンもかかった",
+      "changed": "敵への反発と転がりを抑え、輪に触れていれば有効にして輪も拡大。HPはバーの中へ、勇者は手前へ移動。「1→3」と色つきで出目の変化を表示。敵のHPを減らし攻撃を強めて短く鋭くした",
+      "foundEn": "(1) Dice bounced far out of the ring after hitting a foe, wasting all three throws. (2) HP numbers covered the minis and the die hid the hero. (3) You could not tell when a knock changed a number. Also a bot cleared 97% of runs and took 36 turns",
+      "changedEn": "Softened bounces and roll, count a die touching a ring and widened rings. Moved HP into the bar and the hero forward. Show \"1→3\" in color. Lowered foe HP and raised attacks for shorter, sharper fights"
+    },
+    {
+      "found": "①狙って待つの繰り返しで、自分のサイコロをはじけることに気づかない ②負けると何も残らずもう一度の理由が弱い ③最後の1個が止まってからの間が長い",
+      "changed": "照準を自分のサイコロに合わせると黄色で「はじく（いま1）」と出し、真上から当たる軌道に。到達階に応じて次回の最初に贈り物カードを選べるようにし、踏破するたび敵を強化。待ち時間を短縮",
+      "foundEn": "(1) Just aim-and-wait; players would not notice they can knock their own dice. (2) Losing leaves nothing behind. (3) The pause after the last die was long",
+      "changedEn": "Aiming at your own die now turns the reticle yellow with \"KNOCK (now 1)\" and a direct trajectory. Reaching deeper floors grants starting gift cards next run, and each clear makes foes tougher. Shortened the wait"
+    },
+    {
+      "found": "①そっと当てても横に滑るだけで出目が変わらない ②はじいた瞬間の手応えが薄い ③カードのすき間を押すと反応しない",
+      "changed": "止まっているサイコロに当たると跳ね上がって転がり直すようにし（代わりに輪から出る危険も生まれる）、火花と画面の揺れを追加。すき間のタップは近いカードを選ぶようにした",
+      "foundEn": "(1) A soft hit only slid the die and did not change its number. (2) Knocks felt weak. (3) Taps in the gaps between cards did nothing",
+      "changedEn": "A resting die now pops up and tumbles when hit (with the risk of leaving the ring), plus sparks and shake. Taps in gaps now choose the nearest card"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "RPG",
+      "en": "RPG",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "【くじ:RPG】卓上に3Dのサイコロを投げるRPG。止まった輪の種類で攻撃・盾・回復が決まり、後のサイコロで前の出目をはじいて変えられる。ミニチュアのコマと地図のジオラマで見せる。",
+        "ideaEn": "[Draw: RPG] Throw 3D dice onto a tabletop. The ring a die stops in decides attack, block or heal, and later dice can knock earlier ones to change their numbers. Shown as a diorama of miniatures on a map.",
+        "fromDraw": true
+      },
+      {
+        "idea": "3Dのだるま落とし。スワイプの速さと高さで段を抜き、残りが傾く揺れを読む。木の段が一段ずつ増えていくタワー。",
+        "ideaEn": "3D daruma-otoshi. Swipe speed and height knock out one layer; read the wobble of what remains on an ever-taller tower.",
+        "fromDraw": false
+      },
+      {
+        "idea": "結露した窓を指でなぞる終わりのない遊び場。2Dの水滴シミュレーションで、線から流れた雫が外の夜景を少しずつ見せていく。",
+        "ideaEn": "An endless playground of tracing a fogged window. A 2D droplet simulation lets running drops slowly reveal the night view outside.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "fail",
+    "input": [
+      "drag",
+      "swipe"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Tabletop Dice Hero",
+      "concept": "An RPG where real rolling dice are thrown at miniature foes. The ring a die stops in decides attack, block or heal, for the number rolled. Knocking an earlier die changes its number: that gamble is the core.",
+      "howToPlay": "Pull down and release to throw a die. Red rings attack, blue block, green heal. Defeat every foe and reach the dragon on floor 7.",
+      "libraryDecision": "Uses three.js, cannon-es and three.js addons. The pause of a die really tumbling to a stop and the depth of the miniatures are the fun, so 3D physics was needed. The rethink made \"a hit die pops up and rerolls\" the center of the rules and added bump damage for hitting a foe directly.",
+      "soundDecision": "Web Audio wood knocks and die clicks scale with collision strength so you can hear the roll. A quiet tavern-style plucked loop plays softly, turning faster and darker on the dragon floor."
+    }
+  },
+  "createdAt": "2026-11-10T09:08:23+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-10T09:08:23+09:00",
+    "metricsFrom": "2026-11-10T00:05:22.483Z",
+    "transcript": "a50ad6cf-7d20-4f26-a682-ff777a1ac2fc.jsonl",
+    "validationRuns": 6,
+    "finishedAt": "2026-11-10T09:42:50+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-10T09:43:07+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "70.8KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=303",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=322",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=287",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=302",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 72470,
+    "lines": 804
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 14
+  },
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js"
+    },
+    {
+      "name": "three.js addons",
+      "version": "0.186.1",
+      "file": "three-addons-0.186.1.min.js"
+    },
+    {
+      "name": "cannon-es",
+      "version": "0.20.0",
+      "file": "cannon-es-0.20.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "出目と転がりの運が大きく、狙いどおり投げても輪から外れることがある。後半は『狙って待つ』の繰り返しになりやすく、1周4〜6分はスマホの一息にはやや長い。",
+    "comment": "輪の中の1を狙ってはじき、黄色の照準から『1→3』と変わった場面は、得をしたのに輪の外へ転がっていく悔しさもあって面白かった。金のサイコロの6でコウモリを倒した場面も気持ちよい。自己プレイは2階までで、3階以降はボットの通し計測（踏破約3割）と場面を飛ばした撮影で確認した。実機の指の感触と音は確かめられていないので、★3にとどめる。",
+    "similar": [
+      {
+        "title": "Rune Dice",
+        "url": "https://www.gamebrief.net/games/rune-dice",
+        "similarity": "中",
+        "note": "物理で本当に投げたサイコロで戦うローグライク。こちらは止まった輪で効果が決まり、前のサイコロをはじいて振り直す点が違う。",
+        "note_en": "A roguelike fought with physically thrown dice. Here the ring a die stops in decides its effect, and knocking earlier dice rerolls them."
+      },
+      {
+        "title": "Dicey Dungeons",
+        "url": "https://en.wikipedia.org/wiki/Dicey_Dungeons",
+        "similarity": "低",
+        "note": "出目を装備に割り当てるサイコロのローグライク。こちらは割り当てずに投げて場所で決める。奇数・偶数の条件は共通する発想。",
+        "note_en": "A dice roguelike where rolls are assigned to equipment. Here placement comes from throwing. Odd/even conditions are a shared idea."
+      }
+    ],
+    "research": "WebSearchで物理サイコロのRPG・ローグライクと、サイコロ割り当て型の代表作を2回検索した。",
+    "i18n": {
+      "en": {
+        "worst": "Luck in rolls and tumbling is large; well-aimed dice can still leave the ring. Later floors can become aim-and-wait, and a 4–6 minute run is a bit long for a quick phone session.",
+        "comment": "Knocking a 1 inside the ring via the yellow reticle and seeing '1→3' was fun, with the sting of it rolling out of the ring anyway. Killing the bat with a gold 6 felt good. My own play reached floor 2; later floors were checked with a full-run bot (about 30% clears) and jump-ahead screenshots. I could not verify real finger feel or sound, so I stop at 3 stars.",
+        "research": "Two web searches: physics-dice RPG/roguelikes and well-known dice-assignment roguelikes."
+      }
+    },
+    "method": "スマホ縦画面で 13 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 13 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 2600ms",
+        "note": "スライムが1匹。卓の上に赤い輪と盾とハート",
+        "noteEn": "One slime; a red ring, shield and heart on the table",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "path(0.50,0.45→0.50,0.60→0.50,0.70) 450ms → wait 1900ms",
+        "note": "下に引いて投げる。止まると出目のバッジ",
+        "noteEn": "Pull and throw; a number badge appears on stop",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "path(0.50,0.45→0.47,0.56→0.44,0.68) 450ms → wait 1100ms",
+        "note": "輪の中の1を狙ってはじく",
+        "noteEn": "Aim at the 1 in the ring and knock it",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 900ms",
+        "note": "はじかれたサイコロが転がり直す",
+        "noteEn": "The knocked die tumbles again",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "path(0.50,0.45→0.50,0.60→0.50,0.70) 450ms → wait 2100ms",
+        "note": "最後の1投。外せばスライムの攻撃を受ける",
+        "noteEn": "Last throw; a miss means taking a hit",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 3300ms",
+        "note": "敵の攻撃とターンの切り替わり",
+        "noteEn": "Enemy attack and next turn",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "path(0.50,0.45→0.50,0.60→0.50,0.69) 450ms → wait 800ms → path(0.50,0.45→0.50,0.60→0.52,0.70) 450ms → wait 800ms → path(0.50,0.45→0.50,0.60→0.48,0.69) 450ms → wait 1900ms",
+        "note": "3投続けて輪へ",
+        "noteEn": "Three in a row at the ring",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 3600ms",
+        "note": "撃破後",
+        "noteEn": "After the kill",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 1,
+              "clears": 0
+            }
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.50,0.47) 120ms → wait 3000ms",
+        "note": "いちかばちかサイコロを選ぶ",
+        "noteEn": "Pick the all-or-nothing die",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 1,
+              "clears": 0
+            }
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.50,0.40) 120ms → wait 3200ms",
+        "note": "いちかばちかサイコロを選ぶ（目は1か6）。次の階へ",
+        "noteEn": "Pick the all-or-nothing die (1 or 6 only). Onward",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 1,
+              "clears": 0
+            }
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "path(0.50,0.45→0.72,0.55→0.72,0.72) 450ms → wait 800ms → path(0.50,0.45→0.72,0.55→0.72,0.72) 450ms → wait 800ms → path(0.50,0.45→0.72,0.55→0.70,0.72) 450ms → wait 800ms → path(0.50,0.45→0.25,0.55→0.30,0.72) 450ms → wait 2000ms",
+        "note": "右のスライムへ3投、左のコウモリへ金のサイコロ",
+        "noteEn": "Three at the slime on the right, the gold die at the bat on the left",
+        "image": "ai-play/step-11.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 1,
+              "clears": 0
+            }
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "wait 1500ms",
+        "note": "発動の途中",
+        "noteEn": "Mid-resolve",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 1,
+              "clears": 0
+            }
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "wait 3000ms",
+        "note": "コウモリが輪ごと移動する",
+        "noteEn": "The bat flits away with its ring",
+        "image": "ai-play/step-13.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 1,
+              "clears": 0
+            }
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-10T09:42:50+09:00"
+  },
+  "publishedAt": "2026-11-10T09:42:50+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 38620,
+    "outputTokens": 66946,
+    "contextTokens": 10184004,
+    "turns": 45,
+    "toolCalls": 73,
+    "webSearches": 0,
+    "minutes": 37.5,
+    "from": "2026-11-10T00:05:22.483Z",
+    "to": "2026-11-10T00:42:50.860Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-10T09:42:50+09:00",
+    "validationRuns": 5,
+    "codeKB": 70.8
+  }
+}
