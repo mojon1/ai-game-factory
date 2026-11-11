@@ -1,0 +1,352 @@
+{
+  "id": "2026-11-11-gpt-1",
+  "status": "published",
+  "title": "ひと息の渡り台",
+  "genre": "プラットフォーム",
+  "concept": "長押しで跳ぶ距離をためて、離した瞬間に次の足場へ跳ぶ。遠くの足場と近くの足場に合わせて、ためる長さを変える。落ちても同じ場所から試せる二つの橋。",
+  "howToPlay": "下のボタンを長押しして離すとジャンプ。足場の間隔を読み、向こうの旗まで渡ります。",
+  "libraryDecision": "跳躍の距離と足場の関係を正面の2Dで見せる。少数の物体なので共有ライブラリは使わない。",
+  "soundDecision": "跳躍と着地に短く小さな音を付け、離した瞬間と着地を感じやすくした。BGMは付けない。",
+  "improvements": [
+    {
+      "found": "ためた距離の目安がない。渡った足場数が分からない。落ちた位置が残らない。",
+      "changed": "ためた距離の線、足場の進捗、落下位置の印を追加。",
+      "foundEn": "Charge range, crossing progress, and previous falls are invisible.",
+      "changedEn": "Draw charge range, count platforms crossed, and retain the last fall location."
+    },
+    {
+      "found": "落下印が足場を通過した位置より先にある。跳ぶ・着地の手応えが弱い。結果で橋が隠れる。",
+      "changed": "足場の高さを通過した横位置を記録し、短い音と着地の輪を追加。結果を下部に寄せた。",
+      "foundEn": "The fall mark is beyond the missed landing, feedback is weak, and the result hides the bridge.",
+      "changedEn": "Record the crossing point, add short tones and a landing ring, and keep the bridge visible."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "プラットフォーム",
+      "en": "Platformer",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "ためる時間で距離が変わる橋渡り。2Dで放物線と足場を読む。",
+        "ideaEn": "Cross bridges with hold-dependent jumps in a side view.",
+        "fromDraw": true
+      },
+      {
+        "idea": "二つの声を空間内で探す立体の音遊び。",
+        "ideaEn": "Locate two voices in a 3D sound space.",
+        "fromDraw": false
+      },
+      {
+        "idea": "瓶の影から色の重なりを読む平面の観察。",
+        "ideaEn": "Read layered colors from bottle shadows in a flat scene.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "hold"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "One Breath Bridges",
+      "concept": "Hold to charge a jump and release toward the next platform. Two bridges use different gaps, with retries from the last landing.",
+      "howToPlay": "Hold the lower button and release to jump. Read the gaps and reach the flag.",
+      "libraryDecision": "A 2D side view makes distance and platforms readable without a shared library.",
+      "soundDecision": "Short, quiet jump and landing tones mark release and landing. No background music."
+    }
+  },
+  "createdAt": "2026-11-11T12:05:10+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-11T12:05:10+09:00",
+    "metricsFrom": "2026-11-11T03:03:04.611Z",
+    "transcript": null,
+    "validationRuns": 3,
+    "finishedAt": "2026-11-11T12:11:29+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-11T12:09:36+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "8.1KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=23",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=23",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=28",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=37",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 8309,
+    "lines": 113
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 2,
+    "works": "ok",
+    "worst": "二つの橋は固定で、長押しの時間を覚えると短く終わる。",
+    "comment": "最初は短く押して落ちたが、印を見て長さを増やし、二つ目の橋は落下なしで渡れた。画像を見て二回改良。",
+    "similar": [
+      {
+        "title": "Jump King",
+        "url": "https://store.steampowered.com/app/1061090/Jump_King/JumpKing?l=english",
+        "similarity": "高",
+        "note": "長押しでためて離す跳躍が共通。先方は縦に登る大きな世界、本作は固定の高さを横へ渡り、落下しても足場から再開。",
+        "note_en": "Both charge a jump by holding and release to leap. Jump King climbs a large vertical world; this crosses short horizontal bridges with checkpoints."
+      }
+    ],
+    "research": "Jump Kingの開発元によるSteam説明を検索して比較。",
+    "i18n": {
+      "en": {
+        "worst": "Both bridges are fixed; learning the hold durations makes the game brief.",
+        "comment": "An early short hold fell short. Adjusting from the marker led to crossing the second bridge without falling. Two screenshot-based revisions.",
+        "research": "Searched and compared the developer’s Steam description of Jump King."
+      }
+    },
+    "method": "スマホ縦画面で 6 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 6 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → tap(0.50,0.85) 400ms",
+        "note": "短いジャンプの印が足場の手前になり、届かなかったことが読める。",
+        "noteEn": "The short-jump marker now falls before the platform, showing the miss accurately.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.50,0.85) 600ms",
+        "note": "着地。落下1のまま進捗が1/3になった。",
+        "noteEn": "Landed at 1/3 while retaining one recorded fall.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.50,0.85) 650ms → tap(0.50,0.85) 700ms",
+        "note": "最初の橋を渡り切った。結果の下でも旗と着地点が見える。",
+        "noteEn": "Finished the first bridge; the flag and landing remain visible above the result.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.50,0.50) 120ms → tap(0.50,0.85) 550ms",
+        "note": "二つ目の橋でまず短めの距離を渡った。",
+        "noteEn": "A shorter hold crosses the first gap of the second bridge.",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.50,0.85) 800ms",
+        "note": "一番広い間隔は長めにためて着地した。",
+        "noteEn": "A longer charge crosses the widest gap.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.50,0.85) 650ms → tap(0.50,0.85) 650ms",
+        "note": "二つ目の橋は落下0で渡れた。足場と長押しの対応を覚えると短い。",
+        "noteEn": "Crossed the second bridge without falling. Once hold durations are learned, the course is brief.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 0
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-11T12:11:29+09:00"
+  },
+  "publishedAt": "2026-11-11T12:11:29+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 1020,
+    "outputTokens": 6059,
+    "contextTokens": 10970439,
+    "turns": 27,
+    "toolCalls": 27,
+    "webSearches": null,
+    "minutes": 8.5,
+    "from": "2026-11-11T03:03:04.611Z",
+    "to": "2026-11-11T03:11:33.051Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-11T12:11:33+09:00",
+    "validationRuns": 3,
+    "codeKB": 8.1,
+    "evidence": "metrics-evidence.json"
+  }
+}
