@@ -1,0 +1,482 @@
+{
+  "id": "2026-11-11-claude-2",
+  "status": "published",
+  "title": "ゆらぐな石垣",
+  "genre": "組み立て・建築",
+  "concept": "形のちがう石を積んで石垣を築き、天端に城をのせて地震を耐えさせる。石は積み山のすぐ上に浮いて「置く」感覚で、城をのせる前に水平か傾くかが見える。高さ・平らさ・横の広がりの釣り合いが核。",
+  "howToPlay": "指を左右に動かして石の位置を決め、はなすと置ける。金の線まで積んだら城をのせ、地震で城が残れば落成。",
+  "libraryDecision": "matter-js を使用。石のかみ合わせと地震での崩れ方そのものが遊びなので物理演算が核に直結する。再考で、地震は土台を動かす代わりに横向きの重力を揺らす方式にして、積み方の良し悪しが素直に結果に出るようにした。ZzFX で音も作った。",
+  "soundDecision": "石が当たるたびに強さに応じた「コツ」という石音、地震の低い地鳴り、落成の三音を ZzFX で鳴らす。BGM は入れず、石の音と静けさで積む集中と地震の緊張を際立たせた。",
+  "improvements": [
+    {
+      "found": "石が小さく数も足りず金の線に届かない／高い所から落とすので跳ねて転がる／あとどれだけ積めばいいか分からない",
+      "changed": "石を積み山のすぐ上に自動で浮かせ、指は左右だけで「置く」操作に。石を大きく数を増やし、線の横に「あと何m」を表示",
+      "foundEn": "Stones too small and few to reach the line / dropped from high they bounce and roll / no sense of how much is left",
+      "changedEn": "The stone now hovers right above the pile and the finger only sets x, so you place rather than drop. Bigger and more stones, and a \"m to go\" label by the line"
+    },
+    {
+      "found": "城を低い所に置くと即失敗し理由が分からない／1面の弱い地震でも丸い石の山が全部崩れる／失敗画面に手がかりがない",
+      "changed": "石を角ばった切石中心に変え、静止した石は眠らせて崩れにくく。地震は横向きの重力の揺れにして面ごとに強める。城を置ける高さを判定し、低いと置けない表示に。失敗画面にコツを表示",
+      "foundEn": "Placing the castle low failed instantly with no reason / even the mild stage-1 quake collapsed piles of round stones / the fail screen gave no clue",
+      "changedEn": "Mostly squared cut stones, resting stones sleep so piles hold. The quake is a swinging sideways gravity that ramps per stage. Castle height is checked and refused when too low. Tips on the fail screen"
+    },
+    {
+      "found": "城が傾いた石の上でずり落ちても、置く前に分からない／1面を4回続けて失敗し心が折れる／地震がどれくらい強いか分からない",
+      "changed": "城をつるした時に「◎水平／△かたむく／低い！」を予告。城を軽く幅広にし1面の地震を弱め、回転を15度刻みに。各面に震度を表示",
+      "foundEn": "The castle slid off tilted stones with no warning beforehand / failing stage 1 four times in a row was discouraging / the quake strength was unknown",
+      "changedEn": "While hanging, the castle shows Level / Will tilt / Too low. Lighter, wider castle, gentler stage-1 quake, 15° rotation steps. Each stage shows its quake intensity"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "組み立て・建築",
+      "en": "Building / construction",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "石垣積み: 形のちがう石を積んで城をのせ、最後に来る地震で城が残るかを見守る（2D物理）。",
+        "ideaEn": "Stone wall: stack odd stones, crown with a castle, and watch whether it survives a final earthquake (2D physics).",
+        "fromDraw": true
+      },
+      {
+        "idea": "縁側の風鈴: 風を指で送って風鈴を鳴らし、好きな和音を作る終わりのない遊び場。",
+        "ideaEn": "Veranda wind chimes: blow wind with your finger to ring chimes and make chords; an endless playground.",
+        "fromDraw": false
+      },
+      {
+        "idea": "雪玉ころがし3D: 坂の雪原で雪玉を転がして大きくし、ふもとの雪だるまの胴に合う大きさで止める。",
+        "ideaEn": "3D snowball roll: roll a snowball down a slope to grow it and stop at just the right size for the snowman body.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "fail",
+    "input": [
+      "drag",
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Steady Stones",
+      "concept": "Stack odd-shaped stones into a castle wall, crown it with a castle, and make it survive an earthquake. Stones hover just above the pile so you place them, and before placing the castle you see whether it will sit level. The core is balancing height, flatness and width.",
+      "howToPlay": "Move your finger left and right to position a stone and release to place it. Reach the gold line, place the castle, and if it survives the quake it is built.",
+      "libraryDecision": "Uses matter-js: how stones interlock and how they crumble in a quake is the game itself. On rethinking, the quake swings a sideways gravity instead of shaking the ground, so good and bad stacking show honestly in the result. ZzFX for sound.",
+      "soundDecision": "ZzFX stone clacks scaled by impact, a low rumble for the quake and a three-note chime when built. No BGM: the stone sounds and quiet sharpen the focus of stacking and the tension of the quake."
+    }
+  },
+  "createdAt": "2026-11-11T12:06:40+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-11T12:06:40+09:00",
+    "metricsFrom": "2026-11-11T03:05:49.081Z",
+    "transcript": "6f7a0f49-c655-40f5-b69b-213eda582d5e.jsonl",
+    "validationRuns": 10,
+    "finishedAt": "2026-11-11T12:28:10+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-11T12:27:59+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "32.5KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=183",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=171",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=165",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=150",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 33245,
+    "lines": 595
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "matter-js",
+      "version": "0.20.0",
+      "file": "matter-0.20.0.min.js"
+    },
+    {
+      "name": "ZzFX",
+      "version": "1.4.0",
+      "file": "zzfx-1.4.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 2,
+    "works": "ok",
+    "worst": "物理の積み山が思ったより崩れやすく、1面でも何度も城が落ちる。崩れた理由が分かりにくい時がある",
+    "comment": "石が積み山のすぐ上に浮いて置ける操作は分かりやすく、角石がかみ合うと石垣らしくなる。◎水平の所に城をのせて地震を耐え『落成！』が出た瞬間は気持ちよかった。ただそこまでに細い塔や傾いた石で5回ほど落とし、初見では楽しくなる前に挫けそう。",
+    "similar": [
+      {
+        "title": "Last Tower Standing",
+        "url": "https://apps.apple.com/us/app/-/id1510775790",
+        "similarity": "中",
+        "note": "積んだ塔を地震で試す物理ゲーム。こちらは形のちがう石垣と城をのせる一手、置く前の水平予告が違う",
+        "note_en": "Physics game where you test built towers with an earthquake. Differs in irregular stone walls, crowning with a castle, and the level preview before placing"
+      },
+      {
+        "title": "Tricky Towers",
+        "url": "https://polycade.com/pages/games-tricky-towers",
+        "similarity": "低",
+        "note": "物理で揺れるブロックを積む。こちらは落ち物ではなく自分の間合いで置き、最後に地震が来る",
+        "note_en": "Stacking wobbly physics blocks. Here you place at your own pace rather than falling pieces, and an earthquake comes at the end"
+      }
+    ],
+    "research": "WebSearch で stacking stones physics game earthquake castle tower を検索",
+    "i18n": {
+      "en": {
+        "worst": "The physics piles crumble more easily than expected; the castle fell several times even on stage 1, and the reason is sometimes unclear",
+        "comment": "Placing stones that hover just above the pile is easy to grasp, and interlocking blocks start to look like a real castle wall. Placing the castle on a Level spot and seeing Built! after the quake felt great. But I dropped the castle about five times first, from narrow towers and tilted stones; a newcomer may give up before it gets fun.",
+        "research": "WebSearch for stacking stones physics game earthquake castle tower"
+      }
+    },
+    "method": "スマホ縦画面で 10 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 10 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "開始",
+        "noteEn": "Start",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.36,0.70) 120ms → wait 700ms → tap(0.50,0.70) 120ms → wait 700ms → tap(0.64,0.70) 120ms → wait 1200ms",
+        "note": "土台を3つ並べる",
+        "noteEn": "Three base stones",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.42,0.70) 120ms → wait 900ms",
+        "note": "大石を左2つにまたがせる",
+        "noteEn": "Big block straddling the left two",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.64,0.70) 120ms → wait 900ms",
+        "note": "平石を右の土台に",
+        "noteEn": "Slab onto the right base",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.66,0.70) 120ms → wait 900ms",
+        "note": "小石を右に",
+        "noteEn": "Small stone right",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.42,0.70) 120ms → wait 900ms → tap(0.65,0.70) 120ms → wait 1500ms → tap(0.50,0.93) 120ms → wait 300ms → path(0.53,0.75→0.53,0.75) 50ms",
+        "note": "左右の柱を同じ高さにして、城をまたがせる",
+        "noteEn": "Even out both pillars and bridge the castle across",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 3500ms",
+        "note": "地震の最中、城はふんばっている",
+        "noteEn": "Mid-quake, the castle holds",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 4500ms",
+        "note": "結果",
+        "noteEn": "Result",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 250,
+              "stage": 1
+            }
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.50,0.50) 120ms → wait 800ms",
+        "note": "次の城へ。線が高く、地震も強くなる",
+        "noteEn": "On to the next castle: higher line, stronger quake",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 250,
+              "stage": 1
+            }
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.50,0.50) 120ms → wait 800ms",
+        "note": "タップで次の城へ",
+        "noteEn": "Tap for the next castle",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 250,
+              "stage": 1
+            }
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-11T12:28:10+09:00"
+  },
+  "publishedAt": "2026-11-11T12:28:10+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 23346,
+    "outputTokens": 56227,
+    "contextTokens": 24548006,
+    "turns": 120,
+    "toolCalls": 128,
+    "webSearches": 0,
+    "minutes": 22.4,
+    "from": "2026-11-11T03:05:49.081Z",
+    "to": "2026-11-11T03:28:10.827Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-11T12:28:10+09:00",
+    "validationRuns": 10,
+    "codeKB": 32.5
+  }
+}

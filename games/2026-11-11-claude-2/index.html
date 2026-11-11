@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>ゆらぐな石垣</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #1b1d2e; }
+canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script src="../../lib/matter-0.20.0.min.js"></script>
+<script src="../../lib/zzfx-1.4.0.min.js"></script>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const T = {
+  ja: {
+    title: 'ゆらぐな石垣', sub: '石を積んで城をのせ、地震を耐えぬけ',
+    how1: '指で石を動かし、はなすと落ちる', how2: '金の線まで積んだら、城をのせる', how3: '城が落ちずに残れば落成！',
+    start: 'タップでスタート', hint: '指をはなすと落ちる ／ 左右のボタンで回す',
+    stones: '石', stage: (n) => `第${n}の城`, shindo: (n) => `震度${['3', '4', '5弱', '5強', '6弱', '6強', '7'][Math.min(6, n)]}`, castleBtn: '城をのせる', stoneBtn: '石にもどす',
+    reached: '城をのせられる！ 上を平らにしてもよい', line: 'ここまで',
+    quake: '地震！', clear: '落成！', next: 'タップで次へ', over: '城が落ちた…', overNo: '石が足りない…',
+    again: 'タップでもう一度', best: 'ベスト', newBest: 'ベスト更新！', score: '点',
+    b1: '落成', b2: (n) => `残りの石 ×${n}`, b3: '水平ボーナス', total: '合計',
+    dropCastle: '城を置いて、はなす', tooLow: '低い！ 金の線より上へ', lvOk: '◎ 水平', lvTilt: '△ かたむく', tip: 'コツ: 平たい石で上を平らに。重い石は下へ', left: (m) => `あと ${m}m`, reach: (n) => `城 ${n}つ落成`,
+  },
+  en: {
+    title: 'Steady Stones', sub: 'Stack a wall, crown it, survive the quake',
+    how1: 'Drag a stone, release to drop it', how2: 'Reach the gold line, then place the castle', how3: 'If it stays up, it is built!',
+    start: 'Tap to start', hint: 'Release to drop / buttons rotate',
+    stones: 'Stones', stage: (n) => `Castle ${n}`, shindo: (n) => `Quake ${['III', 'IV', 'V-', 'V+', 'VI-', 'VI+', 'VII'][Math.min(6, n)]}`, castleBtn: 'Place castle', stoneBtn: 'Back to stones',
+    reached: 'Castle ready! You may level the top first', line: 'goal',
+    quake: 'EARTHQUAKE!', clear: 'Built!', next: 'Tap to continue', over: 'The castle fell…', overNo: 'Out of stones…',
+    again: 'Tap to play again', best: 'Best', newBest: 'New best!', score: 'pts',
+    b1: 'Built', b2: (n) => `Stones left ×${n}`, b3: 'Level bonus', total: 'Total',
+    dropCastle: 'Place the castle, release', tooLow: 'Too low! Above the gold line', lvOk: '◎ Level', lvTilt: '△ Will tilt', tip: 'Tip: level the top with flat stones, big ones low', left: (m) => `${m}m to go`, reach: (n) => `${n} castles built`,
+  },
+}[LANG === 'ja' ? 'ja' : 'en'];
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+
+const { Engine, Bodies, Composite, Body, Events, Vertices, Sleeping } = Matter;
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d');
+let CW = 360, CH = 640, S = 1, WH = 640, dpr = 1;
+let groundY = 540;
+function resize() {
+  CW = Math.max(1, innerWidth); CH = Math.max(1, innerHeight);
+  dpr = Math.min(2, devicePixelRatio || 1);
+  cv.width = Math.round(CW * dpr); cv.height = Math.round(CH * dpr);
+  S = CW / 360; WH = CH / S;
+  if (WH < 560) { S = CH / 560; WH = 560; }
+}
+addEventListener('resize', resize); resize();
+const WW = () => CW / S; // world width visible
+const OX = () => (WW() - 360) / 2; // offset so playfield centered
+
+// ---------- sound ----------
+let audioOK = false;
+const Z = (p) => { if (!audioOK) return; try { zzfx(...p); } catch (e) {} };
+let lastClack = 0;
+function clack(v) {
+  const now = performance.now(); if (now - lastClack < 45) return; lastClack = now;
+  const vol = Math.min(1, v / 7);
+  Z([0.35 + vol * 0.9, 0.15, 120 + Math.random() * 90 + vol * 60, 0, 0.012, 0.07, 4, 2.2, 0, 0, 0, 0, 0, 1.2, 0, 0.05, 0, 0.6]);
+}
+const sDrop = () => Z([0.4, 0.05, 520, 0.01, 0.02, 0.08, 0, 1.4, -18]);
+const sRot = () => Z([0.25, 0.02, 880, 0, 0.01, 0.04, 1, 1, 6]);
+const sRumble = () => Z([1.3, 0.1, 42, 0.4, 3.2, 1.2, 3, 0.5, 0, 0, 0, 0, 0.09, 2.4, 0, 0, 0, 0.8, 0, 0.3]);
+const sClear = () => { Z([0.6, 0, 392, 0.02, 0.12, 0.3, 1, 1.4]); setTimeout(() => Z([0.6, 0, 523, 0.02, 0.12, 0.3, 1, 1.4]), 140); setTimeout(() => Z([0.7, 0, 659, 0.02, 0.25, 0.6, 1, 1.4]), 280); };
+const sFail = () => { Z([0.7, 0.05, 220, 0.02, 0.2, 0.5, 2, 1, -2]); };
+const sReach = () => { Z([0.5, 0, 660, 0.01, 0.06, 0.2, 1, 1.6]); setTimeout(() => Z([0.5, 0, 990, 0.01, 0.08, 0.3, 1, 1.6]), 90); };
+
+// ---------- save ----------
+let best = 0, bestStage = 0;
+addEventListener('message', (e) => { if (e.data && e.data.agf === 'loaded' && e.data.data) { best = e.data.data.best || 0; bestStage = e.data.data.stage || 0; } });
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+const saveBest = () => { try { parent.postMessage({ agf: 'save', data: { best, stage: bestStage } }, '*'); } catch (e) {} };
+
+// ---------- world ----------
+let engine, platform, stones = [], castle = null;
+const STAGES = [
+  { h: 90, n: 14, pw: 230, qa: 0.07, qf: 1.3, cw: 70 },
+  { h: 125, n: 16, pw: 222, qa: 0.13, qf: 1.4, cw: 70 },
+  { h: 160, n: 18, pw: 214, qa: 0.19, qf: 1.5, cw: 72 },
+  { h: 190, n: 20, pw: 205, qa: 0.25, qf: 1.6, cw: 74 },
+  { h: 215, n: 22, pw: 196, qa: 0.3, qf: 1.6, cw: 78 },
+];
+const stageCfg = (i) => { if (i < STAGES.length) return STAGES[i]; const k = i - STAGES.length + 1; return { h: Math.min(270, 220 + k * 10), n: 22 + k, pw: Math.max(170, 196 - k * 6), qa: 0.3 + k * 0.04, qf: 1.6 + k * 0.05, cw: 80 }; };
+
+let state = 'title', stage = 0, cfg = stageCfg(0), score = 0, stonesLeft = 0;
+let hold = null, queue = [], holdX = 180, holdY = 90, dragging = false, dragId = null, spawnT = 0;
+let reached = false, castleMode = false, toast = '', toastT = 0, hintT = 0;
+let timer = 0, quakeT = 0, shake = 0, resultT = 0, result = null, platX0 = 180, fallReason = '';
+let quietT = 0, particles = [], quakeOff = 0;
+const goalY = () => groundY - cfg.h;
+
+function rnd(a, b) { return a + Math.random() * (b - a); }
+function makeShape() {
+  const tone = rnd(0, 1);
+  if (Math.random() < 0.15) { // round field stone (unstable)
+    const r = rnd(14, 22), n = 6 + Math.floor(Math.random() * 2), pts = [];
+    for (let i = 0; i < n; i++) { const a = (i / n) * Math.PI * 2 + rnd(-0.2, 0.2); const rr = r * rnd(0.85, 1.05); pts.push({ x: Math.cos(a) * rr * 1.15, y: Math.sin(a) * rr * 0.9 }); }
+    return { pts: Vertices.hull(Vertices.clockwiseSort(pts)), r: r * 1.15, tone, ang: rnd(-0.3, 0.3) };
+  }
+  const roll = Math.random();
+  let w, h;
+  if (roll < 0.2) { w = rnd(28, 38); h = rnd(8, 12); } // flat slab
+  else if (roll < 0.45) { w = rnd(26, 34); h = rnd(16, 22); } // big block
+  else if (roll < 0.85) { w = rnd(17, 26); h = rnd(12, 18); } // medium
+  else { w = rnd(10, 14); h = rnd(8, 11); } // small wedge
+  const c = Math.min(w, h) * rnd(0.15, 0.45), j = () => rnd(-2.5, 2.5);
+  const pts = [{ x: -w + c, y: -h + j() }, { x: w - c, y: -h + j() }, { x: w + j(), y: -h + c }, { x: w + j(), y: h - c }, { x: w - c, y: h + j() }, { x: -w + c, y: h + j() }, { x: -w + j(), y: h - c }, { x: -w + j(), y: -h + c }];
+  return { pts: Vertices.hull(Vertices.clockwiseSort(pts)), r: w, tone, ang: rnd(-0.12, 0.12) };
+}
+function makeCastle() { return { castle: true, w: cfg.cw, h: 26, ang: 0, r: cfg.cw / 2 }; }
+
+function newStage() {
+  cfg = stageCfg(stage);
+  engine = Engine.create({ enableSleeping: true }); quakeOff = 0;
+  engine.gravity.y = 1;
+  engine.positionIterations = 10; engine.velocityIterations = 8;
+  platX0 = 180;
+  platform = Bodies.rectangle(platX0, groundY + 20, cfg.pw, 40, { isStatic: true, friction: 1, frictionStatic: 2, label: 'plat' });
+  Composite.add(engine.world, platform);
+  Events.on(engine, 'collisionStart', (ev) => {
+    for (const p of ev.pairs) {
+      const a = p.bodyA, b = p.bodyB;
+      const dv = Math.hypot(a.velocity.x - b.velocity.x, a.velocity.y - b.velocity.y);
+      if (dv > 1.4) { clack(dv); if (dv > 3) dust(p.collision.supports[0] || a.position, dv); }
+    }
+  });
+  stones = []; castle = null; particles = [];
+  stonesLeft = cfg.n; queue = [makeShape(), makeShape()];
+  hold = null; spawnT = 0.15; reached = false; castleMode = false;
+  holdX = 180; holdY = 90; dragging = false; quietT = 0; timer = 0; shake = 0;
+  state = 'build'; toast = ''; toastT = 0;
+  if (stage === 0) hintT = 4.5;
+}
+function dust(pt, v) {
+  for (let i = 0; i < Math.min(6, v); i++) particles.push({ x: pt.x, y: pt.y, vx: rnd(-1, 1) * v * 0.25, vy: rnd(-1.5, -0.2) * v * 0.2, t: 0, life: rnd(0.35, 0.7) });
+}
+
+function polyYRange(vs, x) {
+  let lo = Infinity, hi = -Infinity;
+  for (let i = 0; i < vs.length; i++) {
+    const a = vs[i], b = vs[(i + 1) % vs.length];
+    if ((a.x <= x && b.x >= x) || (b.x <= x && a.x >= x)) {
+      const y = a.x === b.x ? Math.min(a.y, b.y) : a.y + (b.y - a.y) * (x - a.x) / (b.x - a.x);
+      const y2 = a.x === b.x ? Math.max(a.y, b.y) : y;
+      if (y < lo) lo = y; if (y2 > hi) hi = y2;
+    }
+  }
+  return lo === Infinity ? null : [lo, hi];
+}
+function holdVerts(x, y) {
+  if (!hold) return [];
+  const c = Math.cos(hold.ang), s = Math.sin(hold.ang);
+  const pts = hold.castle ? [{ x: -hold.w / 2, y: -hold.h / 2 }, { x: hold.w / 2, y: -hold.h / 2 }, { x: hold.w / 2, y: hold.h / 2 }, { x: -hold.w / 2, y: hold.h / 2 }] : hold.pts;
+  return pts.map((p) => ({ x: x + p.x * c - p.y * s, y: y + p.x * s + p.y * c }));
+}
+// y offset (relative to hold center) at which the held piece touches the stack below
+function landingY(x) {
+  const vs = holdVerts(x, 0);
+  let minX = Infinity, maxX = -Infinity; for (const v of vs) { minX = Math.min(minX, v.x); maxX = Math.max(maxX, v.x); }
+  const list = castle ? stones.concat([castle]) : stones;
+  let best = Infinity;
+  const N = 13;
+  for (let i = 0; i <= N; i++) {
+    const cx = minX + 0.5 + (maxX - minX - 1) * i / N;
+    const hr = polyYRange(vs, cx); if (!hr) continue;
+    let top = (platform && Math.abs(cx - platform.position.x) <= cfg.pw / 2) ? groundY : WH + 200;
+    for (const b of list) {
+      if (b.bounds.max.x < cx || b.bounds.min.x > cx || b.bounds.min.y > top) continue;
+      const r = polyYRange(b.vertices, cx); if (r && r[0] < top) top = r[0];
+    }
+    const d = top - hr[1];
+    if (d < best) best = d;
+  }
+  return best;
+}
+function colTop(cx) {
+  const list = castle ? stones.concat([castle]) : stones;
+  let top = (platform && Math.abs(cx - platform.position.x) <= cfg.pw / 2) ? groundY : WH + 200;
+  for (const b of list) {
+    if (b.bounds.max.x < cx || b.bounds.min.x > cx || b.bounds.min.y > top) continue;
+    const r = polyYRange(b.vertices, cx); if (r && r[0] < top) top = r[0];
+  }
+  return top;
+}
+// gap under the left / right part of the hovering castle (0 = touching)
+function castleSupport() {
+  const bottom = holdY + hold.h / 2, w = hold.w;
+  let L = Infinity, R = Infinity;
+  for (let i = 0; i < 4; i++) {
+    L = Math.min(L, colTop(holdX - w / 2 + 3 + i * w * 0.08) - bottom);
+    R = Math.min(R, colTop(holdX + w / 2 - 3 - i * w * 0.08) - bottom);
+  }
+  return Math.max(L, R);
+}
+function stackTopNear(x, r) {
+  let top = groundY;
+  const list = castle ? stones.concat([castle]) : stones;
+  for (const b of list) {
+    if (b.bounds.max.x < x - r - 8 || b.bounds.min.x > x + r + 8) continue;
+    if (b.bounds.min.y < top) top = b.bounds.min.y;
+  }
+  return top;
+}
+function clampHold() {
+  if (!hold) return;
+  const r = hold.castle ? hold.w / 2 : hold.r;
+  holdX = Math.max(r * 0.6, Math.min(360 - r * 0.6, holdX));
+  const ly = landingY(holdX);
+  holdY = Math.max(72, Math.min(groundY - 10, ly - 4));
+}
+function dropHold() {
+  if (!hold || state !== 'build') return;
+  clampHold();
+  if (hold.castle) {
+    if (holdY + hold.h / 2 > goalY() + 8) { toast = T.tooLow; toastT = 2; sFail(); return; }
+    castle = Bodies.rectangle(holdX, holdY, hold.w, hold.h, { friction: 1, frictionStatic: 1.5, density: 0.002, restitution: 0, frictionAir: 0.02, label: 'castle', angle: hold.ang });
+    Composite.add(engine.world, castle);
+    hold = null; state = 'settle'; timer = 0; sDrop();
+    return;
+  }
+  const b = Bodies.fromVertices(holdX, holdY, [hold.pts.map((p) => ({ x: p.x, y: p.y }))], { friction: 1, frictionStatic: 1.5, frictionAir: 0.035, density: 0.0022, restitution: 0, label: 'stone' });
+  Body.setAngle(b, hold.ang);
+  b.tone = hold.tone; b.still = 0;
+  Composite.add(engine.world, b);
+  stones.push(b);
+  stonesLeft--; hold = null; spawnT = 0.45; sDrop();
+}
+function nextHold() {
+  if (castleMode) { hold = makeCastle(); return; }
+  if (stonesLeft <= 0) { hold = null; return; }
+  hold = queue.shift(); queue.push(makeShape());
+}
+function setCastleMode(on) {
+  castleMode = on;
+  if (state !== 'build') return;
+  if (on) { if (hold && !hold.castle) queue.unshift(hold); hold = makeCastle(); }
+  else { if (hold && hold.castle) hold = null; if (stonesLeft > 0) { hold = queue.shift(); queue.push(makeShape()); } }
+  sRot();
+}
+
+function startGame() {
+  stage = 0; score = 0; bestAtStart = best; newBestFlag = false; newStage(); signal("start");
+}
+
+// ---------- input ----------
+const btnL = () => ({ x: OX() + 38, y: WH - 44, r: 30 });
+const btnR = () => ({ x: OX() + 322, y: WH - 44, r: 30 });
+const btnC = () => ({ x: OX() + 180, y: WH - 44, w: 150, h: 50 });
+const inCirc = (p, b) => Math.hypot(p.x - b.x, p.y - b.y) <= b.r + 6;
+const inRect = (p, b) => Math.abs(p.x - b.x) <= b.w / 2 + 4 && Math.abs(p.y - b.y) <= b.h / 2 + 4;
+const toWorld = (e) => ({ x: e.clientX / S, y: e.clientY / S });
+function ensureAudio() {
+  try { if (window.ZZFX && ZZFX.audioContext) { ZZFX.audioContext.resume(); audioOK = true; ZZFX.volume = 0.32; } } catch (e) {}
+}
+cv.addEventListener('pointerdown', (e) => {
+  e.preventDefault(); ensureAudio();
+  const p = toWorld(e);
+  if (state === 'title') { startGame(); return; }
+  if (state === 'result' || state === 'over') {
+    if (resultT < 0.7) return;
+    if (state === 'result') { stage++; newStage(); } else startGame();
+    return;
+  }
+  if (state !== 'build') return;
+  if (inCirc(p, btnL())) { if (hold) { hold.ang -= Math.PI / 12; sRot(); } return; }
+  if (inCirc(p, btnR())) { if (hold) { hold.ang += Math.PI / 12; sRot(); } return; }
+  if ((reached || castleMode) && inRect(p, btnC())) { setCastleMode(!castleMode); return; }
+  if (dragging) return;
+  dragging = true; dragId = e.pointerId;
+  holdX = p.x - OX(); clampHold();
+  try { cv.setPointerCapture(e.pointerId); } catch (er) {}
+}, { passive: false });
+cv.addEventListener('pointermove', (e) => {
+  if (!dragging || e.pointerId !== dragId) return;
+  const p = toWorld(e);
+  holdX = p.x - OX(); clampHold();
+}, { passive: false });
+const endDrag = (e) => {
+  if (!dragging || e.pointerId !== dragId) return;
+  dragging = false; dragId = null;
+  if (e.type === 'pointerup' && hold) dropHold();
+};
+cv.addEventListener('pointerup', endDrag);
+cv.addEventListener('pointercancel', endDrag);
+
+// ---------- update ----------
+function update(dt) {
+  if (toastT > 0) toastT -= dt;
+  if (hintT > 0) hintT -= dt;
+  if (state === 'title') return;
+  if (state === 'result' || state === 'over') resultT += dt;
+  if (!engine) return;
+  timer += dt;
+  // quake motion
+  if (state === 'quake') {
+    quakeT += dt;
+    const D = 5.0;
+    const env = Math.min(1, quakeT / 1.2) * Math.min(1, Math.max(0, (D - quakeT) / 0.8));
+    const amp = cfg.qa * env;
+    const ph = Math.sin(quakeT * Math.PI * 2 * cfg.qf);
+    engine.gravity.x = amp * ph;
+    quakeOff = ph * env * (3 + cfg.qa * 14);
+    shake = env * 1.5;
+    if (quakeT >= D) { engine.gravity.x = 0; quakeOff = 0; engine.enableSleeping = true; state = 'judge'; timer = 0; shake = 0; }
+    if (castleFallen(0.9)) { state = 'judge'; timer = 1.2; }
+  }
+  // physics fixed step
+  let steps = Math.round(dt / (1 / 60)); steps = Math.max(1, Math.min(3, steps));
+  for (let i = 0; i < steps; i++) Engine.update(engine, 1000 / 60);
+  // remove fallen
+  for (let i = stones.length - 1; i >= 0; i--) {
+    const b = stones[i];
+    if (b.position.y > WH + 60) { Composite.remove(engine.world, b); stones.splice(i, 1); continue; }
+    if (b.speed < 0.12 && Math.abs(b.angularVelocity) < 0.01) b.still++; else b.still = 0;
+  }
+  // particles
+  for (let i = particles.length - 1; i >= 0; i--) { const q = particles[i]; q.t += dt; q.x += q.vx; q.y += q.vy; q.vy += 0.08; if (q.t > q.life) particles.splice(i, 1); }
+
+  if (state === 'build') {
+    if (!hold) { spawnT -= dt; if (spawnT <= 0) nextHold(); }
+    if (hold) clampHold();
+    // reached?
+    if (!reached) {
+      for (const b of stones) if (b.still > 25 && b.bounds.min.y <= goalY() + 1 && b.position.y < groundY) { reached = true; toast = T.reached; toastT = 3; sReach(); break; }
+    }
+    const allQuiet = stones.every((b) => b.still > 20);
+    if (!hold && stonesLeft <= 0 && !castleMode) {
+      quietT = allQuiet ? quietT + dt : 0;
+      if (reached) { castleMode = true; hold = makeCastle(); }
+      else if (quietT > 1.2) gameOver(T.overNo);
+    }
+  } else if (state === 'settle') {
+    if (castleFallen(0.9)) { state = 'judge'; timer = 1.2; }
+    else if (timer > 1.3) { state = 'quake'; quakeT = 0; sRumble(); toast = T.quake + ' ' + T.shindo(stage); toastT = 1.8; engine.enableSleeping = false; for (const b of stones.concat([castle])) Sleeping.set(b, false); }
+  } else if (state === 'judge') {
+    if (timer > 1.8) judge();
+  }
+}
+function normAng(a) { a = a % (Math.PI * 2); if (a > Math.PI) a -= Math.PI * 2; if (a < -Math.PI) a += Math.PI * 2; return a; }
+function castleFallen(maxA) {
+  if (!castle) return false;
+  return castle.bounds.max.y > goalY() + (maxA < 0.7 ? 40 : 70) || Math.abs(normAng(castle.angle)) > maxA || castle.position.y > groundY;
+}
+function judge() {
+  if (castleFallen(0.6)) { gameOver(T.over); return; }
+  const a = Math.abs(normAng(castle.angle));
+  const pts = { base: 100 + stage * 50, left: stonesLeft * 25, level: Math.round(Math.max(0, 1 - a / 0.3) * 60) };
+  const gain = pts.base + pts.left + pts.level;
+  score += gain;
+  result = { pts, gain };
+  state = 'result'; resultT = 0; sClear();
+  if (stage + 1 > bestStage) bestStage = stage + 1;
+  if (score > best) { best = score; }
+  saveBest();
+  for (let i = 0; i < 26; i++) particles.push({ x: castle.position.x + rnd(-30, 30), y: castle.position.y - 40, vx: rnd(-2, 2), vy: rnd(-3, -0.5), t: 0, life: rnd(0.8, 1.4), gold: true });
+}
+let newBestFlag = false, bestAtStart = 0;
+function gameOver(reason) {
+  fallReason = reason; state = 'over'; resultT = 0; sFail();
+  newBestFlag = score > bestAtStart;
+  if (score > best) best = score;
+  saveBest();
+  signal('end', { score });
+}
+
+// ---------- draw ----------
+function stoneColor(t, k) {
+  const r = Math.round(150 + t * 40 + k), g = Math.round(140 + t * 30 + k), b = Math.round(128 + t * 14 + k);
+  return `rgb(${r},${g},${b})`;
+}
+function drawPoly(vs) { ctx.beginPath(); ctx.moveTo(vs[0].x, vs[0].y); for (let i = 1; i < vs.length; i++) ctx.lineTo(vs[i].x, vs[i].y); ctx.closePath(); }
+function drawStoneVerts(vs, tone, alpha) {
+  ctx.globalAlpha = alpha;
+  let cx = 0, cy = 0; for (const v of vs) { cx += v.x; cy += v.y; } cx /= vs.length; cy /= vs.length;
+  drawPoly(vs); ctx.fillStyle = stoneColor(tone, -18); ctx.fill();
+  ctx.lineWidth = 1.6; ctx.strokeStyle = 'rgba(40,34,30,.85)'; ctx.stroke();
+  const inner = vs.map((v) => ({ x: cx + (v.x - cx) * 0.78 - 1.5, y: cy + (v.y - cy) * 0.74 - 2 }));
+  drawPoly(inner); ctx.fillStyle = stoneColor(tone, 8); ctx.fill();
+  ctx.globalAlpha = alpha * 0.25; ctx.beginPath(); ctx.moveTo(inner[0].x, inner[0].y); ctx.lineTo(inner[1].x, inner[1].y); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.globalAlpha = 1;
+}
+function drawCastleLocal(w, h) {
+  // body = white wall w x h centered
+  ctx.fillStyle = '#3b3530'; ctx.fillRect(-w / 2, h / 2 - 5, w, 5);
+  ctx.fillStyle = '#f2ede2'; ctx.fillRect(-w / 2 + 2, -h / 2, w - 4, h - 5);
+  ctx.fillStyle = '#2b2a33';
+  const nw = Math.max(2, Math.floor(w / 16));
+  for (let i = 0; i < nw; i++) { const x = -w / 2 + (i + 0.5) * (w / nw); ctx.fillRect(x - 3, -h / 2 + 7, 6, 7); }
+  // roof 1
+  ctx.fillStyle = '#3d4a5c';
+  ctx.beginPath(); ctx.moveTo(-w / 2 - 8, -h / 2 + 2); ctx.lineTo(w / 2 + 8, -h / 2 + 2); ctx.lineTo(w / 2 - 8, -h / 2 - 11); ctx.lineTo(-w / 2 + 8, -h / 2 - 11); ctx.closePath(); ctx.fill();
+  // upper wall
+  const w2 = w * 0.6;
+  ctx.fillStyle = '#f2ede2'; ctx.fillRect(-w2 / 2, -h / 2 - 25, w2, 14);
+  ctx.fillStyle = '#2b2a33'; ctx.fillRect(-4, -h / 2 - 21, 8, 6);
+  // roof 2
+  ctx.fillStyle = '#3d4a5c';
+  ctx.beginPath(); ctx.moveTo(-w2 / 2 - 8, -h / 2 - 23); ctx.lineTo(w2 / 2 + 8, -h / 2 - 23); ctx.lineTo(w2 / 2 - 6, -h / 2 - 34); ctx.lineTo(-w2 / 2 + 6, -h / 2 - 34); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#e8b84a';
+  ctx.beginPath(); ctx.arc(-w2 / 2 + 5, -h / 2 - 36, 2.6, 0, 7); ctx.arc(w2 / 2 - 5, -h / 2 - 36, 2.6, 0, 7); ctx.fill();
+}
+function txt(s, x, y, size, color, align = 'center', weight = '700', maxW = 330) {
+  ctx.font = `${weight} ${size}px ${FONT}`; ctx.textAlign = align; ctx.textBaseline = 'middle';
+  let w = ctx.measureText(s).width;
+  if (w > maxW) { ctx.font = `${weight} ${size * maxW / w}px ${FONT}`; }
+  ctx.fillStyle = color; ctx.fillText(s, x, y);
+}
+function drawBg() {
+  const ww = WW();
+  const g = ctx.createLinearGradient(0, 0, 0, WH);
+  g.addColorStop(0, '#2a2f55'); g.addColorStop(0.55, '#c9746a'); g.addColorStop(0.8, '#f0b77a'); g.addColorStop(1, '#f0b77a');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, ww, WH);
+  // sun
+  ctx.fillStyle = 'rgba(255,226,170,.55)'; ctx.beginPath(); ctx.arc(ww * 0.78, groundY - 40, 46, 0, 7); ctx.fill();
+  // mountains
+  ctx.fillStyle = '#7b5a6e';
+  ctx.beginPath(); ctx.moveTo(0, groundY + 10);
+  for (let x = 0; x <= ww + 20; x += 20) ctx.lineTo(x, groundY - 50 - Math.sin(x * 0.018) * 30 - Math.sin(x * 0.05 + 1) * 10);
+  ctx.lineTo(ww, groundY + 10); ctx.fill();
+  ctx.fillStyle = '#5b4058';
+  ctx.beginPath(); ctx.moveTo(0, groundY + 10);
+  for (let x = 0; x <= ww + 20; x += 20) ctx.lineTo(x, groundY - 18 - Math.sin(x * 0.03 + 2) * 14);
+  ctx.lineTo(ww, groundY + 10); ctx.fill();
+  // moat
+  const wg = ctx.createLinearGradient(0, groundY, 0, WH);
+  wg.addColorStop(0, '#3b5f7a'); wg.addColorStop(1, '#1d2c42');
+  ctx.fillStyle = wg; ctx.fillRect(0, groundY + 8, ww, WH - groundY);
+  ctx.strokeStyle = 'rgba(255,220,170,.25)'; ctx.lineWidth = 1.5;
+  for (let i = 0; i < 6; i++) { const y = groundY + 22 + i * 14, o = (performance.now() / 60 + i * 37) % 60; ctx.beginPath(); for (let x = -60 + o; x < ww; x += 60) { ctx.moveTo(x, y); ctx.lineTo(x + 22, y); } ctx.stroke(); }
+}
+function drawPlatform() {
+  const px = platform ? platform.position.x : 180, py = platform ? platform.position.y : groundY + 20, w = cfg.pw;
+  ctx.save(); ctx.translate(OX(), 0);
+  ctx.fillStyle = '#5a4634';
+  ctx.beginPath(); ctx.moveTo(px - w / 2, py - 20); ctx.lineTo(px + w / 2, py - 20); ctx.lineTo(px + w / 2 + 14, py + 40); ctx.lineTo(px - w / 2 - 14, py + 40); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#6f8a4a'; ctx.fillRect(px - w / 2, py - 22, w, 6);
+  ctx.restore();
+}
+function render() {
+  const ww = WW();
+  ctx.setTransform(dpr * S, 0, 0, dpr * S, 0, 0);
+  ctx.clearRect(0, 0, ww, WH);
+  const sx = shake ? rnd(-shake, shake) * 0.6 : 0, sy = shake ? rnd(-shake, shake) * 0.3 : 0;
+  ctx.save(); ctx.translate(sx, sy);
+  drawBg();
+  if (state === 'title') { ctx.restore(); drawTitle(); return; }
+  ctx.translate(quakeOff, 0);
+  drawPlatform();
+  ctx.save(); ctx.translate(OX(), 0);
+  // goal line
+  const gy = goalY();
+  ctx.setLineDash([8, 6]); ctx.lineWidth = 2.5; ctx.strokeStyle = reached ? 'rgba(255,230,120,.95)' : 'rgba(255,215,90,.8)';
+  ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(360, gy); ctx.stroke(); ctx.setLineDash([]);
+  txt(T.line, 6, gy - 10, 12, 'rgba(255,230,140,.95)', 'left', '700');
+  if (!reached) {
+    let top = groundY; for (const b of stones) if (b.speed < 0.6 && b.bounds.min.y < top) top = b.bounds.min.y;
+    const m = Math.max(0, (top - gy) / 40);
+    txt(T.left(m.toFixed(1)), 354, gy - 10, 13, 'rgba(255,240,190,.95)', 'right', '700');
+    if (top < groundY) { ctx.strokeStyle = 'rgba(255,255,255,.25)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(300, top); ctx.lineTo(360, top); ctx.stroke(); }
+  }
+  // stones
+  for (const b of stones) drawStoneVerts(b.vertices, b.tone, 1);
+  if (castle) { ctx.save(); ctx.translate(castle.position.x, castle.position.y); ctx.rotate(castle.angle); drawCastleLocal(cfg.cw, 26); ctx.restore(); }
+  // particles
+  for (const q of particles) { ctx.globalAlpha = Math.max(0, 1 - q.t / q.life); ctx.fillStyle = q.gold ? '#ffd96a' : 'rgba(220,200,170,1)'; ctx.fillRect(q.x - 2, q.y - 2, 4, 4); }
+  ctx.globalAlpha = 1;
+  // hold
+  if (hold && state === 'build') {
+    const r = hold.castle ? hold.w / 2 : hold.r;
+    const top = stackTopNear(holdX, r);
+    ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 1.5; ctx.setLineDash([3, 5]);
+    ctx.beginPath(); ctx.moveTo(holdX, holdY); ctx.lineTo(holdX, top); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.beginPath(); ctx.ellipse(holdX, top - 1, r * 0.8, 3, 0, 0, 7); ctx.fill();
+    // rope
+    ctx.strokeStyle = 'rgba(70,50,40,.8)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(holdX, 0); ctx.lineTo(holdX, holdY - (hold.castle ? 50 : r * 0.6)); ctx.stroke();
+    if (hold.castle) {
+      const ok = holdY + hold.h / 2 <= goalY() + 8;
+      const level = ok && castleSupport() <= 9;
+      ctx.save(); ctx.translate(holdX, holdY); ctx.rotate(hold.ang); ctx.globalAlpha = 0.92; drawCastleLocal(hold.w, hold.h);
+      ctx.globalAlpha = 1; ctx.lineWidth = 3; ctx.strokeStyle = !ok ? 'rgba(255,90,80,.95)' : level ? 'rgba(120,255,140,.9)' : 'rgba(255,210,80,.95)';
+      ctx.strokeRect(-hold.w / 2 - 3, -hold.h / 2 - 3, hold.w + 6, hold.h + 6); ctx.restore();
+      const lbl = !ok ? T.tooLow : level ? T.lvOk : T.lvTilt;
+      txt(lbl, holdX, holdY - hold.h / 2 - 50, 14, !ok ? '#ff9a90' : level ? '#a6ffb0' : '#ffd86a', 'center', '800', 200);
+    }
+    else {
+      const c = Math.cos(hold.ang), s = Math.sin(hold.ang);
+      drawStoneVerts(hold.pts.map((p) => ({ x: holdX + p.x * c - p.y * s, y: holdY + p.x * s + p.y * c })), hold.tone, 0.92);
+    }
+  }
+  ctx.restore();
+  ctx.restore();
+  drawHud();
+}
+function drawBtnCirc(b, label) {
+  ctx.fillStyle = 'rgba(20,24,40,.55)'; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, 7); ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,.6)'; ctx.lineWidth = 2; ctx.stroke();
+  txt(label, b.x, b.y + 1, 28, '#fff', 'center', '700');
+}
+function drawHud() {
+  const ww = WW();
+  ctx.fillStyle = 'rgba(20,22,40,.45)'; ctx.fillRect(0, 0, ww, 52);
+  txt(`${score}`, 14, 26, 24, '#fff', 'left', '800');
+  txt(T.stage(stage + 1), ww / 2, 18, 15, '#ffe3a8', 'center', '700', 130);
+  txt(T.shindo(stage), ww / 2, 38, 13, '#ffb08a', 'center', '700', 130);
+  // stones left + next preview
+  txt(`${T.stones} ${Math.max(0, stonesLeft)}`, ww - 14, 18, 15, '#fff', 'right', '700');
+  if (queue[0] && !castleMode && stonesLeft > (hold && !hold.castle ? 1 : 0)) {
+    const q = queue[0]; ctx.save(); ctx.translate(ww - 30, 38); ctx.scale(0.32, 0.32); drawStoneVerts(q.pts, q.tone, 0.9); ctx.restore();
+    txt(LANG === 'ja' ? 'つぎ' : 'next', ww - 52, 38, 12, 'rgba(255,255,255,.75)', 'right', '600');
+  }
+  if (state === 'build') {
+    drawBtnCirc(btnL(), '↺'); drawBtnCirc(btnR(), '↻');
+    if (reached || castleMode) {
+      const b = btnC(); const pulse = castleMode ? 0 : (Math.sin(performance.now() / 180) + 1) * 0.5;
+      ctx.fillStyle = castleMode ? 'rgba(20,24,40,.6)' : `rgba(${200 + pulse * 40},${150 + pulse * 30},40,.95)`;
+      roundRect(b.x - b.w / 2, b.y - b.h / 2, b.w, b.h, 14); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = 2; ctx.stroke();
+      txt(castleMode ? T.stoneBtn : T.castleBtn, b.x, b.y + 1, 17, '#fff', 'center', '800', b.w - 14);
+    }
+  }
+  if (toastT > 0 && toast) {
+    ctx.globalAlpha = Math.min(1, toastT * 2);
+    const big = toast.startsWith(T.quake);
+    txt(toast, ww / 2, big ? WH * 0.3 : 76, big ? 40 : 15, big ? '#ffefe0' : '#fff6d8', 'center', '800', ww - 30);
+    ctx.globalAlpha = 1;
+  }
+  if (state === 'build' && castleMode && hold && toastT <= 0) txt(T.dropCastle, ww / 2, 76, 15, '#fff6d8', 'center', '700');
+  if (hintT > 0 && state === 'build') { ctx.globalAlpha = Math.min(1, hintT); txt(T.hint, ww / 2, WH - 92, 14, '#fff', 'center', '700', ww - 40); ctx.globalAlpha = 1; }
+  if (state === 'result' && result) drawResult();
+  if (state === 'over') drawOver();
+}
+function roundRect(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function panel(h) { const ww = WW(); const y = Math.max(60, WH * 0.1); ctx.fillStyle = 'rgba(16,18,34,.78)'; roundRect(24, y, ww - 48, h, 18); ctx.fill(); return y; }
+function drawResult() {
+  const ww = WW(); const y = panel(250);
+  txt(T.clear, ww / 2, y + 42, 40, '#ffd96a', 'center', '900');
+  const p = result.pts;
+  const rows = [[T.b1, p.base], [T.b2(stonesLeft), p.left], [T.b3, p.level]];
+  rows.forEach((r, i) => { txt(r[0], 50, y + 92 + i * 28, 15, '#eee', 'left', '600'); txt(`+${r[1]}`, ww - 50, y + 92 + i * 28, 15, '#fff', 'right', '700'); });
+  txt(`${T.total} ${score}`, ww / 2, y + 190, 22, '#fff', 'center', '800');
+  if (resultT > 0.7) txt(T.next, ww / 2, y + 228, 15, 'rgba(255,255,255,.85)', 'center', '600');
+}
+function drawOver() {
+  const ww = WW(); const y = panel(250);
+  txt(fallReason, ww / 2, y + 40, 26, '#ffb4a0', 'center', '800');
+  txt(`${score}`, ww / 2, y + 100, 52, '#fff', 'center', '900');
+  txt(T.reach(stage), ww / 2, y + 142, 15, '#ddd', 'center', '600');
+  txt(newBestFlag ? T.newBest : `${T.best} ${best}`, ww / 2, y + 170, 17, newBestFlag ? '#ffd96a' : '#eee', 'center', '700');
+  txt(T.tip, ww / 2, y + 200, 12, 'rgba(255,240,200,.8)', 'center', '600', ww - 70);
+  if (resultT > 0.7) txt(T.again, ww / 2, y + 230, 15, 'rgba(255,255,255,.85)', 'center', '600');
+}
+let titleStones = null;
+function drawTitle() {
+  const ww = WW();
+  ctx.fillStyle = '#5a4634'; ctx.fillRect(ww / 2 - 120, groundY, 240, 40);
+  ctx.fillStyle = '#6f8a4a'; ctx.fillRect(ww / 2 - 120, groundY - 2, 240, 6);
+  if (!titleStones) { titleStones = []; const rows = [[-84, -42, 0, 42, 84], [-63, -21, 21, 63], [-42, 0, 42], [-21, 21]]; rows.forEach((row, ri) => row.forEach((x) => { const s = makeShape(); titleStones.push({ s, x, y: -22 - ri * 34 }); })); }
+  ctx.save(); ctx.translate(ww / 2, groundY);
+  for (const t of titleStones) { const k = 24 / Math.max(...t.s.pts.map((p) => Math.abs(p.x))), k2 = 19 / Math.max(...t.s.pts.map((p) => Math.abs(p.y))); drawStoneVerts(t.s.pts.map((p) => ({ x: t.x + p.x * k, y: t.y + p.y * k2 })), t.s.tone, 1); }
+  ctx.save(); ctx.translate(0, -22 - 3 * 34 - 32); drawCastleLocal(72, 26); ctx.restore();
+  ctx.restore();
+  txt(T.title, ww / 2, WH * 0.15, 46, '#fff', 'center', '900', ww - 30);
+  txt(T.sub, ww / 2, WH * 0.15 + 42, 15, '#ffe3c0', 'center', '600', ww - 30);
+  ctx.fillStyle = 'rgba(16,18,34,.55)'; roundRect(30, WH * 0.27, ww - 60, 96, 14); ctx.fill();
+  [T.how1, T.how2, T.how3].forEach((s, i) => txt(s, ww / 2, WH * 0.27 + 22 + i * 26, 14, '#fff', 'center', '600', ww - 80));
+  if (best > 0) txt(`${T.best} ${best}`, ww / 2, WH * 0.27 + 118, 15, '#ffd96a', 'center', '700');
+  const a = 0.6 + Math.sin(performance.now() / 300) * 0.4;
+  ctx.globalAlpha = a; txt(T.start, ww / 2, WH - 50, 20, '#fff', 'center', '800'); ctx.globalAlpha = 1;
+}
+
+// ---------- loop ----------
+let last = 0;
+function frame(ts) {
+  const dt = Math.min(0.05, last ? (ts - last) / 1000 : 0.016); last = ts;
+  groundY = WH - 104;
+  try { update(dt); render(); } catch (e) { console.error(e); }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
