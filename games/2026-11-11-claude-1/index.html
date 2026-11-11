@@ -1,0 +1,868 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>にじみ墨合戦</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #2a2622; }
+canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const T = {
+  ja: {
+    title: 'にじみ墨合戦',
+    how1: '長押しで墨をためて、はなすと落ちる',
+    how2: 'ぬれた紙ほど、遠くまでにじむ',
+    how3: 'まだ濡れている相手の墨は、上から奪える',
+    tap: 'タップでスタート',
+    you: 'あなた', cpu: '朱',
+    yourTurn: 'あなたの番', cpuTurn: '朱の番',
+    ink: '墨', drops: 'のこり',
+    hint1: '長押しで墨をためる。にじむ形が見えたら、はなす',
+    hint2: '青っぽい所は濡れている。よくにじむ',
+    hint3: '光っている朱はまだ濡れている。落とせば奪える',
+    hint4: '墨は毎回すこしずつたまる。ためて大きく落とすのもあり',
+    hint5: '自分の色の上に落とすと、ふちまで流れて広がる',
+    blocked: '乾いた墨の上には落とせない',
+    win: '勝ち！', lose: '負け…', draw: '引き分け',
+    next: 'タップで次の局へ', again: 'タップでもう一度',
+    round: (n) => `第${n}局`,
+    best: (n) => `最高 第${n}局まで`,
+    newBest: '最高記録更新！',
+    wax: 'ろうの白抜き：墨をはじく',
+    gold: '金箔：塗ると3倍の広さ',
+    dryFast: '紙が早く乾く',
+    shift: (a, b) => `藍 ${a}%　朱 ${b}%`,
+  },
+  en: {
+    title: 'Ink Bloom Battle',
+    how1: 'Hold to load ink, release to drop it',
+    how2: 'Wet paper lets ink bloom farther',
+    how3: 'Wet enemy ink can be taken over',
+    tap: 'Tap to start',
+    you: 'You', cpu: 'Red',
+    yourTurn: 'Your turn', cpuTurn: "Red's turn",
+    ink: 'Ink', drops: 'Drops',
+    hint1: 'Hold to load ink; watch the bloom, then release',
+    hint2: 'Bluish paper is wet: ink runs far there',
+    hint3: 'Shiny red is still wet. Drop on it to take it',
+    hint4: 'Ink refills each turn. Save it for a big bloom',
+    hint5: 'Drop on your own color: it flows to the edges',
+    blocked: "Can't drop on dry ink",
+    win: 'You win!', lose: 'You lose…', draw: 'Draw',
+    next: 'Tap to continue', again: 'Tap to play again',
+    round: (n) => `Round ${n}`,
+    best: (n) => `Best: Round ${n}`,
+    newBest: 'New best!',
+    wax: 'Wax resist: ink cannot go there',
+    gold: 'Gold leaf: counts triple',
+    dryFast: 'Paper dries faster',
+    shift: (a, b) => `Blue ${a}%  Red ${b}%`,
+  },
+}[LANG === 'ja' ? 'ja' : 'en'];
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+
+// ---------- canvas ----------
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d');
+let W = 360, H = 640, DPR = 1;
+function resize() {
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = Math.max(1, innerWidth || 360); H = Math.max(1, innerHeight || 640);
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+  layout();
+}
+addEventListener('resize', resize);
+
+// ---------- grid ----------
+const GW = 100, GH = 155, N = GW * GH;
+const owner = new Int8Array(N);      // 0 none, 1 player (indigo), 2 cpu (vermilion)
+const prevOwner = new Int8Array(N);
+const fresh = new Uint8Array(N);     // still wet ink of the most recent drop
+const revealAt = new Float32Array(N);
+const wet = new Float32Array(N);
+const fiber = new Float32Array(N);
+const grain = new Float32Array(N);
+const jit = new Float32Array(N);
+const wax = new Uint8Array(N);
+const gold = new Uint8Array(N);
+const dist = new Float32Array(N);
+const seen = new Uint8Array(N);
+const preview = new Uint8Array(N);
+let previewKey = '', previewOn = false;
+const CAPC = 1.5;      // cost to take over wet enemy ink
+const INCOME = 800, VMIN = 80, VMAX = 1600, DROPS = 8;
+const HOLD_FULL = 1.4;
+
+const NB = [[1, 0, 1], [-1, 0, 1], [0, 1, 1], [0, -1, 1], [1, 1, 1.414], [1, -1, 1.414], [-1, 1, 1.414], [-1, -1, 1.414],
+  [2, 1, 2.236], [2, -1, 2.236], [-2, 1, 2.236], [-2, -1, 2.236], [1, 2, 2.236], [1, -2, 2.236], [-1, 2, 2.236], [-1, -2, 2.236]];
+
+// value noise
+function makeNoise(seedScale) {
+  const g = 9 * seedScale + 1, gh = Math.ceil(g * GH / GW) + 1;
+  const pts = new Float32Array((g + 1) * (gh + 1));
+  for (let i = 0; i < pts.length; i++) pts[i] = Math.random();
+  return (x, y) => {
+    const fx = x / GW * g, fy = y / GW * g;
+    const ix = Math.floor(fx), iy = Math.floor(fy), tx = fx - ix, ty = fy - iy;
+    const sx = tx * tx * (3 - 2 * tx), sy = ty * ty * (3 - 2 * ty);
+    const r = g + 1;
+    const a = pts[iy * r + ix], b = pts[iy * r + ix + 1], c = pts[(iy + 1) * r + ix], d = pts[(iy + 1) * r + ix + 1];
+    return (a + (b - a) * sx) + ((c + (d - c) * sx) - (a + (b - a) * sx)) * sy;
+  };
+}
+
+function genPaper(level) {
+  owner.fill(0); prevOwner.fill(0); fresh.fill(0); wet.fill(0); wax.fill(0); gold.fill(0); revealAt.fill(-99);
+  const n1 = makeNoise(1), n2 = makeNoise(3), n3 = makeNoise(6);
+  for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) {
+    const i = y * GW + x;
+    fiber[i] = 0.42 + 0.95 * n1(x, y) + 0.3 * n2(x, y);
+    grain[i] = 0.6 * n3(x, y) + 0.4 * Math.random();
+    jit[i] = 0.45 + Math.random() * 1.1;
+  }
+  // wet brush strokes
+  const strokes = 4 + (Math.random() < 0.5 ? 1 : 0);
+  for (let s = 0; s < strokes; s++) {
+    const p0 = [Math.random() * GW, Math.random() * GH];
+    const ang = Math.random() * Math.PI * 2, len = 45 + Math.random() * 65;
+    const p3 = [p0[0] + Math.cos(ang) * len, p0[1] + Math.sin(ang) * len];
+    const p1 = [p0[0] + (Math.random() - 0.5) * 64, p0[1] + (Math.random() - 0.5) * 64];
+    const p2 = [p3[0] + (Math.random() - 0.5) * 64, p3[1] + (Math.random() - 0.5) * 64];
+    const wid = 3.6 + Math.random() * 5;
+    for (let k = 0; k <= 60; k++) {
+      const t = k / 60, u = 1 - t;
+      const bx = u * u * u * p0[0] + 3 * u * u * t * p1[0] + 3 * u * t * t * p2[0] + t * t * t * p3[0];
+      const by = u * u * u * p0[1] + 3 * u * u * t * p1[1] + 3 * u * t * t * p2[1] + t * t * t * p3[1];
+      const ww = wid * (0.55 + 0.6 * Math.sin(t * Math.PI));
+      stamp(bx, by, ww);
+    }
+  }
+  const pud = 2 + Math.floor(Math.random() * 2);
+  for (let s = 0; s < pud; s++) stamp(10 + Math.random() * (GW - 20), 12 + Math.random() * (GH - 24), 6 + Math.random() * 6);
+  // wax resist (round 2+)
+  if (level >= 2) {
+    const k = 3 + Math.min(3, level - 2);
+    for (let s = 0; s < k; s++) {
+      const cx = 8 + Math.random() * (GW - 16), cy = 12 + Math.random() * (GH - 24);
+      const shape = Math.floor(Math.random() * 3);
+      const r = 4 + Math.random() * 3.5;
+      for (let y = -16; y <= 16; y++) for (let x = -16; x <= 16; x++) {
+        const gx = Math.round(cx + x), gy = Math.round(cy + y);
+        if (gx < 0 || gy < 0 || gx >= GW || gy >= GH) continue;
+        let inside = false;
+        if (shape === 0) inside = x * x + y * y < r * r && x * x + y * y > (r - 1.6) * (r - 1.6); // ring
+        else if (shape === 1) inside = (Math.abs(x) < 1.1 && Math.abs(y) < r * 1.6) || (Math.abs(y) < 1.1 && Math.abs(x) < r * 1.6); // cross
+        else inside = Math.abs(x + y) < 1.2 && Math.abs(x - y) < r * 3; // slash
+        if (inside) wax[gy * GW + gx] = 1;
+      }
+    }
+  }
+  // gold leaf (round 3+)
+  if (level >= 3) {
+    const k = 3 + (level >= 5 ? 1 : 0);
+    for (let s = 0; s < k; s++) {
+      const cx = 8 + Math.random() * (GW - 16), cy = 12 + Math.random() * (GH - 24);
+      const r = 4 + Math.random() * 2.8;
+      for (let y = -9; y <= 9; y++) for (let x = -9; x <= 9; x++) {
+        const gx = Math.round(cx + x), gy = Math.round(cy + y);
+        if (gx < 0 || gy < 0 || gx >= GW || gy >= GH) continue;
+        const i = gy * GW + gx;
+        const rr = r * (0.8 + 0.4 * fiber[i]);
+        if (x * x + y * y < rr * rr && !wax[i]) gold[i] = 1;
+      }
+    }
+  }
+}
+function stamp(cx, cy, r) {
+  const R = Math.ceil(r + 3);
+  for (let y = -R; y <= R; y++) for (let x = -R; x <= R; x++) {
+    const gx = Math.round(cx + x), gy = Math.round(cy + y);
+    if (gx < 0 || gy < 0 || gx >= GW || gy >= GH) continue;
+    const d = Math.hypot(gx - cx, gy - cy);
+    const v = Math.max(0, Math.min(1, (r + 1.5 - d) / 3));
+    const i = gy * GW + gx;
+    if (v > wet[i]) wet[i] = v;
+  }
+}
+const weight = (i) => gold[i] ? 3 : 1;
+let totalWeight = 1;
+function computeTotal() { let s = 0; for (let i = 0; i < N; i++) if (!wax[i]) s += weight(i); totalWeight = s; }
+const consume = (i) => 0.3 + 0.8 * Math.pow(1 - wet[i], 1.3);
+const blockedFor = (i, pl) => wax[i] || (owner[i] !== 0 && owner[i] !== pl && !fresh[i]);
+
+// ---------- heap ----------
+let hIdx = new Int32Array(N * 4), hKey = new Float32Array(N * 4), hN = 0;
+function hPush(i, k) {
+  if (hN >= hIdx.length) { const a = new Int32Array(hIdx.length * 2); a.set(hIdx); hIdx = a; const b = new Float32Array(hKey.length * 2); b.set(hKey); hKey = b; }
+  let n = hN++;
+  while (n > 0) { const p = (n - 1) >> 1; if (hKey[p] <= k) break; hIdx[n] = hIdx[p]; hKey[n] = hKey[p]; n = p; }
+  hIdx[n] = i; hKey[n] = k;
+}
+function hPop() {
+  const top = hIdx[0];
+  const li = hIdx[--hN], lk = hKey[hN];
+  let n = 0;
+  for (;;) {
+    let c = 2 * n + 1; if (c >= hN) break;
+    if (c + 1 < hN && hKey[c + 1] < hKey[c]) c++;
+    if (hKey[c] >= lk) break;
+    hIdx[n] = hIdx[c]; hKey[n] = hKey[c]; n = c;
+  }
+  hIdx[n] = li; hKey[n] = lk;
+  return top;
+}
+
+// simulate a drop; returns {cells:[i...], d:[...], gain, cap, ok}
+function simulate(sx, sy, pl, V) {
+  const start = sy * GW + sx;
+  if (sx < 0 || sy < 0 || sx >= GW || sy >= GH || blockedFor(start, pl)) return { ok: false, cells: [], d: [], gain: 0, cap: 0 };
+  const opp = 3 - pl;
+  dist.fill(1e9); seen.fill(0); hN = 0;
+  dist[start] = 0; hPush(start, 0);
+  let rem = V, gain = 0, cap = 0;
+  const cells = [], ds = [];
+  while (hN > 0) {
+    const d = hKey[0], i = hPop();
+    if (seen[i]) continue;
+    seen[i] = 1;
+    const o = owner[i];
+    let c = 0;
+    if (o === 0) c = consume(i); else if (o === opp) c = CAPC;
+    if (c > 0) {
+      if (rem < c) break;
+      rem -= c;
+      cells.push(i); ds.push(d);
+      if (o === opp) { cap++; gain += 2 * weight(i); } else gain += weight(i);
+    }
+    const x = i % GW, y = (i - x) / GW;
+    for (let k = 0; k < 16; k++) {
+      const dx = NB[k][0], dy = NB[k][1];
+      const nx = x + dx, ny = y + dy;
+      if (nx < 0 || ny < 0 || nx >= GW || ny >= GH) continue;
+      const j = ny * GW + nx;
+      if (seen[j] || blockedFor(j, pl)) continue;
+      if (k >= 8) {
+        // knight step: both cells it passes must be open
+        const hx = x + (dx > 0 ? 1 : dx < 0 ? -1 : 0) * (Math.abs(dx) === 2 ? 1 : 0), hy = y + (dy > 0 ? 1 : -1) * (Math.abs(dy) === 2 ? 1 : 0);
+        const m1 = hy * GW + hx, m2 = (y + Math.sign(dy)) * GW + (x + Math.sign(dx));
+        if (blockedFor(m1, pl) || blockedFor(m2, pl)) continue;
+      }
+      const oj = owner[j];
+      const tw = oj === pl ? 0.3 : (oj === 0 ? consume(j) : CAPC) * fiber[j] * jit[j];
+      const nd = d + tw * NB[k][2];
+      if (nd < dist[j]) { dist[j] = nd; hPush(j, nd); }
+    }
+  }
+  return { ok: true, cells, d: ds, gain, cap };
+}
+
+// ---------- game state ----------
+let state = 'title';   // title | play | result
+let level = 1, bestLevel = 1;
+let turn = 2;          // whose turn
+let pot = [0, INCOME, INCOME], dropsLeft = [0, DROPS, DROPS];
+let anim = null;       // current drop animation {x,y,pl,t0,end, hold}
+let busyUntil = 0;
+let cpuPlan = null;
+let hold = null;       // {id, x, y, t0}
+let hintText = '', hintUntil = 0, hintStep = 0;
+let toast = '', toastUntil = 0;
+let resultInfo = null, resultAt = 0;
+let now = 0;
+let splashes = [];
+let lastCount = [0, 0, 0];
+let shakeT = 0;
+let playerTurns = 0;
+let levelNote = '';
+
+// save
+addEventListener('message', (e) => {
+  if (e.data && e.data.agf === 'loaded' && e.data.data) {
+    const d = e.data.data;
+    if (typeof d.level === 'number' && d.level >= 1) level = Math.min(99, Math.floor(d.level));
+    if (typeof d.best === 'number') bestLevel = Math.max(bestLevel, Math.floor(d.best));
+  }
+});
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+function persist() { try { parent.postMessage({ agf: 'save', data: { level, best: bestLevel } }, '*'); } catch (e) {} }
+
+function dryRate() { return level >= 4 ? 0.92 : 0.95; }
+
+function startMatch() {
+  genPaper(level); computeTotal();
+  pot = [0, INCOME, INCOME]; dropsLeft = [0, DROPS, DROPS];
+  turn = 2; anim = null; hold = null; cpuPlan = null; splashes = [];
+  busyUntil = now + 0.5; playerTurns = 0; hintStep = 0;
+  state = 'play';
+  levelNote = level >= 4 ? T.dryFast : level === 3 ? T.gold : level === 2 ? T.wax : '';
+  if (levelNote) { toast = levelNote; toastUntil = now + 3.2; }
+  signal('start');
+}
+
+// ---------- CPU ----------
+function cpuChoose() {
+  const pl = 2;
+  const left = dropsLeft[pl];
+  let V = left === 1 || pot[pl] > VMAX - INCOME * 0.5 ? pot[pl] : pot[pl] * (0.5 + Math.random() * 0.5);
+  V = Math.max(VMIN, Math.min(VMAX, Math.min(pot[pl], V)));
+  const skill = Math.min(1, 0.08 + 0.2 * (level - 1));
+  const tries = 14 + Math.round(50 * skill);
+  const cands = [];
+  for (let k = 0; k < tries; k++) {
+    let x, y, tries2 = 0;
+    do {
+      // prefer fresh enemy ink sometimes
+      if (Math.random() < 0.35) {
+        const i = Math.floor(Math.random() * N);
+        x = i % GW; y = (i - x) / GW;
+        if (!(owner[i] === 1 && fresh[i]) && Math.random() < 0.7) { const j = randWet(); x = j % GW; y = (j - x) / GW; }
+      } else { x = Math.floor(Math.random() * GW); y = Math.floor(Math.random() * GH); }
+      tries2++;
+    } while (blockedFor(y * GW + x, pl) && tries2 < 20);
+    const r = simulate(x, y, pl, V);
+    if (!r.ok) continue;
+    let score = r.gain;
+    if (level >= 2) {
+      // the player answers every drop: big wet blobs are an invitation
+      score -= (left === 1 ? 0.6 : 0.2) * skill * r.cells.length;
+    }
+    cands.push({ x, y, score });
+  }
+  if (!cands.length) return { x: GW >> 1, y: GH >> 1, V };
+  cands.sort((a, b) => b.score - a.score);
+  const pick = Math.min(cands.length - 1, Math.floor(Math.random() * Math.max(1, cands.length * (1 - skill) * 0.55)));
+  return { x: cands[pick].x, y: cands[pick].y, V };
+}
+function randWet() {
+  for (let k = 0; k < 40; k++) { const i = Math.floor(Math.random() * N); if (wet[i] > 0.5 && owner[i] === 0 && !wax[i]) return i; }
+  return Math.floor(Math.random() * N);
+}
+
+// ---------- drop ----------
+function doDrop(pl, gx, gy, V) {
+  const r = simulate(gx, gy, pl, V);
+  if (!r.ok) return false;
+  pot[pl] = Math.min(VMAX, Math.max(0, pot[pl] - V) + INCOME); dropsLeft[pl]--;
+  fresh.fill(0);
+  const t0 = now + 0.18;
+  let dmax = 0.001;
+  for (const d of r.d) if (d > dmax) dmax = d;
+  const dur = 1.0 + Math.min(1.0, r.cells.length / 2500);
+  for (let k = 0; k < r.cells.length; k++) {
+    const i = r.cells[k];
+    prevOwner[i] = owner[i]; owner[i] = pl; fresh[i] = 1;
+    revealAt[i] = t0 + dur * Math.sqrt(r.d[k] / dmax);
+  }
+  for (let i = 0; i < N; i++) wet[i] *= dryRate();
+  anim = { x: gx, y: gy, pl, t0, end: t0 + dur + 0.35, cap: r.cap, n: r.cells.length };
+  splashes.push({ x: gx, y: gy, t: now, pl, V });
+  sfxDrop(V / VMAX);
+  setTimeout(() => {}, 0);
+  sfxSpread(dur, Math.min(1, r.cells.length / 2500), pl);
+  if (r.cap > 0) { sfxCapture(Math.min(1, r.cap / 200)); shakeT = now; }
+  busyUntil = anim.end;
+  return true;
+}
+
+function endMatch() {
+  const c = countAll();
+  const a = pct(c[1]), b = pct(c[2]);
+  let res = c[1] > c[2] ? 'win' : c[1] < c[2] ? 'lose' : 'draw';
+  const playedLevel = level;
+  let nb = false;
+  if (res === 'win') { level++; if (level > bestLevel) { bestLevel = level; nb = true; } }
+  persist();
+  resultInfo = { res, a, b, playedLevel, nb };
+  resultAt = now; state = 'result';
+  signal('end', { score: Math.round(a) });
+  if (res === 'win') sfxWin(); else sfxLose();
+}
+function countAll(revealOnly) {
+  const c = [0, 0, 0];
+  for (let i = 0; i < N; i++) {
+    let o = owner[i];
+    if (revealOnly && o && revealAt[i] > now) o = prevOwner[i];
+    if (o) c[o] += weight(i);
+  }
+  return c;
+}
+const pct = (v) => Math.round(v / totalWeight * 1000) / 10;
+
+// ---------- input ----------
+let paper = { x: 0, y: 0, w: 1, h: 1, cs: 1 };
+function layout() {
+  const top = 70, bot = 82, side = 10;
+  const aw = W - side * 2, ah = H - top - bot;
+  const cs = Math.max(0.5, Math.min(aw / GW, ah / GH));
+  const pw = cs * GW, ph = cs * GH;
+  paper = { x: (W - pw) / 2, y: top + (ah - ph) / 2, w: pw, h: ph, cs };
+}
+function toGrid(px, py) {
+  return [Math.floor((px - paper.x) / paper.cs), Math.floor((py - paper.y) / paper.cs)];
+}
+function holdVolume(h) {
+  const t = Math.min(1, (now - h.t0) / HOLD_FULL);
+  const v = VMIN + (VMAX - VMIN) * Math.pow(t, 1.15);
+  return Math.min(pot[1], v);
+}
+cv.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  audioInit();
+  if (state === 'title') { startMatch(); return; }
+  if (state === 'result') { if (now - resultAt > 0.7) startMatch(); return; }
+  if (state !== 'play' || turn !== 1 || dropsLeft[1] <= 0 || hold) return;
+  hold = { id: e.pointerId, x: e.clientX, y: e.clientY, t0: now };
+  sfxHoldStart();
+  try { cv.setPointerCapture(e.pointerId); } catch (er) {}
+}, { passive: false });
+cv.addEventListener('pointermove', (e) => {
+  if (hold && e.pointerId === hold.id) { hold.x = e.clientX; hold.y = e.clientY; }
+});
+function release(e, cancel) {
+  if (!hold || e.pointerId !== hold.id) return;
+  const h = hold; hold = null; sfxHoldStop();
+  if (cancel) return;
+  const [gx, gy] = toGrid(h.x, h.y);
+  if (gx < 0 || gy < 0 || gx >= GW || gy >= GH) return;
+  if (blockedFor(gy * GW + gx, 1)) { toast = T.blocked; toastUntil = now + 1.6; sfxBlock(); return; }
+  const V = holdVolume(h);
+  if (doDrop(1, gx, gy, V)) { turn = 2; playerTurns++; hintUntil = 0; }
+}
+cv.addEventListener('pointerup', (e) => release(e, false));
+cv.addEventListener('pointercancel', (e) => release(e, true));
+
+// ---------- audio ----------
+let AC = null, master = null, holdOsc = null, holdGain = null, noiseBuf = null;
+function audioInit() {
+  try {
+    if (!AC) {
+      AC = new (window.AudioContext || window.webkitAudioContext)();
+      master = AC.createGain(); master.gain.value = 0.5; master.connect(AC.destination);
+      noiseBuf = AC.createBuffer(1, AC.sampleRate * 2, AC.sampleRate);
+      const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    }
+    if (AC.state !== 'running') AC.resume();
+  } catch (e) { AC = null; }
+}
+function tone(f0, f1, dur, type, vol, delay = 0) {
+  if (!AC) return;
+  try {
+    const t = AC.currentTime + delay;
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = type; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(Math.max(20, f1), t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.05);
+  } catch (e) {}
+}
+function noise(dur, f0, f1, vol, q = 1, delay = 0) {
+  if (!AC) return;
+  try {
+    const t = AC.currentTime + delay;
+    const s = AC.createBufferSource(); s.buffer = noiseBuf;
+    const f = AC.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = q;
+    f.frequency.setValueAtTime(f0, t); f.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    const g = AC.createGain();
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + dur * 0.25); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(f); f.connect(g); g.connect(master); s.start(t); s.stop(t + dur + 0.05);
+  } catch (e) {}
+}
+function sfxHoldStart() {
+  if (!AC) return;
+  try {
+    holdOsc = AC.createOscillator(); holdGain = AC.createGain();
+    holdOsc.type = 'sine'; holdOsc.frequency.value = 180;
+    holdGain.gain.value = 0.0001;
+    holdGain.gain.exponentialRampToValueAtTime(0.05, AC.currentTime + 0.1);
+    holdOsc.connect(holdGain); holdGain.connect(master); holdOsc.start();
+  } catch (e) {}
+}
+function sfxHoldUpdate(v) { if (holdOsc && AC) try { holdOsc.frequency.setTargetAtTime(180 + 260 * v, AC.currentTime, 0.05); } catch (e) {} }
+function sfxHoldStop() {
+  if (!holdOsc || !AC) return;
+  try { holdGain.gain.setTargetAtTime(0.0001, AC.currentTime, 0.03); holdOsc.stop(AC.currentTime + 0.2); } catch (e) {}
+  holdOsc = null;
+}
+function sfxDrop(s) {
+  tone(900 - 300 * s, 160, 0.22, 'sine', 0.35);
+  noise(0.08, 3000, 1200, 0.08, 2);
+}
+function sfxSpread(dur, amt, pl) {
+  noise(dur, 500, 2400, 0.05 + 0.1 * amt, 0.8, 0.15);
+  const base = pl === 1 ? [392, 440, 523, 587, 659] : [330, 370, 440, 494, 554];
+  const n = 2 + Math.round(amt * 3);
+  for (let k = 0; k < n; k++) tone(base[k % 5] * (k >= 5 ? 2 : 1), base[k % 5] * 0.99, 0.9, 'triangle', 0.06, 0.2 + k * dur / (n + 1));
+}
+function sfxCapture(s) { tone(140, 60, 0.4, 'sine', 0.25 + 0.2 * s, 0.2); noise(0.5, 400, 200, 0.12, 1.5, 0.2); }
+function sfxBlock() { tone(200, 150, 0.12, 'square', 0.05); }
+function sfxWin() { [523, 587, 659, 784, 880, 1047].forEach((f, k) => tone(f, f, 0.8, 'triangle', 0.13, k * 0.09)); }
+function sfxLose() { tone(330, 320, 0.6, 'triangle', 0.12); tone(262, 255, 0.9, 'triangle', 0.12, 0.3); }
+
+// ---------- rendering ----------
+const gcv = document.createElement('canvas'); gcv.width = GW; gcv.height = GH;
+const gctx = gcv.getContext('2d');
+const img = gctx.createImageData(GW, GH);
+const grainCv = document.createElement('canvas'); grainCv.width = 160; grainCv.height = 160;
+(() => {
+  const g = grainCv.getContext('2d'), d = g.createImageData(160, 160);
+  for (let i = 0; i < 160 * 160; i++) { const v = 128 + (Math.random() - 0.5) * 120; d.data[i * 4] = v; d.data[i * 4 + 1] = v * 0.97; d.data[i * 4 + 2] = v * 0.9; d.data[i * 4 + 3] = 255; }
+  g.putImageData(d, 0, 0);
+  g.globalAlpha = 0.25; g.strokeStyle = '#6a5a40';
+  for (let k = 0; k < 70; k++) { g.beginPath(); const x = Math.random() * 160, y = Math.random() * 160, a = Math.random() * 6.3, l = 4 + Math.random() * 14; g.moveTo(x, y); g.quadraticCurveTo(x + Math.cos(a + 0.5) * l / 2, y + Math.sin(a + 0.5) * l / 2, x + Math.cos(a) * l, y + Math.sin(a) * l); g.lineWidth = 0.5; g.stroke(); }
+})();
+let grainPat = null;
+const CAN_FILTER = typeof ctx.filter === 'string';
+
+const INK = [null, [34, 58, 110], [200, 66, 44]];
+const PAPER = [242, 234, 214], WETP = [205, 210, 206], WAXC = [252, 251, 246], GOLDC = [214, 172, 72];
+
+function inkRGB(o, i, out) {
+  const c = INK[o];
+  const x = i % GW, y = (i - x) / GW;
+  let edge = 0;
+  if (x > 0 && owner[i - 1] !== o) edge++;
+  if (x < GW - 1 && owner[i + 1] !== o) edge++;
+  if (y > 0 && owner[i - GW] !== o) edge++;
+  if (y < GH - 1 && owner[i + GW] !== o) edge++;
+  const dens = 0.62 + 0.3 * grain[i] + 0.12 * edge;
+  let dk = 1 - 0.1 * edge;
+  let r = c[0] * dk, g = c[1] * dk, b = c[2] * dk;
+  if (fresh[i] && o) {
+    const sh = Math.max(0, Math.sin(now * 2.6 + x * 0.32 + y * 0.21));
+    const l = 0.2 + 0.32 * sh * sh * sh + (grain[i] > 0.9 ? 0.25 : 0);
+    r += (255 - r) * l; g += (255 - g) * l; b += (255 - b) * l;
+  }
+  if (gold[i]) { r = r * 0.7 + GOLDC[0] * 0.3; g = g * 0.7 + GOLDC[1] * 0.3; b = b * 0.75 + GOLDC[2] * 0.25; }
+  out[0] = r; out[1] = g; out[2] = b; out[3] = Math.min(1, dens);
+}
+const tmpA = [0, 0, 0, 0], tmpB = [0, 0, 0, 0];
+function updatePreview() {
+  if (!hold || state !== 'play') { if (previewOn) { preview.fill(0); previewOn = false; previewKey = ''; } return; }
+  const [gx, gy] = toGrid(hold.x, hold.y);
+  const V = holdVolume(hold);
+  const key = gx + ',' + gy + ',' + Math.round(V / 25);
+  if (key === previewKey) return;
+  previewKey = key;
+  preview.fill(0); previewOn = true;
+  const r = simulate(gx, gy, 1, V);
+  if (!r.ok) return;
+  for (const i of r.cells) preview[i] = owner[i] === 2 ? 2 : 1;
+}
+function renderGrid() {
+  const d = img.data;
+  for (let i = 0; i < N; i++) {
+    let pr, pg, pb;
+    if (wax[i]) { pr = WAXC[0]; pg = WAXC[1]; pb = WAXC[2]; }
+    else {
+      const w = wet[i], f = 0.965 + 0.05 * grain[i];
+      pr = (PAPER[0] + (WETP[0] - PAPER[0]) * w) * f;
+      pg = (PAPER[1] + (WETP[1] - PAPER[1]) * w) * f;
+      pb = (PAPER[2] + (WETP[2] - PAPER[2]) * w) * f;
+      if (gold[i]) {
+        const s = 0.55 + 0.45 * Math.sin(now * 2 + i * 0.7);
+        const m = 0.55 + 0.25 * grain[i] * s;
+        pr += (GOLDC[0] - pr) * m; pg += (GOLDC[1] - pg) * m; pb += (GOLDC[2] - pb) * m;
+      }
+    }
+    let r = pr, g = pg, b = pb;
+    const o = owner[i];
+    if (o) {
+      const a = Math.max(0, Math.min(1, (now - revealAt[i]) / 0.3));
+      inkRGB(o, i, tmpA);
+      let fr = pr + (tmpA[0] - pr) * tmpA[3], fg = pg + (tmpA[1] - pg) * tmpA[3], fb = pb + (tmpA[2] - pb) * tmpA[3];
+      if (a < 1) {
+        const po = prevOwner[i];
+        let br = pr, bg = pg, bb = pb;
+        if (po) { inkRGB(po, i, tmpB); br = pr + (tmpB[0] - pr) * tmpB[3]; bg = pg + (tmpB[1] - pg) * tmpB[3]; bb = pb + (tmpB[2] - pb) * tmpB[3]; }
+        // wet front: darker rim while spreading
+        const rim = a > 0 ? Math.sin(a * Math.PI) * 0.25 : 0;
+        fr *= 1 - rim; fg *= 1 - rim; fb *= 1 - rim;
+        r = br + (fr - br) * a; g = bg + (fg - bg) * a; b = bb + (fb - bb) * a;
+      } else { r = fr; g = fg; b = fb; }
+    }
+    if (previewOn && preview[i]) {
+      const m = preview[i] === 2 ? ((((i % GW) + ((i / GW) | 0) + Math.floor(now * 6)) & 3) < 2 ? 0.78 : 0.4) : 0.34;
+      r += (90 - r) * m; g += (120 - g) * m; b += (190 - b) * m;
+    }
+    const k = i * 4;
+    d[k] = r; d[k + 1] = g; d[k + 2] = b; d[k + 3] = 255;
+  }
+  gctx.putImageData(img, 0, 0);
+}
+
+function fitFont(text, size, maxW, weight = '700') {
+  let s = size;
+  ctx.font = `${weight} ${s}px ${FONT}`;
+  while (s > 12 && ctx.measureText(text).width > maxW) { s -= 1; ctx.font = `${weight} ${s}px ${FONT}`; }
+  return s;
+}
+function txt(text, x, y, size, color, align = 'center', maxW = W - 24, weight = '700') {
+  fitFont(text, size, maxW, weight);
+  ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = 'middle';
+  ctx.fillText(text, x, y);
+}
+
+function drawPaper() {
+  ctx.save();
+  let ox = 0, oy = 0;
+  const st = now - shakeT;
+  if (st < 0.5) { const a = (0.5 - st) * 4; ox = Math.sin(st * 60) * a; oy = Math.cos(st * 50) * a * 0.6; }
+  ctx.translate(ox, oy);
+  ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  ctx.fillRect(paper.x + 3, paper.y + 5, paper.w, paper.h);
+  updatePreview();
+  renderGrid();
+  ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(gcv, paper.x, paper.y, paper.w, paper.h);
+  if (CAN_FILTER) {
+    ctx.save(); ctx.beginPath(); ctx.rect(paper.x, paper.y, paper.w, paper.h); ctx.clip();
+    ctx.filter = `blur(${Math.max(0.8, paper.cs * 0.45).toFixed(2)}px)`;
+    ctx.drawImage(gcv, paper.x, paper.y, paper.w, paper.h);
+    ctx.restore();
+  }
+  if (!grainPat) grainPat = ctx.createPattern(grainCv, 'repeat');
+  ctx.globalAlpha = 0.09; ctx.globalCompositeOperation = 'multiply';
+  ctx.fillStyle = grainPat; ctx.fillRect(paper.x, paper.y, paper.w, paper.h);
+  ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+  // splashes
+  for (let k = splashes.length - 1; k >= 0; k--) {
+    const s = splashes[k], t = now - s.t;
+    if (t > 0.9) { splashes.splice(k, 1); continue; }
+    const px = paper.x + (s.x + 0.5) * paper.cs, py = paper.y + (s.y + 0.5) * paper.cs;
+    const c = INK[s.pl];
+    if (t < 0.18) {
+      const f = t / 0.18;
+      const r = (6 + 10 * s.V / VMAX) * (1.6 - f * 0.6);
+      ctx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${0.35 + 0.6 * f})`;
+      ctx.beginPath(); ctx.arc(px, py - (1 - f) * 30, r * 0.6, 0, 7); ctx.fill();
+    } else {
+      const f = (t - 0.18) / 0.72;
+      ctx.strokeStyle = `rgba(${c[0]},${c[1]},${c[2]},${0.5 * (1 - f)})`;
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(px, py, 6 + f * 40 * (0.5 + s.V / VMAX), 0, 7); ctx.stroke();
+    }
+  }
+  ctx.restore();
+}
+
+function drawHUD() {
+  const c = countAll(true);
+  const a = pct(c[1]), b = pct(c[2]);
+  // top bar
+  ctx.fillStyle = '#2a2622'; ctx.fillRect(0, 0, W, 66);
+  // share bar
+  const bx = 12, bw = W - 24, by = 52, bh = 7;
+  ctx.fillStyle = '#4a443d'; ctx.fillRect(bx, by, bw, bh);
+  ctx.fillStyle = 'rgb(70,100,170)'; ctx.fillRect(bx, by, bw * a / 100, bh);
+  ctx.fillStyle = 'rgb(220,90,60)'; ctx.fillRect(bx + bw - bw * b / 100, by, bw * b / 100, bh);
+  ctx.fillStyle = '#f3ecdc'; ctx.fillRect(bx + bw / 2 - 1, by - 2, 2, bh + 4);
+  txt(`${T.you} ${a.toFixed(1)}%`, 12, 18, 18, '#a9c0f0', 'left', W * 0.4);
+  txt(`${b.toFixed(1)}% ${T.cpu}`, W - 12, 18, 18, '#f2a48c', 'right', W * 0.4);
+  txt(`${T.drops} ${dropsLeft[1]}`, 12, 38, 14, '#cfc6b4', 'left', W * 0.3, '500');
+  txt(`${T.drops} ${dropsLeft[2]}`, W - 12, 38, 14, '#cfc6b4', 'right', W * 0.3, '500');
+  txt(T.round(state === 'result' && resultInfo ? resultInfo.playedLevel : level), W / 2, 18, 14, '#e8dcc0', 'center', W * 0.2, '600');
+  const tt = state === 'result' ? '' : turn === 1 ? T.yourTurn : T.cpuTurn;
+  const tc = turn === 1 ? '#a9c0f0' : '#f2a48c';
+  txt(tt, W / 2, 38, 14, tc, 'center', W * 0.25);
+
+  // bottom: ink pot
+  const y0 = H - 78;
+  ctx.fillStyle = '#2a2622'; ctx.fillRect(0, y0, W, 78);
+  const potW = W - 24;
+  let use = 0;
+  if (hold) use = holdVolume(hold);
+  ctx.fillStyle = '#4a443d'; roundRect(12, H - 34, potW, 16, 8); ctx.fill();
+  const rem = pot[1] / VMAX;
+  ctx.fillStyle = 'rgb(46,72,130)'; roundRect(12, H - 34, Math.max(0, potW * rem), 16, 8); ctx.fill();
+  if (use > 0) {
+    const uw = potW * use / VMAX;
+    ctx.fillStyle = 'rgba(169,192,240,0.85)';
+    roundRect(12 + potW * rem - uw, H - 34, uw, 16, 8); ctx.fill();
+  }
+  txt(`${T.ink}`, 12, H - 56, 15, '#e8dcc0', 'left', 60);
+  // drop dots
+  for (let k = 0; k < DROPS; k++) {
+    const x = 70 + k * 22, y = H - 56;
+    if (x > W - 20) break;
+    ctx.fillStyle = k < dropsLeft[1] ? 'rgb(70,100,170)' : '#4a443d';
+    ctx.beginPath(); ctx.arc(x, y + 1, 6, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x - 6, y); ctx.quadraticCurveTo(x, y - 14, x, y - 12); ctx.quadraticCurveTo(x, y - 14, x + 6, y); ctx.fill();
+  }
+}
+function roundRect(x, y, w, h, r) {
+  r = Math.min(r, h / 2, Math.max(0, w) / 2);
+  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+
+function drawHold() {
+  if (!hold) return;
+  const V = holdVolume(hold);
+  sfxHoldUpdate((V - VMIN) / (VMAX - VMIN));
+  const [gx, gy] = toGrid(hold.x, hold.y);
+  const inside = gx >= 0 && gy >= 0 && gx < GW && gy < GH;
+  const bad = !inside || blockedFor(gy * GW + gx, 1);
+  const r = Math.sqrt(V / 0.7 / Math.PI) * paper.cs * 0.5;
+  ctx.save();
+  if (bad) {
+    ctx.strokeStyle = 'rgba(90,90,90,0.9)'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(hold.x - 12, hold.y - 12); ctx.lineTo(hold.x + 12, hold.y + 12); ctx.moveTo(hold.x + 12, hold.y - 12); ctx.lineTo(hold.x - 12, hold.y + 12); ctx.stroke();
+  }
+  // drop above finger
+  const dy = hold.y - Math.max(46, r + 18);
+  const dr = 5 + 9 * (V - VMIN) / (VMAX - VMIN);
+  ctx.fillStyle = bad ? 'rgba(110,110,110,0.8)' : 'rgba(34,58,110,0.92)';
+  ctx.beginPath(); ctx.arc(hold.x, dy, dr, 0, 7); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(hold.x - dr, dy); ctx.quadraticCurveTo(hold.x, dy - dr * 2.4, hold.x, dy - dr * 2.2); ctx.quadraticCurveTo(hold.x, dy - dr * 2.4, hold.x + dr, dy); ctx.fill();
+  ctx.strokeStyle = 'rgba(34,58,110,0.5)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(hold.x, dy + dr); ctx.lineTo(hold.x, hold.y - 4); ctx.stroke();
+  ctx.restore();
+}
+
+function drawCpuHover() {
+  if (!cpuPlan || turn !== 2) return;
+  const t = now - cpuPlan.t0;
+  if (t < 0) return;
+  const px = paper.x + (cpuPlan.x + 0.5) * paper.cs, py = paper.y + (cpuPlan.y + 0.5) * paper.cs;
+  const f = Math.min(1, t / cpuPlan.hold);
+  const V = VMIN + (cpuPlan.V - VMIN) * f;
+  const r = Math.sqrt(V / 0.7 / Math.PI) * paper.cs;
+  ctx.save();
+  ctx.setLineDash([5, 5]); ctx.lineDashOffset = -now * 20;
+  ctx.strokeStyle = 'rgba(200,66,44,0.7)'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(px, py, r, 0, 7); ctx.stroke();
+  ctx.setLineDash([]);
+  const dr = 5 + 9 * (V - VMIN) / (VMAX - VMIN);
+  ctx.fillStyle = 'rgba(200,66,44,0.9)';
+  ctx.beginPath(); ctx.arc(px, py - Math.max(30, r + 12), dr, 0, 7); ctx.fill();
+  ctx.restore();
+}
+
+function drawTitle() {
+  ctx.fillStyle = '#2a2622'; ctx.fillRect(0, 0, W, H);
+  drawPaper();
+  ctx.fillStyle = 'rgba(242,234,214,0.72)';
+  const bh = 230, by = H * 0.5 - bh / 2;
+  ctx.fillRect(0, by, W, bh);
+  txt(T.title, W / 2, by + 48, 40, '#1f2a44', 'center', W - 30, '800');
+  txt(T.how1, W / 2, by + 102, 16, '#2a2622', 'center', W - 30, '600');
+  txt(T.how2, W / 2, by + 128, 16, '#2a2622', 'center', W - 30, '600');
+  txt(T.how3, W / 2, by + 154, 16, '#8a2f1d', 'center', W - 30, '600');
+  const pulse = 0.6 + 0.4 * Math.sin(now * 3);
+  ctx.globalAlpha = pulse;
+  txt(T.tap, W / 2, by + 200, 20, '#1f2a44', 'center', W - 30, '700');
+  ctx.globalAlpha = 1;
+  if (bestLevel > 1) txt(T.best(bestLevel), W / 2, by + bh + 22, 14, '#e8dcc0', 'center', W - 30, '500');
+}
+
+function drawResult() {
+  const r = resultInfo;
+  const t = Math.min(1, (now - resultAt) / 0.5);
+  ctx.fillStyle = `rgba(30,26,22,${0.6 * t})`;
+  ctx.fillRect(0, H * 0.32, W, 205);
+  const col = r.res === 'win' ? '#a9c0f0' : r.res === 'lose' ? '#f2a48c' : '#e8dcc0';
+  txt(r.res === 'win' ? T.win : r.res === 'lose' ? T.lose : T.draw, W / 2, H * 0.32 + 50, 40, col, 'center', W - 30, '800');
+  txt(T.shift(r.a.toFixed(1), r.b.toFixed(1)), W / 2, H * 0.32 + 100, 20, '#f3ecdc', 'center', W - 30, '700');
+  txt(r.nb ? T.newBest : T.best(bestLevel), W / 2, H * 0.32 + 136, 15, r.nb ? '#ffd77a' : '#cfc6b4', 'center', W - 30, '600');
+  if (now - resultAt > 0.7) {
+    ctx.globalAlpha = 0.6 + 0.4 * Math.sin(now * 3);
+    txt(r.res === 'win' ? T.next : T.again, W / 2, H * 0.32 + 186, 18, '#f3ecdc', 'center', W - 30, '700');
+    ctx.globalAlpha = 1;
+  }
+}
+
+// ---------- title demo ----------
+let demoT = 0, demoTurn = 1;
+function titleDemoInit() { genPaper(1); computeTotal(); demoT = 0; }
+
+// ---------- update ----------
+function update() {
+  if (state === 'title') {
+    if (now > demoT) {
+      if (countAll()[1] + countAll()[2] > totalWeight * 0.55) titleDemoInit();
+      const pl = demoTurn; demoTurn = 3 - demoTurn;
+      const i = randWet(); const x = i % GW, y = (i - x) / GW;
+      const r = simulate(x, y, pl, 250 + Math.random() * 400);
+      if (r.ok) {
+        fresh.fill(0);
+        let dmax = 0.001; for (const d of r.d) if (d > dmax) dmax = d;
+        for (let k = 0; k < r.cells.length; k++) { const c = r.cells[k]; prevOwner[c] = owner[c]; owner[c] = pl; fresh[c] = 1; revealAt[c] = now + 1.4 * Math.sqrt(r.d[k] / dmax); }
+        splashes.push({ x, y, t: now - 0.18, pl, V: 400 });
+      }
+      demoT = now + 1.8;
+    }
+    return;
+  }
+  if (state !== 'play') return;
+  if (now < busyUntil) return;
+  if (dropsLeft[1] <= 0 && dropsLeft[2] <= 0) { endMatch(); return; }
+  if (turn === 2) {
+    if (dropsLeft[2] <= 0) { turn = 1; return; }
+    if (!cpuPlan) {
+      const p = cpuChoose();
+      cpuPlan = { ...p, t0: now + 0.35, hold: 0.35 + 0.9 * (p.V - VMIN) / (VMAX - VMIN) };
+    } else if (now > cpuPlan.t0 + cpuPlan.hold) {
+      const p = cpuPlan; cpuPlan = null;
+      if (!doDrop(2, p.x, p.y, p.V)) { dropsLeft[2]--; }
+      turn = 1;
+      if (dropsLeft[1] > 0) showTurnHint();
+    }
+  } else {
+    if (dropsLeft[1] <= 0) { turn = 2; }
+  }
+}
+function showTurnHint() {
+  const hs = [T.hint1, T.hint2, T.hint3, T.hint4, T.hint5];
+  if (hintStep < hs.length) {
+    let h = hs[hintStep];
+    // only show the capture hint when there is wet enemy ink
+    hintText = h; hintUntil = now + 4.5 + 2.4; hintStep++;
+  }
+}
+
+function frame(ts) {
+  now = ts / 1000;
+  update();
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.fillStyle = '#2a2622'; ctx.fillRect(0, 0, W, H);
+  if (state === 'title') { drawTitle(); }
+  else {
+    drawPaper();
+    drawCpuHover();
+    drawHold();
+    drawHUD();
+    if (state === 'play') {
+      if (now < hintUntil && now > busyUntil) {
+        const a = Math.min(1, (hintUntil - now) / 0.6);
+        ctx.globalAlpha = a;
+        ctx.fillStyle = 'rgba(30,26,22,0.78)';
+        roundRect(12, H - 124, W - 24, 36, 10); ctx.fill();
+        txt(hintText, W / 2, H - 106, 15, '#f3ecdc', 'center', W - 40, '600');
+        ctx.globalAlpha = 1;
+      }
+      if (now < toastUntil) {
+        ctx.globalAlpha = Math.min(1, (toastUntil - now) / 0.4);
+        ctx.fillStyle = 'rgba(30,26,22,0.82)';
+        roundRect(20, paper.y + 12, W - 40, 36, 10); ctx.fill();
+        txt(toast, W / 2, paper.y + 30, 15, '#ffd77a', 'center', W - 56, '700');
+        ctx.globalAlpha = 1;
+      }
+    }
+    if (state === 'result') drawResult();
+  }
+  requestAnimationFrame(frame);
+}
+resize();
+titleDemoInit();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

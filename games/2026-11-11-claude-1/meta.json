@@ -1,0 +1,461 @@
+{
+  "id": "2026-11-11-claude-1",
+  "status": "published",
+  "title": "にじみ墨合戦",
+  "genre": "陣取り",
+  "concept": "濡れた紙に墨を落とすと、ぬれた筋に沿って遠くまでにじむ。長押しで墨の量を決め、まだ濡れている相手の墨は上から奪える。紙は一滴ごとに乾くので、早く濡れた所を取るか、相手の濡れた一滴を奪うかの読み合いが核。",
+  "howToPlay": "紙を長押しして墨をため（にじむ形がうすく見える）、はなすと落ちる。8滴ずつ落とし、広い面積を染めたほうの勝ち。",
+  "libraryDecision": "使わない。面白さの核は格子上のにじみ計算と、それを1枚の絵としてぼかして描くことで、Canvas 2D だけで十分なめらかに描けるため。",
+  "soundDecision": "BGMは付けず、静かな紙の上の音だけにした。ためる間に上がる低い音、ぽとんと落ちる音、にじむ間のさらさらした音と小さな琴の音、奪ったときの低い音で、墨の手応えと静けさを両立させる。",
+  "improvements": [
+    {
+      "found": "墨が小さくしか広がらず紙がすかすか／にじみが八角形で硬く見える／墨つぼの配分が分かりにくく、終盤に滴が残っているのに墨切れになる",
+      "changed": "紙の吸い込みを弱めて量を増やし、16方向の広がりとむらで形を有機的にした。墨つぼは毎ターン少しずつたまる方式にし、ためて大きく落とす選択を作った",
+      "foundEn": "Ink covered too little and the paper felt empty / blooms looked like hard octagons / the ink pot was hard to budget, so I ran dry with drops left",
+      "changedEn": "Paper absorbs less and drops are bigger; 16-direction spreading with noise makes organic shapes. Ink now refills a little every turn, so saving up for a big bloom is a choice"
+    },
+    {
+      "found": "相手の演出中に『あなたの番』と出ているのに押しても落ちない／濡れた墨と乾いた墨の見分けがつかず、乾いた墨に落として空振りする／第1局のCPUが強すぎて初見で負ける",
+      "changed": "演出中でも長押しを受け付けるようにし、濡れた墨は光の筋が流れる見た目にした。にじみの縁をぼかして水彩らしくし、第1局のCPUは弱くした",
+      "foundEn": "Touches were ignored during the opponent's animation even though it said 'Your turn' / wet and dry ink looked alike, so I wasted drops on dry ink / the round-1 CPU was too strong for a first-timer",
+      "changedEn": "Holding works during animations; wet ink now has moving glossy streaks; bloom edges are softened like watercolor; the round-1 CPU is weaker"
+    },
+    {
+      "found": "長押ししても、どこまでにじむか・奪えるかが落とすまで分からず狙えない／結果画面で局の番号や番の表示が次の局のものになる／CPUが最後の一滴を無防備に大きく出して簡単に逆転される",
+      "changed": "長押し中に、にじむ形を紙の上にうすく予告し、奪える所は縞で点滅させた。結果画面の表示を直し、第2局からのCPUは反撃されにくい手を選ぶようにした",
+      "foundEn": "While holding I couldn't tell how far the ink would go or what it would take / the result screen showed the next round's number and turn / the CPU left its last drop wide open",
+      "changedEn": "A faint preview of the bloom grows while you hold, with capturable cells blinking in stripes. Fixed the result HUD; from round 2 the CPU avoids exposed drops"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "陣取り",
+      "en": "Territory control",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "濡れた紙に墨を落として、にじみで陣地を広げる対CPU戦。まだ濡れている相手の墨は奪える。",
+        "ideaEn": "Drop ink on wet paper and let it bloom to claim territory against a CPU; still-wet enemy ink can be taken.",
+        "fromDraw": true
+      },
+      {
+        "idea": "3Dの雪の斜面で雪玉を転がし、大きくして木をなぎ倒しながら下まで運ぶ。",
+        "ideaEn": "Roll a snowball down a 3D slope, growing it to knock over trees on the way down.",
+        "fromDraw": false
+      },
+      {
+        "idea": "輪をなぞる速さでしゃぼん玉の大きさが変わり、浮かべてくっつけて遊ぶ終わりのない遊び場。",
+        "ideaEn": "An endless playground where the speed you trace a ring sets the bubble size; float and merge bubbles.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "limit",
+    "input": [
+      "hold",
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Ink Bloom Battle",
+      "concept": "Ink dropped on wet paper runs far along the damp streaks. Hold to choose how much ink; still-wet enemy ink can be taken by dropping on it. The paper dries with every drop, so the core is choosing between grabbing the wet areas early and stealing the opponent's wet drop.",
+      "howToPlay": "Hold on the paper to load ink (a faint preview shows the bloom) and release to drop. Eight drops each; whoever colors more paper wins.",
+      "libraryDecision": "No library. The fun is the grid bloom simulation drawn as one softened image, which plain Canvas 2D renders smoothly.",
+      "soundDecision": "No music, only quiet paper sounds: a low tone rising while you hold, a plip when the drop falls, a soft rustle with small koto notes as it blooms, and a low thud when you take enemy ink. It keeps the touch of ink and the calm together."
+    }
+  },
+  "createdAt": "2026-11-11T09:07:20+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-11T09:07:20+09:00",
+    "metricsFrom": "2026-11-11T00:06:04.157Z",
+    "transcript": "897e4020-33c8-48d8-b10e-f78f9f397759.jsonl",
+    "validationRuns": 5,
+    "finishedAt": "2026-11-11T09:39:35+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-11T09:39:23+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "37.6KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=97",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=156",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=73",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=126",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 38454,
+    "lines": 869
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0.7,
+    "idleStarts": 6
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "最後の一滴はいつも自分なので、相手の最後の濡れた墨を奪って逆転する流れになりやすく、勝負の形が毎回似てくる。",
+    "comment": "濡れた筋に落とすと墨が筋に沿って細長く走り、長押し中に予告の形が伸びていくのが気持ちいい。第1局は相手の濡れた朱を奪い合い、最後の一滴で31.2%対33.2%に逆転して勝てた。ただし数局で手順が読めてくる。",
+    "similar": [
+      {
+        "title": "Splatoon（ナワバリバトル）",
+        "url": "https://splatoonwiki.org/wiki/Turf_War",
+        "similarity": "中",
+        "note": "インクで塗った面積の割合で勝敗を決める点が同じ。こちらはターン制で、にじみと紙の乾きが主役。",
+        "note_en": "Same idea of winning by the share of area inked. This one is turn-based and centered on blooming and drying paper."
+      },
+      {
+        "title": "CET - Cover Enemy Terrain",
+        "url": "https://threef.itch.io/cet",
+        "similarity": "中",
+        "note": "ターン制で塗った面積を競う点が近い。こちらは一滴の量と濡れた所の奪い合いが中心。",
+        "note_en": "Close in being a turn-based area-painting contest; here the focus is drop size and stealing wet ink."
+      }
+    ],
+    "research": "WebSearchで「ink spreading territory game paint cover area turn-based」を検索した。",
+    "i18n": {
+      "en": {
+        "worst": "You always make the last drop, so games tend to end with you stealing the CPU's final wet drop; the shape of each match gets samey.",
+        "comment": "Dropping on a wet streak sends the ink running along it, and watching the preview grow while holding feels good. In round 1 we kept stealing each other's wet ink and I won 33.2% to 31.2% with the last drop. After a few rounds the pattern gets predictable, though.",
+        "research": "Searched the web for turn-based ink area-painting territory games."
+      }
+    },
+    "method": "スマホ縦画面で 10 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 10 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 4000ms",
+        "note": "開始。朱は左上の乾いた所に小さく落とした",
+        "noteEn": "Start. Red made a small drop on dry paper, top-left",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.50,0.42) 700ms → wait 5500ms",
+        "note": "まん中の水たまりの列へ。にじむ形を見ながら長押し",
+        "noteEn": "On the puddle row, holding while watching the preview",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.85,0.62) 1300ms → wait 5500ms",
+        "note": "右の光る朱をためた墨で丸ごと奪う",
+        "noteEn": "Take the whole shiny red on the right",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.70,0.15) 900ms → wait 5500ms",
+        "note": "右上のぬれた筋へ",
+        "noteEn": "Upper-right wet streak",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.80,0.32) 1600ms → wait 5500ms",
+        "note": "大きな光る朱をまるごと奪いにいく",
+        "noteEn": "Go for the whole big shiny red",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.30,0.75) 800ms → wait 5500ms",
+        "note": "左下の空き地を取る",
+        "noteEn": "Take the empty lower-left",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.55,0.72) 1000ms → wait 5500ms → tap(0.50,0.88) 1000ms → wait 5500ms",
+        "note": "光る朱を奪い、下の空きへ",
+        "noteEn": "Take shiny red, then the bottom gap",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 500ms",
+        "note": "最後の一手の前に盤面を見る",
+        "noteEn": "Check the board before the last drop",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.45,0.66) 1600ms → wait 5500ms",
+        "note": "まん中の光る朱を奪う",
+        "noteEn": "Take the center shiny red",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.20,0.95) 10ms → tap(0.50,0.82) 1600ms → wait 4000ms",
+        "note": "最後の一滴",
+        "noteEn": "Last drop",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "level": 2,
+              "best": 2
+            }
+          },
+          {
+            "agf": "end",
+            "score": 33
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-11T09:39:35+09:00"
+  },
+  "publishedAt": "2026-11-11T09:39:35+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 26742,
+    "outputTokens": 46043,
+    "contextTokens": 14951716,
+    "turns": 77,
+    "toolCalls": 89,
+    "webSearches": 0,
+    "minutes": 33.5,
+    "from": "2026-11-11T00:06:04.157Z",
+    "to": "2026-11-11T00:39:35.974Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-11T09:39:35+09:00",
+    "validationRuns": 5,
+    "codeKB": 37.6
+  }
+}
