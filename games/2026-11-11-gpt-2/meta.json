@@ -1,0 +1,336 @@
+{
+  "id": "2026-11-11-gpt-2",
+  "status": "published",
+  "title": "湯気の三つ鍋",
+  "genre": "料理",
+  "concept": "ゆで時間の違う三つの鍋を同時に見て、ふたを開けて泡を逃がす。開けっぱなしではゆで上がりが遅く、放っておくと吹きこぼれる。取り出す順番を決め、六皿を仕上げる。",
+  "howToPlay": "鍋をタップしてふたを開閉。泡が多くなったら開け、ゆで上がった鍋から取り出します。",
+  "libraryDecision": "三つの進み具合を並べて比較する平面UIを使う。共有ライブラリは使わない。",
+  "soundDecision": "三つの状態を視覚で比べられるよう無音にした。",
+  "improvements": [
+    {
+      "found": "ゆで時間の数値がない。取り出せる札の見分けが弱い。泡が危険な高さでも同じ色。",
+      "changed": "鍋ごとにゆで時間を表示。取り出し時は緑にし、泡が多い時は赤枠と赤いメーターにした。",
+      "foundEn": "Cooking targets are hidden, ready buttons look ordinary, and dangerous foam has no cue.",
+      "changedEn": "Show target times, highlight ready buttons, and color dangerous foam red."
+    },
+    {
+      "found": "取り出した一皿の得点が分からない。次の麺の投入が気づきにくい。空の鍋も同じ明るさ。",
+      "changed": "直前の得点と損失、次のゆで時間を表示。空の鍋と取り出しを暗くし無効にした。",
+      "foundEn": "Per-bowl score and refills are unclear, and empty pots look active.",
+      "changedEn": "Show the last score, loss, and next duration; dim and disable empty pots."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "料理",
+      "en": "Cooking",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "三つの鍋を開閉する料理ゲーム。ゆでと泡を平面のメーターで比較。",
+        "ideaEn": "A cooking game comparing foam and cooking meters on three pots.",
+        "fromDraw": true
+      },
+      {
+        "idea": "霧の中で星座をつなぐ立体の観測。",
+        "ideaEn": "Connect constellations in a 3D foggy sky.",
+        "fromDraw": false
+      },
+      {
+        "idea": "交代で鳴る音を覚える平面の音階遊び。",
+        "ideaEn": "Remember alternating notes in a flat music game.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "other",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Three Steaming Pots",
+      "concept": "Watch three pots with different cooking times. Vent foam without slowing everything too much, and serve six bowls before closing time.",
+      "howToPlay": "Tap pots to toggle lids. Open to vent foam and take out noodles when cooked.",
+      "libraryDecision": "A flat parallel interface makes all three cooking states comparable. No shared library.",
+      "soundDecision": "Silent play keeps attention on the three visible states."
+    }
+  },
+  "createdAt": "2026-11-11T12:13:09+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-11T12:13:09+09:00",
+    "metricsFrom": "2026-11-11T03:11:36.966Z",
+    "transcript": null,
+    "validationRuns": 3,
+    "finishedAt": "2026-11-11T12:19:12+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-11T12:17:11+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "7.8KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 8003,
+    "lines": 111
+  },
+  "sound": {
+    "uses": false
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 2,
+    "works": "ok",
+    "worst": "注文の順番と時間が固定で、六皿の後に続く変化が少ない。",
+    "comment": "鍋3の泡を先に逃がして他の鍋を取り出し、三皿が重なる場面を越えて六皿554点で終了。目を配る忙しさはあるが短い。画像で二回改良。",
+    "similar": [
+      {
+        "title": "Cook, Serve, Delicious!",
+        "url": "https://store.steampowered.com/app/247020/Cook_Serve_Delicious/",
+        "similarity": "中",
+        "note": "調理の進行を同時に見て順に仕上げる点が近い。先方は多くの料理と注文、本作は麺のゆでと泡の開閉だけ。",
+        "note_en": "Both manage several preparations and finish orders in sequence. Cook, Serve, Delicious! covers many dishes; this focuses on noodle cooking and foam control."
+      }
+    ],
+    "research": "料理の同時進行ゲームを検索し、開発元のSteam作品説明を確認。",
+    "i18n": {
+      "en": {
+        "worst": "Order timings are fixed, with little variety beyond six bowls.",
+        "comment": "Venting pot 3 while serving the other pots handled an overlap of three ready bowls and finished six with 554 points. The multitasking works but is brief. Two screenshot-based revisions.",
+        "research": "Searched for cooking multitasking games and checked the developer’s Steam description."
+      }
+    },
+    "method": "スマホ縦画面で 7 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 7 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 4900ms → tap(0.19,0.83) 120ms",
+        "note": "最初の鍋をほぼゆで上がりで取り出し、次は8秒と分かる。",
+        "noteEn": "Served the first pot close to readiness; the refill clearly says eight seconds.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.81,0.38) 120ms → wait 2700ms → tap(0.50,0.83) 120ms",
+        "note": "鍋3の泡を逃がし、鍋2を取り出した。次は5秒で、取り出す順が変わる。",
+        "noteEn": "Vented pot 3 and served pot 2. Its next batch needs five seconds, changing the order.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.81,0.38) 120ms → wait 4600ms",
+        "note": "鍋3の泡を減らしてから閉め、三つがゆで上がる。",
+        "noteEn": "Closed pot 3 after venting; all three reach readiness.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.19,0.83) 120ms → tap(0.50,0.83) 120ms → tap(0.81,0.83) 120ms → wait 7400ms",
+        "note": "三皿を出して空の鍋が暗くなった。残る鍋だけの泡に注意を向けられる。",
+        "noteEn": "Served three bowls. Empty pots dim, leaving attention on the last pot’s foam.",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.19,0.38) 120ms",
+        "note": "泡が赤いうちにふたを開けて減らした。",
+        "noteEn": "Opened the lid while the foam is red and reduced it.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.19,0.38) 120ms",
+        "note": "再び閉めて最後のゆで上がりを待つ。泡はまだ余裕がある。",
+        "noteEn": "Closed the lid to finish; foam remains manageable.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.19,0.83) 120ms",
+        "note": "六皿を完成。泡を逃がしつつ取り出す順番を考え、時間内に仕上げた。",
+        "noteEn": "All six bowls are finished before closing, balancing venting and serving order.",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 554
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-11T12:19:12+09:00"
+  },
+  "publishedAt": "2026-11-11T12:19:12+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 1131,
+    "outputTokens": 5749,
+    "contextTokens": 11052193,
+    "turns": 26,
+    "toolCalls": 26,
+    "webSearches": null,
+    "minutes": 7.6,
+    "from": "2026-11-11T03:11:36.966Z",
+    "to": "2026-11-11T03:19:15.945Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-11T12:19:16+09:00",
+    "validationRuns": 3,
+    "codeKB": 7.8,
+    "evidence": "metrics-evidence.json"
+  }
+}

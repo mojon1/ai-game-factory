@@ -1,0 +1,192 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-11-11T03:17:19.755Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "wait": 4900
+        },
+        {
+          "tap": [
+            0.19,
+            0.83
+          ]
+        }
+      ],
+      "desc": "tap(0.50,0.50) 120ms → wait 4900ms → tap(0.19,0.83) 120ms",
+      "note": "最初の鍋をほぼゆで上がりで取り出し、次は8秒と分かる。",
+      "noteEn": "Served the first pot close to readiness; the refill clearly says eight seconds.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": [
+        {
+          "tap": [
+            0.81,
+            0.38
+          ]
+        },
+        {
+          "wait": 2700
+        },
+        {
+          "tap": [
+            0.5,
+            0.83
+          ]
+        }
+      ],
+      "desc": "tap(0.81,0.38) 120ms → wait 2700ms → tap(0.50,0.83) 120ms",
+      "note": "鍋3の泡を逃がし、鍋2を取り出した。次は5秒で、取り出す順が変わる。",
+      "noteEn": "Vented pot 3 and served pot 2. Its next batch needs five seconds, changing the order.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "tap": [
+            0.81,
+            0.38
+          ]
+        },
+        {
+          "wait": 4600
+        }
+      ],
+      "desc": "tap(0.81,0.38) 120ms → wait 4600ms",
+      "note": "鍋3の泡を減らしてから閉め、三つがゆで上がる。",
+      "noteEn": "Closed pot 3 after venting; all three reach readiness.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "tap": [
+            0.19,
+            0.83
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.83
+          ]
+        },
+        {
+          "tap": [
+            0.81,
+            0.83
+          ]
+        },
+        {
+          "wait": 7400
+        }
+      ],
+      "desc": "tap(0.19,0.83) 120ms → tap(0.50,0.83) 120ms → tap(0.81,0.83) 120ms → wait 7400ms",
+      "note": "三皿を出して空の鍋が暗くなった。残る鍋だけの泡に注意を向けられる。",
+      "noteEn": "Served three bowls. Empty pots dim, leaving attention on the last pot’s foam.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": {
+        "tap": [
+          0.19,
+          0.38
+        ],
+        "wait": 1200
+      },
+      "desc": "tap(0.19,0.38) 120ms",
+      "note": "泡が赤いうちにふたを開けて減らした。",
+      "noteEn": "Opened the lid while the foam is red and reduced it.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": {
+        "tap": [
+          0.19,
+          0.38
+        ],
+        "wait": 3000
+      },
+      "desc": "tap(0.19,0.38) 120ms",
+      "note": "再び閉めて最後のゆで上がりを待つ。泡はまだ余裕がある。",
+      "noteEn": "Closed the lid to finish; foam remains manageable.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": {
+        "tap": [
+          0.19,
+          0.83
+        ],
+        "wait": 800
+      },
+      "desc": "tap(0.19,0.83) 120ms",
+      "note": "六皿を完成。泡を逃がしつつ取り出す順番を考え、時間内に仕上げた。",
+      "noteEn": "All six bowls are finished before closing, balancing venting and serving order.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 554
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}

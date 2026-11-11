@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Three Steaming Pots</title>
+<style>
+*{box-sizing:border-box;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;overflow:hidden;overscroll-behavior:none;background:#3a2938;color:#fff2d3;font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif}
+main{height:100dvh;padding:16px;display:flex;flex-direction:column;justify-content:space-between;gap:10px}
+header{display:flex;justify-content:space-between;font-size:16px;font-weight:bold}
+#time,#hint{text-align:center;min-height:22px;font-size:15px}
+#pots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.station{min-width:0;text-align:center}
+button{font:inherit;color:inherit;min-height:52px;border:1px solid #bda09c;background:#654c52;border-radius:12px;padding:6px;font-size:14px}
+.pot{width:100%;height:180px;display:flex;flex-direction:column;justify-content:space-between;position:relative}
+.vessel{position:relative;background:#b7c8c4;width:90%;height:54px;border-radius:5px 5px 22px 22px;align-self:center;color:#35494d;padding-top:13px;font-size:20px}
+.lid{position:absolute;left:-5%;width:110%;height:9px;background:#f1d8bc;border:2px solid #796965;top:0;border-radius:50%;transition:top .15s}
+.lid.open{top:-18px;transform:rotate(-8deg)}
+.pot-title{font-size:15px;font-weight:bold}
+.readout{font-size:13px}
+progress{width:100%;height:12px;accent-color:#f2ca77}
+.serve{width:100%;margin-top:16px;background:#bd815b}
+#cover{position:absolute;inset:0;background:#3a2938f5;display:grid;place-items:center;text-align:center;padding:24px}
+h1{font-size:clamp(24px,8vw,37px)}p{line-height:1.7}small{font-size:16px;color:#f3bf82}
+</style>
+<main><header><span id="score"></span><span id="orders"></span></header><div id="time"></div><div id="pots"></div><div id="hint"></div></main><div id="cover"></div>
+<script>
+const lang=new URLSearchParams(location.search).get('lang')||(/^ja/i.test(navigator.language)?'ja':'en');
+const words={
+ ja:{title:'湯気の三つ鍋',help:'鍋をタップしてふたを開け閉め。<br>泡を逃がし、ゆで上がったら「取り出す」。<br>六皿を45秒以内に仕上げよう。',start:'タップでスタート',again:'タップでもう一度',score:'点数',orders:'皿',seconds:'秒',pot:'鍋',closed:'ふたを開ける',open:'ふたを閉める',cook:'ゆで',foam:'泡',serve:'取り出す',early:'まだ固い',ready:'ゆで上がり',done:'空の鍋',hint:'ふたを開けると泡が減り、ゆっくりゆでます',finish:'湯気の向こうの六皿',timeout:'お店じまい',spilled:'吹きこぼれ！',next:'次',empty:'次の麺なし',gain:'前の皿',penalty:'損失'},
+ en:{title:'Three Steaming Pots',help:'Tap pots to open or close their lids.<br>Vent the foam, then take the noodles out when ready.<br>Finish six bowls within 45 seconds.',start:'Tap to start',again:'Tap to play again',score:'Score',orders:'Bowls',seconds:'s',pot:'Pot',closed:'Open lid',open:'Close lid',cook:'Cook',foam:'Foam',serve:'Take out',early:'Still firm',ready:'Ready',done:'Empty pot',hint:'An open lid drains foam but cooks more slowly',finish:'Six steaming bowls',timeout:'Kitchen closed',spilled:'Boiled over!',next:'Next',empty:'No refill',gain:'Last bowl',penalty:'Loss'}
+};
+const t=words[lang]||words.en;
+const byId=id=>document.getElementById(id);
+const durations=[5,8,11,8,5,11],boilRates=[.10,.115,.13];
+const pots=[];
+let notice='';
+let state='title',elapsed=0,last=0,score=0,served=0,launched=0,guard=0;
+const signal=(agf,data={})=>parent.postMessage({agf,...data},'*');
+for(const event of ['contextmenu','selectstart','gesturestart'])addEventListener(event,e=>e.preventDefault(),{passive:false});
+function overlay(title,body,footer){
+ const panel=byId('cover');panel.innerHTML='<div><h1>'+title+'</h1><p>'+body+'</p><small>'+footer+'</small></div>';
+ panel.style.display='grid';
+}
+function fill(pot){
+ if(launched>=durations.length){pot.empty=true;return}
+ pot.goal=durations[launched++];pot.progress=0;pot.foam=0;pot.closed=true;pot.empty=false;pot.spills=0;pot.message='';
+}
+function begin(){
+ elapsed=0;score=0;served=0;notice='';launched=0;state='play';last=performance.now();pots.length=0;
+ for(let i=0;i<3;i++){const pot={};fill(pot);pots.push(pot)}
+ byId('cover').style.display='none';signal('start');build();draw();
+}
+function build(){
+ const board=byId('pots');board.replaceChildren();
+ pots.forEach((pot,i)=>{
+  const panel=document.createElement('div');panel.className='station';
+  panel.innerHTML='<button class="pot" id="pot-'+i+'"><span class="pot-title"></span><span class="vessel">≈<span class="lid"></span></span><span class="readout"></span></button><p>'+t.cook+'</p><progress class="cook" max="1"></progress><p>'+t.foam+'</p><progress class="foam" max="1"></progress><button class="serve" id="serve-'+i+'"></button>';
+  panel.querySelector('.pot').addEventListener('pointerdown',e=>{e.preventDefault();if(state==='play'&&!pot.empty){pot.closed=!pot.closed;pot.message='';draw()}});
+  panel.querySelector('.serve').addEventListener('pointerdown',e=>{e.preventDefault();serve(i)});
+  board.append(panel);pot.panel=panel;
+ });
+}
+function draw(){
+ byId('score').textContent=t.score+' '+score;byId('orders').textContent=t.orders+' '+served+'/6';
+ byId('time').textContent=Math.max(0,Math.ceil(45-elapsed))+' '+t.seconds;byId('hint').textContent=elapsed<5?t.hint:notice;
+ pots.forEach((pot,i)=>{
+  const panel=pot.panel;
+  panel.style.opacity=pot.empty?'.4':'1';
+  panel.querySelector('.pot').disabled=pot.empty;
+  panel.querySelector('.serve').disabled=pot.empty;
+  panel.querySelector('.pot-title').textContent=t.pot+' '+(i+1)+(pot.empty?'':' · '+pot.goal+t.seconds);
+  panel.querySelector('.lid').classList.toggle('open',!pot.closed);
+  panel.querySelector('.readout').textContent=pot.empty?t.done:pot.message||t[pot.closed?'closed':'open'];
+  const cook=panel.querySelector('.cook');cook.value=pot.empty?0:pot.progress/pot.goal;
+  cook.setAttribute('aria-label',t.cook+' '+pot.progress.toFixed(1)+' / '+pot.goal);
+  panel.querySelector('.pot').style.borderColor=pot.foam>.72?'#ff9a7a':'#bda09c';
+  const foam=panel.querySelector('.foam');foam.value=pot.empty?0:pot.foam;foam.style.accentColor=pot.foam>.72?'#ff8a6b':'#f2ca77';
+  foam.setAttribute('aria-label',t.foam+' '+Math.round(pot.foam*100)+'%');
+  const take=panel.querySelector('.serve');take.textContent=pot.progress>=pot.goal&&!pot.empty?t.ready:t.serve;
+  take.style.background=pot.progress>=pot.goal&&!pot.empty?'#477d64':'#bd815b';
+ });
+}
+function finish(){
+ state='end';guard=performance.now()+700;signal('end',{score});
+ overlay(served===6?t.finish:t.timeout,t.score+' '+score+' · '+t.orders+' '+served+'/6',t.again);
+}
+function serve(i){
+ if(state!=='play')return;
+ const pot=pots[i];if(pot.empty)return;
+ if(pot.progress<pot.goal){pot.message=t.early;draw();return}
+ const loss=Math.round((pot.progress-pot.goal)*15)+pot.spills*25;
+ const gain=Math.max(10,100-loss);score+=gain;served++;fill(pot);
+ notice=t.gain+' +'+gain+' · '+t.penalty+' '+Math.min(90,loss)+' · '+(pot.empty?t.empty:t.next+' '+pot.goal+t.seconds);
+ draw();if(served===6)finish();
+}
+setInterval(()=>{
+ if(state!=='play')return;
+ const now=performance.now(),dt=Math.min(.2,(now-last)/1000);last=now;elapsed+=dt;
+ pots.forEach((pot,i)=>{
+  if(pot.empty)return;
+  pot.progress+=dt*(pot.closed?1:.35);
+  pot.foam=Math.max(0,pot.foam+dt*(pot.closed?boilRates[i]:-.45));
+  if(pot.foam>=1){pot.foam=.3;pot.spills++;pot.message=t.spilled}
+  else if(pot.progress>=pot.goal)pot.message=t.ready;
+ });
+ draw();if(elapsed>=45){elapsed=45;finish()}
+},50);
+byId('cover').addEventListener('pointerdown',e=>{
+ e.preventDefault();if(state==='title'||(state==='end'&&performance.now()>=guard))begin();
+});
+overlay(t.title,t.help,t.start);
+</script></html>
