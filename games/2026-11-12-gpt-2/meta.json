@@ -1,0 +1,389 @@
+{
+  "id": "2026-11-12-gpt-2",
+  "status": "published",
+  "title": "カーブ前のひと呼吸",
+  "genre": "レース",
+  "concept": "自動加速する小さな車で、カーブ前の減速だけを受け持つ。早すぎるブレーキとスピンの時間損失の間を狙い、三つの異なる制限速度を一周の記録へつなげる。コース全体を見渡せる俯瞰で先を読む。",
+  "howToPlay": "ボタンを長押しすると減速し、離すと加速します。カーブに入る瞬間に表示された制限速度以下ならスピンせず抜けられます。",
+  "libraryDecision": "見通せる俯瞰図と数値の減速判断が中心なのでCanvas 2Dを使う。3Dの運転席や物理ライブラリで滑りを複雑にせず、速度と距離の関係を一定に保つ。",
+  "soundDecision": "カーブ成功とスピンに小さな高低の正弦波を鳴らし、視線が速度計にあっても結果を伝える。BGMはタイミングの集中を妨げるため入れない。",
+  "improvements": [
+    {
+      "found": "制動距離を暗算する必要がある／スピンの残り待ち時間が見えない／成功の小さな文字だけでは手応えが薄い。",
+      "changed": "現在速度からの制動距離を数値と路面の黄色区間で表示し、間近に合図。スピンの残り秒を出し、成功後に車を緑の輪で囲んだ。",
+      "foundEn": "Braking distance requires mental estimation; spin delay is unclear; success text alone feels weak.",
+      "changedEn": "Added numerical braking distance and a yellow road segment, an approaching-brake cue, a recovery countdown, and a green success ring."
+    },
+    {
+      "found": "カーブ別のタイムが残らず改善点を比較できない／ゴール地点が見えない／再走でベストとの比較対象がいない。",
+      "changed": "三つのカーブ通過時刻を結果に追加。ゴールへ白線を描き、開いている間の最速走行を白いゴーストとして再生する。",
+      "foundEn": "No bend splits to compare; the finish line is invisible; replays lack a visible reference.",
+      "changedEn": "Added three bend split times, a finish stripe, and an in-memory white ghost replaying the fastest lap while the game remains open."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "レース",
+      "en": "Racing",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "カーブ前のひと呼吸。長押しブレーキでタイムを縮める一周レース。3D運転席も考えたが全カーブが見える俯瞰を選ぶ。",
+        "ideaEn": "A Breath Before the Bend: hold the brake to improve lap times. An overhead view shows every bend more clearly than a 3D cockpit.",
+        "fromDraw": true
+      },
+      {
+        "idea": "風鈴の写し絵。鳴った音の順番を指でなぞって返す。2Dの輪が音の高さで揺れる。3Dの奥行きより音の順序を主役にする。",
+        "ideaEn": "Wind-Chime Echo: trace back a tone sequence through swaying 2D rings; sound order matters more than 3D depth.",
+        "fromDraw": false
+      },
+      {
+        "idea": "小惑星の鉱脈。3Dの岩を回して割れ目を探し、見つけた結晶を集める。奥に回り込んだ面を発見する楽しさ。",
+        "ideaEn": "Asteroid Veins: rotate a 3D rock, discover cracks on hidden faces, and collect crystals.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "other",
+    "ending": "goal",
+    "input": [
+      "hold"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "A Breath Before the Bend",
+      "concept": "Brake an automatically accelerating car before three bends with distinct speed limits. Balance early braking against spin delays to improve a lap time, using a full overhead view to plan ahead.",
+      "howToPlay": "Hold the button to slow down; release to accelerate. Reach each bend at or below its displayed limit to avoid a spin.",
+      "libraryDecision": "Canvas 2D keeps the whole route and braking decisions readable. A cockpit view or complex physics would obscure the consistent speed-distance relationship.",
+      "soundDecision": "Quiet high and low sine tones report clean corners and spins while the player watches speed. No music, to keep timing clear."
+    }
+  },
+  "createdAt": "2026-11-12T12:19:09+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-12T12:19:09+09:00",
+    "metricsFrom": "2026-11-12T03:18:37.968Z",
+    "transcript": null,
+    "validationRuns": 3,
+    "finishedAt": "2026-11-12T12:29:21+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-12T12:25:55+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "10.1KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=83",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=79",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=70",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=76",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 10352,
+    "lines": 138
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 2,
+    "works": "ok",
+    "worst": "コースが一つだけで、三つのブレーキを覚えると展開が増えない。",
+    "comment": "21.58秒・スピン0で完走。再走で長く減速すると白い自己ベストが先に出るため、早すぎるブレーキの損失を目で比較できた。手触りは改善したが長く遊ぶ幅は小さい。",
+    "similar": [
+      {
+        "title": "サクッと! スロットカー / Slot Car Rivals",
+        "url": "https://www.nintendo.co.jp/hardware/3dsseries/miiplaza/slotcar/index.html",
+        "similarity": "高",
+        "note": "一つの入力で加減速し、カーブ直前の速度を調節する核が近い。本作は長押しが減速で、自分のゴーストを追う一周だけ。相手Mii・部品・複数コースはない。",
+        "note_en": "Both use one input to manage speed before corners. Here holding brakes, and a single lap races a personal ghost; there are no Mii rivals, parts or multiple courses."
+      }
+    ],
+    "research": "レースの制動操作とスロットカーを2検索し、任天堂公式の操作説明を確認。",
+    "i18n": {
+      "en": {
+        "worst": "Only one course; learning the three braking points leaves little further variety.",
+        "comment": "Finished in 21.58 seconds with no spins. Braking longer on a replay lets the white personal-best ghost move ahead, making lost time visible. Feedback improved, but the game lacks lasting variety.",
+        "research": "Two searches on racing braking and slot cars; checked Nintendo's official control description."
+      }
+    },
+    "method": "スマホ縦画面で 10 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 10 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.55) 120ms",
+        "note": "制動区間へ近づく。最初のカーブは60制限。",
+        "noteEn": "Approaching the braking segment for the 60-limit bend.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.50,0.84) 1250ms",
+        "note": "一つ目をきれいに通過。車の緑の輪が成功を知らせる。",
+        "noteEn": "The first bend is clean; the green ring confirms success.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 4000ms",
+        "note": "直線は離して加速。次の制動区間が短くなっている。",
+        "noteEn": "Releasing on the straight; the next braking segment is shorter.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.50,0.84) 900ms",
+        "note": "二つ目は短く踏んで通過。",
+        "noteEn": "A shorter brake application clears the second bend.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 3400ms",
+        "note": "最後は50制限。早く離しすぎないようにする。",
+        "noteEn": "The final limit is 50; avoiding an early release.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.50,0.84) 1350ms",
+        "note": "最後も成功。あとは白いゴール線まで加速。",
+        "noteEn": "The final bend is clean; accelerating toward the white finish stripe.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 5000ms",
+        "note": "完走。今回は結果画面の通過時刻も読み取れる。",
+        "noteEn": "Finished; the result now shows bend split times.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 216
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.50,0.55) 120ms",
+        "note": "再走開始。白いゴーストが自車と重なっている。",
+        "noteEn": "Starting another lap; the white ghost overlaps the car.",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 216
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.50,0.55) 120ms",
+        "note": "直前のタップは完走直後の保護時間で無効だった。今回は再走が始まる。",
+        "noteEn": "The previous tap was guarded immediately after finishing; restarting now.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 216
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.50,0.84) 2000ms",
+        "note": "長く踏むと白い影が先へ行く。減速しすぎの損失が位置で分かる。",
+        "noteEn": "Braking too long lets the ghost pull ahead, making lost time visible.",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 216
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-12T12:29:21+09:00"
+  },
+  "publishedAt": "2026-11-12T12:29:21+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 2237,
+    "outputTokens": 7728,
+    "contextTokens": 3595973,
+    "turns": 30,
+    "toolCalls": 30,
+    "webSearches": null,
+    "minutes": 10.8,
+    "from": "2026-11-12T03:18:37.968Z",
+    "to": "2026-11-12T03:29:23.965Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-12T12:29:24+09:00",
+    "validationRuns": 3,
+    "codeKB": 10.1,
+    "evidence": "metrics-evidence.json"
+  }
+}

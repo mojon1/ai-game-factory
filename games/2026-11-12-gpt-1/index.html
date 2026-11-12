@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>一筆の郵便鳥</title>
+<style>
+*{box-sizing:border-box;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overscroll-behavior:none;font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;background:#e7f2eb;color:#203d42}
+#game{position:relative;width:100vw;height:100dvh;overflow:hidden;background:linear-gradient(#b9ddd4,#edf3d6)}
+header{position:absolute;top:4%;left:6%;right:6%;display:flex;justify-content:space-between;font-size:16px;font-weight:700}
+#message{position:absolute;top:12%;left:5%;width:90%;text-align:center;font-size:16px;min-height:44px}
+#board{position:absolute;top:22%;left:5%;width:90%;height:52%;overflow:visible}
+.bridge{stroke:#ab8356;stroke-width:3;stroke-linecap:round}
+.used{stroke:#8bb7b0;stroke-width:1;stroke-dasharray:2 3}
+.node.reachable{fill:#c8efb1;stroke:#2c7357;stroke-width:1.5}
+.node{fill:#fff8d9;stroke:#597f70;stroke-width:1}
+.current{fill:#ec9e48;stroke:#693b27;stroke-width:2}
+text{font-size:5px;fill:#203d42;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+button{font:inherit;min-width:70px;min-height:48px;border:2px solid #557b70;border-radius:16px;background:#fff8d9;color:#203d42}
+#actions{position:absolute;top:80%;width:100%;display:flex;justify-content:center;gap:14px}
+#hint{position:absolute;bottom:3%;width:100%;text-align:center;font-size:14px}
+#cover{position:absolute;inset:0;background:#e7f2ebf5;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:8%;text-align:center}
+#cover h1{font-size:clamp(25px,7vw,36px);margin:8px 0}
+#cover p{font-size:17px;line-height:1.7;white-space:pre-line}
+#cover.hidden{display:none}
+#cover.result{background:transparent;justify-content:flex-end;padding:0 5% 3%;pointer-events:auto}
+#cover.result h1{font-size:22px;background:#e7f2eb;margin:3px}
+#cover.result p{font-size:14px;background:#e7f2eb;margin:3px}
+button:disabled{opacity:.4}
+</style>
+</head>
+<body>
+<div id="game">
+<header><span id="count"></span><span id="stage"></span></header>
+<div id="message"></div><svg id="board" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+<div id="actions"><button id="undo"></button><button id="reset"></button></div>
+<div id="hint"></div><div id="cover"></div>
+</div>
+<script>
+const LANG=new URLSearchParams(location.search).get('lang')||(/^ja/i.test(navigator.language)?'ja':'en');
+const words={
+ja:{title:'一筆の郵便鳥',intro:'となりの島をタップして移動。\nすべての橋を一度ずつ渡り、旗へ。\n行き止まりでは一手戻せます。',start:'タップでスタート',again:'タップでもう一度',next:'タップで次へ',undo:'一手戻す',reset:'最初から',hint:'今いる鳥から、となりの島へ',route:'配達路',bridges:'配達',goal:'すべて渡って旗へ戻ろう',bad:'そこへは渡れません',blocked:'行き止まり。一手戻してみよう',clear:'配達できました',all:'三つの島々へ配達完了',steps:'歩いた橋',flag:'旗'},
+en:{title:'One Stroke Postbird',intro:'Tap a neighboring island to move.\nCross every bridge once, ending at the flag.\nUndo if you reach a dead end.',start:'Tap to start',again:'Tap to play again',next:'Tap to continue',undo:'Undo',reset:'Restart',hint:'Tap an island next to the bird',route:'Route',bridges:'Delivered',goal:'Cross all bridges, then return to the flag',bad:'You cannot cross there',blocked:'Dead end. Try undoing a move',clear:'Mail delivered',all:'All three routes delivered',steps:'Bridges crossed',flag:'Flag'}
+};
+const t=words[LANG==='ja'?'ja':'en'];
+const $=id=>document.getElementById(id);
+const signal=(type,data={})=>{try{parent.postMessage({agf:type,...data},'*')}catch{}};
+for(const type of ['contextmenu','selectstart','gesturestart'])addEventListener(type,e=>e.preventDefault(),{passive:false});
+const outer=[[0,1],[1,2],[2,5],[5,8],[8,7],[7,6],[6,3],[3,0]];
+const maps=[
+{edges:[...outer,[1,4],[4,5],[5,1]],start:0,end:0},
+{edges:[...outer,[3,4],[4,7],[7,3]],start:2,end:2},
+{edges:[...outer,[1,4],[4,5],[5,1],[3,4],[4,7],[7,3]],start:0,end:0}
+];
+let level=0,position=0,history=[],used=[],mode='title',ended=0,total=0;
+function xy(i){return [15+(i%3)*35,15+Math.floor(i/3)*35]}
+function cover(title,body,action){
+$('cover').innerHTML='<h1>'+title+'</h1><p>'+body+'</p><p>'+action+'</p>';
+$('cover').classList.toggle('result',mode==='result');
+$('cover').classList.remove('hidden');
+}
+function begin(){
+const map=maps[level];position=map.start;history=[];used=map.edges.map(()=>false);mode='play';
+$('cover').classList.remove('result');$('cover').classList.add('hidden');$('actions').style.visibility='visible';$('message').textContent=t.goal;$('hint').textContent=t.hint;
+setTimeout(()=>{$('hint').textContent=''},4500);signal('start');draw();
+}
+function draw(){
+const map=maps[level];let markup='';
+map.edges.forEach(([a,b],i)=>{
+const [x1,y1]=xy(a),[x2,y2]=xy(b);
+markup+='<line class="bridge '+(used[i]?'used':'')+'" x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'"/>';
+});
+for(let i=0;i<9;i++){
+const [x,y]=xy(i);
+const reachable=map.edges.some(([a,b],j)=>!used[j]&&((a===position&&b===i)||(b===position&&a===i)));
+markup+='<g data-node="'+i+'"><circle class="node '+(i===position?'current':reachable?'reachable':'')+'" cx="'+x+'" cy="'+y+'" r="7"/><text x="'+x+'" y="'+y+'">'+(i===position?'●':i===map.end?'⚑':'•')+'</text></g>';
+}
+const [bx,by]=xy(position);
+markup+='<g pointer-events="none" fill="#f8eee0"><ellipse cx="'+bx+'" cy="'+by+'" rx="3.8" ry="2.8"/><circle cx="'+(bx+2.4)+'" cy="'+(by-2)+'" r="1.8"/><path d="M'+(bx+3.6)+' '+(by-2)+'l2 1-2 1z" fill="#203d42"/><circle cx="'+(bx+2.8)+'" cy="'+(by-2.5)+'" r=".4" fill="#203d42"/></g>';
+$('board').innerHTML=markup;
+$('count').textContent=t.bridges+' '+history.length+'/'+map.edges.length;
+$('stage').textContent=t.route+' '+(level+1)+'/3';
+$('undo').disabled=!history.length;
+const [fx,fy]=xy(map.end);
+$('board').insertAdjacentHTML('beforeend','<text x="'+fx+'" y="'+(fy-11)+'">⚑</text>');
+$('undo').textContent=t.undo;$('reset').textContent=t.reset;
+}
+function move(next){
+if(mode!=='play')return;
+const map=maps[level];
+const edge=map.edges.findIndex(([a,b],i)=>!used[i]&&((a===position&&b===next)||(b===position&&a===next)));
+if(edge<0){$('message').textContent=t.bad;return}
+history.push({edge,from:position});used[edge]=true;position=next;draw();
+if(history.length===map.edges.length&&position===map.end){
+$('hint').textContent='';total+=history.length;$('actions').style.visibility='hidden';mode='result';ended=performance.now();signal('end',{score:history.length});
+cover(level===2?t.all:t.clear,t.steps+' '+history.length,level===2?t.again:t.next);return;
+}
+const available=map.edges.some(([a,b],i)=>!used[i]&&(a===position||b===position));
+$('message').textContent=available?t.goal:t.blocked;
+}
+$('board').addEventListener('pointerdown',e=>{
+e.preventDefault();const node=e.target.closest('[data-node]');
+if(node)move(Number(node.dataset.node));
+});
+$('undo').addEventListener('pointerdown',e=>{
+e.preventDefault();if(mode!=='play'||!history.length)return;
+const back=history.pop();used[back.edge]=false;position=back.from;$('message').textContent=t.goal;draw();
+});
+$('reset').addEventListener('pointerdown',e=>{e.preventDefault();if(mode==='play')begin()});
+$('cover').addEventListener('pointerdown',e=>{
+e.preventDefault();
+if(mode==='title'){begin();return}
+if(mode==='result'&&performance.now()-ended>=700){level=(level+1)%3;begin()}
+});
+position=maps[0].start;draw();cover(t.title,t.intro,t.start);
+</script>
+</body>
+</html>
