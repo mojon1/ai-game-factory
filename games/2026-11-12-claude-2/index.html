@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>風よみ凧あげ</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #7ec3ee; }
+canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const TX = {
+  ja: {
+    title: '風よみ凧あげ',
+    how1: '押さえている間は糸が止まり、凧がぐんと上がる。',
+    how2: 'はなすと糸がのびる。強い風（白いすじ）では はなして！',
+    how3: '風がやんだら押さえて。トントン押すと糸をたぐる。',
+    start: 'タップでスタート',
+    again: 'タップでもう一度',
+    height: '高さ', best: 'ベスト', top: 'この回の最高', line: '糸',
+    tension: '糸のはり', wind: '風の予報 → 赤ではなす・青で押さえる',
+    hint: '長押し＝糸を止めて上げる ／ はなす＝糸をのばす',
+    release: 'はなして！', hold: '押さえて！',
+    snapped: '糸が切れた…', crashed: '凧が落ちた…', tipSnap: 'コツ：予報が赤のときは はなす', tipCrash: 'コツ：予報が青のときは押さえる（トントン）',
+    newBest: 'ベスト更新！', m: 'm', crow: 'カラスだ！',
+    ms: { 10: '電線をこえた', 25: '鳥と同じ高さ', 50: '学校の屋上より上', 80: 'とんびが下に見える', 120: '雲に手が届く', 170: '雲の上', 230: '夕焼けの風', 300: '一番星が見えた', 400: '星の海', 520: '月までもう少し？' },
+  },
+  en: {
+    title: 'Windread Kite',
+    how1: 'Hold to lock the line: the kite climbs.',
+    how2: 'Let go to pay out line. In strong gusts (white streaks), let go!',
+    how3: 'When the wind dies, hold. Tap-tap to pull the line in.',
+    start: 'Tap to start',
+    again: 'Tap to play again',
+    height: 'Height', best: 'Best', top: 'Run best', line: 'Line',
+    tension: 'Line tension', wind: 'Wind ahead → red: let go, blue: hold',
+    hint: 'Hold = lock line & climb / Let go = pay out line',
+    release: 'Let go!', hold: 'Hold!',
+    snapped: 'The line snapped…', crashed: 'The kite fell…', tipSnap: 'Tip: let go while the forecast is red', tipCrash: 'Tip: hold (tap-tap) while it is blue',
+    newBest: 'New best!', m: 'm', crow: 'A crow!',
+    ms: { 10: 'Over the power lines', 25: 'Up with the birds', 50: 'Above the school roof', 80: 'Hawks below you', 120: 'Touching the clouds', 170: 'Above the clouds', 230: 'Sunset winds', 300: 'First star', 400: 'A sea of stars', 520: 'Next stop, the moon?' },
+  },
+};
+const S = TX[LANG] || TX.en;
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+
+// ---- save ----
+let best = 0;
+addEventListener('message', (e) => { if (e.data && e.data.agf === 'loaded' && e.data.data && typeof e.data.data.best === 'number') best = Math.max(best, e.data.data.best); });
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+const saveBest = () => { try { parent.postMessage({ agf: 'save', data: { best } }, '*'); } catch (e) {} };
+
+// ---- canvas ----
+const cv = document.getElementById('c');
+const cx = cv.getContext('2d');
+let W = 360, H = 640, DPR = 1;
+function resize() {
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = Math.max(1, window.innerWidth || 360); H = Math.max(1, window.innerHeight || 640);
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+  cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+addEventListener('resize', resize); resize();
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+function fitText(txt, maxW, size, weight = 700) {
+  let s = size;
+  cx.font = `${weight} ${s}px ${FONT}`;
+  while (s > 12 && cx.measureText(txt).width > maxW) { s -= 1; cx.font = `${weight} ${s}px ${FONT}`; }
+  return s;
+}
+
+// ---- random ----
+let seed = (Math.random() * 1e9) | 0;
+const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const lerp = (a, b, t) => a + (b - a) * t;
+
+// ---- audio ----
+let AC = null, master, windGain, windFilt, humOsc, humGain;
+function initAudio() {
+  if (AC) { if (AC.state === 'suspended') AC.resume(); return; }
+  try {
+    AC = new (window.AudioContext || window.webkitAudioContext)();
+    master = AC.createGain(); master.gain.value = 0.8; master.connect(AC.destination);
+    const len = AC.sampleRate * 2, buf = AC.createBuffer(1, len, AC.sampleRate), d = buf.getChannelData(0);
+    let b = 0; for (let i = 0; i < len; i++) { b = b * 0.97 + (Math.random() * 2 - 1) * 0.03; d[i] = b * 6; }
+    const src = AC.createBufferSource(); src.buffer = buf; src.loop = true;
+    windFilt = AC.createBiquadFilter(); windFilt.type = 'bandpass'; windFilt.frequency.value = 500; windFilt.Q.value = 0.7;
+    windGain = AC.createGain(); windGain.gain.value = 0;
+    src.connect(windFilt); windFilt.connect(windGain); windGain.connect(master); src.start();
+    humOsc = AC.createOscillator(); humOsc.type = 'triangle'; humOsc.frequency.value = 160;
+    humGain = AC.createGain(); humGain.gain.value = 0;
+    humOsc.connect(humGain); humGain.connect(master); humOsc.start();
+    if (AC.state === 'suspended') AC.resume();
+  } catch (e) { AC = null; }
+}
+function tone(f, dur, type = 'sine', vol = 0.12, f2 = null, delay = 0) {
+  if (!AC) return;
+  try {
+    const t0 = AC.currentTime + delay, o = AC.createOscillator(), g = AC.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t0);
+    if (f2) o.frequency.exponentialRampToValueAtTime(f2, t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(master); o.start(t0); o.stop(t0 + dur + 0.02);
+  } catch (e) {}
+}
+function noiseBurst(dur, vol, freq, type = 'highpass') {
+  if (!AC) return;
+  try {
+    const n = Math.max(1, (AC.sampleRate * dur) | 0), buf = AC.createBuffer(1, n, AC.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+    const s = AC.createBufferSource(); s.buffer = buf;
+    const f = AC.createBiquadFilter(); f.type = type; f.frequency.value = freq;
+    const g = AC.createGain(); g.gain.value = vol;
+    s.connect(f); f.connect(g); g.connect(master); s.start();
+  } catch (e) {}
+}
+const sfx = {
+  tick() { noiseBurst(0.012, 0.09, 3500); },
+  pump() { tone(330, 0.07, 'triangle', 0.05, 240); },
+  chime() { tone(880, 0.35, 'sine', 0.09); tone(1320, 0.5, 'sine', 0.07, null, 0.09); },
+  snap() { noiseBurst(0.12, 0.35, 1800); tone(900, 0.3, 'sawtooth', 0.06, 120); },
+  crash() { noiseBurst(0.25, 0.3, 300, 'lowpass'); tone(160, 0.3, 'sine', 0.12, 60); },
+  crow() { tone(520, 0.12, 'square', 0.035, 380); tone(500, 0.14, 'square', 0.035, 360, 0.17); },
+  start() { tone(523, 0.12, 'triangle', 0.08); tone(784, 0.2, 'triangle', 0.08, null, 0.1); },
+};
+
+// ---- wind ----
+// windAt(t): wind strength (1 = normal). Events are gusts (+) and lulls (-).
+let events = [], nextEvt = 0;
+const WMIN = 0.8;
+function genEvents(now, diff) {
+  while (nextEvt < now + 6) {
+    const gust = rnd() < 0.58;
+    const dur = 1.3 + rnd() * 1.4;
+    const amp = gust ? (0.35 + 0.55 * diff + rnd() * 0.25) : -(0.3 + 0.22 * diff + rnd() * 0.12);
+    events.push({ t0: nextEvt, dur, amp });
+    nextEvt += dur + lerp(2.0, 0.7, diff) + rnd() * 1.3;
+  }
+  while (events.length && events[0].t0 + events[0].dur < now - 6) events.shift();
+}
+function windAt(t) {
+  let w = 1 + 0.08 * Math.sin(t * 0.9) + 0.05 * Math.sin(t * 2.3 + 1);
+  for (const e of events) {
+    const u = (t - e.t0) / e.dur;
+    if (u > 0 && u < 1) { const s = Math.sin(u * Math.PI); w += e.amp * Math.min(1, s * 1.6); }
+  }
+  return Math.max(0.15, w);
+}
+
+// ---- game state ----
+let state = 'title', stateT = 0, panelT = 0;
+let gt = 0;       // game time
+let L, th, strain, maxH, hNow, holding = false, pointers = new Set();
+let wNow = 1, weff = 1, tension = 0, payAcc = 0, msIdx = 0, popups = [], endReason = '', newBest = false;
+let crows = [], clouds = [], tumble = 0, warnT = 0, lastWarn = '';
+let outAcc = 0, spoolAng = 0, camS = 10, kx = 0, ky = 0, ksx = 0, ksy = 0, endVX = 0, endVY = 0;
+const MILES = [10, 25, 50, 80, 120, 170, 230, 300, 400, 520];
+const tail = []; for (let i = 0; i < 9; i++) tail.push({ x: 0, y: 0, px: 0, py: 0 });
+const parts = []; for (let i = 0; i < 90; i++) parts.push({ x: Math.random(), y: Math.random(), l: Math.random() });
+const stars = []; for (let i = 0; i < 70; i++) stars.push({ x: Math.random(), y: Math.random() * 0.8, r: Math.random() * 1.4 + 0.4, p: Math.random() * 6 });
+
+function resetGame() {
+  seed = (Math.random() * 1e9) | 0;
+  gt = 0; L = 14; th = 45; strain = 0; maxH = 0; hNow = 0;
+  events = []; nextEvt = 3.0; payAcc = 0; outAcc = 0; msIdx = 0; popups = []; crows = []; tumble = 0; warnT = 0;
+  clouds = [];
+  for (let i = 0; i < 14; i++) clouds.push({ x: rnd() * 260 - 20, y: 90 + rnd() * 150, w: 30 + rnd() * 40 });
+  newBest = false; endReason = '';
+}
+resetGame();
+
+function diffNow() { return clamp(gt / 160 + maxH / 380, 0, 1); }
+
+function startPlay() {
+  resetGame(); state = 'play'; stateT = 0; signal('start'); sfx.start();
+}
+function endPlay(reason) {
+  if (state !== 'play') return;
+  state = 'over'; stateT = 0; endReason = reason;
+  const sc = Math.floor(maxH);
+  if (sc > best) { best = sc; newBest = true; saveBest(); }
+  signal('end', { score: sc });
+  if (reason === 'snap') { sfx.snap(); endVX = 70; endVY = -40; popups.push({ txt: LANG === 'ja' ? 'プツッ！' : 'SNAP!', x: ksx, y: ksy + 30, t: 0, c: '#ff5a4a' }); } else { sfx.crash(); endVX = 30; endVY = 60; popups.push({ txt: LANG === 'ja' ? 'ドサッ' : 'THUD', x: ksx, y: ksy - 30, t: 0, c: '#fff' }); }
+}
+
+// ---- input ----
+function onDown(e) {
+  e.preventDefault();
+  initAudio();
+  pointers.add(e.pointerId);
+  if (state === 'title') { if (stateT > 0.3) startPlay(); return; }
+  if (state === 'over') { if (panelT > 0.7) { state = 'title'; stateT = 0.31; startPlay(); } return; }
+  if (state === 'play') {
+    // pump: a fresh press in weak wind tugs the line in
+    if (weff < WMIN + 0.15) { th += 2.6; L = Math.max(8, L - 0.9); sfx.pump(); popups.push({ txt: LANG === 'ja' ? 'ぐいっ' : 'tug!', x: ksx - 40, y: ksy + 30, t: 0, c: '#fff' }); }
+  }
+}
+function onUp(e) { pointers.delete(e.pointerId); }
+cv.addEventListener('pointerdown', onDown, { passive: false });
+addEventListener('pointerup', onUp); addEventListener('pointercancel', onUp);
+
+// ---- update ----
+function update(dt) {
+  stateT += dt;
+  if (state === 'over') panelT = stateT - 1.4;
+  holding = pointers.size > 0;
+  if (state === 'play') {
+    gt += dt;
+    const diff = diffNow();
+    genEvents(gt, diff);
+    wNow = windAt(gt);
+    hNow = L * Math.sin(th * Math.PI / 180);
+    weff = wNow * (1 + hNow / 420);
+    const thHold = 74 - L / 13;
+    if (holding) {
+      if (weff >= WMIN) th += (thHold - th) * Math.min(1, 0.85 * (weff - 0.3) * dt);
+      else { th -= (WMIN - weff) * 16 * dt; L = Math.max(8, L - 2.2 * dt); }
+      tension = weff * weff * (1 + L / 700);
+    } else {
+      const pay = Math.min(20, 6.5 * weff);
+      L += pay * dt; payAcc += pay * dt; spoolAng += pay * dt * 0.9;
+      if (payAcc > 1.6) { payAcc = 0; sfx.tick(); } outAcc += pay * dt; if (outAcc >= 5) { outAcc -= 5; popups.push({ txt: '+5m', x: anchorX() + 34, y: groundY() - 56, t: 0, c: '#fff6c8' }); }
+      if (weff >= WMIN) th -= (4 + Math.max(0, weff - 1) * 6) * dt;
+      else th -= (WMIN - weff) * 70 * dt;
+      tension = weff * weff * 0.28 * (1 + L / 700);
+    }
+    const TS = 1.7;
+    if (tension > TS) strain += Math.min(1.4, (tension - TS) * 0.9) * dt;
+    else strain = Math.max(0, strain - 0.75 * dt);
+    if (tumble > 0) { tumble -= dt; th -= 9 * dt; }
+    th = clamp(th, -5, 85);
+    hNow = L * Math.sin(th * Math.PI / 180);
+    if (hNow > maxH) maxH = hNow;
+    while (msIdx < MILES.length && maxH >= MILES[msIdx]) {
+      popups.push({ txt: `${MILES[msIdx]}${S.m}  ${S.ms[MILES[msIdx]]}`, big: true, t: 0, c: '#fff6c8' });
+      sfx.chime(); msIdx++;
+    }
+    // warnings
+    if (strain > 0.22 && holding) setWarn(S.release);
+    else if (!holding && weff < WMIN && th < 26) setWarn(S.hold);
+    if (warnT > 0) warnT -= dt;
+    // crows
+    if (hNow > 14 && rnd() < dt * (0.12 + 0.18 * diff)) {
+      crows.push({ fx: 1.12, y: Math.max(6, hNow + (rnd() - 0.4) * Math.max(8, hNow * 0.25)), v: 0.16 + rnd() * 0.1, hit: false, flap: rnd() * 6 });
+    }
+    if (strain >= 1) endPlay('snap');
+    else if (th < 5 || hNow < 1.5) endPlay('crash');
+  } else if (state === 'title') {
+    gt += dt; genEvents(gt, 0); wNow = windAt(gt); weff = wNow;
+    L = 40; th = 52 + Math.sin(gt * 0.8) * 4; hNow = L * Math.sin(th * Math.PI / 180); tension = 0.5;
+    strain = 0;
+  } else if (state === 'over') {
+    gt += dt; wNow = windAt(gt);
+  }
+  // clouds drift
+  for (const c of clouds) { c.x += dt * 2.2 * wNow; if (c.x > Math.max(260, L * 1.2)) c.x = -30 - rnd() * 30; }
+}
+function setWarn(t) { warnT = 0.6; lastWarn = t; }
+
+// ---- draw helpers ----
+function skyColors(h) {
+  const stops = [
+    [0, [126, 195, 238], [208, 236, 250]],
+    [120, [86, 160, 228], [180, 222, 248]],
+    [200, [70, 110, 200], [250, 190, 150]],
+    [280, [46, 50, 120], [220, 110, 120]],
+    [380, [12, 14, 48], [50, 40, 100]],
+    [600, [4, 4, 20], [20, 16, 60]],
+  ];
+  let a = stops[0], b = stops[stops.length - 1];
+  for (let i = 0; i < stops.length - 1; i++) if (h >= stops[i][0] && h <= stops[i + 1][0]) { a = stops[i]; b = stops[i + 1]; break; }
+  if (h > stops[stops.length - 1][0]) a = b;
+  const t = a === b ? 0 : (h - a[0]) / (b[0] - a[0]);
+  const m = (p, q) => `rgb(${p.map((v, i) => Math.round(lerp(v, q[i], t))).join(',')})`;
+  return [m(a[1], b[1]), m(a[2], b[2])];
+}
+const groundY = () => H - 62;
+const anchorX = () => W * 0.13;
+function w2s(x, y) { return [anchorX() + x * camS, groundY() - 10 - y * camS]; }
+
+function drawBackground() {
+  const [top, bot] = skyColors(state === 'play' ? hNow : (state === 'over' ? maxH : 30));
+  const g = cx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, top); g.addColorStop(1, bot);
+  cx.fillStyle = g; cx.fillRect(0, 0, W, H);
+  const hh = state === 'title' ? 0 : (state === 'over' ? maxH : hNow);
+  const starA = clamp((hh - 250) / 120, 0, 1);
+  if (starA > 0) {
+    for (const s of stars) {
+      cx.globalAlpha = starA * (0.6 + 0.4 * Math.sin(gt * 2 + s.p));
+      cx.fillStyle = '#fff'; cx.beginPath(); cx.arc(s.x * W, s.y * H, s.r, 0, 7); cx.fill();
+    }
+    cx.globalAlpha = 1;
+  }
+  // clouds (world objects)
+  for (const c of clouds) {
+    const [sx, sy] = w2s(c.x, c.y); const r = c.w * camS * 0.5;
+    if (sy < -r || sy > H + r || r < 2) continue;
+    cx.globalAlpha = 0.85; cx.fillStyle = hh > 230 ? '#f7c9c0' : '#ffffff';
+    cx.beginPath();
+    cx.ellipse(sx, sy, r, r * 0.32, 0, 0, 7);
+    cx.ellipse(sx - r * 0.35, sy - r * 0.15, r * 0.45, r * 0.3, 0, 0, 7);
+    cx.ellipse(sx + r * 0.3, sy - r * 0.2, r * 0.5, r * 0.34, 0, 0, 7);
+    cx.fill(); cx.globalAlpha = 1;
+  }
+}
+function drawWind(dt) {
+  // streaks: local wind at screen x previews wind that will reach the kite
+  const V = W * 0.55;
+  for (const p of parts) {
+    const x = p.x * W, y = p.y * (groundY() - 20);
+    const ahead = (ksx - x) / V;
+    const w = windAt(gt + ahead);
+    const sp = (0.25 + w) * W * 0.5;
+    p.x += sp * dt / W * (0.6 + p.l * 0.8);
+    if (p.x > 1.05) { p.x = -0.05; p.y = Math.random(); }
+    const strong = clamp((w - 1.15) / 0.6, 0, 1), weak = clamp((WMIN + 0.1 - w) / 0.4, 0, 1);
+    const len = 10 + 50 * strong + 14 * p.l;
+    const a = (0.12 + 0.55 * strong) * (1 - weak * 0.85);
+    if (a < 0.03) continue;
+    cx.strokeStyle = `rgba(255,255,255,${a})`; cx.lineWidth = 1 + strong * 1.6;
+    cx.beginPath(); cx.moveTo(x - len, y + Math.sin(x * 0.03 + gt * 3) * 2); cx.lineTo(x, y); cx.stroke();
+  }
+}
+function drawAltLines() {
+  // faint altitude marks in world space so climbing and zooming out are felt
+  const steps = [5, 10, 25, 50, 100, 200];
+  let st = steps[steps.length - 1];
+  for (const s of steps) if (s * camS >= 70) { st = s; break; }
+  cx.font = `600 12px ${FONT}`; cx.textAlign = 'right'; cx.textBaseline = 'bottom';
+  for (let a = st; a < 2000; a += st) {
+    const [, sy] = w2s(0, a);
+    if (sy < 125) break;
+    if (sy > groundY() - 30) continue;
+    cx.strokeStyle = 'rgba(255,255,255,0.22)'; cx.lineWidth = 1; cx.setLineDash([6, 8]);
+    cx.beginPath(); cx.moveTo(0, sy); cx.lineTo(W, sy); cx.stroke(); cx.setLineDash([]);
+    cx.fillStyle = 'rgba(255,255,255,0.6)'; cx.fillText(`${a}${S.m}`, W - 8, sy - 2);
+  }
+}
+function drawForecast() {
+  // wind lane: future on the left flows right into "now"
+  const x0 = 12, lw = W - 24, y0 = 80, lh = 30;
+  const nowX = x0 + lw * 0.82, pps = (lw * 0.82) / 3.2;
+  cx.fillStyle = 'rgba(20,40,70,0.5)'; cx.fillRect(x0 - 2, y0 - 2, lw + 4, lh + 20);
+  const shear = 1 + hNow / 420, lf = 1 + L / 700;
+  for (let x = x0; x < x0 + lw; x += 3) {
+    const t = gt + (nowX - x) / pps;
+    const w = windAt(t) * shear;
+    const tens = w * w * lf;
+    const hgt = clamp((w - 0.2) / 1.8, 0.05, 1) * (lh - 4);
+    let col;
+    if (tens > 1.7) col = `rgba(255,${Math.round(clamp(200 - (tens - 1.7) * 160, 70, 200))},70,0.95)`;
+    else if (w < WMIN) col = 'rgba(120,190,255,0.95)';
+    else col = 'rgba(255,255,255,0.75)';
+    cx.globalAlpha = x > nowX ? 0.35 : 1;
+    cx.fillStyle = col; cx.fillRect(x, y0 + lh - 2 - hgt, 2.4, hgt);
+  }
+  cx.globalAlpha = 1;
+  cx.fillStyle = '#fff'; cx.fillRect(nowX - 1, y0 - 2, 2, lh + 4);
+  cx.beginPath(); cx.moveTo(nowX - 5, y0 + lh + 7); cx.lineTo(nowX + 5, y0 + lh + 7); cx.lineTo(nowX, y0 + lh + 1); cx.fill();
+  cx.font = `700 12px ${FONT}`; cx.textBaseline = 'top'; cx.textAlign = 'left';
+  cx.fillStyle = 'rgba(255,255,255,0.85)'; cx.fillText(S.wind, x0 + 4, y0 + lh + 3);
+}
+function drawGround() {
+  const gy = groundY();
+  // far hills
+  cx.fillStyle = '#8fc79a';
+  cx.beginPath(); cx.moveTo(0, gy);
+  for (let x = 0; x <= W; x += 20) cx.lineTo(x, gy - 22 - Math.sin(x * 0.013 + 1) * 14 - Math.sin(x * 0.031) * 6);
+  cx.lineTo(W, gy); cx.fill();
+  // trees
+  cx.fillStyle = '#4f9a5e';
+  for (let i = 0; i < 6; i++) {
+    const x = W * (0.3 + i * 0.13); const s = 12 + (i % 3) * 5;
+    cx.beginPath(); cx.arc(x, gy - s, s, 0, 7); cx.fill();
+    cx.fillRect(x - 2, gy - s, 4, s);
+  }
+  // field
+  cx.fillStyle = '#6fb85a'; cx.fillRect(0, gy, W, H - gy);
+  cx.fillStyle = '#5ea84b';
+  for (let x = 0; x < W; x += 14) cx.fillRect(x + ((x * 7) % 5), gy + 8 + ((x * 13) % 20), 6, 2);
+}
+function drawChild() {
+  const x = anchorX(), y = groundY();
+  cx.fillStyle = '#2d3b55';
+  cx.fillRect(x - 13, y - 22, 6, 22); cx.fillRect(x - 5, y - 22, 6, 22); // legs
+  cx.fillStyle = '#e8574a'; cx.fillRect(x - 15, y - 44, 18, 24); // body
+  cx.fillStyle = '#f6d2b0'; cx.beginPath(); cx.arc(x - 6, y - 52, 9, 0, 7); cx.fill();
+  cx.fillStyle = '#2b2b2b'; cx.beginPath(); cx.arc(x - 6, y - 55, 9, Math.PI, 0); cx.fill();
+  // arm to spool
+  const hx = x + 6, hy = holding && state === 'play' ? y - 48 : y - 38;
+  cx.strokeStyle = '#e8574a'; cx.lineWidth = 5; cx.lineCap = 'round';
+  cx.beginPath(); cx.moveTo(x, y - 40); cx.lineTo(hx, hy); cx.stroke();
+  // spool: spins while line pays out
+  cx.fillStyle = '#9b6a3c'; cx.beginPath(); cx.arc(hx + 3, hy, 9, 0, 7); cx.fill();
+  cx.strokeStyle = '#f2e6c8'; cx.lineWidth = 2;
+  for (let k = 0; k < 3; k++) { const a = spoolAng + k * 2.094; cx.beginPath(); cx.moveTo(hx + 3, hy); cx.lineTo(hx + 3 + Math.cos(a) * 8, hy + Math.sin(a) * 8); cx.stroke(); }
+  cx.fillStyle = '#f2e6c8'; cx.beginPath(); cx.arc(hx + 3, hy, 2.5, 0, 7); cx.fill();
+  return [hx + 3, hy];
+}
+function drawLine(hx, hy) {
+  if (state === 'over' && endReason === 'snap') {
+    // slack line falling from the hand
+    cx.strokeStyle = 'rgba(255,255,255,0.8)'; cx.lineWidth = 1.2;
+    cx.beginPath(); cx.moveTo(hx, hy); cx.quadraticCurveTo(hx + 60, hy + 10 + stateT * 30, hx + 120, Math.min(groundY(), hy - 80 + stateT * 160)); cx.stroke();
+    return;
+  }
+  const dx = ksx - hx, dy = ksy - hy, len = Math.hypot(dx, dy);
+  const slack = holding && state === 'play' ? 0.03 : 0.12;
+  const sag = len * slack;
+  const vib = strain > 0.5 ? Math.sin(gt * 70) * (strain - 0.5) * 6 : 0;
+  const mx = hx + dx * 0.5 + vib, my = hy + dy * 0.5 + sag;
+  const r = Math.round(lerp(255, 255, strain)), gg = Math.round(lerp(255, 70, strain)), b = Math.round(lerp(255, 60, strain));
+  cx.strokeStyle = `rgba(${r},${gg},${b},0.95)`; cx.lineWidth = 1.3 + strain * 1.5;
+  cx.beginPath(); cx.moveTo(hx, hy); cx.quadraticCurveTo(mx, my, ksx, ksy); cx.stroke();
+}
+function drawKite(dt) {
+  const ang = -0.35 + (state === 'play' ? (holding ? -0.15 : 0.2) : 0) + Math.sin(gt * 3.1) * 0.06 * (1.3 - Math.min(1, weff)) + (tumble > 0 ? tumble * 8 : 0) + (state === 'over' ? stateT * (endReason === 'snap' ? 3 : 6) : 0);
+  // tail physics (screen space)
+  tail[0].x = ksx - Math.sin(-ang) * 0; tail[0].y = ksy + 22;
+  const step = Math.min(dt, 0.033);
+  for (let i = 1; i < tail.length; i++) {
+    const p = tail[i];
+    const vx = (p.x - p.px) * 0.9, vy = (p.y - p.py) * 0.9;
+    p.px = p.x; p.py = p.y;
+    p.x += vx + (60 * wNow + Math.sin(gt * 6 + i) * 30) * step * step * 30;
+    p.y += vy + 120 * step * step * 30;
+  }
+  for (let k = 0; k < 3; k++) for (let i = 1; i < tail.length; i++) {
+    const a = tail[i - 1], b = tail[i]; const ddx = b.x - a.x, ddy = b.y - a.y, d = Math.hypot(ddx, ddy) || 1, seg = 8;
+    const f = (d - seg) / d; b.x -= ddx * f; b.y -= ddy * f;
+  }
+  cx.strokeStyle = '#ffd23f'; cx.lineWidth = 3; cx.lineJoin = 'round';
+  cx.beginPath(); cx.moveTo(tail[0].x, tail[0].y); for (const p of tail) cx.lineTo(p.x, p.y); cx.stroke();
+  cx.fillStyle = '#e8574a';
+  for (let i = 2; i < tail.length; i += 2) { const p = tail[i]; cx.beginPath(); cx.ellipse(p.x, p.y, 5, 3, 0, 0, 7); cx.fill(); }
+  // kite body: Japanese rectangle kite
+  cx.save(); cx.translate(ksx, ksy); cx.rotate(ang);
+  const kw = 34, kh = 44;
+  cx.fillStyle = '#fbf4e2'; cx.strokeStyle = '#7a4b25'; cx.lineWidth = 2;
+  cx.beginPath(); cx.moveTo(-kw / 2, -kh / 2); cx.quadraticCurveTo(0, -kh / 2 - 6, kw / 2, -kh / 2); cx.lineTo(kw / 2, kh / 2); cx.lineTo(-kw / 2, kh / 2); cx.closePath(); cx.fill(); cx.stroke();
+  cx.fillStyle = '#d8342c'; cx.beginPath(); cx.arc(0, -2, 10, 0, 7); cx.fill();
+  cx.strokeStyle = '#7a4b25'; cx.lineWidth = 1; cx.beginPath(); cx.moveTo(-kw / 2, -kh / 2); cx.lineTo(kw / 2, kh / 2); cx.moveTo(kw / 2, -kh / 2); cx.lineTo(-kw / 2, kh / 2); cx.stroke();
+  cx.fillStyle = '#2b2b2b'; cx.font = `900 13px ${FONT}`; cx.textAlign = 'center'; cx.textBaseline = 'middle';
+  cx.fillStyle = '#fff'; cx.fillText(LANG === 'ja' ? '風' : 'W', 0, -1);
+  cx.restore();
+}
+function drawCrows(dt) {
+  for (let i = crows.length - 1; i >= 0; i--) {
+    const c = crows[i];
+    c.fx -= c.v * dt; c.flap += dt * 10;
+    const [, sy] = w2s(0, c.y); const sx = c.fx * W;
+    if (state === 'play' && !c.hit && Math.hypot(sx - ksx, sy - ksy) < 28) {
+      c.hit = true; tumble = 0.7; strain = Math.min(0.95, strain + 0.15); sfx.crow();
+      popups.push({ txt: S.crow, x: ksx, y: ksy - 40, t: 0, c: '#222' });
+    }
+    if (c.hit) c.y += dt * 6 / Math.max(0.3, camS / 10);
+    if (c.fx < -0.15) { crows.splice(i, 1); continue; }
+    const wy = Math.sin(c.flap) * 6;
+    cx.strokeStyle = '#1d1d24'; cx.lineWidth = 3; cx.lineCap = 'round';
+    cx.beginPath(); cx.moveTo(sx - 12, sy - wy); cx.quadraticCurveTo(sx - 5, sy - 4, sx, sy); cx.quadraticCurveTo(sx + 5, sy - 4, sx + 12, sy - wy); cx.stroke();
+    cx.fillStyle = '#1d1d24'; cx.beginPath(); cx.ellipse(sx, sy + 1, 6, 3.5, 0, 0, 7); cx.fill();
+  }
+}
+function drawHUD() {
+  cx.textBaseline = 'top';
+  cx.fillStyle = 'rgba(20,40,70,0.32)'; cx.fillRect(0, 0, W, 76);
+  cx.textAlign = 'left'; cx.fillStyle = '#fff';
+  cx.font = `600 14px ${FONT}`; cx.fillText(S.height, 14, 8);
+  cx.font = `800 32px ${FONT}`; cx.fillText(`${Math.max(0, Math.floor(hNow))}${S.m}`, 14, 24);
+  cx.textAlign = 'right'; cx.font = `600 14px ${FONT}`;
+  cx.fillText(`${S.best} ${best}${S.m}`, W - 14, 8);
+  cx.fillText(`${S.top} ${Math.floor(maxH)}${S.m}`, W - 14, 28);
+  cx.fillText(`${S.line} ${Math.floor(L)}${S.m}`, W - 14, 48);
+  // tension bar
+  const bx = W * 0.36, bw = W * 0.28, by = 30;
+  cx.textAlign = 'center'; cx.font = `600 12px ${FONT}`; cx.fillText(S.tension, bx + bw / 2, 10);
+  cx.fillStyle = 'rgba(0,0,0,0.35)'; cx.fillRect(bx, by, bw, 12);
+  const tv = clamp(tension / 1.7, 0, 1);
+  cx.fillStyle = tv >= 1 ? '#ffb13b' : '#bfe8ff'; cx.fillRect(bx, by, bw * tv * 0.999, 5);
+  cx.fillStyle = strain > 0.6 ? '#ff4b3a' : '#ff8a5c'; cx.fillRect(bx, by + 6, bw * strain, 6);
+  cx.strokeStyle = 'rgba(255,255,255,0.8)'; cx.lineWidth = 1; cx.strokeRect(bx, by, bw, 12);
+  drawForecast();
+}
+function drawPopups(dt) {
+  for (let i = popups.length - 1; i >= 0; i--) {
+    const p = popups[i]; p.t += dt;
+    if (p.t > (p.big ? 2.4 : 0.8)) { popups.splice(i, 1); continue; }
+    const a = clamp(p.big ? Math.min(p.t * 4, (2.4 - p.t) * 2) : 1 - p.t / 0.8, 0, 1);
+    cx.globalAlpha = a; cx.textAlign = 'center'; cx.textBaseline = 'middle';
+    if (p.big) {
+      const s = fitText(p.txt, W - 40, 22, 800);
+      cx.fillStyle = 'rgba(0,0,0,0.28)'; const by = ksy < H * 0.45 ? H * 0.55 : H * 0.3; cx.fillRect(10, by - 22, W - 20, 44);
+      cx.fillStyle = p.c; cx.fillText(p.txt, W / 2, by);
+    } else {
+      cx.font = `800 16px ${FONT}`; cx.fillStyle = p.c; cx.fillText(p.txt, p.x, p.y - p.t * 30);
+    }
+    cx.globalAlpha = 1;
+  }
+}
+function drawCenterPanel(lines) {
+  cx.fillStyle = 'rgba(10,20,40,0.55)';
+  const ph = lines.reduce((s, l) => s + l.size * 1.5, 0) + 36;
+  const py = H * 0.5 - ph / 2;
+  cx.fillRect(16, py, W - 32, ph);
+  let y = py + 18;
+  cx.textAlign = 'center'; cx.textBaseline = 'top';
+  for (const l of lines) {
+    fitText(l.t, W - 56, l.size, l.w || 700);
+    cx.fillStyle = l.c || '#fff'; cx.fillText(l.t, W / 2, y);
+    y += l.size * 1.5;
+  }
+}
+
+// ---- main loop ----
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(0.05, Math.max(0, (now - last) / 1000)); last = now;
+  if (W < 2 || H < 2) { resize(); requestAnimationFrame(frame); return; }
+  update(dt);
+  // kite world pos & camera
+  if (state !== 'over') {
+    const r = th * Math.PI / 180; kx = L * Math.cos(r); ky = Math.max(0, L * Math.sin(r));
+    const target = Math.min(10, (groundY() - 10 - 190) / (ky + 4), (W * 0.78) / (kx + 4));
+    camS = lerp(camS, target, Math.min(1, dt * 3));
+    [ksx, ksy] = w2s(kx, ky);
+    ksy += Math.sin(gt * 2.2) * 3 * (1.2 - Math.min(1, weff));
+  } else {
+    ksx += endVX * dt; ksy += endVY * dt;
+    if (endReason === 'snap') endVY -= 10 * dt; else { endVY += 300 * dt; if (ksy > groundY() - 10) { ksy = groundY() - 10; endVY = 0; endVX = 0; } }
+  }
+  drawBackground();
+  if (state !== 'title') drawAltLines();
+  drawWind(dt);
+  drawCrows(dt);
+  drawGround();
+  const [hx, hy] = drawChild();
+  drawLine(hx, hy);
+  drawKite(dt);
+  if (state === 'play') {
+    drawHUD();
+    if (warnT > 0) {
+      cx.globalAlpha = Math.min(1, warnT * 3); cx.textAlign = 'center'; cx.textBaseline = 'middle';
+      cx.font = `900 22px ${FONT}`; cx.lineWidth = 4; cx.strokeStyle = 'rgba(0,0,0,0.45)';
+      const wx = clamp(ksx, 70, W - 70), wy = clamp(ksy + 52, 150, groundY() - 90);
+      cx.strokeText(lastWarn, wx, wy); cx.fillStyle = lastWarn === S.release ? '#ffdf5c' : '#9ff0ff'; cx.fillText(lastWarn, wx, wy);
+      cx.globalAlpha = 1;
+    }
+    if (gt < 6) {
+      cx.globalAlpha = clamp(6 - gt, 0, 1);
+      cx.fillStyle = 'rgba(0,0,0,0.4)'; cx.fillRect(0, H - 40, W, 40);
+      fitText(S.hint, W - 20, 14, 600); cx.fillStyle = '#fff'; cx.textAlign = 'center'; cx.textBaseline = 'middle';
+      cx.fillText(S.hint, W / 2, H - 20); cx.globalAlpha = 1;
+    }
+    drawPopups(dt);
+    // sound updates
+    if (AC) {
+      const t = AC.currentTime;
+      windGain.gain.setTargetAtTime(clamp(0.015 + 0.06 * (weff - 0.4), 0.005, 0.12), t, 0.1);
+      windFilt.frequency.setTargetAtTime(300 + weff * 500, t, 0.1);
+      humOsc.frequency.setTargetAtTime(110 + tension * 110, t, 0.05);
+      humGain.gain.setTargetAtTime(holding ? clamp(0.006 + strain * 0.07, 0, 0.08) : 0, t, 0.05);
+    }
+  } else {
+    if (AC) { const t = AC.currentTime; humGain.gain.setTargetAtTime(0, t, 0.05); windGain.gain.setTargetAtTime(0.02, t, 0.3); }
+  }
+  if (state === 'title') {
+    drawCenterPanel([
+      { t: S.title, size: 34, w: 900, c: '#fff6c8' },
+      { t: S.how1, size: 14, w: 600 },
+      { t: S.how2, size: 14, w: 600 },
+      { t: S.how3, size: 14, w: 600 },
+      { t: best > 0 ? `${S.best} ${best}${S.m}` : ' ', size: 14, w: 600, c: '#ffe28a' },
+      { t: S.start, size: 20, w: 800, c: (Math.sin(now / 300) > -0.3) ? '#ffffff' : 'rgba(255,255,255,0.4)' },
+    ]);
+  } else if (state === 'over') {
+    drawPopups(dt);
+    if (panelT > 0) {
+      drawCenterPanel([
+        { t: endReason === 'snap' ? S.snapped : S.crashed, size: 20, w: 700 },
+        { t: `${Math.floor(maxH)}${S.m}`, size: 46, w: 900, c: '#fff6c8' },
+        { t: newBest ? S.newBest : `${S.best} ${best}${S.m}`, size: 18, w: 800, c: newBest ? '#ffdf5c' : '#ffffff' },
+        { t: endReason === 'snap' ? S.tipSnap : S.tipCrash, size: 14, w: 600, c: '#bfe8ff' },
+        { t: panelT > 0.7 ? S.again : ' ', size: 18, w: 700 },
+      ]);
+    }
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
