@@ -1,0 +1,767 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-11-12T00:20:26.834Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "wait": 1500
+        }
+      ],
+      "desc": "tap(0.50,0.50) 120ms → wait 1500ms",
+      "note": "タップで開始。敵の隣のマスが赤い",
+      "noteEn": "Tap to start. Tiles next to enemies are red",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": [
+        {
+          "swipe": [
+            0.4,
+            0.6,
+            0.7,
+            0.6
+          ],
+          "hold": 150
+        },
+        {
+          "wait": 800
+        }
+      ],
+      "desc": "swipe(0.40,0.60→0.70,0.60) 150ms → wait 800ms",
+      "note": "右の端へすべる",
+      "noteEn": "Slide to the right edge",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.75
+          ]
+        },
+        {
+          "wait": 600
+        }
+      ],
+      "desc": "tap(0.50,0.75) 120ms → wait 600ms",
+      "note": "タップで1手待つと、スライムが同じ列に下りてきた",
+      "noteEn": "Tap to wait; the slime comes down into my column",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "swipe": [
+            0.6,
+            0.7,
+            0.6,
+            0.4
+          ],
+          "hold": 150
+        },
+        {
+          "wait": 330
+        }
+      ],
+      "desc": "swipe(0.60,0.70→0.60,0.40) 150ms → wait 330ms",
+      "note": "8マスの助走で7の体当たり。勢いが残る",
+      "noteEn": "8-tile run-up: a 7-power hit, momentum left over",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": [
+        {
+          "wait": 600
+        },
+        {
+          "swipe": [
+            0.7,
+            0.5,
+            0.4,
+            0.5
+          ],
+          "hold": 150
+        },
+        {
+          "wait": 800
+        }
+      ],
+      "desc": "wait 600ms → swipe(0.70,0.50→0.40,0.50) 150ms → wait 800ms",
+      "note": "左のコインへ",
+      "noteEn": "Left for the coin",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.75
+          ]
+        },
+        {
+          "wait": 600
+        }
+      ],
+      "desc": "tap(0.50,0.75) 120ms → wait 600ms",
+      "note": "待って敵の動きを見る",
+      "noteEn": "Wait and watch",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "swipe": [
+            0.4,
+            0.5,
+            0.7,
+            0.5
+          ],
+          "hold": 150
+        },
+        {
+          "wait": 800
+        }
+      ],
+      "desc": "swipe(0.40,0.50→0.70,0.50) 150ms → wait 800ms",
+      "note": "右上の角へ",
+      "noteEn": "To the top-right corner",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": [
+        {
+          "swipe": [
+            0.6,
+            0.4,
+            0.6,
+            0.7
+          ],
+          "hold": 150
+        },
+        {
+          "wait": 900
+        }
+      ],
+      "desc": "swipe(0.60,0.40→0.60,0.70) 150ms → wait 900ms",
+      "note": "下へ。スライムを突き抜けて逃げる",
+      "noteEn": "Down: pierce the slime and escape",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.75
+          ]
+        },
+        {
+          "wait": 500
+        }
+      ],
+      "desc": "tap(0.50,0.75) 120ms → wait 500ms",
+      "note": "待って骨を同じ列へ引きよせる",
+      "noteEn": "Wait to pull the skeleton into my column",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "action": [
+        {
+          "swipe": [
+            0.6,
+            0.7,
+            0.6,
+            0.4
+          ],
+          "hold": 150
+        },
+        {
+          "wait": 1300
+        }
+      ],
+      "desc": "swipe(0.60,0.70→0.60,0.40) 150ms → wait 1300ms",
+      "note": "骨に体当たりして全滅、階段が近くに出た",
+      "noteEn": "Charge the skeleton; floor clear, stairs appear close by",
+      "image": "ai-play/step-10.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "action": [
+        {
+          "swipe": [
+            0.6,
+            0.4,
+            0.6,
+            0.7
+          ],
+          "hold": 150
+        },
+        {
+          "wait": 1200
+        }
+      ],
+      "desc": "swipe(0.60,0.40→0.60,0.70) 150ms → wait 1200ms",
+      "note": "階段へ。報酬を3つから選ぶ",
+      "noteEn": "Onto the stairs; pick 1 of 3 rewards",
+      "image": "ai-play/step-11.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 12,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.64
+          ]
+        },
+        {
+          "wait": 1600
+        }
+      ],
+      "desc": "tap(0.50,0.64) 120ms → wait 1600ms",
+      "note": "はね返りを選んで地下2階へ",
+      "noteEn": "Take Rebound, on to B2",
+      "image": "ai-play/step-12.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 13,
+      "action": [
+        {
+          "swipe": [
+            0.5,
+            0.7,
+            0.5,
+            0.4
+          ],
+          "hold": 150
+        },
+        {
+          "wait": 1500
+        }
+      ],
+      "desc": "swipe(0.50,0.70→0.50,0.40) 150ms → wait 1500ms",
+      "note": "真上の骨を倒し、壁ではね返って戻ってきた",
+      "noteEn": "Kill the skeleton above, rebound back down",
+      "image": "ai-play/step-13.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 14,
+      "action": [
+        {
+          "swipe": [
+            0.5,
+            0.6,
+            0.2,
+            0.6
+          ],
+          "hold": 150
+        },
+        {
+          "wait": 800
+        }
+      ],
+      "desc": "swipe(0.50,0.60→0.20,0.60) 150ms → wait 800ms",
+      "note": "左の角へ。今度ははね返らない",
+      "noteEn": "Left corner; no rebound this time",
+      "image": "ai-play/step-14.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 15,
+      "action": [
+        {
+          "swipe": [
+            0.2,
+            0.6,
+            0.6,
+            0.6
+          ],
+          "hold": 150
+        },
+        {
+          "wait": 450
+        }
+      ],
+      "desc": "swipe(0.20,0.60→0.60,0.60) 150ms → wait 450ms",
+      "note": "敵が下の段に並んだ！右へ4マスの助走で骨とスライムを2体抜き",
+      "noteEn": "They lined up on the bottom row! A 4-tile run pierces both: a double kill",
+      "image": "ai-play/step-15.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 16,
+      "action": {
+        "wait": 900
+      },
+      "desc": "wait 900ms",
+      "note": "2体抜き！の表示。壁ではね返って左へ戻る",
+      "noteEn": "'2 in one slide!' banner; rebound carries me back left",
+      "image": "ai-play/step-16.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 17,
+      "action": [
+        {
+          "swipe": [
+            0.2,
+            0.6,
+            0.6,
+            0.6
+          ],
+          "hold": 150
+        },
+        {
+          "wait": 1200
+        },
+        {
+          "tap": [
+            0.5,
+            0.31
+          ]
+        },
+        {
+          "wait": 1600
+        }
+      ],
+      "desc": "swipe(0.20,0.60→0.60,0.60) 150ms → wait 1200ms → tap(0.50,0.31) 120ms → wait 1600ms",
+      "note": "階段から地下3階へ。弓を持つ敵が出てきた",
+      "noteEn": "Down the stairs to B3; an archer appears",
+      "image": "ai-play/step-17.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 18,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.75
+          ]
+        },
+        {
+          "wait": 600
+        }
+      ],
+      "desc": "tap(0.50,0.75) 120ms → wait 600ms",
+      "note": "敵が多い。まず待って近づくのを見る",
+      "noteEn": "More enemies. Wait and see them close in",
+      "image": "ai-play/step-18.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 19,
+      "action": [
+        {
+          "swipe": [
+            0.5,
+            0.6,
+            0.2,
+            0.6
+          ],
+          "hold": 150
+        },
+        {
+          "wait": 800
+        }
+      ],
+      "desc": "swipe(0.50,0.60→0.20,0.60) 150ms → wait 800ms",
+      "note": "列に3体並んだが、助走が足りず2体目で止まってしまう。左に下がる",
+      "noteEn": "Three lined up, but too short a run to get past the second. Back off left",
+      "image": "ai-play/step-19.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 20,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.75
+          ]
+        },
+        {
+          "wait": 600
+        }
+      ],
+      "desc": "tap(0.50,0.75) 120ms → wait 600ms",
+      "note": "待つ",
+      "noteEn": "Wait",
+      "image": "ai-play/step-20.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 21,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.75
+          ]
+        },
+        {
+          "wait": 600
+        }
+      ],
+      "desc": "tap(0.50,0.75) 120ms → wait 600ms",
+      "note": "もう1手待つ",
+      "noteEn": "Wait once more",
+      "image": "ai-play/step-21.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 22,
+      "action": [
+        {
+          "swipe": [
+            0.2,
+            0.7,
+            0.2,
+            0.4
+          ],
+          "hold": 150
+        },
+        {
+          "wait": 1500
+        }
+      ],
+      "desc": "swipe(0.20,0.70→0.20,0.40) 150ms → wait 1500ms",
+      "note": "左の列の骨へ3の体当たり、はね返って戻る",
+      "noteEn": "3-power hit on the skeleton in the left column, rebound back",
+      "image": "ai-play/step-22.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 23,
+      "action": [
+        {
+          "swipe": [
+            0.2,
+            0.7,
+            0.2,
+            0.4
+          ],
+          "hold": 150
+        },
+        {
+          "wait": 1500
+        }
+      ],
+      "desc": "swipe(0.20,0.70→0.20,0.40) 150ms → wait 1500ms",
+      "note": "下りてきたスライムも同じ列。体当たりして、また壁ではね返る",
+      "noteEn": "The slime came down my column too: hit it and rebound again",
+      "image": "ai-play/step-23.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}

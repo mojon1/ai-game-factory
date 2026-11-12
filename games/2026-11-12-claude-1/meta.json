@@ -1,0 +1,689 @@
+{
+  "id": "2026-11-12-claude-1",
+  "status": "published",
+  "title": "すべり勇者の地下迷宮",
+  "genre": "ローグライク",
+  "concept": "スワイプすると勇者は止まるまですべり、すべった距離がそのまま攻撃力になる。倒せばそのまま突き抜けて次の敵へ。赤いマス（敵の隣）で止まると攻撃されるので、どこで助走を取り、どこで止まるか、タップで待って敵を一列に並ばせるかを一手ずつ読む、すべりと勢いのローグライク。",
+  "howToPlay": "スワイプで上下左右にすべる。タップで1手待つ。敵をすべて倒すと階段が出るので、すべりこんで次の階へ。",
+  "libraryDecision": "効果音のためにZzFXだけ使う。7×9マスの見下ろし盤は影付きの2Dブロックで十分読みやすく、3Dや物理演算は核（すべる距離＝攻撃力の読み）を強めないので使わない。",
+  "soundDecision": "BGMは付けず、すべり出し・体当たり（攻撃力が高いほど低く重い音）・連続撃破で音程が上がる撃破音・コイン・被弾をZzFXで鳴らす。一手ごとの手応えと「何体抜けたか」を耳で感じられるようにした。",
+  "improvements": [
+    {
+      "found": "地下1階がスライム2体だけで、勢い0の体当たり1回で全滅し、核の「距離＝攻撃力」を感じる前に終わった／全滅後、階段まで位置合わせに4手かかり退屈／盤面が暗く、上部の表示が勇者の行に重なった",
+      "changed": "1・2階にHP2の骨を必ず置き、助走が要る敵から始めた。階段はその場から1回ですべって届く列に出す。床を明るくし、案内表示を盤の下へ移した",
+      "foundEn": "B1 had only two slimes, wiped in one zero-momentum bump, so the core (distance = power) was never felt / after clearing, reaching the stairs took 4 fiddly slides / the board was dark and the banner covered the knight's row",
+      "changedEn": "B1 and B2 always have a 2-HP skeleton that needs a run-up. Stairs now appear on a line reachable in one slide. Brighter floor; banners moved below the board"
+    },
+    {
+      "found": "どこで止まると攻撃されるかが、指をゆっくり動かしたときの予告にしか出ず、素早いスワイプでは突然殴られた／敵を倒したあと勢いがいくつ残っているか見えず、突き抜けの気持ちよさが伝わらない／長い助走で倒しても点が同じで、助走を取る理由が弱い",
+      "changed": "敵の隣のマス（弓の狙い線も）を常に赤く表示。すべり中は勇者の下に「勢い N」を出す。余った攻撃力×5点を加点し、長い助走ほど点が伸びるようにした",
+      "foundEn": "Where you'd get hit was only shown in the slow-drag preview, so quick swipes got punished out of nowhere / the momentum left after a kill was invisible, so piercing didn't feel great / long run-ups scored the same, so there was little reason to take one",
+      "changedEn": "Tiles next to enemies (and archer aim lines) are always tinted red. A 'Power N' badge shows under the knight while sliding. Overkill adds 5 pts per point, so longer run-ups score more"
+    },
+    {
+      "found": "敵を一列に並ばせたいのに待つ手段がなく、左右に往復するうちに敵も往復してしまう／『はね返り』が敵のいない移動でも発動し、敵の隣まで戻されて理不尽に被弾した／撃破の数字が勇者に重なって見えない",
+      "changed": "タップでその場で1手待てるようにした（タイトルにも1行追加）。はね返りは敵を倒したすべりのときだけ発動にし、説明も直した。撃破の数字を少し上・横へずらした",
+      "foundEn": "No way to wait for enemies to line up, so I shuffled back and forth and they shuffled with me / the Rebound perk fired on plain repositioning and threw me next to enemies / kill numbers covered the knight",
+      "changedEn": "Tap now waits a turn (one line added to the title). Rebound only triggers on a slide that killed something; its text was updated. Kill numbers moved up and aside"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "ローグライク",
+      "en": "Roguelike",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "スワイプで止まるまですべる勇者。すべった距離が攻撃力で、倒すと突き抜けて次の敵へ。止まった所の隣の敵が攻撃してくる、階層を下りるローグライク。",
+        "ideaEn": "A knight who slides until stopped when you swipe. Distance slid is attack power; a kill lets you slide through to the next enemy. Enemies next to where you stop attack. A floor-descending roguelike.",
+        "fromDraw": true
+      },
+      {
+        "idea": "スノードームを指で振って雪を舞わせ、中の小さな町に雪を積もらせる遊び場（3D）。目標なし。",
+        "ideaEn": "A 3D snow globe toy: shake it with your finger to drift snow onto a tiny town. No goal.",
+        "fromDraw": false
+      },
+      {
+        "idea": "紙飛行機の折り線を指でなぞって折り、その形で飛び方が変わる。遠くの的に届かせる。",
+        "ideaEn": "Trace fold lines to fold a paper plane; its shape changes how it flies. Reach distant targets.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "fail",
+    "input": [
+      "swipe"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Slide Knight Dungeon",
+      "concept": "Swipe and the knight slides until something stops him; the distance slid becomes his attack power. Kill an enemy and you burst through to the next. Stop on a red tile (next to an enemy) and you get hit, so read every move: where to take a run-up, where to stop, and when to tap-wait so enemies line up. A roguelike of sliding and momentum.",
+      "howToPlay": "Swipe to slide up, down, left or right; tap to wait a turn. Defeat every enemy to reveal the stairs, then slide over them to go deeper.",
+      "libraryDecision": "Only ZzFX, for sound effects. The 7x9 top-down board reads fine with shaded 2D blocks; 3D or physics would not strengthen the core (reading distance = power), so they are not used.",
+      "soundDecision": "No music. ZzFX plays the slide, the impact (heavier and lower the more power), kill sounds that rise in pitch per kill in one slide, coins and getting hurt, so you can feel each move and hear how many you cut through."
+    }
+  },
+  "createdAt": "2026-11-12T09:05:54+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-12T09:05:54+09:00",
+    "metricsFrom": "2026-11-12T00:05:34.359Z",
+    "transcript": "a9c6c778-e145-474d-bb45-38ed97cdaa32.jsonl",
+    "validationRuns": 6,
+    "finishedAt": "2026-11-12T09:25:42+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-12T09:25:12+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "41.8KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=109",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=137",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=69",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=122",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 42796,
+    "lines": 807
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "ZzFX",
+      "version": "1.4.0",
+      "file": "zzfx-1.4.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "序盤の階は敵が回り込んでくるのを待つ時間が長く、敵を一列に並ばせる狙いが外れると数手だらだら往復してしまう。演出は軽めで、深い階の変化（弓・こうもり・ゴーレム）もまだ自分で十分に確かめられていない。",
+    "comment": "敵が下の段に並んだ瞬間に左端から4マス助走して骨とスライムを「4!」「2!」と2体抜きし、はね返りで元の位置へ戻ってきた場面がいちばん気持ちよかった。赤いマスとタップで待つを入れてから、「どこで止まるか」を読む遊びとして筋が通った。数分は普通に遊べるが、序盤の待ち時間と見た目の地味さで★4までは届かないと判断。",
+    "similar": [
+      {
+        "title": "Slayaway Camp",
+        "url": "https://www.mobygames.com/game/slayaway-camp",
+        "similarity": "中",
+        "note": "4方向に止まるまですべり、ぶつかった相手を倒す操作が同じ。あちらは決まった面を解くパズルで、こちらは敵が動いて反撃し、すべった距離が攻撃力になるローグライク。",
+        "note_en": "Same slide-until-blocked, four-way movement that kills what you hit. That is a fixed-level puzzle; here enemies move and strike back, and distance slid becomes attack power in a roguelike."
+      },
+      {
+        "title": "Hoplite",
+        "url": "https://www.mobygames.com/game/77779/hoplite/",
+        "similarity": "中",
+        "note": "1画面の盤で敵の位置を読み、移動そのものが攻撃になるスマホのターン制ローグライク。階ごとに能力を選ぶ点も近い。こちらは1マスずつではなく、すべって勢いで貫く。",
+        "note_en": "A one-screen turn-based mobile roguelike where movement is the attack and you pick upgrades between floors. Here you do not step tile by tile: you slide and pierce with momentum."
+      }
+    ],
+    "research": "ウェブ検索で「止まるまですべる」パズル（Slayaway Camp）と、移動が攻撃になるスマホのローグライク（Hoplite）を調べた。",
+    "i18n": {
+      "en": {
+        "worst": "Early floors involve waiting for enemies to come around rocks; when the line-up fails you shuffle for several moves. Effects are modest, and I could not fully test deeper floors (archers, bats, golems) myself.",
+        "comment": "Best moment: enemies lined up on the bottom row, I took a 4-tile run from the left corner and pierced a skeleton and a slime (\"4!\" \"2!\"), then Rebound carried me back. With red danger tiles and tap-to-wait, reading where to stop became a coherent game. Fine for a few minutes, but early-floor waiting and plain visuals keep it below 4 stars.",
+        "research": "Web searches for slide-until-blocked puzzles (Slayaway Camp) and mobile roguelikes where movement is the attack (Hoplite)."
+      }
+    },
+    "method": "スマホ縦画面で 23 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 23 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 1500ms",
+        "note": "タップで開始。敵の隣のマスが赤い",
+        "noteEn": "Tap to start. Tiles next to enemies are red",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "swipe(0.40,0.60→0.70,0.60) 150ms → wait 800ms",
+        "note": "右の端へすべる",
+        "noteEn": "Slide to the right edge",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.50,0.75) 120ms → wait 600ms",
+        "note": "タップで1手待つと、スライムが同じ列に下りてきた",
+        "noteEn": "Tap to wait; the slime comes down into my column",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "swipe(0.60,0.70→0.60,0.40) 150ms → wait 330ms",
+        "note": "8マスの助走で7の体当たり。勢いが残る",
+        "noteEn": "8-tile run-up: a 7-power hit, momentum left over",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 600ms → swipe(0.70,0.50→0.40,0.50) 150ms → wait 800ms",
+        "note": "左のコインへ",
+        "noteEn": "Left for the coin",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.50,0.75) 120ms → wait 600ms",
+        "note": "待って敵の動きを見る",
+        "noteEn": "Wait and watch",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "swipe(0.40,0.50→0.70,0.50) 150ms → wait 800ms",
+        "note": "右上の角へ",
+        "noteEn": "To the top-right corner",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "swipe(0.60,0.40→0.60,0.70) 150ms → wait 900ms",
+        "note": "下へ。スライムを突き抜けて逃げる",
+        "noteEn": "Down: pierce the slime and escape",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.50,0.75) 120ms → wait 500ms",
+        "note": "待って骨を同じ列へ引きよせる",
+        "noteEn": "Wait to pull the skeleton into my column",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "swipe(0.60,0.70→0.60,0.40) 150ms → wait 1300ms",
+        "note": "骨に体当たりして全滅、階段が近くに出た",
+        "noteEn": "Charge the skeleton; floor clear, stairs appear close by",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "swipe(0.60,0.40→0.60,0.70) 150ms → wait 1200ms",
+        "note": "階段へ。報酬を3つから選ぶ",
+        "noteEn": "Onto the stairs; pick 1 of 3 rewards",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.50,0.64) 120ms → wait 1600ms",
+        "note": "はね返りを選んで地下2階へ",
+        "noteEn": "Take Rebound, on to B2",
+        "image": "ai-play/step-12.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "swipe(0.50,0.70→0.50,0.40) 150ms → wait 1500ms",
+        "note": "真上の骨を倒し、壁ではね返って戻ってきた",
+        "noteEn": "Kill the skeleton above, rebound back down",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "swipe(0.50,0.60→0.20,0.60) 150ms → wait 800ms",
+        "note": "左の角へ。今度ははね返らない",
+        "noteEn": "Left corner; no rebound this time",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "swipe(0.20,0.60→0.60,0.60) 150ms → wait 450ms",
+        "note": "敵が下の段に並んだ！右へ4マスの助走で骨とスライムを2体抜き",
+        "noteEn": "They lined up on the bottom row! A 4-tile run pierces both: a double kill",
+        "image": "ai-play/step-15.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "wait 900ms",
+        "note": "2体抜き！の表示。壁ではね返って左へ戻る",
+        "noteEn": "'2 in one slide!' banner; rebound carries me back left",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 17,
+        "action": "swipe(0.20,0.60→0.60,0.60) 150ms → wait 1200ms → tap(0.50,0.31) 120ms → wait 1600ms",
+        "note": "階段から地下3階へ。弓を持つ敵が出てきた",
+        "noteEn": "Down the stairs to B3; an archer appears",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 18,
+        "action": "tap(0.50,0.75) 120ms → wait 600ms",
+        "note": "敵が多い。まず待って近づくのを見る",
+        "noteEn": "More enemies. Wait and see them close in",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 19,
+        "action": "swipe(0.50,0.60→0.20,0.60) 150ms → wait 800ms",
+        "note": "列に3体並んだが、助走が足りず2体目で止まってしまう。左に下がる",
+        "noteEn": "Three lined up, but too short a run to get past the second. Back off left",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 20,
+        "action": "tap(0.50,0.75) 120ms → wait 600ms",
+        "note": "待つ",
+        "noteEn": "Wait",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 21,
+        "action": "tap(0.50,0.75) 120ms → wait 600ms",
+        "note": "もう1手待つ",
+        "noteEn": "Wait once more",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 22,
+        "action": "swipe(0.20,0.70→0.20,0.40) 150ms → wait 1500ms",
+        "note": "左の列の骨へ3の体当たり、はね返って戻る",
+        "noteEn": "3-power hit on the skeleton in the left column, rebound back",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 23,
+        "action": "swipe(0.20,0.70→0.20,0.40) 150ms → wait 1500ms",
+        "note": "下りてきたスライムも同じ列。体当たりして、また壁ではね返る",
+        "noteEn": "The slime came down my column too: hit it and rebound again",
+        "image": "ai-play/step-23.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-12T09:25:42+09:00"
+  },
+  "publishedAt": "2026-11-12T09:25:42+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 20370,
+    "outputTokens": 54224,
+    "contextTokens": 21937138,
+    "turns": 109,
+    "toolCalls": 119,
+    "webSearches": 0,
+    "minutes": 20.1,
+    "from": "2026-11-12T00:05:34.359Z",
+    "to": "2026-11-12T00:25:43.039Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-12T09:25:43+09:00",
+    "validationRuns": 6,
+    "codeKB": 41.8
+  }
+}
