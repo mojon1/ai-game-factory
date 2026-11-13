@@ -1,0 +1,527 @@
+{
+  "id": "2026-11-13-claude-2",
+  "status": "published",
+  "title": "ころがれ雪だま",
+  "genre": "アクション",
+  "concept": "坂を転がる雪だまで、自分より小さいものを巻きこんで大きくなる。さっきまで赤い輪で「大きすぎる」と警告されていた木や小屋が、育った瞬間に「いける！」と食べられる側に変わる、立場の逆転と、列になった小物を一気に巻きこむ連続の気持ちよさが核。",
+  "howToPlay": "左右にドラッグして雪だまを転がす。小さいものは巻きこみ、赤い輪のついた大きいものはよける（ぶつかると削れる）。",
+  "libraryDecision": "three.js を使う。雪だまが育つほどカメラが引いて世界が小さく見えること、巻きこんだ木や箱が玉の表面にくっついて回ることが「大きくなった」実感そのものなので、奥行きのある3Dが核を強めると判断した。物理演算は使わず、転がりと当たりは自前の簡単な計算にした（巻きこみの判定を分かりやすく保つため）。",
+  "soundDecision": "BGMは付けず、雪を踏む転がり音（速さと大きさで音色が変わるノイズ）を常に鳴らす。巻きこむとザクッという音に加えて連続数に合わせて音階が上がる短い音が鳴り、列を一気に巻きこむと旋律になる。大きすぎたものが食べられるようになるとチャイム、節目の大きさでは和音が鳴る。",
+  "improvements": [
+    {
+      "found": "転がるだけで勝手に大きくなり、巻きこむ意味が薄い／食べられる小物がまばらで、何も起きない時間が長い／跡が途切れたタイル状に見え、地面のまだら模様が汚れて見える",
+      "changed": "転がるだけの成長を約1/4にして巻きこみを成長の主役にした。小物を列や弧に並べた「群れ」を出し、続けて巻きこむと点の倍率と音階が上がる連続を追加。跡を途切れない帯にし、地面の模様を薄くした。",
+      "foundEn": "The ball grew on its own just by rolling, so rolling things up barely mattered / edible things were sparse, with long stretches of nothing / the trail looked like broken tiles and the ground blotches looked dirty",
+      "changedEn": "Cut passive growth to about a quarter so rolling things up drives growth. Added clusters of small things in lines and arcs, with a combo that raises the multiplier and the pitch. Made the trail a continuous band and lightened the ground pattern."
+    },
+    {
+      "found": "コースが広くて的が小さく、狙っても外れる／操作がゆるく反応が遅い／開始直後、何もしていないのに大きな木にぶつかって削れる",
+      "changed": "コース幅を約6割にしてカメラを寄せ、小物を少し大きくした。左右の感度を下げて追従を速くした。最初の35mは食べられるものだけを置くようにした。",
+      "foundEn": "The course was wide and targets tiny, so aiming missed / steering felt loose and laggy / right after starting you got chipped by a big tree without doing anything",
+      "changedEn": "Narrowed the course to about 60% and moved the camera closer, with slightly bigger small things. Lowered drag sensitivity and made the ball follow faster. The first 35 m now only has edible things."
+    },
+    {
+      "found": "30秒遊んでも直径1.8mどまりで「どんどん大きくなる」夢に届かない／ぶつかると削れて全部が赤くなる負のらせん／点数の表示が玉に重なって見えにくく、終わりの画面で上の点数とベストがずれる",
+      "changed": "巻きこみの成長量を増やし、連続中はさらに増えるようにした。ぶつかって削れる量を減らし、土の上で溶ける速さも下げた。2m・3m・5m…と節目ごとに「ひとより大きい！」「家より大きい！」の表示と和音を出す。点数は玉の上に出し、終わりの画面で上の表示もそろえた。",
+      "foundEn": "After 30 seconds the ball was only 1.8 m, never reaching the dream of getting huge / hits shrink you until everything turns red, a downward spiral / score pop-ups overlapped the ball, and the HUD disagreed with the result screen",
+      "changedEn": "Increased growth from rolling things up, more during combos. Reduced the loss from hits and slowed melting on bare ground. Added size milestones (2 m, 3 m, 5 m…) with banners like \"Bigger than a person!\" and a chord. Pop-ups now appear above the ball and the HUD matches the result screen."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "アクション",
+      "en": "Action",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "雪だまアクション: 坂を転がる雪だまを左右に操り、自分より小さいものを巻きこんで大きくなる。大きすぎるものにぶつかると削れる。3Dで、育つほどカメラが引いていく。",
+        "ideaEn": "Snowball action: steer a snowball down a slope, roll up anything smaller to grow, and get chipped by things too big. 3D, with the camera pulling back as you grow.",
+        "fromDraw": true
+      },
+      {
+        "idea": "シャボン玉ふくらまし: 長押しで息を吹きこみ、割れる直前で離して風に乗せる。玉どうしがくっつくと大きくなる。2Dのやわらかい表現。",
+        "ideaEn": "Bubble blowing: hold to blow, release just before it pops and let the wind carry it; touching bubbles merge. Soft 2D look.",
+        "fromDraw": false
+      },
+      {
+        "idea": "夜の雪原の足あと遊び場: なぞった所に足あとと音が残る、目標のない遊び場。",
+        "ideaEn": "A snowy-night footprint playground: tracing leaves footprints and sounds, with no goal.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "fail",
+    "input": [
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Roll, Snowball",
+      "concept": "A snowball rolling downhill rolls up anything smaller and grows. Trees and cabins marked with a red \"too big\" ring flip to \"Got it!\" the moment you outgrow them; that role reversal, plus sweeping a whole line of small things in one combo, is the core.",
+      "howToPlay": "Drag left and right to steer. Roll up small things; dodge big ones with red rings (hitting them chips your snowball).",
+      "libraryDecision": "Uses three.js. The camera pulling back as you grow and the trees and gifts stuck on the rolling ball are the feeling of getting bigger, so 3D depth strengthens the core. No physics engine: rolling and collisions are simple custom math to keep the roll-up rule easy to read.",
+      "soundDecision": "No BGM; a constant snow-crunch rolling noise whose tone follows speed and size. Rolling something up adds a crunch plus a short note that climbs with the combo, so sweeping a line plays a melody. A chime sounds when something too big becomes edible, and a chord at each size milestone."
+    }
+  },
+  "createdAt": "2026-11-13T12:06:18+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-13T12:06:18+09:00",
+    "metricsFrom": "2026-11-13T03:05:29.936Z",
+    "transcript": "ebab33c7-9f6a-4b4a-bab3-52b5f83b50e0.jsonl",
+    "validationRuns": 6,
+    "finishedAt": "2026-11-13T12:28:08+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-13T12:27:51+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "33.5KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=63",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=130",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=57",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=55",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 34279,
+    "lines": 551
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "雪だまを転がして大きくなる題材はよくあるもので、1回のプレイで届く大きさも2m前後と、「巨大になる」夢の手前で終わりやすい。ぶつかると削れて周りが赤い輪ばかりになる時間がある。",
+    "comment": "斜めに並んだ箱や岩の列を指でなぞるように追うと、×2、×3…×9と倍率と音が上がりながら一気に巻きこめて、玉の表面に木や箱がくっついて回る。最終プレイで2mの節目に届き「ひとより大きい！」が出た場面は気持ちよかった。赤い輪の木が育った瞬間に『いける！』に変わるのも狙いどおり。一方で、画像を1手ずつ見ながらの自己プレイなので、実機での操作の細かな手触りは確かめきれていない。",
+    "similar": [
+      {
+        "title": "Snowball Effect",
+        "url": "https://westicles.itch.io/snowball-effect",
+        "similarity": "高",
+        "note": "小さいものを巻きこんで育ち、大きいものに削られる雪だまという中心のルールが同じ。こちらは坂を下り続ける3Dの道で、赤い輪の警告が育つと消える逆転と、列を連続で巻きこむ倍率が違い。",
+        "note_en": "Same core rule: a snowball that absorbs smaller things and gets ground down by larger ones. Mine is an endless 3D downhill run, with red warning rings that vanish as you outgrow them and a combo for sweeping lines."
+      },
+      {
+        "title": "Snow Roller (Neopets)",
+        "url": "https://thedailyneopets.com/neopets-games/snow-roller",
+        "similarity": "中",
+        "note": "山を転がる雪玉で小さいものを転がし取り、障害物をよける点が近い。こちらは3Dで、大きさに応じて食べられるものが変わる。",
+        "note_en": "Close in rolling a snowball down a mountain, picking up small items and avoiding obstacles. Mine is 3D, and what you can eat changes with your size."
+      }
+    ],
+    "research": "WebSearchで「snowball rolling downhill grow bigger mobile game absorb objects」を1回検索し、同じ仕組みの作品を確認した。",
+    "i18n": {
+      "en": {
+        "worst": "Rolling a growing snowball is a familiar idea, and a run usually ends around 2 m, short of the dream of getting huge. After hits, there are stretches where almost everything around you has a red ring.",
+        "comment": "Following a diagonal line of gifts or rocks with your finger rolls them up in one go, with the multiplier and the notes climbing ×2, ×3 … ×9, and trees and gifts stick to the ball as it rolls. Hitting the 2 m milestone with 'Bigger than a person!' in the final run felt good, and a red-ringed tree flipping to 'Got it!' as you grow works as intended. I played step by step from screenshots, so I could not fully check the fine feel of steering on a real phone.",
+        "research": "One WebSearch for 'snowball rolling downhill grow bigger mobile game absorb objects' to find games with the same mechanic."
+      }
+    },
+    "method": "スマホ縦画面で 14 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 14 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.60) 120ms",
+        "note": "開始",
+        "noteEn": "Start",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "wait 2000ms",
+        "note": "前方を見る",
+        "noteEn": "Look ahead",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "swipe(0.50,0.70→0.46,0.70) 200ms",
+        "note": "柵と岩の列へ寄せる",
+        "noteEn": "Move toward the fence and rock line",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 1500ms",
+        "note": "柵を巻きこんだ",
+        "noteEn": "Rolled up a fence",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "path(0.50,0.70→0.44,0.70) 500ms",
+        "note": "岩の列をなぞる。連続で×が増えていく",
+        "noteEn": "Trace the rock line; the combo climbs",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "path(0.44,0.70→0.56,0.70) 900ms",
+        "note": "右の箱の列へ",
+        "noteEn": "Over to the gift line",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "path(0.50,0.70→0.52,0.70→0.56,0.70) 1000ms",
+        "note": "斜めに並んだ箱をなぞるように右へ",
+        "noteEn": "Sweep right along the diagonal gifts",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 1200ms",
+        "note": "様子",
+        "noteEn": "Watch",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "path(0.50,0.70→0.48,0.70) 400ms",
+        "note": "正面の小さな木へ",
+        "noteEn": "Toward the small pine ahead",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 1500ms",
+        "note": "木と箱の列",
+        "noteEn": "Pine and gift line",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "wait 1500ms",
+        "note": "様子",
+        "noteEn": "Watch",
+        "image": "ai-play/step-11.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "path(0.50,0.70→0.44,0.70) 500ms",
+        "note": "左の箱と岩の列へ",
+        "noteEn": "Left to the gift and rock line",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "wait 2000ms",
+        "note": "様子",
+        "noteEn": "Watch",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "wait 2000ms",
+        "note": "様子",
+        "noteEn": "Watch",
+        "image": "ai-play/step-14.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-13T12:28:08+09:00"
+  },
+  "publishedAt": "2026-11-13T12:28:08+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 10612,
+    "outputTokens": 37403,
+    "contextTokens": 9929937,
+    "turns": 57,
+    "toolCalls": 62,
+    "webSearches": 0,
+    "minutes": 22.6,
+    "from": "2026-11-13T03:05:29.936Z",
+    "to": "2026-11-13T03:28:08.166Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-13T12:28:08+09:00",
+    "validationRuns": 6,
+    "codeKB": 33.5
+  }
+}
