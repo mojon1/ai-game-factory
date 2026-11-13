@@ -1,0 +1,207 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-11-13T03:07:33.849Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.55
+        ]
+      },
+      "desc": "tap(0.50,0.55) 120ms",
+      "note": "目的地の線と羊の方向線を使って、群れの右から回り込む。",
+      "noteEn": "Using target and direction marks to approach from the right.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": {
+        "path": [
+          [
+            0.5,
+            0.7288888888888889
+          ],
+          [
+            0.7777777777777778,
+            0.6422222222222222
+          ],
+          [
+            0.7916666666666666,
+            0.505
+          ]
+        ],
+        "hold": 5000,
+        "wait": 3000
+      },
+      "desc": "path(0.50,0.73→0.78,0.64→0.79,0.51) 5000ms",
+      "note": "右の羊を入口側へ押す。まだ左の群れは待っている。",
+      "noteEn": "Pushing the right flock toward the gate while the left flock waits.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": {
+        "swipe": [
+          0.7916666666666666,
+          0.505,
+          0.6666666666666666,
+          0.4255555555555556
+        ],
+        "hold": 3000,
+        "wait": 3000
+      },
+      "desc": "swipe(0.79,0.51→0.67,0.43) 3000ms",
+      "note": "入口まで届いた二頭がそのまま囲いへ入った。",
+      "noteEn": "The two sheep near the entrance continue into the pen.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": {
+        "path": [
+          [
+            0.6666666666666666,
+            0.4255555555555556
+          ],
+          [
+            0.8333333333333334,
+            0.6855555555555555
+          ],
+          [
+            0.19444444444444445,
+            0.6855555555555555
+          ]
+        ],
+        "hold": 4500,
+        "wait": 2000
+      },
+      "desc": "path(0.67,0.43→0.83,0.69→0.19,0.69) 4500ms",
+      "note": "残った羊の下へ遠回りする。上から近づけないよう右を回る。",
+      "noteEn": "Taking the right side around to get below the remaining flock.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": {
+        "swipe": [
+          0.19444444444444445,
+          0.6855555555555555,
+          0.1111111111111111,
+          0.5700000000000001
+        ],
+        "hold": 3500,
+        "wait": 2500
+      },
+      "desc": "swipe(0.19,0.69→0.11,0.57) 3500ms",
+      "note": "左下から寄せる。羊が岩の上側へ回った。",
+      "noteEn": "Pushing from the lower left sends sheep around the upper side of the rock.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": {
+        "swipe": [
+          0.1111111111111111,
+          0.5700000000000001,
+          0.2638888888888889,
+          0.5266666666666666
+        ],
+        "hold": 3000,
+        "wait": 3000
+      },
+      "desc": "swipe(0.11,0.57→0.26,0.53) 3000ms",
+      "note": "群れの下を保って犬を上げる。岩の左に一頭残りそう。",
+      "noteEn": "Keeping the dog below the flock; one sheep remains beside the rock.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": {
+        "swipe": [
+          0.2638888888888889,
+          0.5266666666666666,
+          0.4722222222222222,
+          0.5483333333333333
+        ],
+        "hold": 2000,
+        "wait": 4000
+      },
+      "desc": "swipe(0.26,0.53→0.47,0.55) 2000ms",
+      "note": "入口前の羊は自分で進むので、下の二頭に集中できる。",
+      "noteEn": "The sheep at the entrance continue home, freeing attention for the remaining pair.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": {
+        "swipe": [
+          0.4722222222222222,
+          0.5483333333333333,
+          0.5833333333333334,
+          0.5122222222222221
+        ],
+        "hold": 2000,
+        "wait": 5000
+      },
+      "desc": "swipe(0.47,0.55→0.58,0.51) 2000ms",
+      "note": "最後の一頭を下から押して入口へ。",
+      "noteEn": "Moving below the last sheep to guide it to the gate.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}

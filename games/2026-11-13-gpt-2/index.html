@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>残り火の三番人</title>
+<style>
+*{box-sizing:border-box;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overscroll-behavior:none;font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;background:#222c3c;color:#f4e5c9}
+#game{position:relative;width:100vw;height:100dvh;overflow:hidden;background:radial-gradient(ellipse at 50% 55%,#664234,#222c3c 70%)}
+header{position:absolute;top:3%;left:6%;right:6%;display:flex;justify-content:space-between;font-size:16px;font-weight:700}
+#bars{position:absolute;top:14%;left:6%;width:88%;height:7px;display:flex;gap:8px}
+.meter{background:#48515c;flex:1;border-radius:5px;overflow:hidden}.meter i{display:block;height:100%;transition:width .18s}
+#enemybar{position:absolute;top:21%;left:20%;width:60%;height:6px;background:#48515c}#enemybar i{display:block;height:100%;background:#dfaf84}
+#rule{position:absolute;top:70%;width:100%;text-align:center;font-size:12px;color:#edc17e}
+#stats{position:absolute;top:9%;left:6%;right:6%;display:flex;justify-content:space-between;font-size:18px}
+#enemy{position:absolute;top:17%;width:100%;text-align:center;font-size:19px;font-weight:700}
+#figure{position:absolute;top:23%;left:28%;width:44%;height:24%}
+#intent{position:absolute;top:49%;left:5%;width:90%;padding:12px;border:1px solid #baa079;border-radius:12px;background:#202b3bd9;text-align:center;font-size:15px;white-space:pre-line}
+#log{position:absolute;top:62%;left:5%;width:90%;height:10%;text-align:center;font-size:15px;line-height:1.5}
+#actions{position:absolute;top:75%;left:5%;width:90%;height:17%;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+button{min-width:44px;min-height:44px;border:2px solid #b89b72;border-radius:13px;background:#e8d2ac;color:#283341;font:700 17px system-ui}
+button:disabled{opacity:.35}
+#hint{position:absolute;bottom:2%;width:100%;text-align:center;font-size:14px}
+#cover{position:absolute;inset:0;background:#222c3cf5;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7%;text-align:center}
+#cover.hidden{display:none}
+#cover.result{background:transparent;justify-content:flex-end;padding:0 5% 3%}#cover.result h1{font-size:23px;margin:3px;background:#222c3c}#cover.result p{font-size:14px;margin:3px;background:#222c3c}
+h1{font-size:clamp(25px,7vw,35px);margin:8px 0}p{font-size:17px;line-height:1.7;white-space:pre-line}
+</style>
+</head>
+<body>
+<div id="game">
+<header><span id="label"></span><span id="stage"></span></header>
+<div id="stats"><span id="hp"></span><span id="heat"></span></div>
+<div id="bars"><span class="meter"><i id="lifeBar" style="background:#96c59e"></i></span><span class="meter"><i id="heatBar" style="background:#edb26d"></i></span></div><div id="enemybar"><i id="enemyFill"></i></div><div id="enemy"></div>
+<svg id="figure" viewBox="0 0 140 140">
+<ellipse cx="70" cy="124" rx="48" ry="8" fill="#141e2b"/>
+<path id="body" d="M35 110L24 55 45 31 95 31 116 55 105 110Z" fill="#9a9481" stroke="#d2b58b" stroke-width="4"/>
+<path d="M46 47L58 20 70 35 82 20 96 47Z" fill="#b69d73"/>
+<path d="M43 64H97V85H43Z" fill="#28303e"/>
+<circle cx="55" cy="73" r="4" fill="#ffd38d"/><circle cx="85" cy="73" r="4" fill="#ffd38d"/>
+<path d="M55 101H85" stroke="#28303e" stroke-width="5"/>
+</svg>
+<div id="intent"></div><div id="log"></div><div id="rule"></div>
+<div id="actions"><button id="cut"></button><button id="fire"></button><button id="guard"></button><button id="potion"></button></div>
+<div id="hint"></div><div id="cover"></div>
+</div>
+<script>
+const LANG=new URLSearchParams(location.search).get('lang')||(/^ja/i.test(navigator.language)?'ja':'en');
+const words={
+ja:{title:'残り火の三番人',intro:'斬ると熱がたまり、火術で使う。\n敵の予告を見て、防御も選ぼう。\n三番人を越えて灯台に火を。',start:'タップでスタート',again:'タップでもう一度',next:'タップで次へ',label:'灯台への道',stage:'番人',hp:'体力',heat:'熱',enemyHP:'残り体力',cut:'斬る 2傷・熱+2',fire:'火術 6傷・熱−3',guard:'防御 5軽減・熱+1',potion:'薬 7回復',hint:'敵の次の行動を読もう',names:['薪の番人','霜の番人','鉄の番人'],strike:'打撃',shield:'盾を構える：斬撃を3軽減',charge:'ためる：今回は攻撃なし',drain:'冷気：3傷・熱を2失う',smash:'大打撃',incoming:'次の行動',damage:'傷',dealt:'与えた傷',taken:'受けた傷',heal:'回復',burn:'火傷！2傷、熱を3に',clear:'番人を越えた',rest:'小休止で体力+4\n残った熱と薬は持ち越す',win:'灯台に火がともった',lose:'火が消えた',remaining:'残った体力',potions:'薬',then:'続いて',done:'この戦いは終了',short:{strike:'打撃',shield:'盾',charge:'ため',drain:'冷気',smash:'大打撃'},need:'火術には熱が3必要',rule:'熱7以上で火傷2傷・熱3へ／火術は盾を無視'},
+en:{title:'Three Keepers of the Ember',intro:'Build heat with cuts, spend it on fire.\nRead enemy intentions and choose when to guard.\nPass three keepers to light the beacon.',start:'Tap to start',again:'Tap to play again',next:'Tap to continue',label:'Road to the beacon',stage:'Keeper',hp:'Health',heat:'Heat',enemyHP:'Health left',cut:'Cut 2 · heat +2',fire:'Fire 6 · heat −3',guard:'Guard 5 · heat +1',potion:'Potion: heal 7',hint:'Read the enemy’s next move',names:['Wood Keeper','Frost Keeper','Iron Keeper'],strike:'Strike',shield:'Shield: cuts deal 3 less',charge:'Charging: no attack this turn',drain:'Cold: 3 damage and heat −2',smash:'Heavy strike',incoming:'Next action',damage:'damage',dealt:'Damage dealt',taken:'Damage taken',heal:'Restored',burn:'Burn! 2 damage; heat set to 3',clear:'Keeper passed',rest:'Rest restores 4 health\nHeat and potions carry forward',win:'The beacon is lit',lose:'The ember went out',remaining:'Health remaining',potions:'Potions',then:'Then',done:'This battle is over',short:{strike:'Strike',shield:'Shield',charge:'Charge',drain:'Cold',smash:'Heavy strike'},need:'Fire needs 3 heat',rule:'Heat over 6: burn 2, reset to 3. Fire ignores shields.'}
+};
+const t=words[LANG==='ja'?'ja':'en'],$=id=>document.getElementById(id);
+for(const type of ['contextmenu','selectstart','gesturestart'])addEventListener(type,e=>e.preventDefault(),{passive:false});
+const signal=(type,data={})=>{try{parent.postMessage({agf:type,...data},'*')}catch{}};
+const enemies=[
+{hp:8,moves:[{type:'strike',damage:3},{type:'shield',damage:0},{type:'strike',damage:4}]},
+{hp:14,moves:[{type:'charge',damage:0},{type:'smash',damage:7},{type:'shield',damage:0},{type:'drain',damage:3}]},
+{hp:20,moves:[{type:'strike',damage:4},{type:'drain',damage:3},{type:'shield',damage:0},{type:'charge',damage:0},{type:'smash',damage:8}]}
+];
+let mode='title',level=0,hp=22,heat=0,potions=2,enemyHP=8,turn=0,ended=0,started=0;
+function cover(title,body,action){$('cover').innerHTML='<h1>'+title+'</h1><p>'+body+'</p><p>'+action+'</p>';$('cover').classList.toggle('result',mode==='result');$('cover').classList.remove('hidden')}
+function begin(){
+enemyHP=enemies[level].hp;turn=0;mode='play';started=performance.now();$('figure').style.opacity='1';$('cover').classList.add('hidden');$('actions').style.visibility='visible';$('log').textContent='';$('hint').textContent=t.hint;signal('start');draw();
+}
+function intentText(move){
+if(move.type==='shield'||move.type==='charge'||move.type==='drain')return t[move.type];
+return t[move.type]+' '+move.damage+' '+t.damage;
+}
+function draw(){
+$('label').textContent=t.label;$('stage').textContent=t.stage+' '+(level+1)+'/3';
+$('hp').textContent=t.hp+' '+hp+'/22';$('heat').textContent=t.heat+' '+heat+'/6';
+$('enemy').textContent=t.names[level]+' · '+t.enemyHP+' '+enemyHP;
+const move=enemies[level].moves[turn%enemies[level].moves.length];
+const after=enemies[level].moves[(turn+1)%enemies[level].moves.length];
+$('intent').textContent=t.incoming+'\n'+intentText(move)+'\n'+t.then+': '+t.short[after.type]+(after.damage?' '+after.damage:'');
+$('body').setAttribute('fill',['#9a9481','#6cabb0','#b28172'][level]);
+$('lifeBar').style.width=(hp/22*100)+'%';$('heatBar').style.width=(heat/6*100)+'%';$('enemyFill').style.width=(enemyHP/enemies[level].hp*100)+'%';$('rule').textContent=t.rule;
+$('cut').textContent=t.cut;$('fire').textContent=t.fire;$('guard').textContent=t.guard;$('potion').textContent=t.potion+' ('+potions+')';
+$('fire').disabled=heat<3;$('potion').disabled=potions===0;
+}
+function act(kind){
+if(mode!=='play'||(kind==='fire'&&heat<3)||(kind==='potion'&&potions===0))return;
+const move=enemies[level].moves[turn%enemies[level].moves.length];
+let damage=0,block=0,restored=0;
+if(kind==='cut'){damage=Math.max(0,2-(move.type==='shield'?3:0));heat+=2}
+if(kind==='fire'){damage=6;heat-=3}
+if(kind==='guard'){block=5;heat++}
+if(kind==='potion'){restored=Math.min(7,22-hp);hp+=restored;potions--}
+$('figure').animate([{transform:'translateX(0)',filter:'brightness(1)'},{transform:'translateX('+(damage?'-9':'0')+'px)',filter:'brightness('+(kind==='fire'?'1.9':'1.3')+')'},{transform:'translateX(0)',filter:'brightness(1)'}],{duration:260});
+$('stats').animate([{color:'#f4e5c9'},{color:kind==='guard'?'#a7dfd0':kind==='potion'?'#b5df96':'#ffd18c'},{color:'#f4e5c9'}],{duration:380});
+enemyHP=Math.max(0,enemyHP-damage);
+let burned=false;if(heat>6){heat=3;hp-=2;burned=true}
+let taken=0;
+if(enemyHP>0){taken=Math.max(0,move.damage-block);hp-=taken;if(move.type==='drain')heat=Math.max(0,heat-2)}
+turn++;
+$('log').textContent=t.dealt+' '+damage+' · '+t.taken+' '+taken+(restored?' · '+t.heal+' '+restored:'')+(burned?'\n'+t.burn:'');
+hp=Math.max(0,hp);draw();
+if(hp<=0||enemyHP<=0){
+$('intent').textContent=t.done;if(enemyHP<=0)$('figure').style.opacity='.45';$('actions').style.visibility='hidden';$('hint').textContent='';$('rule').textContent='';mode='result';ended=performance.now();signal('end');
+if(hp<=0)cover(t.lose,t.remaining+' 0',t.again);
+else if(level===2)cover(t.win,t.remaining+' '+hp+'/22',t.again);
+else cover(t.clear,t.rest,t.next);
+}
+}
+for(const kind of ['cut','fire','guard','potion'])$(kind).addEventListener('pointerdown',e=>{e.preventDefault();act(kind)});
+$('cover').addEventListener('pointerdown',e=>{
+e.preventDefault();
+if(mode==='title'){begin();return}
+if(mode==='result'&&performance.now()-ended>=700){
+if(hp<=0||level===2){level=0;hp=22;heat=0;potions=2}else{level++;hp=Math.min(22,hp+4)}
+begin();
+}
+});
+function tick(){if(mode==='play'&&performance.now()-started>4500)$('hint').textContent='';requestAnimationFrame(tick)}
+draw();cover(t.title,t.intro,t.start);requestAnimationFrame(tick);
+</script>
+</body></html>
