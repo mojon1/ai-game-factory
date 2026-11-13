@@ -1,0 +1,664 @@
+{
+  "id": "2026-11-13-claude-1",
+  "status": "published",
+  "title": "かえし刃",
+  "genre": "アクション",
+  "concept": "飛んでくる矢を指でなぞって切り返す。なぞった向きがそのまま矢の飛ぶ向きになり、敵を討つ。引きつけて切れば速く貫く「見切り」、壁ではね返して盾の横を突く一撃と、一太刀の向きと間合いで敵を崩す手触りが核。",
+  "howToPlay": "矢や手裏剣が輪に入ったら、敵の方へ指でさっとなぞって返す。引きつけるほど強く、壁ではね返すと盾の鬼も倒せる。",
+  "libraryDecision": "効果音に ZzFX を使う。打ち返す金属音・見切りの高い音・連が伸びるほど上がる命中音など、切った瞬間の手応えを音で強めたいから。描画は Canvas 2D で足り、3Dや物理は向きを読む遊びをかえって分かりにくくするので使わない。",
+  "soundDecision": "ZzFX で、なぞる風切り音、矢をはじく金属音（見切りはさらに高く長く）、命中・爆発・盾ではじく音を鳴らす。後ろでは陣が進むほど速くなる控えめな太鼓を刻み、緊張感を上げる。切った瞬間の気持ちよさが核なので、音は欠かせない。",
+  "improvements": [
+    {
+      "found": "陣が始まってから最初の攻撃まで3秒近く何も起きず間延びする／月がHUDの「ベスト」に重なる／切っても侍が動かず、切った手応えが薄い",
+      "changed": "最初の攻撃までの待ちと攻撃の間隔を縮め、同時に飛ぶ矢を2本からにした。月を下へずらした。切った向きへ刀が振れて弧が光るようにし、敵にも笠・覆面・目を描いて見分けやすくした",
+      "foundEn": "Nearly 3 seconds of nothing at the start of each wave / the moon overlapped the Best label / the samurai never moved, so cuts felt detached",
+      "changedEn": "Shortened the opening delay and attack intervals and allowed two projectiles at once from wave 1. Moved the moon down. The sword now snaps toward the cut with a glowing arc; foes got hats, masks and eyes"
+    },
+    {
+      "found": "手裏剣や矢が暗い地面にまぎれて見えにくい／爆弾が遅く、待つだけの時間が長い／動く忍者に返すと外れやすい",
+      "changed": "敵の飛び道具に赤いにじみを付け、手裏剣を白く大きくした。爆弾と岩を速くした。狙いの補正を、飛んでいく間に忍者が動く分まで先読みするようにした",
+      "foundEn": "Shuriken and arrows blended into the dark ground / bombs were slow, leaving dead waiting time / returns at moving ninjas usually missed",
+      "changedEn": "Added a red glow to enemy projectiles and made shuriken brighter and bigger. Sped up bombs and rocks. Aim assist now leads a moving ninja by the flight time"
+    },
+    {
+      "found": "壁ではね返して盾の横を突こうとしても、狙いの補正が鬼本体へ吸い寄せて盾に当たってしまう／鬼の体力や「盾！」の文字がHUDに重なる／連が伸びても音や見た目が変わらない",
+      "changed": "盾ではじかれる向きの敵には補正をかけないようにした。敵の出る高さをHUDの下に下げ、「盾！」を鬼の下に出した。連が伸びるほど命中音が高くなり、連の文字が弾んで5連から桃色になる",
+      "foundEn": "Trying to bank past a shield, the aim assist pulled the shot straight into it / the oni's life pips and Blocked text overlapped the HUD / long chains felt the same as short ones",
+      "changedEn": "Aim assist now ignores foes whose shield would block the shot. Foes spawn below the HUD and Blocked shows under the oni. Hit pitch rises with the chain, and the chain counter pops and turns pink from 5"
+    },
+    {
+      "found": "陣を破った後も残った矢が飛んできて、返しても当てる敵がいない／鬼が中央寄りだと盾の守りが広すぎて、壁ばねでもほぼ通らない／壁ではね返して当てても倒しきれないと「はずれ」扱いで連が切れる",
+      "changed": "陣を破ると残りの矢が散って消えるようにした。盾の守る角度を狭めた。当たれば連を切らないよう直し、壁ではね返した一撃は2ダメージ＋「はね返し +300」にして狙う価値を上げた。画面端の文字も枠内に収めた",
+      "foundEn": "Leftover arrows kept coming after a wave broke, with nobody left to return them to / with the oni near the center the shield covered so much that banks rarely got through / a bank shot that hurt but did not kill counted as a miss and broke the chain",
+      "changedEn": "Breaking a wave now scatters remaining arrows. Narrowed the shield angle. Any hit keeps the chain, and a banked hit deals 2 damage plus a +300 Bank shot bonus. Floating text is kept on screen"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "アクション",
+      "en": "Action",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "飛んでくる矢を指でなぞって切り返し、なぞった向きで敵を討つ侍アクション。見切り・壁ばね・爆弾の誘爆で一太刀の向きを読む。",
+        "ideaEn": "A samurai action game: swipe through incoming arrows to send them back, the swipe direction aiming the return; Perfects, wall banks and bomb blasts.",
+        "fromDraw": true
+      },
+      {
+        "idea": "指で砂に熊手の線を引くと、その上を転がる石が線に沿って流れる枯山水の遊び場（終わりなし）。",
+        "ideaEn": "A zen garden playground: rake lines in sand and pebbles roll along them (no ending).",
+        "fromDraw": false
+      },
+      {
+        "idea": "3Dの鍾乳洞で、しずくが落ちる場所を予想して指でコップを動かし、音階を集めて曲を完成させる。",
+        "ideaEn": "In a 3D limestone cave, move a cup to catch dripping water and collect notes to finish a melody.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "fail",
+    "input": [
+      "swipe"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Turnback Blade",
+      "concept": "Swipe through incoming arrows to send them back: the direction of your swipe is the direction they fly. Cut late for a fast, piercing Perfect; bank off a wall to strike a shielded oni from the side. The core is reading the angle and timing of a single cut.",
+      "howToPlay": "When an arrow or shuriken enters the ring, swipe toward a foe to send it back. Cut late for power; bank off walls to beat shields.",
+      "libraryDecision": "Uses ZzFX for sound effects: the metallic parry, the higher Perfect chime and hit sounds that rise with the chain all strengthen the feel of each cut. Canvas 2D is enough for drawing; 3D or physics would only blur the direction-reading play.",
+      "soundDecision": "ZzFX swish on the swipe, a metallic clang on each parry (higher and longer for a Perfect), hits, blasts and shield pings, over a quiet taiko pulse that speeds up wave by wave. The joy of the cut is the core, so sound is essential."
+    }
+  },
+  "createdAt": "2026-11-13T09:07:02+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-13T09:07:02+09:00",
+    "metricsFrom": "2026-11-13T00:06:29.548Z",
+    "transcript": "27549cfb-609b-4453-af90-d87589de370e.jsonl",
+    "validationRuns": 7,
+    "finishedAt": "2026-11-13T09:33:48+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-13T09:33:34+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "37.4KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=99",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=126",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=80",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=130",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 38290,
+    "lines": 817
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0.4,
+    "idleStarts": 5
+  },
+  "libraries": [
+    {
+      "name": "ZzFX",
+      "version": "1.4.0",
+      "file": "zzfx-1.4.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "序盤の2陣は矢が1〜2本ずつ来るだけで「待つ→なぞる」の繰り返しになりやすい。第5陣以降は新しい敵が出ず数が増えるだけで、変化が尽きる",
+    "comment": "なぞった向きに矢が飛び返る手触りははっきりしていて、ひきつけて「見切り！」で弓兵と奥の忍者をまとめて貫いた場面、爆弾を返して「2人斬り！」になった場面、右の壁ではね返した岩で盾鬼を一撃で倒した場面は気持ちよかった。一方で自己プレイは時間が止まる環境なので、実機で飛んでくる矢を素早くなぞる難しさは確かめられていない。補正があるので狙いはやさしめのはず",
+    "similar": [
+      {
+        "title": "Saber Master",
+        "url": "https://apps.apple.com/app/id1555031681",
+        "similarity": "中",
+        "note": "スワイプで剣を動かして飛び道具をはじく点が似ている。こちらは返す向きで敵を討ち、壁ばねや盾で角度を読ませる",
+        "note_en": "Also swipes a blade to deflect projectiles. Here the return direction kills foes, with wall banks and shields to read angles"
+      },
+      {
+        "title": "Ink Parry: Seonbi Swordsman",
+        "url": "https://www.pocketgamer.com/ink-parry-seonbi-swordsman/out-now/",
+        "similarity": "中",
+        "note": "飛んでくる矢を切り落としてパリィの連続をつなぐ点が似ている。こちらは切った矢そのものが攻撃になる",
+        "note_en": "Also cuts arrows mid-flight and builds parry combos. Here the cut arrow itself becomes your attack"
+      }
+    ],
+    "research": "WebSearch で「swipe deflect arrows back samurai mobile parry」を1回検索し、スワイプで飛び道具をはじくスマホ作品を確認した",
+    "i18n": {
+      "en": {
+        "worst": "The first two waves send only one or two arrows at a time, so it settles into wait-then-swipe. After wave 5 no new foes appear, only more of the same",
+        "comment": "The feel of the arrow flying back along your swipe is clear. Holding late for a Perfect that pierced an archer and the ninja behind, returning a bomb for a two-kill blast, and felling the shielded oni with a rock banked off the right wall all felt great. Self-play runs with time frozen, so I could not verify how hard real-time swiping is on a phone; aim assist should keep it forgiving",
+        "research": "One WebSearch for swipe-to-deflect samurai parry mobile games"
+      }
+    },
+    "method": "スマホ縦画面で 20 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 20 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 1700ms",
+        "note": "最終プレイ開始。弓兵2体",
+        "noteEn": "Final run starts. Two archers",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "wait 1600ms → swipe(0.49,0.79→0.49,0.67) 50ms → wait 350ms",
+        "note": "矢を引きつけて真上へ見切り",
+        "noteEn": "Hold the arrow and Perfect it straight up",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 2400ms",
+        "note": "見切りで1体",
+        "noteEn": "One down with a Perfect",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 1000ms → swipe(0.47,0.70→0.46,0.58) 50ms → wait 500ms",
+        "note": "残る弓兵へ返す",
+        "noteEn": "Back to the remaining archer",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 3200ms",
+        "note": "第2陣へ",
+        "noteEn": "Into wave 2",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 550ms → swipe(0.40,0.67→0.37,0.58) 45ms → wait 250ms",
+        "note": "矢と爆弾が同時に。先に矢を左の弓兵へ",
+        "noteEn": "Arrow and bomb together; arrow first, to the left archer",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "swipe(0.51,0.69→0.49,0.59) 45ms → wait 700ms",
+        "note": "爆弾を上へ。爆風で焙烙兵と弓兵を2人斬り",
+        "noteEn": "Bomb up: the blast takes the thrower and the archer together",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 2500ms",
+        "note": "残っていた矢は陣を破った瞬間に散った。4連のまま第3陣へ",
+        "noteEn": "The leftover arrow scattered when the wave broke. On to wave 3 keeping the 4 chain",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 720ms → swipe(0.36,0.67→0.31,0.60) 40ms → wait 300ms",
+        "note": "左の忍者の手裏剣を、近くの焙烙兵へ",
+        "noteEn": "The left ninja's shuriken goes to the nearby bomb thrower",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 930ms → swipe(0.54,0.77→0.57,0.69) 40ms → wait 350ms",
+        "note": "5連で文字が桃色に。弓兵と忍者が縦に並んだので、引きつけて見切りで貫く",
+        "noteEn": "At 5 chain the text turns pink. Archer and ninja line up; hold late and pierce with a Perfect",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "wait 700ms",
+        "note": "見切りの矢が手裏剣を撃ち落とし、弓兵も討った。6連",
+        "noteEn": "The Perfect arrow cut down a shuriken and felled the archer. 6 chain",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "wait 600ms → swipe(0.48,0.69→0.47,0.58) 40ms → wait 2500ms",
+        "note": "見切りの矢がそのまま奥の忍者も貫いて2人斬り。最後の忍者へ返す",
+        "noteEn": "The Perfect arrow pierced the ninja behind too. Returning to the last ninja",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "wait 900ms",
+        "note": "忍者が右へ逃げていて外れた。連が切れた",
+        "noteEn": "The ninja had slipped right; a miss, and the chain broke",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "wait 200ms → swipe(0.63,0.67→0.68,0.59) 40ms → wait 2600ms",
+        "note": "今度は先読みの補正込みで忍者に返す",
+        "noteEn": "This time the return leads the moving ninja",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "wait 1250ms",
+        "note": "右に盾鬼。岩を右の壁へ返せば、はね返って盾の横から当たるはず",
+        "noteEn": "Shielded oni on the right. Bank the rock off the right wall to hit it from the side",
+        "image": "ai-play/step-15.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "wait 40ms → swipe(0.57,0.64→0.69,0.57) 40ms → wait 250ms",
+        "note": "岩を右上の壁へ向けて斜めに切り返す",
+        "noteEn": "Cut the rock back diagonally toward the right wall",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 17,
+        "action": "wait 150ms",
+        "note": "岩が右の壁ではね返り、盾の横から鬼に命中",
+        "noteEn": "The rock bounces off the right wall and hits the oni past its shield",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 18,
+        "action": "wait 300ms → swipe(0.52,0.69→0.51,0.58) 40ms → wait 400ms",
+        "note": "壁ではね返した一撃で盾鬼を倒せた。これは気持ちいい。弓兵の矢を真上へ返す",
+        "noteEn": "One bank shot felled the shielded oni, a great feeling. Arrow straight back at the archer",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 19,
+        "action": "wait 7000ms",
+        "note": "ここから手を止めて、ゲームオーバーの画面を確かめる",
+        "noteEn": "Stopping here to check the game-over screen",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 4620
+            }
+          },
+          {
+            "agf": "end",
+            "score": 4620
+          }
+        ]
+      },
+      {
+        "step": 20,
+        "action": "wait 1000ms → tap(0.50,0.50) 120ms → wait 800ms",
+        "note": "結果画面から、タップでもう一度遊べる",
+        "noteEn": "From the result screen, tap to play again",
+        "image": "ai-play/step-20.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 4620
+            }
+          },
+          {
+            "agf": "end",
+            "score": 4620
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-13T09:33:48+09:00"
+  },
+  "publishedAt": "2026-11-13T09:33:48+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 29239,
+    "outputTokens": 55989,
+    "contextTokens": 38849763,
+    "turns": 185,
+    "toolCalls": 187,
+    "webSearches": 0,
+    "minutes": 27.4,
+    "from": "2026-11-13T00:06:29.548Z",
+    "to": "2026-11-13T00:33:52.234Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-13T09:33:52+09:00",
+    "validationRuns": 7,
+    "codeKB": 37.4
+  }
+}
