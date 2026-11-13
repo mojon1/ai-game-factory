@@ -1,0 +1,348 @@
+{
+  "id": "2026-11-13-gpt-1",
+  "status": "published",
+  "title": "まわりこみ牧羊犬",
+  "genre": "生き物・ペット",
+  "concept": "羊の後ろへ犬を回り込ませ、逃げる方向を変えて囲いへ導く。群れが岩の左右へ分かれたら、犬の位置を変えて合流させる。急ぐ制限はなく、反応を見ながら6頭の帰り道を作る。",
+  "howToPlay": "牧場で指を動かすと犬が追いかけます。羊の進めたい方向と反対側へ犬を回し、上の囲いへ6頭を導きましょう。",
+  "libraryDecision": "犬と群れを同時に観察する俯瞰のCanvas 2Dを選んだ。3Dの草で羊が隠れる表現や棚の物理は使わず、距離に応じた反応を読みやすく保つ。",
+  "soundDecision": "羊が帰ると小さな音階が上がる正弦波を鳴らす。群れを見ている最中も成功が伝わるようにし、BGMは入れない。",
+  "improvements": [
+    {
+      "found": "犬がどこまで羊に影響するか見えない／入口の判定位置が曖昧／帰った瞬間の反応が小さい。",
+      "changed": "犬の周囲に反応範囲の点線を描き、入口を明るい帯で示した。到着時は帯を黄色にして短い歓迎文を表示。",
+      "foundEn": "The dog's influence range is unclear; the arrival boundary is ambiguous; arrivals feel faint.",
+      "changedEn": "Added a dotted influence circle, a bright entrance strip, and a yellow flash with a welcome message for each arrival."
+    },
+    {
+      "found": "入口の直前で羊が止まり追い直す待ちが長い／反応中の羊の進む向きが読みにくい／犬が目指す場所が見えない。",
+      "changed": "入口に近づいた羊には囲いへの弱い誘導を加えた。犬に反応中の羊へ短い方向線を出し、犬の目的地と経路を点線で示す。",
+      "foundEn": "Sheep stall just before the gate; their response direction is hard to read; the dog's destination is invisible.",
+      "changedEn": "Added gentle pen attraction near the entrance, short direction marks for influenced sheep, and a dotted target line for the dog."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "生き物・ペット",
+      "en": "Creatures / pets",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "まわりこみ牧羊犬。羊の背後へ犬を動かし群れを導く。3Dの草地も考えたが、俯瞰2Dなら羊が隠れず反応の方向が読める。",
+        "ideaEn": "Around the Flock: steer sheep by moving a dog behind them. An overhead 2D pasture keeps their reactions clearer than 3D grass.",
+        "fromDraw": true
+      },
+      {
+        "idea": "雨音の間借り。窓の開閉で雨の拍を重ねる終わりのない音の庭。2Dの水紋を音と同期させ、奥行きより指先の響きを重視。",
+        "ideaEn": "Borrowed Rain: layer rain rhythms by opening windows in an endless sound garden. Flat ripples synchronize with sound rather than adding depth.",
+        "fromDraw": false
+      },
+      {
+        "idea": "小惑星の裏庭。3Dの岩を回して日陰の種を見つけ、光の向きで育てる。裏側を観察する奥行きを発見そのものにする。",
+        "ideaEn": "Asteroid Garden: rotate a 3D rock to discover hidden seeds and grow them with directional light. Depth makes observation a discovery.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "complete",
+    "ending": "goal",
+    "input": [
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Around the Flock",
+      "concept": "Move a dog behind sheep to steer their escape direction into a pen. Reunite a flock split by a rock by changing the dog's position, without a time limit.",
+      "howToPlay": "Move your finger in the field and the dog follows. Get behind sheep, opposite the direction you want them to go, and guide all six into the upper pen.",
+      "libraryDecision": "Canvas 2D keeps dog and flock visible together. No 3D grass or library physics obscures the readable distance-based reactions.",
+      "soundDecision": "A quiet rising sine tone marks each sheep arriving home, so success is clear while watching the flock. No background music."
+    }
+  },
+  "createdAt": "2026-11-13T12:00:16+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-13T12:00:16+09:00",
+    "metricsFrom": "2026-11-13T02:58:47.107Z",
+    "transcript": null,
+    "validationRuns": 3,
+    "finishedAt": "2026-11-13T12:11:24+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-13T12:07:30+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "9.1KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=47",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=76",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=42",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=72",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 9274,
+    "lines": 119
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 2,
+    "works": "ok",
+    "worst": "牧場と初期配置が一つだけなので、追い方を覚えると変化が少ない。",
+    "comment": "右の二頭を帰してから犬を下へ大回りし、左の群れを岩の上へ押すと5/6までまとまって進んだ。最後の一頭を追って43.1秒で完了。回り込む意味はあるが、次の遊びが同じ配置だけなのは弱い。",
+    "similar": [
+      {
+        "title": "Herdling",
+        "url": "https://www.okomotive.ch/presskit/sheet.php?p=herdling",
+        "similarity": "中",
+        "note": "群れを導いて障害物のある場所を通す構造が近い。本作は一画面の2D牧場で犬から逃げる羊6頭を囲いへ導く。山への旅や生き物との物語はない。",
+        "note_en": "Both guide a herd around environmental obstacles. Here six sheep flee a dog toward a pen in one flat pasture, without a mountain journey or creature narrative."
+      }
+    ],
+    "research": "Herdlingの公式情報を1検索し、開発元Okomotiveのプレスキットで群れと障害物の構造を確認。",
+    "i18n": {
+      "en": {
+        "worst": "There is only one pasture and starting arrangement, so learning the route leaves little variety.",
+        "comment": "After returning the right pair, circling below and pushing the left flock above the rock brought the count to 5/6. The last sheep finished in 43.1 seconds. Positioning matters, but every replay repeats the same arrangement.",
+        "research": "One search for official Herdling information; checked the developer Okomotive press kit for herding and obstacle features."
+      }
+    },
+    "method": "スマホ縦画面で 8 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 8 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.55) 120ms",
+        "note": "目的地の線と羊の方向線を使って、群れの右から回り込む。",
+        "noteEn": "Using target and direction marks to approach from the right.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "path(0.50,0.73→0.78,0.64→0.79,0.51) 5000ms",
+        "note": "右の羊を入口側へ押す。まだ左の群れは待っている。",
+        "noteEn": "Pushing the right flock toward the gate while the left flock waits.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "swipe(0.79,0.51→0.67,0.43) 3000ms",
+        "note": "入口まで届いた二頭がそのまま囲いへ入った。",
+        "noteEn": "The two sheep near the entrance continue into the pen.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "path(0.67,0.43→0.83,0.69→0.19,0.69) 4500ms",
+        "note": "残った羊の下へ遠回りする。上から近づけないよう右を回る。",
+        "noteEn": "Taking the right side around to get below the remaining flock.",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "swipe(0.19,0.69→0.11,0.57) 3500ms",
+        "note": "左下から寄せる。羊が岩の上側へ回った。",
+        "noteEn": "Pushing from the lower left sends sheep around the upper side of the rock.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "swipe(0.11,0.57→0.26,0.53) 3000ms",
+        "note": "群れの下を保って犬を上げる。岩の左に一頭残りそう。",
+        "noteEn": "Keeping the dog below the flock; one sheep remains beside the rock.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "swipe(0.26,0.53→0.47,0.55) 2000ms",
+        "note": "入口前の羊は自分で進むので、下の二頭に集中できる。",
+        "noteEn": "The sheep at the entrance continue home, freeing attention for the remaining pair.",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "swipe(0.47,0.55→0.58,0.51) 2000ms",
+        "note": "最後の一頭を下から押して入口へ。",
+        "noteEn": "Moving below the last sheep to guide it to the gate.",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-13T12:11:24+09:00"
+  },
+  "publishedAt": "2026-11-13T12:11:24+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 4126,
+    "outputTokens": 8076,
+    "contextTokens": 5290396,
+    "turns": 27,
+    "toolCalls": 27,
+    "webSearches": null,
+    "minutes": 12.7,
+    "from": "2026-11-13T02:58:47.107Z",
+    "to": "2026-11-13T03:11:28.128Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-13T12:11:28+09:00",
+    "validationRuns": 3,
+    "codeKB": 9.1,
+    "evidence": "metrics-evidence.json"
+  }
+}

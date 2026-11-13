@@ -1,0 +1,594 @@
+{
+  "id": "2026-11-13-gpt-2",
+  "status": "published",
+  "title": "残り火の三番人",
+  "genre": "RPG",
+  "concept": "斬撃で得る熱を火術へ変え、敵の予告に合わせて防御や薬を挟む。盾には火術、重い一撃には防御という使い分けに、熱の上限と冷気の損失を重ねる。三戦に体力と薬を持ち越す短い旅。",
+  "howToPlay": "敵の次の行動を見て四つのボタンから選びます。斬ると熱+2、火術は熱3を使って6傷。防御は5傷を防ぎます。熱6を超えると火傷します。",
+  "libraryDecision": "敵の予告と手札の比較が中心なので、2Dの大きな像とHTMLの数値を使う。3Dの戦場や描画・物理の棚で情報を散らさず、四つの行動の判断を前面に置く。",
+  "soundDecision": "音は付けず、敵の予告と前の行動結果を自分のペースで読む静かな戦いにする。効果は文字と状態変化で伝える。",
+  "improvements": [
+    {
+      "found": "体力と熱が数字だけで比較しにくい／熱の上限超過と火術の盾無視が画面から分からない／結果が最後の一撃を隠す。",
+      "changed": "体力・熱・敵体力のバーを加え、火傷と盾無視の短い説明を常設。結果を下の余白へ移し、戦闘の状態と最後の結果を残した。",
+      "foundEn": "Numbers alone slow health and heat comparisons; burn and shield bypass rules are unclear; results hide the last hit.",
+      "changedEn": "Added player health, heat and enemy health bars, a short burn and shield rule, and a bottom result panel retaining the combat state."
+    },
+    {
+      "found": "次の一手だけではための後を準備しづらい／斬撃・火術・防御が数値の変化だけで手応えが薄い／倒した敵が次の攻撃を予告し続ける。",
+      "changed": "二手目の短い予告を追加。攻撃時の像の揺れと光、防御・回復時の色を加えた。決着後は敵を暗くし、予告を戦闘終了へ切り替える。",
+      "foundEn": "One-action previews limit preparation; cuts, fire and guard feel mostly numerical; defeated foes keep announcing attacks.",
+      "changedEn": "Added a compact second-action preview, attack shake and light, guard and healing color feedback, and a dimmed defeated foe with a battle-over message."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "RPG",
+      "en": "RPG",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "残り火の三番人。斬撃で熱をため、火術と防御で三連戦を抜ける。3D戦場より、大きな平面像と予告札で行動を比較させる。",
+        "ideaEn": "Three Keepers of the Ember: build heat with cuts and use fire and guard through three battles. A flat figure and intention panel clarify choices better than a 3D battlefield.",
+        "fromDraw": true
+      },
+      {
+        "idea": "曇りガラスの庭。指で窓を拭くと奥の植物が光を受けて育つ。3Dの奥行きが日陰を発見する役割を持つ、終わりのない観察遊び。",
+        "ideaEn": "Fogged Glass Garden: wipe a window to grow plants behind it. 3D depth reveals shaded areas in an endless observation toy.",
+        "fromDraw": false
+      },
+      {
+        "idea": "ひも先の音符。弦の長さを動かして旋律を作り、小鳥の歌に返す。2Dの弦の波形と指の動きを対応させ、音を核にする。",
+        "ideaEn": "Notes on a String: change string lengths to answer a bird's melody. Flat waveforms connect finger movement directly to sound.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "other",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Three Keepers of the Ember",
+      "concept": "Turn heat from cuts into fire, guarding or healing according to enemy intentions. Shields favor fire, heavy strikes favor guard, and cold and overheating complicate heat management across three battles.",
+      "howToPlay": "Read the next enemy action and choose one of four buttons. Cut adds 2 heat, fire spends 3 heat to deal 6 damage, and guard blocks 5 damage. Exceeding 6 heat causes a burn.",
+      "libraryDecision": "A large flat enemy figure and HTML values keep intentions and actions readable. A 3D battlefield or rendering and physics libraries would distract from the four-action decision.",
+      "soundDecision": "No sound, allowing players to read intentions and results at their own pace. Text and state changes communicate effects."
+    }
+  },
+  "createdAt": "2026-11-13T12:13:53+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-13T12:13:53+09:00",
+    "metricsFrom": "2026-11-13T03:11:31.691Z",
+    "transcript": null,
+    "validationRuns": 3,
+    "finishedAt": "2026-11-13T12:23:45+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-13T12:18:50+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "10.6KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 10889,
+    "lines": 119
+  },
+  "sound": {
+    "uses": false
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 2,
+    "works": "ok",
+    "worst": "敵の行動列と三連戦が固定で、一度勝ち筋を見つけると育成や新しい選択が増えない。",
+    "comment": "二番人で大打撃を防いで盾に火術を通し、最後は斬撃で倒して熱5を持ち越せた。三戦目は冷気の前に倒し、体力10・薬2で完了。順番を考える場面はできたが、短い固定戦闘の範囲に留まる。",
+    "similar": [
+      {
+        "title": "Into the Breach",
+        "url": "https://www.subsetgames.com/itb.html",
+        "similarity": "中",
+        "note": "敵の攻撃予告を見て、被害を防ぐ行動を選ぶ点が近い。本作は盤面移動のない一対一の三連戦で、熱の増減と四行動だけを扱う。",
+        "note_en": "Both telegraph enemy attacks so the player can counter them. This is three one-on-one fights without grid movement, using heat and four fixed actions."
+      }
+    ],
+    "research": "敵の行動予告を扱う作品を2検索し、Subset Games公式のInto the Breach説明を確認。",
+    "i18n": {
+      "en": {
+        "worst": "Enemy sequences and the three fights are fixed; finding a winning line adds no growth or new choices.",
+        "comment": "Guarding the second keeper's heavy hit, piercing its shield with fire, then finishing with a cut preserved five heat. The last keeper fell before its cold attack, leaving ten health and two potions. Order matters, but this remains a short fixed combat puzzle.",
+        "research": "Two searches for games with enemy intentions; checked the official Into the Breach description by Subset Games."
+      }
+    },
+    "method": "スマホ縦画面で 18 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 18 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.55) 120ms",
+        "note": "二手先に盾が見える。熱をためて次の打撃前に倒す方針。",
+        "noteEn": "The shield is visible two actions ahead; building heat for a killing fire.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.27,0.79) 120ms",
+        "note": "斬って熱2。盾の次に4傷の打撃が来る。",
+        "noteEn": "Cut for 2 heat; a 4-damage strike follows the shield.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.27,0.79) 120ms",
+        "note": "盾へ斬って熱を4までためた。",
+        "noteEn": "Cutting into the shield raises heat to four.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.73,0.79) 120ms",
+        "note": "火術で一戦目を抜けた。倒した像が暗くなり、戦闘終了の表示になった。",
+        "noteEn": "Fire wins the first battle; the defeated figure dims and the preview ends.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.50,0.55) 120ms",
+        "note": "二戦目。ためのあとに7傷が来ると最初から見える。",
+        "noteEn": "The second battle previews a 7-damage blow after charging.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.27,0.79) 120ms → tap(0.27,0.88) 120ms",
+        "note": "ための間に斬り、大打撃を防御。次の盾を貫く熱4を残せた。",
+        "noteEn": "Cut while charging, guard the heavy blow, and retain four heat for the shield.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.73,0.79) 120ms",
+        "note": "盾を無視して6傷。冷気の前に熱を使い、失う分を減らせた。",
+        "noteEn": "Fire pierces the shield and spends heat before the cold can remove it.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.27,0.79) 120ms",
+        "note": "冷気で熱が1に落ちた。ための間にもう一度ため直せる。",
+        "noteEn": "Cold reduces heat to one; the charging turn allows rebuilding it.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.27,0.79) 120ms",
+        "note": "熱3と敵の体力2。次の大打撃を受ける前に倒せる。",
+        "noteEn": "Heat three versus two enemy health: a kill can prevent the next heavy blow.",
+        "image": "ai-play/step-09.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.27,0.79) 120ms",
+        "note": "ここは火術を使わず斬撃で倒し、熱5を次へ持ち越す。",
+        "noteEn": "A cut finishes the keeper while preserving five heat for the final battle.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.50,0.55) 120ms",
+        "note": "三番人へ。熱5ならすぐ火術を使えるが、斬ると火傷になる。",
+        "noteEn": "Five carried heat enables immediate fire, while another cut would burn.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.73,0.79) 120ms",
+        "note": "冷気の前に熱を使って6傷。次は防御で冷気の傷を抑えたい。",
+        "noteEn": "Spending heat before cold deals six damage; guarding next can block the cold hit.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "tap(0.27,0.88) 120ms",
+        "note": "冷気の傷は防げたが、熱は1まで減った。",
+        "noteEn": "Guard blocks the cold damage, but heat still falls to one.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "tap(0.27,0.79) 120ms",
+        "note": "盾を叩いて熱3に。次のためる間に火術を使える。",
+        "noteEn": "Cutting the shield builds three heat for fire during the charge.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "tap(0.73,0.79) 120ms",
+        "note": "ためる間に6傷を与えた。大打撃8には防御を合わせる。",
+        "noteEn": "Fire deals six during the charge; guard is ready for the heavy eight.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "tap(0.27,0.88) 120ms",
+        "note": "8傷を3傷へ抑えた。敵はあと8、こちらは体力14。",
+        "noteEn": "Guard cuts eight damage to three; the enemy has eight health and I have fourteen.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 17,
+        "action": "tap(0.27,0.79) 120ms",
+        "note": "斬撃で敵を6に、熱を3にできた。冷気が来る前の火術で決着できる。",
+        "noteEn": "A cut leaves six enemy health and three heat; fire can finish before the cold.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 18,
+        "action": "tap(0.73,0.79) 120ms",
+        "note": "三番人を越えた。最後の冷気を受けずに終え、体力10と薬2を残せた。",
+        "noteEn": "All three keepers passed; the final cold never lands, leaving ten health and two potions.",
+        "image": "ai-play/step-18.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-13T12:23:45+09:00"
+  },
+  "publishedAt": "2026-11-13T12:23:45+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 4852,
+    "outputTokens": 8678,
+    "contextTokens": 8222591,
+    "turns": 36,
+    "toolCalls": 36,
+    "webSearches": null,
+    "minutes": 12.3,
+    "from": "2026-11-13T03:11:31.691Z",
+    "to": "2026-11-13T03:23:48.804Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-13T12:23:49+09:00",
+    "validationRuns": 3,
+    "codeKB": 10.6,
+    "evidence": "metrics-evidence.json"
+  }
+}
