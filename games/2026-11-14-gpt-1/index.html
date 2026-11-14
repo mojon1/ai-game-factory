@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>六面の星あつめ</title>
+<style>
+*{box-sizing:border-box;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overscroll-behavior:none;font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;background:#23394a;color:#f4e9cd}
+#game{position:relative;width:100vw;height:100dvh;overflow:hidden;background:radial-gradient(#5d7a80,#23394a)}
+header{position:absolute;top:4%;left:6%;right:6%;display:flex;justify-content:space-between;font-size:17px;font-weight:700}
+#message{position:absolute;top:12%;left:6%;width:88%;text-align:center;font-size:16px}
+#ledger{position:absolute;top:17%;left:15%;width:70%;display:flex;justify-content:space-around}#ledger span{width:23px;height:23px;border-radius:50%;border:2px solid #f4e9cd;text-align:center;line-height:19px;font-size:14px;color:#23394a}
+#view{position:absolute;top:21%;left:0;width:100%;height:57%}
+canvas{display:block;width:100%;height:100%}
+#home{position:absolute;top:83%;left:30%;width:40%;min-height:48px;border:2px solid #ddd8ba;border-radius:16px;background:#e6dec4;color:#23394a;font:16px system-ui}
+#hint{position:absolute;bottom:3%;width:100%;text-align:center;font-size:15px}
+#cover{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:7%;background:#23394af5;text-align:center}
+#cover.hidden{display:none}
+#cover.result{background:transparent;justify-content:flex-end;padding:0 5% 2%}#cover.result h1{font-size:23px;background:#23394a;margin:3px}#cover.result p{font-size:14px;background:#23394a;margin:3px}
+h1{font-size:clamp(26px,7vw,36px);margin:8px 0}p{font-size:17px;line-height:1.7;white-space:pre-line}
+</style>
+</head>
+<body>
+<div id="game">
+<header><span id="label"></span><span id="count"></span></header><div id="message"></div>
+<div id="ledger"></div><div id="view"></div><button id="home"></button><div id="hint"></div><div id="cover"></div>
+</div>
+<script src="../../lib/three-0.186.1.min.js"></script>
+<script>
+const LANG=new URLSearchParams(location.search).get('lang')||(/^ja/i.test(navigator.language)?'ja':'en');
+const words={
+ja:{title:'六面の星あつめ',intro:'庭を指で回して、六つの面を探そう。\n金色の星がある面をタップ。\n裏も底も、忘れずに。',start:'タップでスタート',again:'タップでもう一度',label:'小さな星の庭',count:'見つけた星',message:'回して、まだ金色の面を探そう',hint:'なぞって回す・短くタップして集める',done:'六つの星がそろった',time:'探した時間',seconds:'秒',found:'見つけた！',already:'この面の星は集めたよ',home:'向きを戻す'},
+en:{title:'Six Sides of Starlight',intro:'Turn the garden to explore its six faces.\nTap a face with a golden star.\nRemember the back and the bottom.',start:'Tap to start',again:'Tap to play again',label:'A little star garden',count:'Stars found',message:'Turn it to find the golden faces',hint:'Drag to turn · tap a face to collect',done:'All six stars are together',time:'Time exploring',seconds:'s',found:'Found one!',already:'This face is already collected',home:'Reset view'}
+};
+const t=words[LANG==='ja'?'ja':'en'],$=id=>document.getElementById(id);
+for(const type of ['contextmenu','selectstart','gesturestart'])addEventListener(type,e=>e.preventDefault(),{passive:false});
+const signal=(type,data={})=>{try{parent.postMessage({agf:type,...data},'*')}catch{}};
+const scene=new THREE.Scene(),camera=new THREE.OrthographicCamera(-2.7,2.7,2.7,-2.7,.1,20);
+camera.position.set(0,0,7);camera.lookAt(0,0,0);
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(2,devicePixelRatio||1));renderer.setClearColor(0,0);$('view').appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xfff5db,0x607989,2.8));
+const key=new THREE.DirectionalLight(0xffffff,2);key.position.set(-3,5,5);scene.add(key);
+const garden=new THREE.Group();scene.add(garden);
+const colors=[0x92c6ab,0xa1bfd1,0xcdba89,0xaca0bf,0xb5cc9d,0xc79a93];
+const materials=colors.map(color=>new THREE.MeshStandardMaterial({color,roughness:.85}));
+const cube=new THREE.Mesh(new THREE.BoxGeometry(2.2,2.2,2.2),materials);garden.add(cube);
+const edge=new THREE.LineSegments(new THREE.EdgesGeometry(cube.geometry),new THREE.LineBasicMaterial({color:0xf1e6c8}));garden.add(edge);
+const normals=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
+const stars=[];
+const shape=new THREE.Shape();
+for(let i=0;i<10;i++){const a=Math.PI/2+i*Math.PI/5,r=i%2?.15:.34,x=Math.cos(a)*r,y=Math.sin(a)*r;i?shape.lineTo(x,y):shape.moveTo(x,y)}shape.closePath();
+const starGeometry=new THREE.ExtrudeGeometry(shape,{depth:.1,bevelEnabled:true,bevelThickness:.025,bevelSize:.025,bevelSegments:1,steps:1});
+for(let i=0;i<6;i++){
+const face=new THREE.Group(),normal=new THREE.Vector3(...normals[i]);
+face.position.copy(normal.clone().multiplyScalar(1.115));face.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),normal);
+const disk=new THREE.Mesh(new THREE.CylinderGeometry(.48,.48,.025,24),new THREE.MeshStandardMaterial({color:0x678578,roughness:.9}));
+disk.rotation.x=Math.PI/2;face.add(disk);
+const star=new THREE.Mesh(starGeometry,new THREE.MeshStandardMaterial({color:0xffd36c,metalness:.3,roughness:.35}));star.position.z=.025;face.add(star);
+for(const [x,y] of [[-.75,-.7],[.7,.7]]){
+const plant=new THREE.Mesh(new THREE.ConeGeometry(.12,.35,6),new THREE.MeshStandardMaterial({color:0x497d69}));
+plant.rotation.x=Math.PI/2;plant.position.set(x,y,.15);face.add(plant);
+}
+garden.add(face);stars.push(star);
+}
+const ray=new THREE.Raycaster(),axisX=new THREE.Vector3(1,0,0),axisY=new THREE.Vector3(0,1,0);
+let spinX=0,spinY=0;
+let found=Array(6).fill(false),mode='title',pointer=null,origin=null,previous=null,moved=0,elapsed=0,last=0,ended=0,audio=null;
+function tone(f){try{audio??=new (window.AudioContext||window.webkitAudioContext)();audio.resume();const o=audio.createOscillator(),g=audio.createGain();o.frequency.value=f;g.gain.setValueAtTime(.04,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.18);o.connect(g);g.connect(audio.destination);o.start();o.stop(audio.currentTime+.2)}catch{}}
+function cover(title,body,action){$('cover').innerHTML='<h1>'+title+'</h1><p>'+body+'</p><p>'+action+'</p>';$('cover').classList.toggle('result',mode==='result');$('cover').classList.remove('hidden')}
+function start(){
+mode='play';spinX=0;spinY=0;elapsed=0;found=Array(6).fill(false);pointer=null;
+garden.rotation.set(.42,-.55,0);
+stars.forEach(star=>{star.material.color.setHex(0xffd36c);star.scale.setScalar(1)});
+$('cover').classList.add('hidden');$('home').style.visibility='visible';$('message').textContent=t.message;$('hint').textContent=t.hint;signal('start');tone(340);drawCount();
+}
+function drawCount(){$('count').textContent=t.count+' '+found.filter(Boolean).length+'/6';$('ledger').innerHTML=colors.map((c,i)=>'<span style="background:#'+c.toString(16).padStart(6,'0')+'">'+(found[i]?'✓':'')+'</span>').join('')}
+function collect(e){
+const rect=renderer.domElement.getBoundingClientRect();if(!rect.width||!rect.height)return;
+garden.updateMatrixWorld(true);ray.setFromCamera(new THREE.Vector2((e.clientX-rect.left)/rect.width*2-1,-((e.clientY-rect.top)/rect.height*2-1)),camera);
+const hit=ray.intersectObject(cube)[0];
+let face=hit?hit.face.materialIndex:null,closest=27;
+for(let i=0;i<6;i++){
+const normal=new THREE.Vector3(...normals[i]).applyQuaternion(garden.quaternion);if(normal.z<=.1)continue;
+const point=stars[i].getWorldPosition(new THREE.Vector3()).project(camera),x=rect.left+(point.x+1)*rect.width/2,y=rect.top+(1-point.y)*rect.height/2,d=Math.hypot(e.clientX-x,e.clientY-y);
+if(d<closest){closest=d;face=i}
+}
+if(face===null)return;
+if(found[face]){$('message').textContent=t.already;return}
+found[face]=true;stars[face].material.color.setHex(0xf3f0dc);stars[face].scale.setScalar(.85);$('message').textContent=t.found;drawCount();tone(440+found.filter(Boolean).length*55);
+if(found.every(Boolean)){$('home').style.visibility='hidden';$('hint').textContent='';mode='result';spinX=0;spinY=0;ended=performance.now();signal('end');cover(t.done,t.time+' '+elapsed.toFixed(1)+t.seconds,t.again)}
+}
+renderer.domElement.addEventListener('pointerdown',e=>{
+e.preventDefault();if(mode!=='play'||pointer!==null)return;
+spinX=0;spinY=0;pointer=e.pointerId;origin={x:e.clientX,y:e.clientY};previous={...origin};moved=0;renderer.domElement.setPointerCapture(pointer);
+});
+renderer.domElement.addEventListener('pointermove',e=>{
+if(e.pointerId!==pointer||mode!=='play')return;
+const dx=e.clientX-previous.x,dy=e.clientY-previous.y;spinX=dy*.009;spinY=dx*.009;moved=Math.max(moved,Math.hypot(e.clientX-origin.x,e.clientY-origin.y));
+garden.quaternion.premultiply(new THREE.Quaternion().setFromAxisAngle(axisY,dx*.009)).premultiply(new THREE.Quaternion().setFromAxisAngle(axisX,dy*.009));previous={x:e.clientX,y:e.clientY};
+});
+renderer.domElement.addEventListener('pointerup',e=>{if(e.pointerId!==pointer)return;pointer=null;if(mode==='play'&&moved<10){spinX=0;spinY=0;collect(e)}});
+renderer.domElement.addEventListener('pointercancel',e=>{if(e.pointerId===pointer){pointer=null;spinX=0;spinY=0}});
+$('cover').addEventListener('pointerdown',e=>{e.preventDefault();if(mode==='title'||(mode==='result'&&performance.now()-ended>=700))start()});
+$('home').textContent=t.home;$('home').addEventListener('pointerdown',e=>{e.preventDefault();if(mode!=='play')return;pointer=null;spinX=0;spinY=0;garden.rotation.set(.42,-.55,0);$('message').textContent=t.message});
+function resize(){const w=$('view').clientWidth,h=$('view').clientHeight;if(w<=0||h<=0)return;renderer.setSize(w,h,false);const aspect=w/h;camera.left=-2.7*aspect;camera.right=2.7*aspect;camera.top=2.7;camera.bottom=-2.7;camera.updateProjectionMatrix()}
+function loop(now){const dt=last?Math.min(.05,(now-last)/1000):0;last=now;if(mode==='play'){elapsed+=dt;if(pointer===null){garden.quaternion.premultiply(new THREE.Quaternion().setFromAxisAngle(axisY,spinY*dt*60)).premultiply(new THREE.Quaternion().setFromAxisAngle(axisX,spinX*dt*60));spinX*=Math.pow(.86,dt*60);spinY*=Math.pow(.86,dt*60)}if(elapsed>5)$('hint').textContent=''}renderer.render(scene,camera);requestAnimationFrame(loop)}
+$('label').textContent=t.label;drawCount();garden.rotation.set(.42,-.55,0);cover(t.title,t.intro,t.start);addEventListener('resize',resize);resize();requestAnimationFrame(loop);
+</script>
+</body></html>
