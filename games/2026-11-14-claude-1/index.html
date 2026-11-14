@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>素数斬り / Prime Slash</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #14122a; }
+canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const T = {
+  ja: {
+    title: '素数斬り',
+    how1: '数の石をなぞって斬ると、かけ算の2つに割れる',
+    how2: '素数になるまで斬れ。素数は斬るな。',
+    start: 'タップでスタート',
+    hint: '割れる数は斬る・素数は見送る',
+    over: '修行おわり',
+    best: 'ベスト',
+    newBest: 'ベスト更新！',
+    again: 'タップでもう一度',
+    primes: '集めた素数',
+    isPrime: 'は素数',
+    missed: '見のがし',
+    cut: '斬った',
+    combo: '連斬',
+    oneCut: '一太刀！',
+    lv: '段',
+  },
+  en: {
+    title: 'Prime Slash',
+    how1: 'Swipe a number stone to split it into two factors',
+    how2: 'Slash until only primes remain. Never slash a prime.',
+    start: 'Tap to start',
+    hint: 'Slash composites, let primes fall',
+    over: 'Training over',
+    best: 'Best',
+    newBest: 'New best!',
+    again: 'Tap to play again',
+    primes: 'Primes collected',
+    isPrime: 'is prime',
+    missed: 'Missed',
+    cut: 'Slashed',
+    combo: 'chain',
+    oneCut: 'One stroke!',
+    lv: 'Lv',
+  },
+}[LANG === 'ja' ? 'ja' : 'en'];
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d');
+let W = 360, H = 640, DPR = 1, U = 1;
+function resize() {
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = Math.max(1, window.innerWidth || 360);
+  H = Math.max(1, window.innerHeight || 640);
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+  U = Math.min(W / 360, H / 640);
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+addEventListener('resize', resize);
+resize();
+
+// ---------- sound ----------
+let AC = null, master = null;
+function initAudio() {
+  try {
+    if (!AC) {
+      AC = new (window.AudioContext || window.webkitAudioContext)();
+      master = AC.createGain(); master.gain.value = 0.5; master.connect(AC.destination);
+    }
+    if (AC.state === 'suspended') AC.resume();
+  } catch (e) { AC = null; }
+}
+function tone(f, dur, type = 'sine', vol = 0.2, when = 0, slide = 0) {
+  if (!AC) return;
+  try {
+    const t = AC.currentTime + when;
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(30, f * slide), t + dur);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.02);
+  } catch (e) {}
+}
+let noiseBuf = null;
+function noise(dur, vol, freq, q = 1, when = 0) {
+  if (!AC) return;
+  try {
+    if (!noiseBuf) {
+      noiseBuf = AC.createBuffer(1, AC.sampleRate * 0.5, AC.sampleRate);
+      const d = noiseBuf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    }
+    const t = AC.currentTime + when;
+    const s = AC.createBufferSource(); s.buffer = noiseBuf;
+    const f = AC.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = q;
+    const g = AC.createGain();
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(f); f.connect(g); g.connect(master); s.start(t); s.stop(t + dur + 0.02);
+  } catch (e) {}
+}
+const PENTA = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24];
+const sndSlice = (k) => { noise(0.12, 0.35, 2600 + k * 300, 0.8); tone(180 + k * 40, 0.12, 'triangle', 0.18, 0, 0.5); noise(0.09, 0.25, 700, 2, 0.01); };
+const sndChain = (k) => { tone(523 * Math.pow(2, PENTA[Math.min(k, PENTA.length - 1)] / 12), 0.25, 'triangle', 0.12, 0.02); };
+const sndGem = (k) => { const f = 880 * Math.pow(2, PENTA[k % PENTA.length] / 12); tone(f, 0.4, 'sine', 0.1); tone(f * 2, 0.3, 'sine', 0.04, 0.03); };
+const sndClang = () => { tone(1200, 0.5, 'square', 0.06, 0, 0.98); tone(1690, 0.4, 'square', 0.04, 0, 0.97); tone(90, 0.3, 'sawtooth', 0.15, 0, 0.5); };
+const sndMiss = () => { tone(220, 0.35, 'sawtooth', 0.12, 0, 0.5); tone(110, 0.4, 'sine', 0.2, 0.05, 0.6); };
+const sndToss = () => { noise(0.18, 0.05, 400, 0.7); };
+
+// ---------- math ----------
+function isPrime(n) { if (n < 2) return false; for (let i = 2; i * i <= n; i++) if (n % i === 0) return false; return true; }
+function splitOf(n) { let a = 1; for (let i = 2; i * i <= n; i++) if (n % i === 0) a = i; return [a, n / a]; }
+function factorStr(n) { const f = []; let m = n; for (let p = 2; p * p <= m; p++) while (m % p === 0) { f.push(p); m /= p; } if (m > 1) f.push(m); return f.join(' × '); }
+const TRICK_C = [51, 57, 87, 91, 119, 133, 143, 161, 169, 187, 203, 209, 221, 247, 253, 289];
+const TRICK_P = [53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157];
+const rnd = (a, b) => a + Math.random() * (b - a);
+const ri = (a, b) => Math.floor(rnd(a, b + 1));
+const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+// ---------- state ----------
+let scene = 'title'; // title, play, over
+let rocks = [], parts = [], pops = [], gems = [];
+let score = 0, best = 0, lives = 3, level = 1, primesGot = 0, slashed = 0;
+let waveTimer = 0, waveCount = 0, elapsed = 0, hitstop = 0, shake = 0, overAt = 0, newBest = false;
+let lastMistake = null, hintT = 0, flash = 0, flashCol = '#fff', banner = null;
+let gemStreak = 0;
+
+addEventListener('message', (e) => { if (e.data && e.data.agf === 'loaded' && e.data.data && typeof e.data.data.best === 'number') best = e.data.data.best; });
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+
+function stoneR(n) { return U * 20 * (0.78 + 0.16 * Math.log2(n)); }
+function makeRock(n, x, y, vx, vy) {
+  return { n, x, y, vx, vy, r: stoneR(n), rot: rnd(-0.4, 0.4), vr: rnd(-1.2, 1.2), lock: 0, prime: isPrime(n), alive: true, hitPrime: false, seed: Math.random() * 1000, age: 0 };
+}
+function gravity() { return H * (0.42 + Math.min(0.3, (level - 1) * 0.03)); }
+
+function chooseNumber() {
+  const maxN = Math.min(260, 20 + level * 14);
+  const r = Math.random();
+  if (level >= 3 && r < 0.12 + Math.min(0.12, level * 0.01)) {
+    const pool = TRICK_C.filter((v) => v <= maxN + 40);
+    if (pool.length) return pick(pool);
+  }
+  if (level >= 3 && r < 0.26) {
+    const pool = TRICK_P.filter((v) => v <= maxN + 40);
+    if (pool.length) return pick(pool);
+  }
+  if (Math.random() < 0.35) { // prime
+    const ps = []; for (let i = 2; i <= Math.max(13, maxN * 0.6); i++) if (isPrime(i)) ps.push(i);
+    return pick(ps);
+  }
+  // composite with nice factor trees
+  for (let t = 0; t < 40; t++) {
+    const n = ri(4, maxN);
+    if (!isPrime(n)) return n;
+  }
+  return 12;
+}
+
+function launchWave() {
+  waveCount++;
+  if (waveCount % 3 === 0) { level++; banner = { text: T.lv + ' ' + level, t: 1.4 }; }
+  const cnt = Math.min(5, 2 + Math.floor((level - 1 + Math.random() * 1.5) / 2));
+  const g = gravity();
+  const nums = []; for (let i = 0; i < cnt; i++) nums.push(chooseNumber());
+  if (waveCount >= 2 && !nums.some(isPrime)) {
+    const tp = TRICK_P.filter((v) => v <= 20 + level * 14 + 40);
+    nums[nums.length - 1] = level >= 3 && tp.length && Math.random() < 0.6 ? pick(tp) : pick([7, 11, 13, 17, 19, 23, 29, 31, 37]);
+  }
+  for (let i = 0; i < cnt; i++) {
+    const n = nums[i];
+    const x = rnd(W * 0.15, W * 0.85);
+    const peak = rnd(H * 0.22, H * 0.42);
+    const vy = -Math.sqrt(2 * g * (H + 40 - peak));
+    const tx = rnd(W * 0.2, W * 0.8);
+    const tUp = -vy / g;
+    const vx = (tx - x) / tUp;
+    const rk = makeRock(n, x, H + stoneR(n) + 10 + i * 25 * U, vx, vy);
+    rk.delay = i * rnd(0.18, 0.4);
+    rk.root = { n, pend: 1, strokes: new Set() };
+    rocks.push(rk);
+  }
+  sndToss();
+}
+
+function startGame() {
+  scene = 'play';
+  rocks = []; parts = []; pops = []; gems = [];
+  score = 0; lives = 3; level = 1; primesGot = 0; slashed = 0;
+  waveTimer = 0.6; waveCount = 0; elapsed = 0; lastMistake = null; hintT = 4; newBest = false; banner = null; gemStreak = 0;
+  signal('start');
+}
+function endGame() {
+  scene = 'over'; overAt = performance.now();
+  if (score > best) { best = score; newBest = true; try { parent.postMessage({ agf: 'save', data: { best } }, '*'); } catch (e) {} }
+  signal('end', { score });
+}
+
+function loseLife(msg) {
+  lives--; shake = 14 * U; flash = 0.35; flashCol = '#ff3050';
+  lastMistake = msg;
+  sndMiss();
+  if (lives <= 0) { setTimeout(() => { if (scene === 'play') endGame(); }, 650); }
+}
+
+// ---------- particles ----------
+function burst(x, y, col, n, sp) {
+  for (let i = 0; i < n; i++) {
+    const a = Math.random() * Math.PI * 2, s = rnd(0.3, 1) * sp;
+    parts.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: rnd(0.35, 0.8), max: 0.8, col, sz: rnd(1.5, 4) * U });
+  }
+}
+function pop(x, y, text, col, size = 18, big = false) { pops.push({ x, y, text, col, t: 0, size, big }); }
+
+// ---------- input ----------
+const trails = new Map(); // pointerId -> {pts:[{x,y,t}], chain}
+function segCircle(x1, y1, x2, y2, cx, cy, r) {
+  const dx = x2 - x1, dy = y2 - y1, l2 = dx * dx + dy * dy;
+  let t = l2 ? ((cx - x1) * dx + (cy - y1) * dy) / l2 : 0; t = Math.max(0, Math.min(1, t));
+  const px = x1 + dx * t - cx, py = y1 + dy * t - cy;
+  return px * px + py * py <= r * r;
+}
+cv.addEventListener('pointerdown', (e) => {
+  e.preventDefault(); initAudio();
+  if (scene === 'title') { startGame(); return; }
+  if (scene === 'over') { if (performance.now() - overAt > 700) startGame(); return; }
+  trails.set(e.pointerId, { pts: [{ x: e.clientX, y: e.clientY, t: performance.now() }], chain: 0, last: { x: e.clientX, y: e.clientY } });
+  try { cv.setPointerCapture(e.pointerId); } catch (err) {}
+});
+cv.addEventListener('pointermove', (e) => {
+  const tr = trails.get(e.pointerId); if (!tr || scene !== 'play') return;
+  const x = e.clientX, y = e.clientY, now = performance.now();
+  const l = tr.last; const d = Math.hypot(x - l.x, y - l.y);
+  if (d < 2) return;
+  tr.pts.push({ x, y, t: now }); if (tr.pts.length > 40) tr.pts.shift();
+  const steps = Math.max(1, Math.ceil(d / (8 * U)));
+  for (let s = 0; s < steps; s++) {
+    const ax = l.x + (x - l.x) * s / steps, ay = l.y + (y - l.y) * s / steps;
+    const bx = l.x + (x - l.x) * (s + 1) / steps, by = l.y + (y - l.y) * (s + 1) / steps;
+    checkCut(ax, ay, bx, by, tr);
+  }
+  tr.last = { x, y };
+});
+function endPtr(e) {
+  const tr = trails.get(e.pointerId);
+  if (tr) { tr.ended = performance.now(); if (tr.chain >= 3) { banner = { text: tr.chain + ' ' + T.combo + '!', t: 1 }; } }
+  trails.delete(e.pointerId);
+  fadeTrails.push(tr);
+}
+const fadeTrails = [];
+cv.addEventListener('pointerup', endPtr);
+cv.addEventListener('pointercancel', endPtr);
+
+function checkCut(x1, y1, x2, y2, tr) {
+  for (const rk of rocks) {
+    if (!rk.alive || rk.delay > 0 || rk.lock > 0 || rk.hitPrime) continue;
+    if (!segCircle(x1, y1, x2, y2, rk.x, rk.y, rk.r * 1.05)) continue;
+    const dx = x2 - x1, dy = y2 - y1, dl = Math.hypot(dx, dy) || 1;
+    if (rk.prime) {
+      // clang: bounce off
+      rk.hitPrime = true; rk.vy = Math.min(rk.vy, 0) - 40 * U; rk.vx += dx / dl * 60 * U; rk.vr += 6;
+      burst(rk.x, rk.y, '#ffd34d', 14, 260 * U);
+      sndClang();
+      pop(rk.x, Math.max(90 * U, rk.y - rk.r - 16 * U), rk.n + ' ' + T.isPrime, '#ffd34d', 22, true);
+      loseLife(rk.n + ' ' + T.isPrime);
+      continue;
+    }
+    // split
+    const [a, b] = splitOf(rk.n);
+    rk.alive = false;
+    tr.chain++; slashed++;
+    const pts = rk.n * tr.chain;
+    score += pts;
+    const root = rk.root || { n: rk.n, pend: 1, strokes: new Set() };
+    root.strokes.add(tr);
+    const nx = -dy / dl, ny = dx / dl; // perpendicular
+    const push = 95 * U;
+    const k1 = makeRock(a, rk.x + nx * rk.r * 0.4, rk.y + ny * rk.r * 0.4, rk.vx * 0.5 + nx * push + dx / dl * 20 * U, Math.min(rk.vy * 0.4, 0) - 120 * U + ny * push);
+    const k2 = makeRock(b, rk.x - nx * rk.r * 0.4, rk.y - ny * rk.r * 0.4, rk.vx * 0.5 - nx * push + dx / dl * 20 * U, Math.min(rk.vy * 0.4, 0) - 120 * U - ny * push);
+    for (const k of [k1, k2]) {
+      if (k.prime) {
+        // your own split made a prime: it is "cut clean" and becomes a gem at once
+        primesGot++; score += k.n; gemStreak++;
+        gems.push({ x: k.x, y: k.y, n: k.n, t: 0, vx: k.vx * 0.3, vy: -60 * U, quiet: true });
+        sndGem(gemStreak);
+      } else { k.lock = 0.16; k.delay = 0; k.born = 0.25; k.root = root; root.pend++; rocks.push(k); }
+    }
+    root.pend--;
+    if (root.pend === 0) completeRoot(root, rk.x, rk.y);
+    burst(rk.x, rk.y, '#cfd2ff', 12, 220 * U);
+    burst(rk.x, rk.y, '#8a86b8', 8, 140 * U);
+    parts.push({ slash: true, x: rk.x, y: rk.y, ang: Math.atan2(dy, dx), len: rk.r * 3, life: 0.22, max: 0.22 });
+    if (tr.chain > 1) pop(rk.x, rk.y - rk.r - 6 * U, '×' + tr.chain, '#7ef0ff', 14 + Math.min(12, tr.chain * 2));
+    hitstop = 0.035; shake = Math.max(shake, 3 * U);
+    sndSlice(tr.chain);
+    if (tr.chain > 1) sndChain(tr.chain - 2);
+  }
+}
+
+function completeRoot(root, x, y) {
+  const facs = factorStr(root.n).split(' × ').length;
+  const one = root.strokes.size === 1 && facs >= 3;
+  const bonus = root.n * (one ? 2 : 1);
+  score += bonus;
+  pop(x, Math.max(90 * U, y - 30 * U), root.n + ' = ' + factorStr(root.n), '#ffe27a', 20 + Math.min(8, facs * 2), true);
+  if (one) { banner = { text: T.oneCut + ' +' + bonus, t: 1.1 }; for (let i = 0; i < 4; i++) tone(659 * Math.pow(2, [0, 4, 7, 12][i] / 12), 0.3, 'triangle', 0.09, 0.06 + i * 0.06); }
+  else { tone(784, 0.25, 'triangle', 0.07, 0.05); tone(1046, 0.3, 'triangle', 0.06, 0.11); }
+}
+
+// ---------- update ----------
+function update(dt) {
+  if (scene !== 'play') {
+    // title ambient
+    for (const rk of rocks) { rk.vy += gravity() * dt; rk.x += rk.vx * dt; rk.y += rk.vy * dt; rk.rot += rk.vr * dt; }
+    rocks = rocks.filter((r) => r.y < H + 200);
+    if (scene === 'title' && Math.random() < dt * 0.9) {
+      const n = pick([12, 18, 24, 30, 36, 7, 13, 48, 60, 91, 97]);
+      const g = gravity();
+      rocks.push(makeRock(n, rnd(W * 0.15, W * 0.85), H + 50, rnd(-30, 30) * U, -Math.sqrt(2 * g * H * 0.5) * rnd(0.85, 1)));
+    }
+    updParticles(dt);
+    return;
+  }
+  elapsed += dt;
+  if (hintT > 0) hintT -= dt;
+  const g = gravity();
+  for (const rk of rocks) {
+    if (!rk.alive) continue;
+    if (rk.delay > 0) { rk.delay -= dt; continue; }
+    rk.age += dt;
+    if (rk.lock > 0) rk.lock -= dt;
+    rk.vy += g * dt; rk.x += rk.vx * dt; rk.y += rk.vy * dt; rk.rot += rk.vr * dt;
+    if (rk.born > 0) rk.born -= dt;
+    // walls
+    if (rk.x < rk.r) { rk.x = rk.r; rk.vx = Math.abs(rk.vx) * 0.6; }
+    if (rk.x > W - rk.r) { rk.x = W - rk.r; rk.vx = -Math.abs(rk.vx) * 0.6; }
+    if (rk.vy > 0 && rk.y - rk.r > H) {
+      rk.alive = false;
+      if (rk.prime) {
+        if (!rk.hitPrime) {
+          primesGot++; score += rk.n; gemStreak++;
+          gems.push({ x: rk.x, y: H - 10 * U, n: rk.n, t: 0, vx: 0, vy: -90 * U });
+          sndGem(gemStreak);
+        }
+      } else {
+        gemStreak = 0;
+        pop(W / 2, H * 0.8, rk.n + ' = ' + factorStr(rk.n), '#ff8a9c', 22, true);
+        loseLife(rk.n + ' = ' + factorStr(rk.n));
+      }
+    }
+  }
+  rocks = rocks.filter((r) => r.alive);
+  if (lives > 0) {
+    const pending = rocks.filter((r) => !r.prime || r.y < H * 0.45).length;
+    waveTimer -= dt;
+    if (waveTimer <= 0 && (pending === 0 || waveTimer < -2.2)) {
+      launchWave();
+      waveTimer = Math.max(1.1, 2.4 - level * 0.1);
+    }
+  }
+  updParticles(dt);
+}
+function updParticles(dt) {
+  for (const p of parts) { p.life -= dt; if (!p.slash) { p.vy += 500 * U * dt; p.x += p.vx * dt; p.y += p.vy * dt; } }
+  parts = parts.filter((p) => p.life > 0);
+  for (const p of pops) p.t += dt;
+  pops = pops.filter((p) => p.t < (p.big ? 1.6 : 1.1));
+  for (const gm of gems) { gm.t += dt; gm.x += gm.vx * dt; gm.y += gm.vy * dt; }
+  gems = gems.filter((g) => g.t < 1.2);
+  if (shake > 0) shake = Math.max(0, shake - 60 * U * dt);
+  if (flash > 0) flash -= dt;
+  if (banner) { banner.t -= dt; if (banner.t <= 0) banner = null; }
+}
+
+// ---------- draw ----------
+function fitText(text, maxW, size, weight = '700') {
+  let s = size;
+  ctx.font = `${weight} ${s}px ${FONT}`;
+  while (s > 12 && ctx.measureText(text).width > maxW) { s -= 1; ctx.font = `${weight} ${s}px ${FONT}`; }
+  return s;
+}
+function drawBg() {
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, '#1b1838'); g.addColorStop(0.7, '#24204a'); g.addColorStop(1, '#2f2246');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  // tatami-ish lines
+  ctx.strokeStyle = 'rgba(255,255,255,0.035)'; ctx.lineWidth = 1;
+  for (let y = H * 0.15; y < H; y += 46 * U) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+  // moon
+  ctx.fillStyle = 'rgba(255,240,200,0.08)';
+  ctx.beginPath(); ctx.arc(W * 0.8, H * 0.2, 70 * U, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = 'rgba(255,240,200,0.06)';
+  ctx.beginPath(); ctx.arc(W * 0.8, H * 0.2, 46 * U, 0, Math.PI * 2); ctx.fill();
+  // floor glow
+  const fg = ctx.createLinearGradient(0, H - 60 * U, 0, H);
+  fg.addColorStop(0, 'rgba(255,80,110,0)'); fg.addColorStop(1, 'rgba(255,80,110,0.12)');
+  ctx.fillStyle = fg; ctx.fillRect(0, H - 60 * U, W, 60 * U);
+}
+function drawRock(rk) {
+  if (rk.delay > 0) return;
+  ctx.save(); ctx.translate(rk.x, rk.y); ctx.rotate(rk.rot);
+  const r = rk.r * (rk.born > 0 ? 1 + rk.born * 0.6 : 1);
+  // stone body (irregular polygon)
+  ctx.beginPath();
+  const N = 9;
+  for (let i = 0; i < N; i++) {
+    const a = i / N * Math.PI * 2;
+    const rr = r * (0.9 + 0.1 * Math.sin(rk.seed + i * 2.3));
+    const px = Math.cos(a) * rr, py = Math.sin(a) * rr;
+    i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+  }
+  ctx.closePath();
+  const gg = ctx.createRadialGradient(-r * 0.35, -r * 0.4, r * 0.1, 0, 0, r * 1.1);
+  if (rk.hitPrime) { gg.addColorStop(0, '#fff3b0'); gg.addColorStop(1, '#c78a18'); }
+  else { gg.addColorStop(0, '#9e9bb8'); gg.addColorStop(1, '#4b4866'); }
+  ctx.fillStyle = gg; ctx.fill();
+  ctx.lineWidth = 2 * U; ctx.strokeStyle = rk.hitPrime ? '#ffe680' : '#2a2840'; ctx.stroke();
+  ctx.restore();
+  // number (unrotated for readability)
+  const s = Math.round(rk.r * (rk.n >= 100 ? 0.78 : 0.95));
+  ctx.font = `800 ${s}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.fillText(rk.n, rk.x + 1.5 * U, rk.y + 2 * U);
+  ctx.fillStyle = rk.hitPrime ? '#5a3a00' : '#ffffff'; ctx.fillText(rk.n, rk.x, rk.y);
+}
+function drawTrail(tr, now, fade) {
+  const pts = tr.pts.filter((p) => now - p.t < 160);
+  if (pts.length < 2) return;
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  for (let i = 1; i < pts.length; i++) {
+    const a = 1 - (now - pts[i].t) / 160;
+    ctx.strokeStyle = `rgba(190,240,255,${a * 0.9})`;
+    ctx.lineWidth = (2 + 6 * a) * U;
+    ctx.beginPath(); ctx.moveTo(pts[i - 1].x, pts[i - 1].y); ctx.lineTo(pts[i].x, pts[i].y); ctx.stroke();
+  }
+}
+function drawParticles() {
+  for (const p of parts) {
+    const a = Math.max(0, p.life / p.max);
+    if (p.slash) {
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.ang);
+      ctx.strokeStyle = `rgba(255,255,255,${a})`; ctx.lineWidth = 3 * U * a + 1;
+      ctx.beginPath(); ctx.moveTo(-p.len / 2, 0); ctx.lineTo(p.len / 2, 0); ctx.stroke();
+      ctx.restore(); continue;
+    }
+    ctx.globalAlpha = a; ctx.fillStyle = p.col;
+    ctx.fillRect(p.x - p.sz / 2, p.y - p.sz / 2, p.sz, p.sz);
+  }
+  ctx.globalAlpha = 1;
+  for (const gm of gems) {
+    const a = 1 - gm.t / 1.2, y = gm.y;
+    ctx.globalAlpha = a;
+    ctx.save(); ctx.translate(gm.x, y); ctx.rotate(Math.PI / 4);
+    ctx.fillStyle = '#7ef0c8'; ctx.shadowColor = '#7ef0c8'; ctx.shadowBlur = 14;
+    const s = 12 * U; ctx.fillRect(-s / 2, -s / 2, s, s);
+    ctx.restore();
+    ctx.font = `800 ${Math.round(16 * U)}px ${FONT}`; ctx.textAlign = 'center'; ctx.fillStyle = '#b6ffe6';
+    if (!gm.quiet) ctx.fillText(gm.n, gm.x, y - 16 * U);
+    ctx.globalAlpha = 1;
+  }
+  for (const p of pops) {
+    if (p.big) continue;
+    const a = 1 - p.t / (p.big ? 1.6 : 1.1);
+    ctx.globalAlpha = Math.max(0, a);
+    const s = fitText(p.text, W - 20, Math.round(p.size * U), '800');
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const tw = ctx.measureText(p.text).width;
+    const x = Math.max(tw / 2 + 8, Math.min(W - tw / 2 - 8, p.x));
+    ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillText(p.text, x + 1, p.y - p.t * (p.big ? 20 : 40) * U + 1.5);
+    ctx.fillStyle = p.col; ctx.fillText(p.text, x, p.y - p.t * (p.big ? 20 : 40) * U);
+  }
+  ctx.globalAlpha = 1;
+}
+function drawBigPops() {
+  for (const p of pops) {
+    if (!p.big) continue;
+    const a = Math.max(0, 1 - p.t / 1.6);
+    fitText(p.text, W - 24, Math.round(p.size * U), '800');
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const tw = ctx.measureText(p.text).width;
+    const x = Math.max(tw / 2 + 12, Math.min(W - tw / 2 - 12, p.x)), y = p.y - p.t * 20 * U;
+    const h = p.size * U * 1.5;
+    ctx.globalAlpha = a * 0.7; ctx.fillStyle = '#120f28';
+    ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x - tw / 2 - 10, y - h / 2, tw + 20, h, h / 2) : ctx.rect(x - tw / 2 - 10, y - h / 2, tw + 20, h); ctx.fill();
+    ctx.globalAlpha = a; ctx.fillStyle = p.col; ctx.fillText(p.text, x, y);
+  }
+  ctx.globalAlpha = 1;
+}
+function heart(x, y, s, on) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s / 20, s / 20);
+  ctx.beginPath(); ctx.moveTo(0, 6);
+  ctx.bezierCurveTo(-10, -2, -8, -12, 0, -6); ctx.bezierCurveTo(8, -12, 10, -2, 0, 6);
+  ctx.fillStyle = on ? '#ff5a78' : 'rgba(255,255,255,0.15)'; ctx.fill();
+  ctx.restore();
+}
+function drawHUD() {
+  ctx.textBaseline = 'top'; ctx.textAlign = 'left';
+  ctx.font = `800 ${Math.round(26 * U)}px ${FONT}`; ctx.fillStyle = '#fff';
+  ctx.fillText(score, 14 * U, 12 * U);
+  ctx.font = `600 ${Math.max(14, Math.round(14 * U))}px ${FONT}`; ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.fillText(T.lv + ' ' + level, 14 * U, 44 * U);
+  ctx.textAlign = 'right';
+  for (let i = 0; i < 3; i++) heart(W - 20 * U - i * 26 * U, 26 * U, 22 * U, i < lives);
+  ctx.font = `600 ${Math.max(14, Math.round(14 * U))}px ${FONT}`; ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.fillText(T.best + ' ' + best, W - 12 * U, 44 * U);
+  if (hintT > 0) {
+    ctx.globalAlpha = Math.min(1, hintT);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    fitText(T.hint, W - 30, Math.round(16 * U), '700');
+    ctx.fillStyle = '#e6e4ff'; ctx.fillText(T.hint, W / 2, H - 70 * U);
+    ctx.globalAlpha = 1;
+  }
+  if (banner) {
+    ctx.globalAlpha = Math.min(1, banner.t * 2);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    fitText(banner.text, W - 30, Math.round(34 * U), '900');
+    ctx.fillStyle = '#7ef0ff'; ctx.fillText(banner.text, W / 2, H * 0.68);
+    ctx.globalAlpha = 1;
+  }
+}
+function drawTitle() {
+  ctx.fillStyle = 'rgba(15,12,35,0.55)'; ctx.fillRect(0, 0, W, H);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  fitText(T.title, W - 40, Math.round(64 * U), '900');
+  ctx.fillStyle = '#ffffff'; ctx.fillText(T.title, W / 2, H * 0.3);
+  ctx.strokeStyle = '#7ef0ff'; ctx.lineWidth = 3 * U;
+  ctx.beginPath(); ctx.moveTo(W * 0.18, H * 0.3 + 22 * U); ctx.lineTo(W * 0.82, H * 0.3 - 18 * U); ctx.stroke();
+  fitText(T.how1, W - 32, Math.round(16 * U), '600');
+  ctx.fillStyle = '#d8d6f5'; ctx.fillText(T.how1, W / 2, H * 0.44);
+  fitText(T.how2, W - 32, Math.round(16 * U), '700');
+  ctx.fillStyle = '#ffd34d'; ctx.fillText(T.how2, W / 2, H * 0.44 + 28 * U);
+  ctx.font = `600 ${Math.round(15 * U)}px ${FONT}`; ctx.fillStyle = '#b7f4ff';
+  ctx.fillText('12 → 3 × 4 → 3 × 2 × 2', W / 2, H * 0.55);
+  const a = 0.6 + 0.4 * Math.sin(performance.now() / 300);
+  ctx.globalAlpha = a; fitText(T.start, W - 40, Math.round(22 * U), '800');
+  ctx.fillStyle = '#fff'; ctx.fillText(T.start, W / 2, H * 0.72); ctx.globalAlpha = 1;
+  if (best > 0) { ctx.font = `600 ${Math.round(15 * U)}px ${FONT}`; ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.fillText(T.best + ' ' + best, W / 2, H * 0.79); }
+}
+function drawOver() {
+  ctx.fillStyle = 'rgba(15,12,35,0.72)'; ctx.fillRect(0, 0, W, H);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  fitText(T.over, W - 40, Math.round(30 * U), '800'); ctx.fillStyle = '#d8d6f5'; ctx.fillText(T.over, W / 2, H * 0.2);
+  fitText(String(score), W - 40, Math.round(72 * U), '900'); ctx.fillStyle = '#fff'; ctx.fillText(score, W / 2, H * 0.32);
+  if (newBest) { fitText(T.newBest, W - 40, Math.round(22 * U), '800'); ctx.fillStyle = '#ffd34d'; ctx.fillText(T.newBest, W / 2, H * 0.41); }
+  else { ctx.font = `600 ${Math.round(18 * U)}px ${FONT}`; ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.fillText(T.best + ' ' + best, W / 2, H * 0.41); }
+  ctx.font = `600 ${Math.round(16 * U)}px ${FONT}`; ctx.fillStyle = '#b6ffe6';
+  ctx.fillText(T.primes + ' ' + primesGot + '　' + T.cut + ' ' + slashed, W / 2, H * 0.5);
+  if (lastMistake) {
+    fitText(lastMistake, W - 40, Math.round(24 * U), '800'); ctx.fillStyle = '#ff8a9c'; ctx.fillText(lastMistake, W / 2, H * 0.59);
+  }
+  if (performance.now() - overAt > 700) {
+    const a = 0.6 + 0.4 * Math.sin(performance.now() / 300);
+    ctx.globalAlpha = a; fitText(T.again, W - 40, Math.round(22 * U), '800');
+    ctx.fillStyle = '#fff'; ctx.fillText(T.again, W / 2, H * 0.74); ctx.globalAlpha = 1;
+  }
+}
+function draw(now) {
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  drawBg();
+  ctx.save();
+  if (shake > 0) ctx.translate(rnd(-shake, shake), rnd(-shake, shake));
+  drawParticles();
+  for (const rk of rocks) drawRock(rk);
+  for (const tr of trails.values()) drawTrail(tr, now);
+  for (let i = fadeTrails.length - 1; i >= 0; i--) { const tr = fadeTrails[i]; if (!tr || now - tr.ended > 200) fadeTrails.splice(i, 1); else drawTrail(tr, now); }
+  drawBigPops();
+  ctx.restore();
+  if (flash > 0) { ctx.globalAlpha = flash; ctx.fillStyle = flashCol; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; }
+  if (scene === 'play') drawHUD();
+  else if (scene === 'title') drawTitle();
+  else drawOver();
+}
+
+let lastT = performance.now();
+function frame(now) {
+  let dt = Math.min(0.05, Math.max(0, (now - lastT) / 1000)); lastT = now;
+  if (hitstop > 0) { hitstop -= dt; dt *= 0.15; }
+  update(dt);
+  draw(now);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

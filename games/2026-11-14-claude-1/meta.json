@@ -1,0 +1,523 @@
+{
+  "id": "2026-11-14-claude-1",
+  "status": "published",
+  "title": "素数斬り",
+  "genre": "数字・計算",
+  "concept": "投げ上げられた数の石をなぞって斬ると、かけ算の2つに割れる。素数になるまで斬り、素数は斬らずに見送る。91は斬れるか、97は斬っていいか、一瞬の因数分解の判断と、一太刀で24→4,6→2,2,2,3と割り切る連斬の気持ちよさが核。",
+  "howToPlay": "石をなぞって斬る。割れる数（合成数）は素数になるまで斬り、素数はそのまま下へ落とす。素数を斬ったり、合成数を落としたりすると命が減る。",
+  "libraryDecision": "使わない。2Dのキャンバスで石・斬撃・破片は十分に描け、物理演算も放物線だけで足りる。判断の速さが核なので、読みやすさを優先した。",
+  "soundDecision": "効果音だけをWeb Audioで自作。斬る音は連斬ごとに音程が上がり、落ちた素数は五音音階の澄んだ音で鳴る。素数を斬るとカキンと硬い金属音。BGMは数字を読む集中を妨げるので入れない。",
+  "improvements": [
+    {
+      "found": "斬り返すと、自分で割って生まれた素数のかけらまで斬ってしまい命が減る（連斬が罰になる）。素数が落ちるまで待つ時間が長くて間延びする。数字のポップ表示が石の数字に重なって読めない。",
+      "changed": "自分で割って生まれた素数はその場で宝石になって消えるようにした（素数の判断は投げ上げられた石だけ）。素数しか残っていなければ次の波を早めに出す。ポップは石より後ろに描く。",
+      "foundEn": "Slashing back and forth hit the prime fragments my own cut had just created, costing lives (chaining was punished). Waiting for primes to fall was slow. Score pop-ups covered the stone numbers.",
+      "changedEn": "Primes produced by your own split turn into gems instantly, so the prime judgment applies only to tossed stones. The next wave comes early when only primes remain. Pop-ups draw behind stones."
+    },
+    {
+      "found": "+点数の文字が積み重なってごちゃごちゃ。石を割り切っても達成感がなく、数学の面白さ（16=2×2×2×2）が見えない。段1が長く、石が1〜2個で簡単すぎる。",
+      "changed": "元の石を素数まで割り切ると「16 = 2 × 2 × 2 × 2」と式を大きく出してボーナス、3つ以上の素数を1筆で割り切れば「一太刀！」で2倍。斬るたびの点数表示はやめて連斬数だけにした。波は最初から2個、3波ごとに段が上がる。",
+      "foundEn": "Piles of +score text were messy. Fully splitting a stone gave no sense of achievement, and the math (16=2×2×2×2) was invisible. Level 1 dragged on with only 1–2 easy stones.",
+      "changedEn": "Fully factoring a tossed stone shows the equation like \"16 = 2 × 2 × 2 × 2\" with a bonus; doing 3+ primes in one stroke gives \"One stroke!\" ×2. Per-slash score text removed, only chain count shown. Waves start with 2 stones and level up every 3 waves."
+    },
+    {
+      "found": "序盤の波に素数がほとんど混ざらず「素数は斬るな」の緊張がない。割れたかけらどうしが重なって数字が読めない。見のがしの式や連斬の表示が石や式と重なって隠れる。",
+      "changed": "2波目からは必ず素数を1つ混ぜ、段3以降は59や97のような紛らわしい素数を多めにした。かけらを左右に強くはじくようにした。式・ミス表示は暗い帯つきで最前面に、連斬バナーは画面の下寄りに移した。",
+      "foundEn": "Early waves rarely contained primes, so \"never slash a prime\" had no tension. Split fragments overlapped and hid their numbers. Miss equations and chain banners were hidden behind stones or other text.",
+      "changedEn": "Every wave from the 2nd includes a prime, with tricky ones like 59 or 97 more often from level 3. Fragments are pushed apart harder. Equations and miss messages draw on top with a dark band; the chain banner moved lower."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "数字・計算",
+      "en": "Number game",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "素数斬り: 投げ上げられた数の石をなぞると因数の2つに割れる。素数になるまで斬り、素数は見送る。",
+        "ideaEn": "Prime Slash: swipe tossed number stones to split them into two factors; slash until only primes remain, let primes fall.",
+        "fromDraw": true
+      },
+      {
+        "idea": "抜いて積む塔（3D・cannon-es）: 積み木の塔から1本ずつ指で押し出して上に積む。崩れ方そのものが遊び。",
+        "ideaEn": "Pull-and-stack tower (3D, cannon-es): push blocks out of a tower one by one and stack them on top; the way it wobbles is the game.",
+        "fromDraw": false
+      },
+      {
+        "idea": "夜の湖の灯籠流し: 指で水面に流れを描くと灯籠が流れ、ふれあった灯籠どうしが和音を鳴らす遊び場。",
+        "ideaEn": "Lantern lake: draw currents on the water to drift lanterns; lanterns that touch play chords together. A playground.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "fail",
+    "input": [
+      "swipe"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Prime Slash",
+      "concept": "Swipe tossed number stones and they split into two factors. Slash until only primes remain, and let primes fall untouched. Is 91 splittable? Is 97 safe? The split-second factoring call, plus the joy of one stroke chaining 24→4,6→2,2,2,3, is the core.",
+      "howToPlay": "Swipe to slash stones. Keep slashing composites until they become primes; let primes fall. Slashing a prime or dropping a composite costs a life.",
+      "libraryDecision": "None. 2D canvas draws stones, slashes and debris well, and simple parabolas need no physics engine. The core is fast reading, so legibility comes first.",
+      "soundDecision": "Hand-made Web Audio effects only. Slashes rise in pitch through a chain, fallen primes ring a clear pentatonic tone, and slashing a prime gives a hard metal clang. No BGM, so it does not distract from reading numbers."
+    }
+  },
+  "createdAt": "2026-11-14T09:06:46+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-14T09:06:46+09:00",
+    "metricsFrom": "2026-11-14T00:06:11.722Z",
+    "transcript": "e2b7f8c3-387d-4830-a649-e9619972b8d2.jsonl",
+    "validationRuns": 5,
+    "finishedAt": "2026-11-14T09:16:27+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-14T09:14:21+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "26.6KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=118",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=50",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=76",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=49",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 27244,
+    "lines": 598
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0.1,
+    "idleStarts": 1
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "Factor Samurai など既存の「数を斬って素数に割る」ゲームとほぼ同じ核で、独自性が薄い。段1〜2は数が小さく、素数かどうか迷う場面が少ない。",
+    "comment": "30を斬り返す一筆で2・3・5の宝石がはじけ「30 = 2 × 3 × 5」「一太刀！」と出る瞬間は気持ちよかった。33と11が並んで上がってきて、33だけを払い11には触れない判断をした場面が一番この作品らしかった。一方、序盤は簡単で、動く石を追いかけて空振りすることもある。数分は普通に遊べるが、強い「もう1回」までは届かないと感じた。",
+    "similar": [
+      {
+        "title": "Factor Samurai",
+        "url": "https://apps.apple.com/us/app/factor-samurai-multiply-divide-your-way-to-times-tables/id441919897",
+        "similarity": "高",
+        "note": "数をスワイプで斬って素数まで割り、素数を斬ると罰という核はほぼ同じ。本作は自分で割った素数が即座に宝石になる・一筆で割り切る一太刀ボーナス・割り切った式を見せる点が違う。",
+        "note_en": "Nearly the same core: swipe-slice numbers down to primes, penalty for slicing primes. This game differs by turning self-made primes into gems at once, rewarding full factoring in one stroke, and showing the finished equation."
+      },
+      {
+        "title": "Primee! - A Brain Teaser Game",
+        "url": "https://apps.apple.com/app/id6504009384",
+        "similarity": "中",
+        "note": "合成数をスワイプで素因数に斬る点が似る。素数はタップして集める操作で、本作は素数は見送るだけ。",
+        "note_en": "Also swipes composites into prime factors, but primes are tapped to collect; here primes are simply let go."
+      }
+    ],
+    "research": "WebSearch で「prime factorization slicing game swipe」を1回検索。作ったあとに調べ、Factor Samurai がほぼ同じ核だと分かった。",
+    "i18n": {
+      "en": {
+        "worst": "Its core is nearly the same as existing number-slicing factor games like Factor Samurai, so originality is thin. Levels 1–2 use small numbers with few tricky prime calls.",
+        "comment": "The stroke that zigzags through 30 and pops 2, 3, 5 gems with \"30 = 2 × 3 × 5\" and \"One stroke!\" felt great. The best moment was 33 and 11 rising together: slashing only 33 while leaving 11 untouched. Early levels are easy and moving stones are sometimes missed. Fine for a few minutes, but not quite a strong \"one more\".",
+        "research": "One WebSearch for prime-factorization slicing games after building; found Factor Samurai has nearly the same core."
+      }
+    },
+    "method": "スマホ縦画面で 13 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 13 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.60) 120ms",
+        "note": "開始",
+        "noteEn": "Start",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "wait 1800ms",
+        "note": "最初の波。30と11",
+        "noteEn": "First wave: 30 and 11",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "path(0.38,0.30→0.62,0.33→0.45,0.24→0.65,0.26) 300ms",
+        "note": "30を一太刀で割り切った。11は避けた",
+        "noteEn": "Split 30 completely in one stroke, dodging 11",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 900ms",
+        "note": "次の波",
+        "noteEn": "Next wave",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "path(0.60,0.60→0.95,0.58→0.65,0.66→0.95,0.70) 300ms",
+        "note": "落ちてくる28を斬る",
+        "noteEn": "Slash the falling 28",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "path(0.70,0.56→0.98,0.62→0.75,0.68) 200ms",
+        "note": "残った4を仕上げる",
+        "noteEn": "Finish the leftover 4",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 1200ms",
+        "note": "次の波",
+        "noteEn": "Next wave",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "swipe(0.50,0.32→0.95,0.34) 120ms",
+        "note": "33は3×11なので斬る。すぐ下の11は素数なので触れないように上を払う",
+        "noteEn": "33 = 3×11, slash it; skim above the prime 11 just below",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "swipe(0.50,0.47→0.90,0.43) 100ms",
+        "note": "わざと11を斬ってみる（素数を斬るとどうなるか）",
+        "noteEn": "Deliberately slash prime 11 to see the penalty",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 3500ms",
+        "note": "次の波を放置して落としてみる",
+        "noteEn": "Let the next wave fall untouched",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "wait 4000ms",
+        "note": "さらに放置",
+        "noteEn": "Keep idling",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "wait 2500ms",
+        "note": "6を落として最後の命を失う",
+        "noteEn": "Drop 6 and lose the last life",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 299
+            }
+          },
+          {
+            "agf": "end",
+            "score": 299
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "wait 1200ms",
+        "note": "結果画面",
+        "noteEn": "Result screen",
+        "image": "ai-play/step-13.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 299
+            }
+          },
+          {
+            "agf": "end",
+            "score": 299
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-14T09:16:27+09:00"
+  },
+  "publishedAt": "2026-11-14T09:16:27+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 7764,
+    "outputTokens": 33102,
+    "contextTokens": 11337563,
+    "turns": 67,
+    "toolCalls": 73,
+    "webSearches": 0,
+    "minutes": 10.3,
+    "from": "2026-11-14T00:06:11.722Z",
+    "to": "2026-11-14T00:16:27.766Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-14T09:16:27+09:00",
+    "validationRuns": 5,
+    "codeKB": 26.6
+  }
+}
