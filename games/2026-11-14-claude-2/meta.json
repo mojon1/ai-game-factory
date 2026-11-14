@@ -1,0 +1,496 @@
+{
+  "id": "2026-11-14-claude-2",
+  "status": "published",
+  "title": "スコーン！だるま落とし",
+  "genre": "物理おもちゃ",
+  "concept": "だるま落としの「力加減」が核。すばやく払えば段だけスコーンと抜けるが、遅いと上ごと引きずってずれ、強すぎると揺れる。軽い段はやさしく、重い段は思いきり。ずれたら反対から打つか、そっと押して戻す。",
+  "howToPlay": "段を横にすばやくスワイプして打ち抜く。ゆっくり押すとずれた段を戻せる。だるまを落とさず最後の1段まで。",
+  "libraryDecision": "使わない。積み木の崩れは物理エンジンより「重心が支えの端を越えたら崩れる」という読める規則の方が、ずれを見て直す遊びに向き、手触りも調整しやすいため自作した。",
+  "soundDecision": "BGMは付けず、木を打つ音だけをWeb Audioで合成。スコーンが続くと音程が五音音階で上がり、遅いと鈍いこすれ音になるので、耳で力加減の良し悪しが分かる。",
+  "improvements": [
+    {
+      "found": "一番下の段は床の上なので、ずれても危険がなく、下ばかり打てば済む／ゆっくり押すと段が行き過ぎる不具合／どの段がずれているか分かりにくい",
+      "changed": "打てない台座を置き、どの段を抜いてもずれが効くようにした。押しの不具合を直し、ずれた継ぎ目に赤い「!」を出すようにした。",
+      "foundEn": "The bottom block sat on the floor so drift there was harmless; pushing overshot; hard to see which joint was shifted",
+      "changedEn": "Added an unhittable stand so every knock matters, fixed the push overshoot, and marked shifted joints with a red \"!\"."
+    },
+    {
+      "found": "少し遅いスワイプが「押す」になり、段を最後まで押し出して崩れる／軽い・重いの違いが見た目で分からない／ステージ1が長く単調",
+      "changedEn": "Pushes are capped per touch and slip off when the finger speeds up; blocks are labelled \"light · soft\" / \"heavy · hard\"; stage 1 has 3 blocks; the sweet window narrows on later stages.",
+      "changed": "押しは1回で動く量に上限を付け、指が速くなると滑って外れるようにした。段に「軽・やさしく」「重・つよく」と書いた。ステージ1を3段にし、先のステージほどスコーンの幅を狭めた。",
+      "foundEn": "A slightly slow swipe became a push that shoved a block all the way out; light/heavy blocks were not readable; stage 1 was long and flat"
+    },
+    {
+      "found": "雑に打っても崩れずクリアできて緊張感がない／下手な打ち方でも点が多い／重い段の文字が帯に隠れる",
+      "changed": "支えの範囲を端より内側にして崩れやすくし、雑な打ち方の点を下げ、全部スコーンでクリアすると大きなボーナスを付けた。帯を上下に移し、着地でだるまがつぶれる動きを足した。",
+      "foundEn": "Sloppy hits still cleared stages, so no tension; poor hits scored too much; the heavy label was hidden by bands",
+      "changedEn": "Support now ends inside the edge so sloppy play topples, poor hits score less, and an all-THWACK clear gives a big bonus. Moved the bands and added a squash when the daruma lands."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "その他",
+      "en": "Other",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "しゃぼん玉ふくらまし：長押しで膨らませ、割れる前に離して飛ばし、風に乗せて窓の外へ運ぶ。",
+        "ideaEn": "Bubble blowing: hold to inflate, release before it pops, and ride the wind out the window.",
+        "fromDraw": true
+      },
+      {
+        "idea": "だるま落とし：スワイプの速さで段を打ち抜く。遅いと上がずれ、そっと押せば直せる。",
+        "ideaEn": "Daruma otoshi: swipe speed knocks blocks out; slow hits shift the stack, gentle pushes fix it.",
+        "fromDraw": false
+      },
+      {
+        "idea": "紙ひこうき：3Dで折り方を選んでから投げ、飛びながら傾けて距離を伸ばす。",
+        "ideaEn": "Paper plane: choose folds in 3D, throw, and tilt in flight to go farther.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 1
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "fail",
+    "input": [
+      "swipe",
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Daruma Knock!",
+      "concept": "The core is strength control in daruma otoshi. A fast flick knocks one block clean out; too slow drags the stack sideways, too hard makes it shake. Light blocks want a soft hit, heavy ones a hard one. When it shifts, hit from the other side or push it back gently.",
+      "howToPlay": "Swipe fast across a block to knock it out. Push slowly to slide a shifted block back. Keep the daruma up to the last block.",
+      "libraryDecision": "None. A readable rule (it falls when the centre of mass passes the support edge) suits reading and fixing drift better than a physics engine and is easier to tune, so I wrote it myself.",
+      "soundDecision": "No BGM; only synthesized wooden knocks via Web Audio. Consecutive THWACKs climb a pentatonic scale and slow hits make a dull scrape, so you hear how good your hit was."
+    }
+  },
+  "createdAt": "2026-11-14T12:06:50+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-14T12:06:50+09:00",
+    "metricsFrom": "2026-11-14T03:05:37.043Z",
+    "transcript": "ec4d6c74-7575-48eb-88ec-cf7519344045.jsonl",
+    "validationRuns": 7,
+    "finishedAt": "2026-11-14T12:21:00+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-14T12:21:16+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "38.7KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=235",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=141",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=209",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=137",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 39654,
+    "lines": 919
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "やることが毎回ほぼ同じ（速さを合わせて払う）で、ステージが進んでも新しい驚きが少ない。指の速さの測り方が端末で違い、スコーンの幅に慣れるまで少しかかる",
+    "comment": "全部スコーンで決めたステージ1は気持ちよく、連続で音程が上がるのが楽しい。ステージ2で軽い段をいつもの強さで打って『強すぎ！』、ずれた所に赤い!が出てだるまが冷や汗をかき、同じ向きにもう一度打って崩した場面で、反対から打てばよかったと分かってもう1回やりたくなった。ただ、数分で手順が見えてしまい、長くは続かない。画像は見えている状態でプレイした",
+    "similar": [
+      {
+        "title": "Daruma Challenge",
+        "url": "https://apps.apple.com/np/app/daruma-challenge/id1567421331",
+        "similarity": "中",
+        "note": "だるま落としのスマホゲーム。片指で塔から段を打ち抜く点は同じ。こちらはスワイプの速さで結果が変わり、ずれを押して直す点が違う",
+        "note_en": "Mobile daruma otoshi knocking blocks with one finger. Here swipe speed decides the outcome and you can push drift back."
+      },
+      {
+        "title": "Daruma Rhm",
+        "url": "https://apps.apple.com/us/app/-/id778861908",
+        "similarity": "低",
+        "note": "だるま落とし題材だが色に合わせて左右をタップするリズム型。力加減や重心の要素はない",
+        "note_en": "Daruma otoshi theme but a tap-left/right rhythm game; no strength control or balance."
+      }
+    ],
+    "research": "WebSearchで「daruma otoshi mobile game swipe hammer」を1回検索。だるま落とし題材のアプリは複数あるが、スワイプの速さで力加減する作品は見つからなかった。ルーツは伝統玩具のだるま落とし",
+    "i18n": {
+      "en": {
+        "worst": "Every stage is mostly the same act (match the speed and flick); few new surprises as stages go on, and finger speed varies by device so the sweet window takes some getting used to",
+        "comment": "Stage 1 with all THWACKs feels great and the rising pitch is fun. In stage 2 I hit a light block too hard, a red ! appeared and the daruma started sweating, then I hit the same way again and it fell — I saw I should have hit from the other side and wanted another go. But the pattern becomes clear within minutes. I played while viewing the screenshots.",
+        "research": "One WebSearch for 'daruma otoshi mobile game swipe hammer'. Several daruma otoshi apps exist, but none found using swipe speed as strength. Root: the traditional toy."
+      }
+    },
+    "method": "スマホ縦画面で 9 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 9 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 300ms",
+        "note": "開始。3段とだるま",
+        "noteEn": "Start: three blocks and the daruma",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "swipe(0.05,0.70→0.95,0.70) 120ms → wait 400ms",
+        "note": "一番下をシュッとはらう。スコーン！と抜けて上がストンと落ちる",
+        "noteEn": "Flick the bottom block: THWACK, and the rest drops down",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "swipe(0.95,0.70→0.05,0.70) 120ms → wait 400ms",
+        "note": "今度は右から。連続スコーンで音が上がっていく",
+        "noteEn": "Now from the right; consecutive THWACKs climb in pitch",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "swipe(0.05,0.70→0.95,0.70) 120ms → wait 900ms",
+        "note": "最後の1段。全部スコーンでクリア",
+        "noteEn": "Last block: clear with all THWACKs",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 1040,
+              "bestStage": 2
+            }
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.50,0.50) 120ms → wait 300ms",
+        "note": "ステージ2。軽い段が混ざる",
+        "noteEn": "Stage 2: a light block appears",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 1040,
+              "bestStage": 2
+            }
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "swipe(0.05,0.55→0.95,0.55) 110ms → wait 500ms",
+        "note": "軽い段をいつもの強さで打ってしまう",
+        "noteEn": "Hit the light block at full strength by habit",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 1040,
+              "bestStage": 2
+            }
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "swipe(0.05,0.62→0.95,0.62) 300ms → wait 500ms",
+        "note": "右にずれたのに、さらに右へ遅く打つ",
+        "noteEn": "It already leans right, and I hit slowly to the right again",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 1040,
+              "bestStage": 2
+            }
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "swipe(0.05,0.70→0.95,0.70) 300ms → wait 1800ms",
+        "note": "もう一度右へ。崩れるか",
+        "noteEn": "Once more to the right. Will it fall?",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 1040,
+              "bestStage": 2
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 1080,
+              "bestStage": 2
+            }
+          },
+          {
+            "agf": "end",
+            "score": 1080
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 800ms",
+        "note": "ずれを同じ向きに重ねると崩れる。押し戻すか、反対から打つべきだった。もう一回やりたい",
+        "noteEn": "Stacking drift in one direction topples it. I should have pushed back or hit from the other side. I want another go",
+        "image": "ai-play/step-09.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 1040,
+              "bestStage": 2
+            }
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 1080,
+              "bestStage": 2
+            }
+          },
+          {
+            "agf": "end",
+            "score": 1080
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-14T12:21:00+09:00"
+  },
+  "publishedAt": "2026-11-14T12:21:00+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 21631,
+    "outputTokens": 41198,
+    "contextTokens": 14588428,
+    "turns": 77,
+    "toolCalls": 81,
+    "webSearches": 0,
+    "minutes": 15.4,
+    "from": "2026-11-14T03:05:37.043Z",
+    "to": "2026-11-14T03:21:00.622Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-14T12:21:00+09:00",
+    "validationRuns": 6,
+    "codeKB": 38.7
+  }
+}
