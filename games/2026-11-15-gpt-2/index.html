@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>返却日のランタン屋</title>
+<style>
+*{box-sizing:border-box;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overscroll-behavior:none;font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;background:#26384a;color:#f8e6b8}
+#game{position:relative;width:100vw;height:100dvh;overflow:hidden;background:radial-gradient(ellipse at 50% 35%,#5e5147,#26384a 75%)}
+header{position:absolute;top:4%;left:6%;right:6%;display:flex;justify-content:space-between;font-size:18px;font-weight:700}
+#stock{position:absolute;top:11%;width:100%;text-align:center;font-size:17px}
+#lanterns{position:absolute;top:17%;left:8%;width:84%;height:15%;display:flex;justify-content:space-around}
+.lamp{width:28%;text-align:center;font-size:13px}.lamp svg{display:block;margin:auto;width:66px;height:64px}.lamp.away svg{opacity:.35}
+#offer{position:absolute;top:34%;left:7%;width:86%;padding:12px;background:#1f3040cc;border:1px solid #b79e77;border-radius:17px;text-align:center;min-height:132px}
+#offer h2{font-size:21px;margin:0 0 8px}#offer p{font-size:16px;line-height:1.5;margin:4px;white-space:pre-line}
+#upcoming{position:absolute;top:61%;left:7%;width:86%;font-size:13px;line-height:1.4;white-space:pre-line}
+#notice{position:absolute;top:76%;left:5%;width:90%;text-align:center;font-size:14px}
+#actions{position:absolute;top:82%;left:7%;width:86%;display:flex;gap:12px}
+button{flex:1;min-height:52px;min-width:44px;border:2px solid #b79e77;border-radius:15px;background:#f4d79a;color:#27394a;font:700 18px system-ui}
+button:disabled{opacity:.35}
+#hint{position:absolute;bottom:3%;width:100%;text-align:center;font-size:13px}
+#cover{position:absolute;inset:0;background:#26384af5;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:7%;text-align:center}
+#cover.hidden{display:none}
+#cover h1{font-size:clamp(25px,7vw,35px);margin:8px 0}#cover p{font-size:17px;line-height:1.7;white-space:pre-line}
+</style>
+</head>
+<body><div id="game">
+<header><span id="cash"></span><span id="day"></span></header>
+<div id="stock"></div><div id="lanterns"></div><div id="offer"></div><div id="upcoming"></div><div id="notice"></div>
+<div id="actions"><button id="accept"></button><button id="skip"></button></div>
+<div id="hint"></div><div id="cover"></div>
+</div>
+<script>
+const LANG=new URLSearchParams(location.search).get('lang')||(/^ja/i.test(navigator.language)?'ja':'en');
+const words={
+ja:{title:'返却日のランタン屋',intro:'3個のランタンを貸す小さな店。\n数と返却日を見て契約を選ぶ。\n9日間の売上を伸ばそう。',start:'タップでスタート',again:'タップでもう一度',cash:'売上',yen:'円',day:'日目',stock:'在庫',goal:'目標',reached:'目標達成！',gap:'目標まで',daysTaken:'契約日',stockouts:'在庫不足',unit:'個',available:'貸せます',due:'朝返却',offer:'今日の注文',duration:'日間',returning:'返却',fee:'契約全体で',next:'次の注文',accept:'契約する',skip:'見送る',hint:'借りている間、そのランタンは貸せません',taken:'契約しました',missed:'注文を見送りました',short:'在庫が足りません',shortButton:'不足',returned:'朝の返却',closed:'九日間の営業終了',best:'ベスト',newBest:'ベスト更新！',contracts:'契約',none:'次の注文はありません'},
+en:{title:'Lanterns on Loan',intro:'Run a little shop with three lanterns.\nChoose quantities and return dates.\nEarn as much as you can.',start:'Tap to start',again:'Tap to play again',cash:'Sales',yen:'coins',day:'Day',stock:'Stock',goal:'Goal',reached:'Goal reached!',gap:'To goal',daysTaken:'Accepted days',stockouts:'Stockouts',unit:'',available:'Available',due:'morning return',offer:"Today's order",duration:'days',returning:'Returns',fee:'Whole contract',next:'Upcoming orders',accept:'Accept',skip:'Pass',hint:'A lantern on loan cannot be rented again',taken:'Contract accepted',missed:'Order passed',short:'Not enough in stock',shortButton:'Stock',returned:'Morning returns',closed:'Nine days complete',best:'Best',newBest:'New best!',contracts:'Contracts',none:'No more orders'}
+};
+const t=words[LANG==='ja'?'ja':'en'],$=id=>document.getElementById(id);
+for(const type of ['contextmenu','selectstart','gesturestart'])addEventListener(type,e=>e.preventDefault(),{passive:false});
+const signal=(type,data={})=>{try{parent.postMessage({agf:type,...data},'*')}catch{}};
+const offers=[
+{need:2,length:3,pay:8},{need:2,length:1,pay:7},{need:1,length:2,pay:6},
+{need:3,length:3,pay:21},{need:2,length:1,pay:9},{need:1,length:3,pay:9},
+{need:3,length:1,pay:18},{need:2,length:2,pay:11},{need:1,length:1,pay:6}
+];
+let mode='title',day=1,cash=0,lamps=[0,0,0],contracts=0,ledger=[],best=null,ended=0,started=0;
+const free=()=>lamps.map((due,i)=>due<=day?i:-1).filter(i=>i>=0);
+const date=n=>LANG==='ja'?n+t.day:t.day+' '+n;
+function cover(title,body,action){$('cover').innerHTML='<h1>'+title+'</h1><p>'+body+'</p><p>'+action+'</p>';$('cover').classList.remove('hidden')}
+function start(){day=1;cash=0;lamps=[0,0,0];contracts=0;ledger=[];mode='play';started=performance.now();$('cover').classList.add('hidden');$('notice').textContent='';$('hint').textContent=t.hint;signal('start');draw()}
+function orderText(o,n){return o.need+t.unit+' · '+o.length+t.duration+' · '+o.pay+' '+t.yen+'\n'+t.returning+' '+date(n+o.length)}
+function draw(){
+$('cash').textContent=t.cash+' '+cash+' '+t.yen;$('day').textContent=date(Math.min(day,9))+' / 9';
+$('stock').textContent=t.stock+' '+free().length+'/3 · '+t.goal+' 60 '+t.yen;
+$('lanterns').innerHTML=lamps.map((due,i)=>'<div class="lamp '+(due>day?'away':'')+'"><svg viewBox="0 0 70 80"><path d="M25 18V10Q35 0 45 10V18" fill="none" stroke="#dbbc82" stroke-width="4"/><path d="M18 22H52L56 67H14Z" fill="#f5d58c" stroke="#9e835e" stroke-width="4"/><path d="M17 23L53 67M53 23L17 67" stroke="#d0a66b" stroke-width="3"/><ellipse cx="35" cy="47" rx="10" ry="15" fill="#fff1ba"/><path d="M12 68H58" stroke="#b39266" stroke-width="6"/></svg><span>'+(due>day?date(due)+'<br>'+t.returning:t.available)+'</span></div>').join('');
+const o=offers[Math.min(day-1,8)];
+$('offer').innerHTML='<h2>'+t.offer+'</h2><p>'+o.need+t.unit+' · '+o.length+t.duration+'</p><p>'+t.fee+' '+o.pay+' '+t.yen+'</p><p>'+t.returning+' '+date(day+o.length)+'</p>';
+$('upcoming').textContent=t.next+'\n'+offers.slice(day,day+2).map((o,i)=>date(day+i+1)+': '+orderText(o,day+i+1)).join('\n');
+if(day>=9)$('upcoming').textContent=t.none;
+$('accept').textContent=free().length<o.need?t.shortButton+' '+free().length+'/'+o.need:t.accept;const returned=lamps.filter(due=>due===day).length;if(returned)$('notice').textContent+=' · '+t.returned+' '+returned;
+$('skip').textContent=t.skip;$('accept').disabled=free().length<o.need;
+}
+function finish(){
+mode='result';ended=performance.now();$('cash').textContent=t.cash+' '+cash+' '+t.yen;const improved=best===null||cash>best;best=Math.max(best??0,cash);signal('end',{score:cash});
+cover(t.closed,t.cash+' '+cash+' '+t.yen+'\n'+t.best+' '+best+' '+t.yen+(improved?'\n'+t.newBest:'')+'\n'+(cash>=60?t.reached:t.gap+' '+(60-cash)+' '+t.yen)+'\n'+t.daysTaken+' '+ledger.filter(x=>x.accept).map(x=>x.day).join('・')+'\n'+t.stockouts+' '+ledger.filter(x=>x.blocked).length,t.again);
+}
+function decide(accept){
+if(mode!=='play')return;
+const o=offers[day-1],available=free();
+if(accept&&available.length<o.need){$('notice').textContent=t.short;return}
+if(accept){for(const i of available.slice(0,o.need))lamps[i]=day+o.length;cash+=o.pay;contracts++}
+ledger.push({day,accept,blocked:available.length<o.need});$('notice').textContent=accept?t.taken:t.missed;
+day++;
+if(day>9){finish();return}
+draw();
+}
+$('accept').addEventListener('pointerdown',e=>{e.preventDefault();decide(true)});
+$('skip').addEventListener('pointerdown',e=>{e.preventDefault();decide(false)});
+$('cover').addEventListener('pointerdown',e=>{e.preventDefault();if(mode==='title'||(mode==='result'&&performance.now()-ended>=700))start()});
+function loop(){if(mode==='play'&&performance.now()-started>5000)$('hint').textContent='';requestAnimationFrame(loop)}
+draw();cover(t.title,t.intro,t.start);requestAnimationFrame(loop);
+</script>
+</body></html>

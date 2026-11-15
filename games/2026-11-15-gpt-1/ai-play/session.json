@@ -1,0 +1,366 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-11-15T03:11:37.446Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.55
+        ],
+        "wait": 1350
+      },
+      "desc": "tap(0.50,0.55) 120ms",
+      "note": "短い準備を経て最初の球が来た。右へ合わせる。",
+      "noteEn": "After the brief ready period, meeting the first ball on the right.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": {
+        "tap": [
+          0.65,
+          0.78
+        ],
+        "wait": 700
+      },
+      "desc": "tap(0.65,0.78) 120ms",
+      "note": "最初の球を端で斜めに返す。",
+      "noteEn": "Sending the first ball diagonally from the paddle edge.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": {
+        "wait": 1700
+      },
+      "desc": "wait 1700ms",
+      "note": "最初の得点を確認する。",
+      "noteEn": "Checking the first point.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.55
+          ],
+          "wait": 1350
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.55) 120ms",
+      "note": "二球目の位置と角度を見る。勝利まであと2点。",
+      "noteEn": "Reading the second serve's position and angle; two points remain.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": {
+        "tap": [
+          0.55,
+          0.78
+        ],
+        "wait": 700
+      },
+      "desc": "tap(0.55,0.78) 120ms",
+      "note": "左へ来る球をラケット左端で返すのを狙う。",
+      "noteEn": "Aiming to return the leftward ball from the paddle's left edge.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.55
+          ],
+          "wait": 1350
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.55) 120ms",
+      "note": "端を狙いすぎて届かず1対1。次の球を見て合わせ直す。",
+      "noteEn": "The edge aim was too wide, making it 1–1; reading the next serve.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": {
+        "tap": [
+          0.52,
+          0.78
+        ],
+        "wait": 700
+      },
+      "desc": "tap(0.52,0.78) 120ms",
+      "note": "少し余裕を持って右端へ合わせる。",
+      "noteEn": "Leaving a little margin while aiming for the right edge.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": {
+        "wait": 1700
+      },
+      "desc": "wait 1700ms",
+      "note": "返したコースがCPUに届くかを見る。",
+      "noteEn": "Watching whether the chosen angle beats the CPU.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 2
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": [
+        {
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.5,
+            0.55
+          ],
+          "wait": 1350
+        }
+      ],
+      "desc": "wait 900ms → tap(0.50,0.55) 120ms",
+      "note": "あと1点の球。まず軌跡を見て下の到達位置を読む。",
+      "noteEn": "One point from winning; reading the serve's trail before positioning.",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 2
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "action": {
+        "tap": [
+          0.32,
+          0.78
+        ],
+        "wait": 700
+      },
+      "desc": "tap(0.32,0.78) 120ms",
+      "note": "左の球にラケットを合わせ、端で右側へ抜ける角度を狙う。",
+      "noteEn": "Meeting the leftward ball and aiming an edge return across the CPU.",
+      "image": "ai-play/step-10.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 2
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "action": {
+        "wait": 1700
+      },
+      "desc": "wait 1700ms",
+      "note": "最後の球の行方を見る。",
+      "noteEn": "Watching the final return.",
+      "image": "ai-play/step-11.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 2
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 3
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}

@@ -1,0 +1,369 @@
+{
+  "id": "2026-11-15-gpt-2",
+  "status": "published",
+  "title": "返却日のランタン屋",
+  "genre": "経営",
+  "concept": "ランタン三個を九日間貸し出し、契約の数・期間・代金から注文を受けるか選ぶ。長い契約は目先の売上になるが、翌日の高い注文を断る原因にもなる。返却日を読み、短い契約へ在庫を回す経営。",
+  "howToPlay": "今日の注文と次の二件を見て、契約するか見送るかを選びます。ランタンは表示された日の朝に戻り、契約した時点で注文全体の代金が売上になります。 売上60円が目標。終了時の契約日を見て、別の選び方で再挑戦できます。",
+  "libraryDecision": "在庫と日付を読み比べる遊びなので、2Dのランタン図と日付カードにする。3Dの店内や描画・物理の棚で返却情報を隠さず、貸出中の数をそのまま示す。",
+  "soundDecision": "音を付けず、次の注文と返却日を自分のペースで考える経営にする。貸出状態と日付の切り替えで契約の影響を伝える。",
+  "improvements": [
+    {
+      "found": "契約ボタンが無効な理由と不足数が出ない／先の注文と返却ラベルが詰まって読みづらい／朝に何個戻ったかの反応がない。",
+      "changed": "不足時はボタンに現在数/必要数を表示。日付ラベルを二行に整理し、予告の行間を詰めて通知と離した。朝の返却個数を通知へ追加。",
+      "foundEn": "Disabled Accept lacks a reason and shortage count; forecasts and return labels are dense; morning returns lack feedback.",
+      "changedEn": "Show stock/required quantity on disabled Accept, use compact two-line return labels and forecasts, and report morning return counts."
+    },
+    {
+      "found": "見送りの差が49円→51円と小さい。結果から契約日を振り返れず、売上目標もない。最終日の背景売上が更新されていない。",
+      "changed": "四日目と七日目の報酬を21円・18円にし、在庫を空ける判断の差を広げた。60円目標、結果の契約日と在庫不足回数、最終売上の同期を追加。",
+      "foundEn": "Passing orders only improved sales from 49 to 51; results lacked a decision history and goal, and the final background total was stale.",
+      "changedEn": "Raised day-four and day-seven fees to 21 and 18; added a 60-coin goal, accepted-day and stockout history, and synchronized the final sales total."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "経営",
+      "en": "Management / tycoon",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "返却日のランタン屋。3個のランタンを九日間貸し、返却日で次の契約を読む。3D店内より平面の在庫と日付カードを優先。",
+        "ideaEn": "Lanterns on Loan: rent three lanterns across nine days, scheduling around returns. Flat stock and date cards matter more than a 3D shop.",
+        "fromDraw": true
+      },
+      {
+        "idea": "月の小包便。重力の違う三つの月で小包を投げ渡す。3Dの軌道を回り込んで狙い、裏側への落下を読む。",
+        "ideaEn": "Moon Parcels: throw packages between three moons with differing gravity, using 3D orbit views to anticipate far-side landings.",
+        "fromDraw": false
+      },
+      {
+        "idea": "まばたきの庭。指で光の輪を押すと花が音階で開く、終わりのない即興遊び。2Dの重なる輪と音の対応を楽しむ。",
+        "ideaEn": "Blink Garden: touch light rings to open flowers in musical scales. An endless flat improvisation links overlapping rings with sound.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "limit",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Lanterns on Loan",
+      "concept": "Rent three lanterns across nine days, choosing orders by quantity, duration and payment. Long loans earn immediately but may block better upcoming orders. Manage return dates to reserve stock for short contracts.",
+      "howToPlay": "Read today's order and the next two, then accept or pass. Lanterns return on the listed morning; accepting adds the entire contract payment immediately. Aim for 60 coins, then use the accepted-day list to try a different schedule.",
+      "libraryDecision": "Flat lantern drawings and date cards keep stock and return dates comparable. A 3D shop or rendering and physics libraries would obscure the scheduling information.",
+      "soundDecision": "No sound, so players can compare future orders and return dates at their own pace. Rental states and date changes communicate decisions."
+    }
+  },
+  "createdAt": "2026-11-15T12:19:09+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-15T12:19:09+09:00",
+    "metricsFrom": "2026-11-15T03:16:14.698Z",
+    "transcript": null,
+    "validationRuns": 3,
+    "finishedAt": "2026-11-15T12:37:36+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-15T12:29:57+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "8.3KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 8518,
+    "lines": 85
+  },
+  "sound": {
+    "uses": false
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 2,
+    "works": "ok",
+    "worst": "注文が毎回同じ九件で、目標を超える契約順が分かると再挑戦の余地が小さい。",
+    "comment": "画像を見ながら九日間をプレイ。目先の契約で在庫を埋める49円の選び方から、三日目を見送って四日目と七日目の注文を受ける63円へ改善できた。返却日を読む判断はあるが、固定注文で展開が少ないため★2。英語iPhoneでも63円、在庫不足、再開を確認。",
+    "similar": [
+      {
+        "title": "Rent A Car Simulator 24",
+        "url": "https://store.steampowered.com/app/2099680/",
+        "similarity": "中",
+        "note": "品物を貸し、貸出状況と収益を管理する点が共通。本作は三個のランタンと九日間の契約選択に絞り、車の購入・運転・修理はない。",
+        "note_en": "Both manage rentals, availability, and income. This game limits play to three lanterns and nine days of contract choices, without purchasing, driving, or repairs."
+      }
+    ],
+    "research": "rental business managementの類似作をウェブ検索し、Steamの開発者・販売元による紹介で貸出管理の説明とURLを確認。",
+    "i18n": {
+      "en": {
+        "worst": "The same nine orders repeat, so replay value falls sharply once a goal-beating schedule is known.",
+        "comment": "Played all nine days while inspecting screenshots. Reserving stock for days four and seven improved a greedy 49-coin schedule to 63. Return dates create decisions, but fixed orders limit variety, hence two stars. English iPhone replay, shortages, and restart also passed.",
+        "research": "Searched for rental-business management games and verified rental-management details and the URL in the developer/publisher Steam description."
+      }
+    },
+    "method": "スマホ縦画面で 10 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 10 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.55) 120ms",
+        "note": "60円目標へ、まず返却日を見る。",
+        "noteEn": "Reading return dates toward the 60-coin goal.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.72,0.86) 120ms",
+        "note": "一日目は見送り、二日目の短い契約を選ぶ。",
+        "noteEn": "Passing day one for a shorter day-two rental.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.28,0.86) 120ms",
+        "note": "翌朝に返る二個を貸す。",
+        "noteEn": "Taking the two-lantern contract returning tomorrow morning.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.72,0.86) 120ms",
+        "note": "今日の6円を見送り、明日の21円へ三個を空ける。",
+        "noteEn": "Passing six coins today to leave three lanterns for tomorrow's 21.",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.28,0.86) 120ms",
+        "note": "三個を七日目まで貸す。",
+        "noteEn": "Renting all three until day seven.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.72,0.86) 120ms",
+        "note": "在庫ゼロの五日目を見送る。",
+        "noteEn": "Passing day five with no stock.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.72,0.86) 120ms",
+        "note": "七日目の朝の三個返却を確かめる。",
+        "noteEn": "Checking all three lanterns return on day seven.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.28,0.86) 120ms",
+        "note": "翌日返却の18円を受ける。",
+        "noteEn": "Accepting 18 coins with next-day returns.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.28,0.86) 120ms",
+        "note": "二個を貸して残り一個を最終日に残す。",
+        "noteEn": "Leaving one lantern for the final day.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.28,0.86) 120ms",
+        "note": "63円と契約日・在庫不足回数の結果表示を確認。",
+        "noteEn": "Checking the 63-coin result, accepted days, and stockout count.",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 63
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-15T12:37:36+09:00"
+  },
+  "publishedAt": "2026-11-15T12:37:36+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 6553,
+    "outputTokens": 14755,
+    "contextTokens": 9854451,
+    "turns": 43,
+    "toolCalls": 42,
+    "webSearches": null,
+    "minutes": 21.4,
+    "from": "2026-11-15T03:16:14.698Z",
+    "to": "2026-11-15T03:37:40.043Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-15T12:37:40+09:00",
+    "validationRuns": 3,
+    "codeKB": 8.3,
+    "evidence": "metrics-evidence.json"
+  }
+}
