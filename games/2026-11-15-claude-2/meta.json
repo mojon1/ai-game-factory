@@ -1,0 +1,605 @@
+{
+  "id": "2026-11-15-claude-2",
+  "status": "published",
+  "title": "スイングバイ・ゴルフ",
+  "genre": "狙って打つ（ゴルフ・ビリヤードなど）",
+  "concept": "惑星の引力で球が曲がる宇宙ゴルフ。見える予測線は打ち出しの一瞬だけで、その先は空間のゆがみを読む。月の横をかすめて曲げ、巨大な星でスイングバイし、緑の星のカップに転がし込む「曲がって入る」快感が核。",
+  "howToPlay": "画面のどこでも引っぱって離すと、反対向きに球を打つ。星の引力で曲がる球を、旗のカップに入れる。全9ホール。",
+  "libraryDecision": "効果音に ZzFX だけを使う（打音・着地・カップの音を数値で作れて軽い）。描画は Canvas 2D で十分なめらかで、引力で曲がる道すじと空間のゆがみの格子が主役なので、3D や物理演算ライブラリは使わず、引力と転がりは自前で計算した。",
+  "soundDecision": "曲は付けず、飛んでいる間だけ速さに合わせて音程が上下する低い唸りを鳴らす。星をかすめて加速すると音が上がるので、スイングバイが耳でも分かる。打音・着地・壁・カップ・ファンファーレは ZzFX。",
+  "improvements": [
+    {
+      "found": "緑の星に乗ってからカップまでが、小さく跳ねるだけで何打もかかる／球がまだ動いているのか止まったのか分かりにくい／打数の点が右から埋まって読みにくい",
+      "changed": "カップのまわりに「グリーン」（カップへ下る傾斜）を作って明るく表示し、芝の転がりを良くした。止まった判定を早め、打てる時は球のまわりに輪を出す。打数の点を左から埋めるようにした。",
+      "foundEn": "Getting from landing on the green to the cup took many tiny hops / hard to tell if the ball had stopped / stroke dots filled from the right",
+      "changedEn": "Added a highlighted \"green\" that slopes toward the cup and made grass roll farther. Faster stop detection with a ready ring around the ball. Stroke dots fill from the left."
+    },
+    {
+      "found": "着地で大きく跳ねて場外に出やすい／引力の強さが画面から読めず、巨大な星に落ちると抜け出せない／球がゆっくり漂う時間が長くテンポが悪い。さらにホールインワンなのに「ボギー」と出る不具合",
+      "changed": "着地の衝撃で勢いを吸うようにし、ガス惑星は弾むようにした。空間の格子のゆがみを2倍近く強め、星ごとに引力の光の輪を付けた。最大の強さを上げ、飛行中の時間を1.3倍速にした。表示の不具合を直した。",
+      "foundEn": "Landings bounced the ball out of bounds / gravity strength was unreadable and the giant planet trapped the ball / long slow drifting hurt the tempo; also a hole-in-one showed \"Bogey\"",
+      "changedEn": "Impacts now absorb speed and gas giants are bouncy. Grid warping is almost twice as strong with a gravity halo per planet. Higher max power, flight runs 1.3x faster. Fixed the label bug."
+    },
+    {
+      "found": "最弱でも強く飛んでしまい、カップ手前のパットができない／場外ペナルティが続いて「もう1回」より先にうんざりする／ホール2は同じ打ち方で毎回ホールインワンになって簡単すぎる",
+      "changed": "最弱の打球をごく弱くして力の曲線をなめらかにし、パットできるようにした。場外をやめてコースのふちを跳ね返る柵にし、壁を使うバンクショットも狙えるようにした（ペナルティはブラックホールだけ）。ホール2のカップを奥側に移し、カップの吸い込みを少し弱めた。",
+      "foundEn": "Even the softest shot flew too far to putt / repeated out-of-bounds penalties made it tiresome / hole 2 was an ace every time with the same shot",
+      "changedEn": "Softest shot is now very gentle with a smoother power curve, so putting works. Replaced out-of-bounds with a bouncy fence at the course edge, enabling bank shots (only black holes penalize). Moved hole 2 cup to the far side and weakened the cup pull."
+    },
+    {
+      "found": "グリーンの端ぎりぎりで球が止まり、ちょんと押すだけのパットが何度も続く／グリーンの帯が細く暗くて場所が分からない／打つたびに同じ所で止まって単調",
+      "changed": "グリーンの範囲を広げ、グリーン上ではどこでも同じ強さでカップへ下るようにした（乗せれば転がり込む）。グリーンの帯を太く明るい黄緑にして星のふちの外側に描いた。",
+      "foundEn": "The ball kept stopping right at the edge of the green, forcing repeated tiny putts / the green band was thin and dark / it felt repetitive",
+      "changedEn": "Widened the green and gave it a constant slope toward the cup (land on it and it rolls in). Drew the green as a thicker, brighter band just outside the rim."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "狙って打つ（ゴルフ・ビリヤードなど）",
+      "en": "Aim and shoot (golf, billiards…)",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "惑星の引力で曲がる球を打つ宇宙ゴルフ。予測線は最初の一瞬だけ見え、その先は空間のゆがみを読んでスイングバイさせ、緑の星のカップへ。",
+        "ideaEn": "Space golf where planets bend the ball. Only the first moment of the path is previewed; read the warped space to swing by and reach the cup on the green planet.",
+        "fromDraw": true
+      },
+      {
+        "idea": "雨どい合奏：屋根から落ちる雨粒の通り道を指でなぞって変え、とい・バケツ・葉に当たる音で即興の曲を作る遊び場（目標なし）。",
+        "ideaEn": "Gutter ensemble: redraw where raindrops flow off a roof; drops hitting gutters, buckets and leaves make an improvised tune (a playground, no goal).",
+        "fromDraw": false
+      },
+      {
+        "idea": "影ふみ鬼：夕方、自分の影で鬼の影を踏む追いかけっこ。日が沈むほど影が長く伸びて届きやすくなるが、鬼の影も長くなる。",
+        "ideaEn": "Shadow tag at dusk: step on the chaser's shadow with yours. As the sun sets both shadows grow longer.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "goal",
+    "input": [
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Swing-by Golf",
+      "concept": "Space golf where planets bend the ball with gravity. The aim line only previews the first instant; beyond that you read the warped space. Skim past moons, swing around giants and roll it into the cup on the green planet: the joy is in curving it in.",
+      "howToPlay": "Pull back anywhere and release to shoot the opposite way. Gravity bends the ball; sink it in the flag cup. 9 holes.",
+      "libraryDecision": "Only ZzFX for sound effects (light, numeric shot/landing/cup sounds). Canvas 2D runs smoothly and the stars of the show are the curved paths and the warped grid, so no 3D or physics library: gravity and rolling are computed by hand.",
+      "soundDecision": "No music; while the ball flies a low hum follows its speed, rising as it whips past a planet so you hear the swing-by. Shot, landing, fence, cup and fanfare sounds via ZzFX."
+    }
+  },
+  "createdAt": "2026-11-15T12:16:21+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-15T12:16:21+09:00",
+    "metricsFrom": "2026-11-15T03:15:44.908Z",
+    "transcript": "236146fd-07f4-4bde-9aa7-2eb8e6c57198.jsonl",
+    "validationRuns": 11,
+    "finishedAt": "2026-11-15T12:46:17+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-15T12:45:51+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "41.3KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=108",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=181",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=86",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=156",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 42288,
+    "lines": 869
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "ZzFX",
+      "version": "1.4.0",
+      "file": "zzfx-1.4.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "緑の星に着いてからカップまでの小さなパットや、球が止まるまで待つ時間が続く場面があり、テンポが途切れる。回る月に何度も捕まるホールもある",
+    "comment": "ホール3で巨大な星の左をかすめて弧を描き、裏側の緑の星に乗った瞬間は気持ちよく、続けてバーディーが取れた。ホール2では月の横を曲がった球がカップに蹴られ、戻って転がり込むホールインワンが出た。空間の格子のゆがみで引力の強さがある程度読める。一方、カップ手前でちょんと押すパットが続く場面はだれる。数分は普通に楽しく遊べる★3。",
+    "similar": [
+      {
+        "title": "Golf Skies (Starpolygon)",
+        "url": "https://www.gamezebo.com/reviews/golf-skies-review-casual-gravity-based-golfing/",
+        "similarity": "高",
+        "note": "引力を持つ小惑星の間をゴルフ球で打つ2Dゴルフ。本作は予測線を打ち出しの一瞬に限り、格子のゆがみで引力を読ませ、星の上のグリーンへ転がし込む点が違う",
+        "note_en": "2D golf among planetoids with gravity. This game limits the aim line to the first instant, shows gravity with a warped grid, and ends by rolling onto a sloped green on a planet"
+      },
+      {
+        "title": "Astro Golf (Spatula Interactive)",
+        "url": "https://spatulainteractive.itch.io/astrogolf",
+        "similarity": "中",
+        "note": "重力場を持つ惑星のあるゴルフ。本作はブラックホール・回る月・ワームホール・跳ね返る柵を9ホールに組み、ホール単位のパー競技にしている",
+        "note_en": "Golf with planets that have gravity fields. This game builds 9 par holes from black holes, orbiting moons, wormholes and a bouncy fence"
+      }
+    ],
+    "research": "WebSearch で gravity golf planets orbit を1回検索し、引力ゴルフの先行作（Golf Skies、Astro Golf、Gravity.Golf など）が多数あることを確認した。ジャンルのルーツは宇宙ゴルフ系の作品群。",
+    "i18n": {
+      "en": {
+        "worst": "After reaching the green planet, small putts and waiting for the ball to stop can break the tempo; on one hole the circling moons keep catching the ball",
+        "comment": "On hole 3 the ball arced past the giant's left side and landed on the hidden green, which felt great, and I got a birdie. On hole 2 a ball curving past the moon lipped out, rolled back and dropped for a hole in one. The warped grid lets you roughly read gravity. Repeated tiny putts near the cup drag, though. Solidly fun for a few minutes: 3 stars.",
+        "research": "One WebSearch for 'gravity golf planets orbit' showed many predecessors (Golf Skies, Astro Golf, Gravity.Golf, etc.); the idea comes from the space-golf genre."
+      }
+    },
+    "method": "スマホ縦画面で 18 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 18 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "タイトル。引っぱって打つ、と3行で分かる",
+        "noteEn": "Title explains pull-and-release in 3 lines",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "swipe(0.50,0.50→0.46,0.66) 300ms → wait 3300ms",
+        "note": "ホール1。右上へ打つと緑の星へ曲がって着地",
+        "noteEn": "Hole 1: up-right shot curves onto the green planet",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "swipe(0.50,0.50→0.49,0.41) 300ms → wait 3500ms",
+        "note": "右側から下へ、ふちに沿って転がす",
+        "noteEn": "Roll down along the rim",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "swipe(0.50,0.50→0.57,0.47) 300ms → wait 2500ms",
+        "note": "下側で止まった。左へ軽く押してグリーンに乗せる",
+        "noteEn": "Light push left onto the green",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 500ms → tap(0.50,0.50) 120ms → swipe(0.50,0.50→0.44,0.68) 300ms → wait 900ms",
+        "note": "ホール2。カップが奥側に移った。月の右をかすめて曲げる",
+        "noteEn": "Hole 2: the cup is on the far side now; curve past the moon",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 3000ms",
+        "note": "着地",
+        "noteEn": "Landing",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "swipe(0.50,0.50→0.58,0.54) 300ms → wait 3000ms",
+        "note": "カップは左上。左上へ転がし上げる",
+        "noteEn": "Cup is upper-left; roll it up the left side",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 2000ms",
+        "note": "グリーンの傾斜でカップへ転がっていく",
+        "noteEn": "The green's slope rolls it toward the cup",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "swipe(0.50,0.50→0.54,0.55) 300ms → wait 3000ms",
+        "note": "ほんの少しだけ左上へ押す",
+        "noteEn": "Just a nudge up-left",
+        "image": "ai-play/step-09.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.50,0.50) 120ms → swipe(0.50,0.42→0.68,0.60) 300ms → wait 1200ms",
+        "note": "ホール3。巨大な星の左をまわって裏の緑へ。強めに左上へ",
+        "noteEn": "Hole 3: strong shot up-left around the giant",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "wait 3500ms",
+        "note": "行方",
+        "noteEn": "Watching",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "swipe(0.50,0.50→0.32,0.50) 300ms → wait 3500ms",
+        "note": "上から右へ打ち、ふちを回ってカップ側へ",
+        "noteEn": "Shoot right from the top to roll around toward the cup",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "wait 1500ms",
+        "note": "結果",
+        "noteEn": "Result",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "tap(0.50,0.50) 120ms → wait 2500ms",
+        "note": "ホール4。2つの月がまわっている",
+        "noteEn": "Hole 4: two moons circling",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "swipe(0.50,0.45→0.38,0.60) 300ms → wait 1000ms",
+        "note": "月が縦に並んだすきに、右側を抜けるよう右上へ",
+        "noteEn": "Moons lined up vertically; shoot up-right past their right side",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "wait 3500ms",
+        "note": "行方",
+        "noteEn": "Watching",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 17,
+        "action": "swipe(0.50,0.45→0.40,0.60) 300ms → wait 1000ms",
+        "note": "回る月に乗ったまま運ばれる。月の勢いも乗せて右上へ",
+        "noteEn": "Riding the moving moon; use its momentum toward upper-right",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 18,
+        "action": "wait 3500ms",
+        "note": "行方",
+        "noteEn": "Watching",
+        "image": "ai-play/step-18.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-15T12:46:17+09:00"
+  },
+  "publishedAt": "2026-11-15T12:46:17+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 27018,
+    "outputTokens": 54604,
+    "contextTokens": 22926867,
+    "turns": 108,
+    "toolCalls": 118,
+    "webSearches": 0,
+    "minutes": 30.6,
+    "from": "2026-11-15T03:15:44.908Z",
+    "to": "2026-11-15T03:46:20.357Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-15T12:46:20+09:00",
+    "validationRuns": 11,
+    "codeKB": 41.3
+  }
+}
