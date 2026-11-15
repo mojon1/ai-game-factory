@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>端打ちラリー</title>
+<style>
+*{box-sizing:border-box;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overscroll-behavior:none;font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;background:#203d49;color:#f5edcf}
+#game{position:relative;width:100vw;height:100dvh;overflow:hidden;background:linear-gradient(#294d58,#183540)}
+header{position:absolute;top:4%;left:6%;right:6%;display:flex;justify-content:space-between;font-size:19px;font-weight:700}
+#goal{position:absolute;top:15%;width:100%;text-align:center;font-size:14px;color:#c4d8c2}
+#message{position:absolute;top:11%;width:100%;text-align:center;font-size:16px}
+canvas{position:absolute;top:18%;left:0;width:100%;height:68%}
+#hint{position:absolute;bottom:4%;width:100%;text-align:center;font-size:14px}
+#cover{position:absolute;inset:0;background:#203d49f5;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7%;text-align:center}
+#cover.hidden{display:none}
+#cover.result{background:transparent;justify-content:flex-end;padding:0 4% 1%}#cover.result h1{font-size:23px;background:#203d49;margin:2px}#cover.result p{font-size:14px;background:#203d49;margin:2px}
+h1{font-size:clamp(27px,7vw,37px);margin:8px 0}p{font-size:18px;line-height:1.7;white-space:pre-line}
+</style>
+</head>
+<body><div id="game">
+<header><span id="score"></span><span id="opponent"></span></header>
+<div id="message"></div><div id="goal"></div><canvas id="table"></canvas><div id="hint"></div><div id="cover"></div>
+</div>
+<script>
+const LANG=new URLSearchParams(location.search).get('lang')||(/^ja/i.test(navigator.language)?'ja':'en');
+const words={
+ja:{title:'端打ちラリー',intro:'指で下のラケットを左右へ。\n端で返すと斜めに飛びます。\nCPUより先に3点を取ろう。',start:'タップでスタート',again:'タップでもう一度',next:'タップで次の球へ',you:'あなた',cpu:'CPU',message:'ラケットの端でコースを変えよう',hint:'指を左右に動かしてラケットを合わせる',winPoint:'あなたの得点',losePoint:'CPUの得点',win:'試合に勝った！',lose:'また挑戦しよう',rally:'ラリー',points:'3点先取',edge:'端で返した',center:'中央で返した',ready:'準備…',toWin:'勝利まであと',unit:'点'},
+en:{title:'Edge-Shot Rally',intro:'Move the lower paddle with your finger.\nHit near an edge to send the ball diagonally.\nReach three points before the CPU.',start:'Tap to start',again:'Tap to play again',next:'Tap for the next ball',you:'You',cpu:'CPU',message:'Use paddle edges to change the angle',hint:'Move your finger sideways to meet the ball',winPoint:'Your point',losePoint:'CPU point',win:'You won the match!',lose:'Try another match',rally:'Rally',points:'First to 3',edge:'Edge return',center:'Center return',ready:'Ready…',toWin:'To win:',unit:'points'}
+};
+const t=words[LANG==='ja'?'ja':'en'],$=id=>document.getElementById(id),canvas=$('table'),ctx=canvas.getContext('2d');
+for(const type of ['contextmenu','selectstart','gesturestart'])addEventListener(type,e=>e.preventDefault(),{passive:false});
+const signal=(type,data={})=>{try{parent.postMessage({agf:type,...data},'*')}catch{}};
+let trail=[],contact=null,ready=0;
+let mode='title',mine=0,theirs=0,paddle=180,target=180,cpu=180,ball={x:180,y:220,vx:80,vy:175},rally=0,pointer=null,last=0,elapsed=0,ended=0,audio=null;
+function tone(f){try{audio??=new (window.AudioContext||window.webkitAudioContext)();audio.resume();const o=audio.createOscillator(),g=audio.createGain();o.frequency.value=f;g.gain.setValueAtTime(.035,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.09);o.connect(g);g.connect(audio.destination);o.start();o.stop(audio.currentTime+.1)}catch{}}
+function cover(title,body,action){$('cover').innerHTML='<h1>'+title+'</h1><p>'+body+'</p><p>'+action+'</p>';$('cover').classList.toggle('result',mode==='result');$('cover').classList.remove('hidden')}
+function hud(){$('score').textContent=t.you+' '+mine;$('opponent').textContent=t.cpu+' '+theirs;$('goal').textContent=t.points+' · '+t.toWin+' '+Math.max(0,3-mine)+' '+t.unit}
+function begin(){
+trail=[];contact=null;paddle=180;target=180;cpu=180;ball=(mine+theirs)===0?{x:180,y:220,vx:80,vy:175}:{x:120+Math.random()*120,y:220,vx:((mine+theirs)%2?-1:1)*(50+Math.random()*55),vy:175};ready=.65;rally=0;elapsed=0;pointer=null;mode='play';$('cover').classList.add('hidden');$('message').textContent=t.message;$('hint').textContent=t.hint;signal('start');tone(360);hud();
+}
+function point(won){
+if(won)mine++;else theirs++;
+$('hint').textContent='';mode='result';ended=performance.now();pointer=null;signal('end',{score:mine});hud();
+const over=mine>=3||theirs>=3;
+cover(over?(mine>=3?t.win:t.lose):(won?t.winPoint:t.losePoint),mine+' : '+theirs,over?t.again:t.next);tone(won?660:180);
+}
+function update(dt){
+if(mode!=='play')return;
+elapsed+=dt;if(ready>0){ready=Math.max(0,ready-dt);$('message').textContent=t.ready;return}if(rally===0)$('message').textContent=t.message;trail.push({x:ball.x,y:ball.y});if(trail.length>13)trail.shift();if(contact)contact.life-=dt;if(elapsed>5)$('hint').textContent='';
+paddle+=(target-paddle)*Math.min(1,dt*25);
+const chase=Math.max(-90*dt,Math.min(90*dt,ball.x-cpu));cpu=Math.max(54,Math.min(306,cpu+chase));
+const previousY=ball.y;
+ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;
+if(ball.x<26){ball.x=52-ball.x;ball.vx=Math.abs(ball.vx)}
+if(ball.x>334){ball.x=668-ball.x;ball.vx=-Math.abs(ball.vx)}
+if(ball.vy>0&&previousY<=420&&ball.y>=420&&Math.abs(ball.x-paddle)<=47){
+ball.y=420;const offset=Math.max(-1,Math.min(1,(ball.x-paddle)/42));ball.vx=offset*225;ball.vy=-Math.min(290,210+rally*8);rally++;contact={x:ball.x,y:430,life:1};tone(480);$('message').textContent=(Math.abs(offset)>.5?t.edge:t.center)+' · '+t.rally+' '+rally;
+}
+if(ball.vy<0&&previousY>=82&&ball.y<=82&&Math.abs(ball.x-cpu)<=41){
+ball.y=82;ball.vx=Math.max(-160,Math.min(160,(ball.x-cpu)*4+(Math.random()-.5)*50));ball.vy=Math.min(290,210+rally*8);tone(300);
+}
+if(ball.y>470)point(false);else if(ball.y<28)point(true);
+}
+function paint(){
+const r=canvas.getBoundingClientRect();if(r.width<=0||r.height<=0)return;
+const dpr=Math.min(2,devicePixelRatio||1);if(canvas.width!==Math.round(r.width*dpr)||canvas.height!==Math.round(r.height*dpr)){canvas.width=Math.round(r.width*dpr);canvas.height=Math.round(r.height*dpr)}
+ctx.setTransform(canvas.width/360,0,0,canvas.height/500,0,0);ctx.clearRect(0,0,360,500);
+ctx.fillStyle='#386b68';ctx.fillRect(20,42,320,420);ctx.strokeStyle='#d5dcb5';ctx.lineWidth=3;ctx.strokeRect(20,42,320,420);
+ctx.beginPath();ctx.moveTo(180,42);ctx.lineTo(180,462);ctx.stroke();
+ctx.strokeStyle='#e8e5cb';ctx.lineWidth=4;ctx.setLineDash([7,6]);ctx.beginPath();ctx.moveTo(20,250);ctx.lineTo(340,250);ctx.stroke();ctx.setLineDash([]);
+ctx.fillStyle='#db9482';ctx.fillRect(cpu-35,62,70,12);ctx.fillStyle='#97cad3';ctx.fillRect(paddle-42,430,84,14);
+ctx.fillStyle='#b8e5e5';ctx.fillRect(paddle-42,430,10,14);ctx.fillRect(paddle+32,430,10,14);
+for(let i=0;i<trail.length;i++){ctx.globalAlpha=i/trail.length*.5;ctx.fillStyle='#fff4bc';ctx.beginPath();ctx.arc(trail[i].x,trail[i].y,4,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;
+if(contact&&contact.life>0){ctx.strokeStyle='#ffe49b';ctx.lineWidth=2;ctx.beginPath();ctx.arc(contact.x,contact.y,12+(1-contact.life)*8,0,Math.PI*2);ctx.stroke()}
+ctx.fillStyle='#152f3e55';ctx.beginPath();ctx.arc(ball.x+3,ball.y+6,8,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff4bc';ctx.beginPath();ctx.arc(ball.x,ball.y,7,0,Math.PI*2);ctx.fill();
+}
+function aim(e){const r=canvas.getBoundingClientRect();if(r.width>0)target=Math.max(62,Math.min(298,(e.clientX-r.left)/r.width*360))}
+canvas.addEventListener('pointerdown',e=>{e.preventDefault();if(mode!=='play'||pointer!==null)return;pointer=e.pointerId;canvas.setPointerCapture(pointer);aim(e)});
+canvas.addEventListener('pointermove',e=>{if(e.pointerId===pointer)aim(e)});
+function release(e){if(e.pointerId===pointer)pointer=null}
+canvas.addEventListener('pointerup',release);canvas.addEventListener('pointercancel',release);
+$('cover').addEventListener('pointerdown',e=>{e.preventDefault();if(mode==='title'){begin();return}if(mode==='result'&&performance.now()-ended>=700){if(mine>=3||theirs>=3){mine=0;theirs=0}begin()}});
+function loop(now){const dt=last?Math.min(.05,(now-last)/1000):0;last=now;update(dt);paint();requestAnimationFrame(loop)}
+hud();cover(t.title,t.intro,t.start);requestAnimationFrame(loop);
+</script>
+</body></html>
