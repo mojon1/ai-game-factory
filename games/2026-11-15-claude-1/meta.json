@@ -1,0 +1,450 @@
+{
+  "id": "2026-11-15-claude-1",
+  "status": "published",
+  "title": "てのひら灯火",
+  "genre": "反射神経",
+  "concept": "風が来る方角へ手をかざしてろうそくの火を守る。手を近づけるほど広く風を防げるが、近すぎると火は息がつまって弱る。守りたいのに覆いすぎてはいけない、その手の距離の加減が核。夜明けまで灯し続ける。",
+  "howToPlay": "光る方角から風が来るので、その方向に指を置いて手をかざす。手を炎に近づけすぎると息がつまるので、少し離して守る。",
+  "libraryDecision": "使わない。炎の揺らぎと光は Canvas 2D のグラデーションで十分に描け、遊びの核（手の角度と距離）も単純な幾何計算なので、物理や3Dを足しても面白さは増えないと判断した。",
+  "soundDecision": "BGMは付けず、風の音を主役にした。風は来る方向から左右に定位して近づき、手でふさぐとこもった音に変わるので、耳でも風を読め、防げた手応えが分かる。虫の声と時を告げる鐘で夜の静けさと進み具合を伝える。",
+  "improvements": [
+    {
+      "found": "①炎のすぐそばで押さえると2秒ほどで急に消え、どこから近すぎるのか見えない ②息がつまって消えかけているのに「ふせいだ！」が出て矛盾する ③右上の2本のバーが何を表すか分からない",
+      "changed": "息がつまる速さをゆるめ（夜が進むほど少し速く）、炎のまわりに「ここより内は息がつまる」点線の輪を描き、手が入ると青く点滅させた。炎が弱っているときは「ふせいだ」にしない。バーに「火」「息」のラベルを付けた。",
+      "foundEn": "(1) Holding right next to the flame killed it in ~2 s with no sign of where 'too close' begins (2) 'Blocked!' appeared while the flame was suffocating (3) The two bars at top right were unexplained",
+      "changedEn": "Slowed the smothering (slightly faster on later nights), drew a dotted ring marking the smother zone that flashes blue when the hand is inside, stopped awarding blocks when the flame weakened, and labeled the bars Fire / Air."
+    },
+    {
+      "found": "①最初の夜は単発の風ばかりで、予告→かざす→待つの繰り返しが間延びする ②風の筋が雨のように見え、風だと分かりにくい ③変化球の風（往復・回る風）が出るのが遅すぎる",
+      "changed": "風の間隔を縮め、長く吹く風・二方向の風を1夜目の前半から、回る風を1夜目の終盤から出すようにした。風に木の葉を混ぜ、筋を細く薄くして「風」に見えるようにした。",
+      "foundEn": "(1) Night 1 was all single gusts, so warn-hold-wait got slow (2) The wind streaks looked like rain (3) Varied gusts (double, swirling) appeared too late",
+      "changedEn": "Shortened gaps; long and double gusts now start early on night 1 and swirling gusts near its end. Added tumbling leaves to the wind and made streaks thinner so it reads as wind."
+    },
+    {
+      "found": "①風を受けても炎の傾きが小さく、危ないことが伝わりにくい ②防いでも毎回同じ「ふせいだ！」で、上達の手応えが薄い ③防いだご褒美がなく、次の風への気持ちが乗らない",
+      "changed": "風を受けた炎を大きく倒して低くなるようにした。連続で防ぐと「ふせいだ！×N」と数え、音が五音音階で上がっていき、炎が一瞬明るく広がって少し回復する。結果画面に最大連続数を出す。",
+      "foundEn": "(1) The flame barely leaned when hit, so danger did not read (2) Every block showed the same 'Blocked!', with no sense of improving (3) No reward for a block",
+      "changedEn": "Hit flames now bend hard and shrink. Consecutive blocks count up ('Blocked! xN') with a rising pentatonic chime, a brief flare of light and a small heal; the result screen shows the best chain."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "ワンボタン",
+      "en": "One-button",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "ワンボタンのブランコ跳び：押している間こぎ、離した瞬間に跳ぶ。高さと離すタイミングで着地点が変わり、遠くの干し草へ飛び移り続ける。",
+        "ideaEn": "One-button swing jump: hold to pump, release to leap. Timing and height decide where you land as you hop from haystack to haystack.",
+        "fromDraw": true
+      },
+      {
+        "idea": "てのひら灯火：風が来る方角へ手をかざしてろうそくを守る。近いほど広く防げるが近すぎると火が息をつまらせる。夜明けまで灯し続ける。",
+        "ideaEn": "Cupped Flame: hold your hand toward the incoming wind to shield a candle. Closer blocks more, but too close smothers the flame. Keep it lit until dawn.",
+        "fromDraw": false
+      },
+      {
+        "idea": "夜空の星つなぎ遊び場：星をなぞってつなぐと星座の形に合わせて音が鳴る、終わりのない音のおもちゃ。",
+        "ideaEn": "Night-sky playground: trace between stars to form constellations that play notes, an endless sound toy.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 1
+  },
+  "structure": {
+    "goal": "survive",
+    "ending": "fail",
+    "input": [
+      "drag",
+      "hold"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Cupped Flame",
+      "concept": "Shield a candle by holding your hand toward the incoming wind. The closer your hand, the wider it blocks, but too close and the flame suffocates. The core is that balance of distance: protect it without smothering it, until dawn.",
+      "howToPlay": "Wind comes from the glowing side; put your finger there to raise your hand. Keep a little distance or the flame will suffocate.",
+      "libraryDecision": "No libraries. The flickering flame and its light work well with Canvas 2D gradients, and the core (hand angle and distance) is simple geometry, so physics or 3D would not add fun.",
+      "soundDecision": "No music; the wind is the star. It is panned from the side it comes from and becomes muffled when your hand blocks it, so you can read wind by ear and feel a successful block. Crickets and an hourly bell set the night mood and mark progress."
+    }
+  },
+  "createdAt": "2026-11-15T10:47:15+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-15T10:47:15+09:00",
+    "metricsFrom": "2026-11-15T01:46:28.536Z",
+    "transcript": "fb1e2e7d-3c83-4fd3-95da-8ba19140ab3c.jsonl",
+    "validationRuns": 5,
+    "finishedAt": "2026-11-15T10:58:54+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-15T10:58:39+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "38.2KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=134",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=148",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=117",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=165",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 39151,
+    "lines": 894
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 9
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "1夜目の前半は予告の弧へ指を置くだけの繰り返しで、手の距離の駆け引き（近いと息がつまる）が効いてくるのは長く吹く風や回る風が来てから。そこまでが少し単調。",
+    "comment": "暗い野原で、指をかざすと手のひらが炎に照らされ、風の筋と木の葉が手に当たってそれていくのは気持ちよかった。左上の風を防いで『ふせいだ！×2』と音が上がったとき、次も防ぎたくなった。長く吹く風で早く手を離して火が半分に減り、近づけすぎると点線の輪が青く光って息がつまるので、距離を考える場面はある。音は自己プレイでは聞けていない（風の定位とこもりは実機未確認）。数分は普通に遊べるが、もう1回と強く思うほどの変化はまだ少ないので★3。",
+    "similar": [
+      {
+        "title": "Will you let the candle die?",
+        "url": "https://juankz.itch.io/will-you-let-the-candle-die",
+        "similarity": "高",
+        "note": "手を動かして風からろうそくを守るモバイル作品。こちらは指で手を置き、近づけすぎると息がつまる距離の駆け引きと、方角の予告・夜明けまでの生き残りがある。",
+        "note_en": "A mobile game about moving a hand to shield a candle from wind. Mine places the hand by finger, adds the smothering distance trade-off, directional warnings and surviving until dawn."
+      },
+      {
+        "title": "By the Candlelight",
+        "url": "https://cacctus1.itch.io/by-the-candlelight",
+        "similarity": "中",
+        "note": "マウスカーソルで風をさえぎりろうそくを灯し続けるPC作品。ふさぎすぎの不利はない。",
+        "note_en": "A PC game where the mouse cursor blocks gusts to keep a candle lit; no penalty for covering too closely."
+      }
+    ],
+    "research": "WebSearchで「手で風からろうそくの炎を守る」ゲームを検索し、同じ題材の小品が複数あることを確認した。",
+    "i18n": {
+      "en": {
+        "worst": "The first half of night 1 is mostly putting your finger on the warning arc; the distance trade-off (too close smothers) only bites once long and swirling gusts arrive, so the start is a bit monotonous.",
+        "comment": "In the dark field, raising a hand that gets lit by the flame while wind streaks and leaves glance off it feels good. Blocking the upper-left gust and hearing 'Blocked! x2' rise made me want the next one. On a long gust I let go too early and lost half the fire, and getting too close turns the dotted ring blue as the flame chokes, so distance does matter. I could not hear the audio in self-play (wind panning/muffling unverified on device). Fine for a few minutes, but not enough variety yet to strongly want another go: 3 stars.",
+        "research": "Searched the web for games about shielding a candle flame from wind with a hand and found several small games on the same theme."
+      }
+    },
+    "method": "スマホ縦画面で 10 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 10 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.85) 120ms → wait 2900ms",
+        "note": "開始。左に風の予告の弧が光る",
+        "noteEn": "Start. A warning arc glows on the left",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.28,0.59) 2200ms",
+        "note": "左の点線の輪の少し外に手をかざす",
+        "noteEn": "Hold my hand just outside the dotted ring on the left",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 1500ms",
+        "note": "次の予告を待つ",
+        "noteEn": "Wait for the next warning",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.33,0.46) 1700ms",
+        "note": "左上から。左上に手をかざす",
+        "noteEn": "From the upper left; hand there",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 1000ms",
+        "note": "連続で防げたか確認",
+        "noteEn": "Check if the chain continued",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 400ms",
+        "note": "×2。次の予告を探す",
+        "noteEn": "Chain x2. Looking for the next warning",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 700ms",
+        "note": "静かな間",
+        "noteEn": "A quiet pause",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 600ms",
+        "note": "予告を待つ",
+        "noteEn": "Waiting for a warning",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.66,0.47) 2100ms",
+        "note": "右上から。輪の外の右上に手をかざす",
+        "noteEn": "From the upper right; hand outside the ring",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 800ms",
+        "note": "×3になるか",
+        "noteEn": "Will it become x3?",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-15T10:58:54+09:00"
+  },
+  "publishedAt": "2026-11-15T10:58:54+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 13454,
+    "outputTokens": 38554,
+    "contextTokens": 10344592,
+    "turns": 58,
+    "toolCalls": 65,
+    "webSearches": 0,
+    "minutes": 12.4,
+    "from": "2026-11-15T01:46:28.536Z",
+    "to": "2026-11-15T01:58:54.117Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-15T10:58:54+09:00",
+    "validationRuns": 5,
+    "codeKB": 38.2
+  }
+}
