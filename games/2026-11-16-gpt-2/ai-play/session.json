@@ -1,0 +1,139 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-11-16T03:21:48.280Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.55
+        ]
+      },
+      "desc": "tap(0.50,0.55) 120ms",
+      "note": "新しい配置を見て、次の星がある軌道を読む。",
+      "noteEn": "Reading the new layout for the next star's ring.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": {
+        "wait": 1400
+      },
+      "desc": "wait 1400ms",
+      "note": "最初は右下の内側の星。",
+      "noteEn": "Taking the first inner star at lower right.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": {
+        "wait": 1300
+      },
+      "desc": "wait 1300ms",
+      "note": "次も内側なので、今度は切り替えず待つ。",
+      "noteEn": "The next star is also inside, so waiting instead of switching.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": {
+        "tap": [
+          0.5,
+          0.85
+        ],
+        "wait": 1700
+      },
+      "desc": "tap(0.50,0.85) 120ms",
+      "note": "次は外側の左上。早めに跳び移る。",
+      "noteEn": "Jumping early for the next star on the upper-left outer ring.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": {
+        "tap": [
+          0.5,
+          0.85
+        ],
+        "wait": 1100
+      },
+      "desc": "tap(0.50,0.85) 120ms",
+      "note": "上の星は内側。赤い岩のある外側から離れる。",
+      "noteEn": "The top star is inside; leaving the outer ring before its rock.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": {
+        "tap": [
+          0.5,
+          0.85
+        ],
+        "wait": 1400
+      },
+      "desc": "tap(0.50,0.85) 120ms",
+      "note": "残り二つは外側に続いて見える。",
+      "noteEn": "The final two stars appear consecutively on the outer ring.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": {
+        "wait": 900
+      },
+      "desc": "wait 900ms",
+      "note": "切り替えず最後の星へ。一周の時間を確かめる。",
+      "noteEn": "Staying outside for the final star and checking the lap time.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 6
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}

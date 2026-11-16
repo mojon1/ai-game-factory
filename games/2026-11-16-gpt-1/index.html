@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>ひかりを追うつる</title>
+<style>
+*{box-sizing:border-box;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overscroll-behavior:none;background:#112e32;color:#fff4ce;font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif}
+#game{width:100vw;height:100dvh;position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,#285352,#112e32)}
+header{position:absolute;top:4%;left:6%;right:6%;display:flex;justify-content:space-between;font-size:17px}
+canvas{position:absolute;left:0;top:14%;width:100%;height:72%}
+#hint{position:absolute;bottom:3%;width:100%;text-align:center;font-size:14px}
+#cover{position:absolute;inset:0;background:#112e32ed;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:7%}
+#cover.hidden{display:none}#cover.result{inset:auto 4% 1%;padding:8px;background:#112e32f2;border:1px solid #9cc7a0;border-radius:14px}#cover.result h1{font-size:22px;margin:0}#cover.result p{font-size:14px;margin:3px}#meter{position:absolute;top:10%;left:6%;width:88%;height:5px;background:#45625e}#fill{height:100%;background:#a9d795}h1{font-size:clamp(25px,7vw,34px)}p{font-size:17px;line-height:1.7;white-space:pre-line}
+</style></head><body><div id="game"><header><span id="score"></span><span id="water"></span></header><div id="meter"><div id="fill"></div></div><canvas></canvas><div id="hint"></div><div id="cover"></div></div>
+<script>
+const LANG=new URLSearchParams(location.search).get('lang')||(/^ja/i.test(navigator.language)?'ja':'en');
+const words={ja:{title:'ひかりを追うつる',intro:'光を指で動かすと、つるが伸びる。\nとげを避け、三つの花へ導こう。\n指を離すと成長が止まる。',start:'タップでスタート',again:'タップでもう一度',reserve:'残った水',flowers:'花',water:'残りの水',hint:'指を置いた光へ伸びます',thorn:'とげに触れました',dry:'水がなくなりました',clear:'三つの花が咲いた！'},en:{title:'Light-Seeking Vine',intro:'Move the light to grow a vine.\nAvoid thorns and reach three flowers.\nLift your finger to pause growth.',start:'Tap to start',again:'Tap to play again',reserve:'Water saved',flowers:'Flowers',water:'Water left',hint:'The vine grows toward your light',thorn:'Touched a thorn',dry:'Out of water',clear:'Three flowers bloom!'}};
+const t=words[LANG==='ja'?'ja':'en'],cv=document.querySelector('canvas'),g=cv.getContext('2d'),$=x=>document.getElementById(x),cover=$('cover');
+for(const type of ['contextmenu','selectstart','gesturestart'])addEventListener(type,e=>e.preventDefault(),{passive:false});
+const signal=(type,data={})=>{try{parent.postMessage({agf:type,...data},'*')}catch{}};
+let mode='title',pts=[],x=180,y=400,angle=-Math.PI/2,light={x:180,y:320},finger=null,water=620,flowers=[],ended=0,started=0,last=0;
+const thorns=[{x:180,y:290,r:30},{x:120,y:170,r:25}];
+const count=()=>flowers.filter(f=>f.hit).length;
+function overlay(title,body,action){cover.innerHTML='<h1>'+title+'</h1><p>'+body+'</p><p>'+action+'</p>';cover.classList.remove('hidden')}
+function reset(){x=180;y=400;angle=-Math.PI/2;pts=[{x,y}];light={x:180,y:320};water=620;flowers=[{x:90,y:320,hit:false},{x:270,y:220,hit:false},{x:180,y:100,hit:false}];finger=null;mode='play';started=performance.now();cover.classList.add('hidden');cover.classList.remove('result');signal('start')}
+function finish(reason){mode='result';finger=null;ended=performance.now();signal('end',{score:count()});overlay(reason,t.flowers+' '+count()+'/3 · '+t.reserve+' '+Math.ceil(Math.max(0,water)),t.again);cover.classList.add('result')}
+function pos(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)*360/r.width,y:(e.clientY-r.top)*430/r.height}}
+cv.addEventListener('pointerdown',e=>{e.preventDefault();if(mode!=='play'||finger!==null)return;finger=e.pointerId;light=pos(e);try{cv.setPointerCapture(finger)}catch{}});
+cv.addEventListener('pointermove',e=>{if(e.pointerId===finger)light=pos(e)});
+for(const type of ['pointerup','pointercancel'])cv.addEventListener(type,e=>{if(e.pointerId===finger)finger=null});
+cover.addEventListener('pointerdown',e=>{e.preventDefault();if(mode==='title'||performance.now()-ended>=700)reset()});
+addEventListener('pointerdown',e=>{if(mode==='result'&&!cover.contains(e.target)&&performance.now()-ended>=700){e.preventDefault();reset()}},{capture:true});
+function resize(){const r=cv.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);cv.width=Math.max(1,r.width*d);cv.height=Math.max(1,r.height*d)}addEventListener('resize',resize);resize();
+function update(dt){
+if(mode!=='play'||finger===null)return;
+const target=Math.atan2(light.y-y,light.x-x),diff=Math.atan2(Math.sin(target-angle),Math.cos(target-angle));angle+=Math.max(-2.4*dt,Math.min(2.4*dt,diff));
+const ds=40*dt;if(Math.hypot(light.x-x,light.y-y)<8)return;
+x+=Math.cos(angle)*ds;y+=Math.sin(angle)*ds;water-=ds;pts.push({x,y});
+for(const f of flowers)if(!f.hit&&Math.hypot(x-f.x,y-f.y)<20)f.hit=true;
+if(count()===3){finish(t.clear);return}
+if(thorns.some(o=>Math.hypot(x-o.x,y-o.y)<o.r+3)||x<12||x>348||y<12||y>418){finish(t.thorn);return}
+if(water<=0)finish(t.dry)
+}
+function draw(){
+g.setTransform(cv.width/360,0,0,cv.height/430,0,0);g.clearRect(0,0,360,430);
+g.fillStyle='#406c67';for(let i=0;i<30;i++){g.beginPath();g.arc((i*71)%350+5,(i*53)%410+5,1.2,0,7);g.fill()}
+for(const o of thorns){g.strokeStyle='#cd8c9766';g.lineWidth=1;g.beginPath();g.arc(o.x,o.y,o.r+3,0,7);g.stroke();g.fillStyle='#b56e7a';g.beginPath();for(let i=0;i<24;i++){const a=i*Math.PI/12,r=i%2?o.r*.64:o.r;const px=o.x+Math.cos(a)*r,py=o.y+Math.sin(a)*r;i?g.lineTo(px,py):g.moveTo(px,py)}g.closePath();g.fill()}
+for(const f of flowers){g.strokeStyle=f.hit?'#ffcc73':'#a5d6b3';g.lineWidth=3;g.beginPath();g.arc(f.x,f.y,17,0,7);g.stroke();for(let i=0;i<5;i++){const a=i*Math.PI*2/5;g.fillStyle=f.hit?'#ffcc73':'#67968a';g.beginPath();g.arc(f.x+Math.cos(a)*9,f.y+Math.sin(a)*9,7,0,7);g.fill()}g.fillStyle='#fff1bb';g.beginPath();g.arc(f.x,f.y,5,0,7);g.fill()}
+g.lineWidth=6;g.strokeStyle='#a9d795';g.lineCap='round';g.beginPath();pts.forEach((p,i)=>i?g.lineTo(p.x,p.y):g.moveTo(p.x,p.y));g.stroke();
+g.fillStyle='#79a985';for(let i=12;i<pts.length;i+=22){const p=pts[i];g.beginPath();g.ellipse(p.x+6,p.y,8,4,-.6,0,7);g.fill()}
+g.fillStyle='#f2b875';g.fillRect(160,401,40,24);
+g.strokeStyle='#c1e5b588';g.lineWidth=2;g.beginPath();g.moveTo(x,y);g.lineTo(x+Math.cos(angle)*24,y+Math.sin(angle)*24);g.stroke();g.fillStyle='#e5f1b3';g.beginPath();g.arc(x,y,5,0,7);g.fill();if(mode==='result'&&count()<3){g.strokeStyle='#ffb1a4';g.lineWidth=3;g.beginPath();g.arc(x,y,12,0,7);g.stroke()}
+if(finger!==null){g.fillStyle='#ffe3a344';g.beginPath();g.arc(light.x,light.y,26,0,7);g.fill();g.fillStyle='#ffe3a3';g.beginPath();g.arc(light.x,light.y,10,0,7);g.fill()}
+$('fill').style.width=Math.max(0,water)/620*100+'%';$('fill').style.background=water<100?'#e89f87':'#a9d795';$('score').textContent=t.flowers+' '+count()+'/3';$('water').textContent=t.water+' '+Math.ceil(Math.max(0,water));$('hint').textContent=mode==='play'&&performance.now()-started<5000?t.hint:'';
+}
+function loop(now){const dt=Math.min(.05,(now-last)/1000||0);last=now;update(dt);draw();requestAnimationFrame(loop)}
+flowers=[{x:90,y:320},{x:270,y:220},{x:180,y:100}];overlay(t.title,t.intro,t.start);requestAnimationFrame(loop);
+</script></body></html>
