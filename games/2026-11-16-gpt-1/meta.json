@@ -1,0 +1,337 @@
+{
+  "id": "2026-11-16-gpt-1",
+  "status": "published",
+  "title": "ひかりを追うつる",
+  "genre": "育成",
+  "concept": "指の光へ少しずつ曲がるつるを育て、とげの間を通して三つの花を咲かせる。指を離せば考える時間になるが、水には限りがある。成長の曲がり方を読み、次に伸ばす方向を先回りして選ぶ。",
+  "howToPlay": "画面を押して光を置き、つるを三つの花へ導きます。離すと止まり、とげに触れるか水が尽きると終了します。",
+  "libraryDecision": "成長の先端と光の関係を平面で見比べるためCanvas 2Dを使う。3Dの奥行きや物理の揺れは進路判断を曖昧にするので、棚の描画・物理ライブラリは使わない。",
+  "soundDecision": "音を付けず、指を止めて成長の曲線を眺める静かな育成にする。花の開花と葉の増加を成長の反応として使う。",
+  "improvements": [
+    {
+      "found": "水が数字だけで成長の残りをつかみにくい／止めると先端の向きが見えない／完成時に育てたつる全体が結果で隠れる。",
+      "changed": "水の残量バーと少量時の色変化、先端の方向線を追加。結果を下部の小さなカードにして成長の軌跡を残した。",
+      "foundEn": "Numeric water is hard to gauge; a paused tip has no heading cue; the result hides the grown vine.",
+      "changedEn": "Added a colored water meter and tip-heading line; moved results to a compact bottom card so the grown route remains visible."
+    },
+    {
+      "found": "カード外タップで再開できない／とげの隙間も当たる範囲が見えない／失敗した先端やクリア時の残り水を結果から読みづらい。",
+      "changed": "画面のどこでも0.7秒後に再開可能にした。接触範囲を円で示し、失敗先端を赤い輪で強調。結果へ残り水を加え、短い経路を試す目印にした。",
+      "foundEn": "Restart only works inside the card; thorn gaps hide the collision boundary; failure position and water efficiency are unclear.",
+      "changedEn": "Enabled restart anywhere after 0.7 seconds, outlined collision boundaries and the failed tip, and added saved water to results as a route-efficiency cue."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "育成",
+      "en": "Raising / nurturing",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "ひかりを追うつる。指の光へ曲がるつるを三つの花へ導く。平面の曲線で成長方向を読み、3Dの奥行きより先端の曲がりを見せる。",
+        "ideaEn": "Light-Seeking Vine: steer growth toward three flowers with a movable light. Flat curves reveal turning more clearly than depth.",
+        "fromDraw": true
+      },
+      {
+        "idea": "こぼれ音の水琴。器を傾けると滴が異なる鍵盤へ落ち、旋律を重ねる終わりのない2D音遊び。",
+        "ideaEn": "Dripping Chimes: tilt a bowl to drop water on keys and layer melodies in an endless flat musical toy.",
+        "fromDraw": false
+      },
+      {
+        "idea": "磁石の小惑星。3Dの小さな球面を回して磁石を置き、転がる鉱石をくぼみに集める。裏側を読む立体の探索。",
+        "ideaEn": "Magnetic Asteroid: turn a small 3D world and place magnets to roll ore into craters, exploring the far side.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "complete",
+    "ending": "other",
+    "input": [
+      "hold",
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Light-Seeking Vine",
+      "concept": "Grow a vine that turns gradually toward your finger-light, reaching three flowers between thorns. Lifting your finger pauses growth, but water is limited. Anticipate turns rather than drawing an instant path.",
+      "howToPlay": "Hold and move the light to guide growth toward three flowers. Lift to pause. Thorns or depleted water end the attempt.",
+      "libraryDecision": "Canvas 2D makes the light, growth tip and turns directly comparable. Depth and physical wobble would obscure route decisions, so no shelf libraries are used.",
+      "soundDecision": "No sound: pause and inspect the growing curve at your own pace. Blooming flowers and new leaves provide growth feedback."
+    }
+  },
+  "createdAt": "2026-11-16T12:05:47+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-16T12:05:47+09:00",
+    "metricsFrom": "2026-11-16T03:04:13.025Z",
+    "transcript": null,
+    "validationRuns": 3,
+    "finishedAt": "2026-11-16T12:13:33+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-16T12:11:06+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "7.5KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=49",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=59",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=52",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=61",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 7688,
+    "lines": 57
+  },
+  "sound": {
+    "uses": false
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 2,
+    "works": "ok",
+    "worst": "庭が一つだけで、三つの花への経路が分かると育成の変化が少ない。",
+    "comment": "画像を見ながら成長と停止を繰り返し、中央のとげを左から回って三つの花を咲かせた。二つ目から早めに曲がると残り水が77から89へ増えた。曲線を読む手触りはあるが、固定の庭一つで短く終わるため★2。英語iPhoneでも開花・とげ・カード外再開・指を離した停止を確認。",
+    "similar": [
+      {
+        "title": "Prune",
+        "url": "https://play.google.com/store/apps/details?id=com.Polyculture.Prune",
+        "similarity": "中",
+        "note": "植物を育てて危険を避け、光と開花を目指す点が共通。本作は枝を剪定せず、一本の先端を指の光で曲げ、水の長さをやりくりする。",
+        "note_en": "Both guide plant growth around dangers toward light and blooms. Here a finger-light bends a single tip instead of pruning branches, with a limited growth budget."
+      }
+    ],
+    "research": "Prune game grow tree sunlightでウェブ検索し、開発者によるGoogle Play紹介で成長・光・危険回避とURLを確認。",
+    "i18n": {
+      "en": {
+        "worst": "There is only one garden; once its route is known, growth offers little further variation.",
+        "comment": "Inspected each screenshot while growing and pausing, rounding the central thorn to bloom all three flowers. Turning earlier after the second flower increased saved water from 77 to 89. Curved steering has some appeal, but one fixed garden is brief, hence two stars. English iPhone bloom, thorn failure, restart outside the card, and pause passed.",
+        "research": "Searched for Prune tree growth and sunlight; verified growth, light, hazards, and the URL in its developer Google Play description."
+      }
+    },
+    "method": "スマホ縦画面で 7 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 7 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "三つの花へ戻り、水を節約できる経路を試す。",
+        "noteEn": "Trying a route through all flowers while saving water.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.25,0.68) 3000ms",
+        "note": "左の花を咲かせたら離して、次の曲がりを考える。",
+        "noteEn": "Blooming left, then lifting to plan the next turn.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.20,0.53) 2000ms",
+        "note": "円の外を左から抜ける。",
+        "noteEn": "Passing around the left of the hazard boundary.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.75,0.51) 3000ms",
+        "note": "中央の円より上を横断する。",
+        "noteEn": "Crossing above the central circle.",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.75,0.51) 1800ms",
+        "note": "花の中心まで行かず、開花したところで次へ曲がりたい。",
+        "noteEn": "Turning as soon as the flower blooms, before reaching its center.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.50,0.31) 3300ms",
+        "note": "二つ目から早めに上へ曲がる。",
+        "noteEn": "Turning upward early after blooming the second flower.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.50,0.31) 700ms",
+        "note": "最後の花へ。前回より水を残せるか確認する。",
+        "noteEn": "Reaching the final flower and checking saved water against the earlier route.",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 3
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-16T12:13:33+09:00"
+  },
+  "publishedAt": "2026-11-16T12:13:33+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 1453,
+    "outputTokens": 7129,
+    "contextTokens": 3826064,
+    "turns": 28,
+    "toolCalls": 28,
+    "webSearches": null,
+    "minutes": 9.4,
+    "from": "2026-11-16T03:04:13.025Z",
+    "to": "2026-11-16T03:13:36.661Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-16T12:13:36+09:00",
+    "validationRuns": 3,
+    "codeKB": 7.5,
+    "evidence": "metrics-evidence.json"
+  }
+}

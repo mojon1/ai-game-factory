@@ -1,0 +1,344 @@
+{
+  "id": "2026-11-16-gpt-2",
+  "status": "published",
+  "title": "ふたつの月環",
+  "genre": "ワンボタン",
+  "concept": "同じ角度に星と赤い岩が並ぶ二重の軌道を、白い船が回り続ける。タップで内外を跳び移り、次に星のある軌道へ早めに着地する。飛んでいる短い時間を読み、六つの星を一周につなぐ。",
+  "howToPlay": "画面のどこかをタップすると内外の軌道を跳び移ります。白い玉で六つの星を集め、赤い岩への三回の接触を避けてください。 配置は三種類から選ばれ、取り逃した星は次の周回で拾えます。",
+  "libraryDecision": "three.jsで軌道間を移る跳躍の高さと真下の影を表現する。平面の切り替えより着地までの時間が読めるよう再考し、二つのリングを見下ろす固定カメラと低い障害物で先を見渡せるようにする。",
+  "soundDecision": "軌道変更は低い短音、星の獲得は上がる正弦波、接触は低音で伝える。BGMは入れず、次の切り替えに集中できる控えめな音量にする。",
+  "improvements": [
+    {
+      "found": "開始直後の無敵点滅で白い玉が見えない／回る向きが分かりづらい／星が消えるだけで獲得の反応が薄い。",
+      "changed": "開始の無敵では点滅しないよう変更。先端に進行方向の矢印を置き、星を取ると金色の輪が広がる反応を追加。",
+      "foundEn": "Initial invulnerability hides the ship; orbit direction is unclear; stars simply vanish without enough feedback.",
+      "changedEn": "Kept the starting ship visible, added a forward-pointing arrow, and a gold expanding ring on collection."
+    },
+    {
+      "found": "接触の反応が数字と点滅だけで薄い／毎回同じ切り替えで単調／取り逃した星を次の周回で拾っても時間の違いが分からない。",
+      "changed": "接触時に赤い輪を追加。三種類の配置から毎回一つ選び、続けて同じ軌道を進む場面も入れた。結果に経過秒とページ内ベストを表示し、一周で集める目安にした。",
+      "foundEn": "Impact feedback is weak; the same switches repeat; missing a star and taking another lap has no visible time cost.",
+      "changedEn": "Added a red impact ring, three randomized layouts including consecutive same-ring stars, and elapsed time plus an in-page best on results."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "ワンボタン",
+      "en": "One-button",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "ふたつの月環。内外の軌道を一タップで跳び移り、星と岩を見て着地点を選ぶ。3Dの跳躍と影で移動中を示す。",
+        "ideaEn": "Two Moon Rings: one tap jumps between concentric orbits; choose a landing ring from stars and rocks. A 3D hop and shadow reveal transit.",
+        "fromDraw": true
+      },
+      {
+        "idea": "透明箱の錠前。3Dの透明な箱を回し、三つの面の穴が重なる方向から鍵を通す。正面だけでは見えない奥行きの推理。",
+        "ideaEn": "Glass-Box Lock: rotate a transparent 3D box and pass a key through aligned holes on three faces; depth reveals the solution.",
+        "fromDraw": false
+      },
+      {
+        "idea": "砂紋の小庭。指で砂の流れを曲げ、波紋と小石の模様を作る終わりのない2Dの庭。粒子の流れ自体を手触りにする。",
+        "ideaEn": "Sand-Ripple Garden: bend flowing sand around stones in an endless 2D garden, with particle flow as the tactile core.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "complete",
+    "ending": "other",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Two Moon Rings",
+      "concept": "A white ship circles two rings where stars and red rocks share angular positions. Tap to hop between rings and land early on the next star lane. Read the brief flight time to link six stars in a lap.",
+      "howToPlay": "Tap anywhere to jump between rings. Collect six stars with the white orb while avoiding three hits from red rocks. One of three layouts is selected each round; missed stars can be collected on a later lap.",
+      "libraryDecision": "three.js shows hop height and a shadow beneath the ship. The design was refined around readable landing time, using a fixed overhead view and low obstacles to keep future routes visible.",
+      "soundDecision": "A low tone marks ring changes, rising sine tones mark stars, and a bass tone marks impacts. Quiet effects without BGM keep attention on the next switch."
+    }
+  },
+  "createdAt": "2026-11-16T12:15:37+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-16T12:15:37+09:00",
+    "metricsFrom": "2026-11-16T03:13:40.489Z",
+    "transcript": null,
+    "validationRuns": 3,
+    "finishedAt": "2026-11-16T12:24:44+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-16T12:21:45+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "8.3KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=133",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=111",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=116",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=116",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 8533,
+    "lines": 60
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0.1,
+    "idleStarts": 2
+  },
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 2,
+    "works": "ok",
+    "worst": "配置は三種類だけで、一周の切り替えが分かると約八秒で終わり、長く遊ぶ変化が乏しい。",
+    "comment": "画像を見ながら一手ずつ操作し、同じ内側で二つ待ってから外・内・外へ切り替える配置を無傷8.1秒で完了した。跳ぶ高さと影、獲得の輪で切り替えは読みやすい。外側に居続けると三回接触で終了し、英語iPhoneでも二種類の配置を含む三回の無傷クリアと再開・失敗を確認。短く単調なので★2。",
+    "similar": [
+      {
+        "title": "Orbia",
+        "url": "https://www.playorbia.com/",
+        "similarity": "中",
+        "note": "タイミングを読んだ一タップで障害物を避ける点が共通。本作は二つの同心円を切り替える短い星集めで、固定角度の岩と三種類の配置に限られる。",
+        "note_en": "Both use well-timed taps to avoid obstacles. This is a short collection loop between two concentric rings, with fixed rock angles and only three layouts."
+      }
+    ],
+    "research": "Orbia official game JOX orbit tap obstaclesでウェブ検索し、開発者公式サイトで一タップと障害回避の紹介・URLを確認。",
+    "i18n": {
+      "en": {
+        "worst": "Only three layouts exist; a known route clears in about eight seconds, leaving little long-term variation.",
+        "comment": "Inspected each screenshot and cleared a layout by waiting for two inner stars, then switching outer, inner, outer: 8.1 seconds with no damage. Hop height, shadows, and collection rings clarify switching. Staying outside ends on three hits. English iPhone tests covered three clean clears across two layouts, restarts, and failure. Short and repetitive, hence two stars.",
+        "research": "Searched for Orbia, JOX, taps and obstacles; verified one-tap obstacle timing and the URL on the developer's official game site."
+      }
+    },
+    "method": "スマホ縦画面で 7 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 7 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.55) 120ms",
+        "note": "新しい配置を見て、次の星がある軌道を読む。",
+        "noteEn": "Reading the new layout for the next star's ring.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "wait 1400ms",
+        "note": "最初は右下の内側の星。",
+        "noteEn": "Taking the first inner star at lower right.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 1300ms",
+        "note": "次も内側なので、今度は切り替えず待つ。",
+        "noteEn": "The next star is also inside, so waiting instead of switching.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.50,0.85) 120ms",
+        "note": "次は外側の左上。早めに跳び移る。",
+        "noteEn": "Jumping early for the next star on the upper-left outer ring.",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.50,0.85) 120ms",
+        "note": "上の星は内側。赤い岩のある外側から離れる。",
+        "noteEn": "The top star is inside; leaving the outer ring before its rock.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.50,0.85) 120ms",
+        "note": "残り二つは外側に続いて見える。",
+        "noteEn": "The final two stars appear consecutively on the outer ring.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 900ms",
+        "note": "切り替えず最後の星へ。一周の時間を確かめる。",
+        "noteEn": "Staying outside for the final star and checking the lap time.",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 6
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-16T12:24:44+09:00"
+  },
+  "publishedAt": "2026-11-16T12:24:44+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 3861,
+    "outputTokens": 7307,
+    "contextTokens": 4310029,
+    "turns": 26,
+    "toolCalls": 26,
+    "webSearches": null,
+    "minutes": 11.1,
+    "from": "2026-11-16T03:13:40.489Z",
+    "to": "2026-11-16T03:24:48.116Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-16T12:24:48+09:00",
+    "validationRuns": 3,
+    "codeKB": 8.3,
+    "evidence": "metrics-evidence.json"
+  }
+}
