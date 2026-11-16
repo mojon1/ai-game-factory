@@ -1,0 +1,515 @@
+{
+  "id": "2026-11-16-claude-2",
+  "status": "published",
+  "title": "たねまき盤",
+  "genre": "ボードゲーム",
+  "concept": "石を1つずつ隣の穴へまく昔の盤あそび（マンカラ）を、穴を押すと全部の行き先と「もう一回」「横取り」が光って見える形にした。数える手間を消し、まき方の読み合いと連続手番を組む気持ちよさだけを残す。まく石は一粒ごとに音階を上がる。",
+  "howToPlay": "左の列の自分の穴を押すと石の行き先が見え、はなすとまきます。最後の石が蔵に入ればもう一回、空いた自分の穴なら向かいを横取り。蔵に多くためたほうが勝ち。",
+  "libraryDecision": "使わない。石の数を一目で読めることが一番大事なので、真上から見た Canvas 2D の盤が最適で、3Dや物理演算は読みやすさを下げ核を強めないため。",
+  "soundDecision": "BGMは付けず、石が穴に落ちるたびにガラスの音と五音音階の音を Web Audio で鳴らし、まく石が増えるほど音が上がっていく。長くまくと一つの旋律になり、連続手番が音でも気持ちよくなる。相手は低い音域で鳴る。",
+  "improvements": [
+    {
+      "found": "蔵のラベルが中の石を隠し、ためた手応えが見えない／相手の横取りが突然で、自分の手が何を招くか分からない／石が小さく穴がスカスカで地味、相手の考える間が長い",
+      "changed": "蔵の左にラベル、右に石を並べた。押している間、その手のあとで相手に横取りされる穴を赤い点線と「狙われる -N」で示し、自分の番には今狙われている穴に赤い！を付けた。石を大きくし、相手の待ち時間を短くした",
+      "foundEn": "The store label hid the stones inside, so hoarding felt invisible; the rival's steals came out of nowhere and you could not tell what your move invited; the stones were tiny, pits looked empty, and the rival paused too long",
+      "changedEn": "The label now sits left and stones fill the right of the store. While holding a pit, pits the rival could steal afterward get a red dashed ring and \"At risk -N\", and on your turn currently threatened pits show a red !. Bigger stones and a shorter rival pause"
+    },
+    {
+      "found": "終わった直後、盤とHUDが次の相手の名前に変わり誰に勝ったのか混乱する／多い穴の石が一列に重なって読めない／最初の相手が強すぎ、最後の相手は先を読みすぎて歯が立たない",
+      "changed": "対局中の相手と進み具合を分けて、結果画面の後ろは今戦った相手のままにした。穴の石を2〜3段に並べた。CPU同士の対戦を数百回まわして強さを測り、見習いのでたらめさを上げ、名人の先読みを7手から5手にした",
+      "foundEn": "Right after a match the board and HUD switched to the next rival's name, confusing who you beat; stones in full pits piled in one row and could not be read; the first rival was too strong and the last read too deep to ever beat",
+      "changedEn": "Separated the current rival from progress so the finished match stays on screen. Stones now sit in 2-3 rows. Measured strength with hundreds of CPU-vs-CPU games, made the apprentice more random, and cut the master's lookahead from 7 to 5 moves"
+    },
+    {
+      "found": "自陣が空になると相手の残りの石が相手の蔵へ行くルールが見えず、16対20で突然負けた／何個集めれば勝ちなのか分からず中盤の目標がぼやける／負けた理由が画面に出ない",
+      "changed": "押した手で終局する場合は「終局 16対20」と最終結果を赤や金で予告するようにした。蔵に「勝ちまで あとN」を出した。片側が空になって負けたときは結果画面にそのルールを一行で出すようにした",
+      "foundEn": "The rule that a side running empty hands the other side its leftovers was invisible, so I suddenly lost 16-20; it was unclear how many stones win, so the midgame goal blurred; the loss screen never said why",
+      "changedEn": "A move that ends the game now previews the final score, e.g. \"Game ends 16-20\", in red or gold. Stores show \"N more to win\". After losing to an emptied side, the result screen explains that rule in one line"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "ボードゲーム",
+      "en": "Board game",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "マンカラ（種まき盤）をCPU相手に。穴を押すと石の行き先と「もう一回」「横取り」が光って見え、数えずに読み合える。",
+        "ideaEn": "Mancala against the CPU. Holding a pit lights up where every stone lands and whether you go again or steal, so you can plan without counting.",
+        "fromDraw": true
+      },
+      {
+        "idea": "砂の庭: 指で熊手を引いて枯山水の砂紋を描き、石を置いて眺める、目標のない遊び場。",
+        "ideaEn": "Sand garden: rake patterns into a zen garden with your finger and place stones, a goal-free playground.",
+        "fromDraw": false
+      },
+      {
+        "idea": "結び目ほどき: 3Dのひもの端をつまんで引き、からまった結び目をほどく。",
+        "ideaEn": "Knot untangling: pinch and pull the ends of a 3D rope to undo a tangled knot.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "other",
+    "input": [
+      "hold",
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Sowing Board",
+      "concept": "The old sowing game (mancala), where stones are dropped one by one into the next pits, reshaped so holding a pit lights up every landing spot and whether you go again or steal. Counting disappears; what is left is reading the board and chaining extra turns. Each sown stone rises up the scale.",
+      "howToPlay": "Hold one of your pits in the left column to preview, release to sow. End in your store to go again; end in an empty pit of yours to steal the stones across. Most stones in your store wins.",
+      "libraryDecision": "None. Reading stone counts at a glance matters most, so a top-down Canvas 2D board is best; 3D or physics would hurt readability without strengthening the core.",
+      "soundDecision": "No BGM. Each stone dropping into a pit plays a glass click and a pentatonic note via Web Audio, rising with every stone sown, so long sows become a melody and chained turns feel good in your ears too. The rival plays in a lower register."
+    }
+  },
+  "createdAt": "2026-11-16T12:08:37+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-16T12:08:37+09:00",
+    "metricsFrom": "2026-11-16T03:05:41.926Z",
+    "transcript": "f3fb465a-1fc3-4d34-a329-6a1dc4232863.jsonl",
+    "validationRuns": 7,
+    "finishedAt": "2026-11-16T12:25:39+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-16T12:24:28+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "39.0KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=318",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=399",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=282",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=355",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 39892,
+    "lines": 936
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "ルール自体は昔からあるマンカラ（カラハ）そのもので、予告表示の工夫を除けば新しい遊びはない。後半の相手は1局が数分かかり、テンポがゆっくり",
+    "comment": "押すと行き先・もう一回・横取り・狙われる穴・終局のスコアまで光るので、数えずに読み合いだけを楽しめた。こまめ戦で、蔵ぴったりのもう一回から空いた穴へ1個を落として横取りする連続が気持ちよく、終盤は『下の1個を先に動かすと終局16対20で負け』と予告を見て手順を入れ替え、20対16で逆転できた。玉が一粒ずつ音階を上がって落ちる手触りも良い。ただし予告画面は指を押している間だけで、自己プレイでは押している最中の画面を撮れず、予告の見え方は画像では確かめていない",
+    "similar": [
+      {
+        "title": "Kalah（カラハ）",
+        "url": "https://en.wikipedia.org/wiki/Kalah",
+        "similarity": "高",
+        "note": "ルール（6穴・蔵・もう一回・横取り・片側が空で終局）はカラハそのもの。違いは、押すと行き先と結果が全部光る予告表示と、4人のCPUに挑む構成",
+        "note_en": "The rules (six pits, stores, extra turn, capture, end when a side is empty) are Kalah itself. The difference is the hold-to-preview overlay of every outcome and the ladder of four CPU rivals"
+      },
+      {
+        "title": "Kalah（Board Game Arena）",
+        "url": "https://en.boardgamearena.com/gamepanel?game=kalah",
+        "similarity": "中",
+        "note": "オンラインで遊べるカラハ。対人戦が中心で、手の結果の予告表示はない",
+        "note_en": "Online Kalah, mostly against people, without outcome previews"
+      }
+    ],
+    "research": "「Kalah mancala rules capture extra turn store」でウェブ検索し、ルールの出どころと既存のオンライン版を確認した",
+    "i18n": {
+      "en": {
+        "worst": "The rules are classic mancala (Kalah); apart from the preview overlays there is no new play. Later matches take several minutes and the tempo is slow",
+        "comment": "Holding a pit lights up the landing spots, extra turns, steals, at-risk pits and even the final score, so I could enjoy the reading without counting. Against Komame, chaining an exact store landing into a single-stone steal felt great, and near the end the preview warned that moving the bottom stone first would lose 16-20, so I swapped the order and won 20-16. Stones rising up the scale one by one feel nice. However, the preview only shows while a finger is down; self-play screenshots are taken after release, so I could not confirm how the preview looks in an image",
+        "research": "Web-searched 'Kalah mancala rules capture extra turn store' to confirm the rule origin and existing online versions"
+      }
+    },
+    "method": "スマホ縦画面で 12 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 12 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 2400ms",
+        "note": "タイトルをタップして開始。左の列が自分、右が相手のこまめ",
+        "noteEn": "Tap the title to start. Left column is mine, right is the rival Komame",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.27,0.55) 300ms → wait 1500ms",
+        "note": "4番目の穴は3個でちょうど蔵に届き、もう一回",
+        "noteEn": "The 4th pit has exactly 3 to reach my store: go again",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.27,0.27) 300ms → wait 1300ms",
+        "note": "一番上の3個を空いた4番目へ。向かいの3個を横取り",
+        "noteEn": "Top pit's 3 stones end in the empty 4th pit, stealing the 3 across",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 5500ms",
+        "note": "こまめの手番。選んだ穴と行き先がこちらにも光って見える",
+        "noteEn": "Komame's turn; its chosen pit and path light up for me too",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.27,0.46) 300ms → wait 7000ms",
+        "note": "赤い！は次に横取りされる印。3番目の5個を先に逃がす",
+        "noteEn": "The red ! marks a pit the rival can steal next; move the 3rd pit's 5 stones away",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.27,0.36) 300ms → wait 7000ms",
+        "note": "今度は2番目が狙われる。追いかけっこのように逃がす",
+        "noteEn": "Now the 2nd pit is at risk; keep dodging",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.27,0.56) 300ms → wait 7000ms",
+        "note": "4番目の2個を手前に。蔵の下に『勝ちまであと12』と出ていて目標が分かりやすい",
+        "noteEn": "Sow the 4th pit's 2 stones forward. The store shows '12 more to win', a clear target",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.27,0.46) 300ms → wait 7000ms → tap(0.27,0.74) 300ms → wait 7000ms → tap(0.27,0.64) 300ms → wait 7000ms",
+        "note": "1個を空き穴へ落として横取り、そのあと下の大きな穴をまく。相手側に石を送りすぎた",
+        "noteEn": "Steal with a single stone, then sow the big bottom pits; I fed the rival's side too many stones",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.27,0.27) 300ms → wait 8000ms",
+        "note": "下の1個で蔵→もう一回の後は自陣が空になり『終局 16対20』の負けと予告される。先に上の1個で横取りして、下の1個を残す",
+        "noteEn": "Bottom stone first would empty my side and the preview warns 'Game ends 16-20'. Steal with the top stone first and keep the bottom one",
+        "image": "ai-play/step-09.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.27,0.27) 300ms → wait 8000ms",
+        "note": "また上の1個で横取り。あと4で勝ち",
+        "noteEn": "Steal again with the top stone; 4 more to win",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.27,0.74) 300ms → wait 1800ms → tap(0.27,0.27) 300ms → wait 9000ms",
+        "note": "下の1個で蔵へもう一回、上の1個で横取り。今度は自陣が空になっても勝ちの予告",
+        "noteEn": "Bottom stone into the store for another turn, top stone steals; this time emptying my side is a predicted win",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "wins": 1,
+              "clears": 0,
+              "best": 4
+            }
+          },
+          {
+            "agf": "end",
+            "score": 20
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.50,0.50) 120ms → wait 900ms",
+        "note": "タップで次の相手とんびへ。名前が大きく出る",
+        "noteEn": "Tap to face the next rival, Tonbi, announced in large text",
+        "image": "ai-play/step-12.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "wins": 1,
+              "clears": 0,
+              "best": 4
+            }
+          },
+          {
+            "agf": "end",
+            "score": 20
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-16T12:25:39+09:00"
+  },
+  "publishedAt": "2026-11-16T12:25:39+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 24879,
+    "outputTokens": 42472,
+    "contextTokens": 14246862,
+    "turns": 73,
+    "toolCalls": 80,
+    "webSearches": 0,
+    "minutes": 20,
+    "from": "2026-11-16T03:05:41.926Z",
+    "to": "2026-11-16T03:25:39.566Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-16T12:25:39+09:00",
+    "validationRuns": 7,
+    "codeKB": 39
+  }
+}

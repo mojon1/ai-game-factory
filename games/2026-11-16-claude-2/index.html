@@ -1,0 +1,935 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>たねまき盤</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #17120d; }
+canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const JA = LANG === 'ja';
+const T = {
+  ja: {
+    title: 'たねまき盤',
+    sub: '石を1つずつまく、むかしの盤あそび',
+    how1: '自分の穴（左の列）を押すと、石の行き先が光る。',
+    how2: '最後の石が蔵に入ればもう一回。空いた穴なら向かいを横取り。',
+    how3: '蔵に多くためたほうが勝ち。4人の相手に挑もう。',
+    tap: 'タップでスタート',
+    hint: '穴を押すと行き先が見える・はなすとまく',
+    yourTurn: 'あなたの番',
+    thinking: (n) => `${n}が考え中…`,
+    again: 'もう一回！',
+    steal: (n) => `横取り +${n}`,
+    end: 'ここで終わり',
+    yourStore: 'あなたの蔵',
+    cpuStore: (n) => `${n}の蔵`,
+    vs: (i, n) => `相手 ${i}/4`,
+    wins: (n) => `勝ち ${n}`,
+    win: '勝ち！',
+    lose: '負け…',
+    draw: '引き分け',
+    score: (a, b) => `${a} 対 ${b}`,
+    next: (n) => `次の相手: ${n}`,
+    tapNext: 'タップで次へ',
+    tapAgain: 'タップでもう一度',
+    allClear: '4人全員に勝った！',
+    clearSub: (n) => `${n}周目の名人`,
+    bestDiff: (d) => `最大の差 ${d}`,
+    newBest: 'ベスト更新！',
+    sweep: '片側が空に。残りの石はそれぞれの蔵へ',
+    noSeeds: '空の穴はえらべない',
+    danger: (n) => `狙われる -${n}`,
+    need: (n) => `勝ちまで あと${n}`,
+    sure: '勝ち確定！',
+    endGame: (a, b) => `終局 ${a}対${b}`,
+    tipSweep: '自陣が空になると、相手の残りの石は相手の蔵へ',
+  },
+  en: {
+    title: 'Sowing Board',
+    sub: 'An old game of sowing stones one by one',
+    how1: 'Hold one of your pits (left column) to see where the stones go.',
+    how2: 'End in your store: go again. End in an empty pit: steal across.',
+    how3: 'Most stones in your store wins. Beat 4 rivals.',
+    tap: 'Tap to start',
+    hint: 'Hold a pit to preview · release to sow',
+    yourTurn: 'Your turn',
+    thinking: (n) => `${n} is thinking…`,
+    again: 'Go again!',
+    steal: (n) => `Steal +${n}`,
+    end: 'Ends here',
+    yourStore: 'Your store',
+    cpuStore: (n) => `${n}'s store`,
+    vs: (i, n) => `Rival ${i}/4`,
+    wins: (n) => `Wins ${n}`,
+    win: 'You win!',
+    lose: 'You lose…',
+    draw: 'Draw',
+    score: (a, b) => `${a} to ${b}`,
+    next: (n) => `Next rival: ${n}`,
+    tapNext: 'Tap to continue',
+    tapAgain: 'Tap to play again',
+    allClear: 'You beat all four!',
+    clearSub: (n) => `Master, round ${n}`,
+    bestDiff: (d) => `Best margin ${d}`,
+    newBest: 'New best!',
+    sweep: 'One side is empty. Leftovers go home.',
+    noSeeds: 'That pit is empty',
+    danger: (n) => `At risk -${n}`,
+    need: (n) => `${n} more to win`,
+    sure: 'Win locked!',
+    endGame: (a, b) => `Game ends ${a}-${b}`,
+    tipSweep: 'When a side runs empty, the other side keeps its stones',
+  },
+}[JA ? 'ja' : 'en'];
+
+const OPP = [
+  { ja: 'こまめ', en: 'Komame', tagJa: '見習い', tagEn: 'apprentice', seeds: 3, depth: 1, rand: 0.65, col: '#7fc8a9' },
+  { ja: 'とんび', en: 'Tonbi', tagJa: 'くいしんぼう', tagEn: 'the greedy', seeds: 4, depth: 1, rand: 0, col: '#79b4e0' },
+  { ja: 'みずち', en: 'Mizuchi', tagJa: '先読み', tagEn: 'the planner', seeds: 4, depth: 3, rand: 0, col: '#b49be0' },
+  { ja: 'おばば', en: 'Obaba', tagJa: '盤の名人', tagEn: 'the master', seeds: 4, depth: 5, rand: 0, col: '#e58f8f' },
+];
+const oppName = (o) => (JA ? o.ja : o.en);
+
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+
+// ---------- 保存 ----------
+let prog = { stage: 0, wins: 0, clears: 0, best: 0 };
+let cur = 0; // いま対局中の相手
+addEventListener('message', (e) => {
+  if (e.data && e.data.agf === 'loaded' && e.data.data && state === 'title') {
+    const d = e.data.data;
+    prog = { stage: d.stage | 0, wins: d.wins | 0, clears: d.clears | 0, best: d.best | 0 };
+    if (prog.stage < 0 || prog.stage > 3) prog.stage = 0;
+    cur = prog.stage;
+  }
+});
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+const persist = () => { try { parent.postMessage({ agf: 'save', data: prog }, '*'); } catch (e) {} };
+
+// ---------- 画面 ----------
+const cv = document.getElementById('c');
+const cx = cv.getContext('2d');
+let W = 360, H = 640, DPR = 1;
+let L = null;
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+const GLASS = ['#e8505b', '#f59e3a', '#f2cf3c', '#56c597', '#45a0dd', '#8d7ad0', '#ef7aa8', '#e9e3d3'];
+let sprites = [];
+
+function resize() {
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = Math.max(1, innerWidth); H = Math.max(1, innerHeight);
+  cv.width = Math.max(1, Math.round(W * DPR)); cv.height = Math.max(1, Math.round(H * DPR));
+  layout();
+}
+
+function genSlots(rx, ry, r, square) {
+  const pts = [];
+  const s = r * 2.08;
+  const ax = Math.max(r, rx - r * (square ? 1.15 : 0.9)), ay = Math.max(r * 0.5, ry - r * (square ? 1.05 : 0.62));
+  const rows = Math.ceil(ay / (s * 0.866)) + 1, cols = Math.ceil(ax / s) + 1;
+  for (let row = -rows; row <= rows; row++) for (let col = -cols; col <= cols; col++) {
+    const x = (col + (row & 1) * 0.5) * s, y = row * s * 0.866;
+    const d = square ? Math.pow(Math.abs(x) / ax, 4) + Math.pow(Math.abs(y) / ay, 4) : (x / ax) ** 2 + (y / ay) ** 2;
+    if (d <= 1.001) pts.push([x, y, square ? (x / ax) ** 2 * 0.6 + (y / ay) ** 2 : d]);
+  }
+  if (!pts.length) pts.push([0, 0, 0]);
+  pts.sort((a, b) => a[2] - b[2]);
+  return pts;
+}
+
+function layout() {
+  const hud = 50, foot = 46;
+  const avH = Math.max(100, H - hud - foot);
+  const bw = Math.max(100, Math.min(W - 20, avH * 0.68, 520));
+  const bh = Math.max(100, Math.min(avH, bw / 0.6));
+  const bx = (W - bw) / 2, by = hud + (avH - bh) / 2;
+  const pad = bw * 0.035;
+  const storeH = bh * 0.13;
+  const pitsTop = by + pad + storeH + pad * 0.8;
+  const pitsBot = by + bh - pad - storeH - pad * 0.8;
+  const rowH = (pitsBot - pitsTop) / 6;
+  const colW = (bw - pad * 3) / 2;
+  const pits = [];
+  for (let i = 0; i < 14; i++) {
+    let c;
+    if (i < 6) c = { x: bx + pad + colW / 2, y: pitsTop + rowH * (i + 0.5), rx: colW * 0.44, ry: rowH * 0.41 };
+    else if (i === 6) c = { x: bx + bw / 2, y: by + bh - pad - storeH / 2, rx: (bw - pad * 2) / 2, ry: storeH / 2, store: true };
+    else if (i < 13) c = { x: bx + pad * 2 + colW * 1.5, y: pitsTop + rowH * (5 - (i - 7) + 0.5), rx: colW * 0.44, ry: rowH * 0.41 };
+    else c = { x: bx + bw / 2, y: by + pad + storeH / 2, rx: (bw - pad * 2) / 2, ry: storeH / 2, store: true };
+    pits.push(c);
+  }
+  const r = Math.max(3, Math.min(pits[0].rx * 0.23, pits[0].ry * 0.4));
+  for (const p of pits) {
+    if (p.store) { p.labW = Math.min(p.rx * 0.78, 118); p.sx = p.x + p.labW / 2; p.srx = p.rx - p.labW / 2 - 2; }
+    else { p.sx = p.x; p.srx = p.rx; }
+  }
+  L = { bx, by, bw, bh, pad, storeH, rowH, colW, pits, r, hud, foot };
+  L.slots = pits.map((p) => genSlots(p.srx, p.ry, r, !!p.store));
+  // ガラス玉の絵を先に作る
+  sprites = GLASS.map((col) => {
+    const R = Math.ceil(r * DPR * 1.25) + 2;
+    const c = document.createElement('canvas'); c.width = c.height = R * 2;
+    const g = c.getContext('2d');
+    const rr = r * DPR * 1.2;
+    const grd = g.createRadialGradient(R - rr * 0.35, R - rr * 0.4, rr * 0.1, R, R, rr);
+    grd.addColorStop(0, '#ffffff');
+    grd.addColorStop(0.18, col);
+    grd.addColorStop(0.75, col);
+    grd.addColorStop(1, shade(col, -0.45));
+    g.fillStyle = grd; g.beginPath(); g.arc(R, R, rr, 0, Math.PI * 2); g.fill();
+    g.globalAlpha = 0.35; g.fillStyle = '#fff';
+    g.beginPath(); g.ellipse(R + rr * 0.25, R + rr * 0.45, rr * 0.35, rr * 0.18, -0.5, 0, Math.PI * 2); g.fill();
+    return { c, R };
+  });
+  grain = null;
+}
+
+function shade(hex, k) {
+  const n = parseInt(hex.slice(1), 16);
+  let r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+  const f = (v) => Math.max(0, Math.min(255, Math.round(k < 0 ? v * (1 + k) : v + (255 - v) * k)));
+  return `rgb(${f(r)},${f(g)},${f(b)})`;
+}
+
+function slotPos(i, idx) {
+  const p = L.pits[i], S = L.slots[i];
+  if (idx < S.length) return [p.sx + S[idx][0], p.y + S[idx][1]];
+  const k = idx - S.length, q = S[k % S.length], layer = 1 + Math.floor(k / S.length);
+  return [p.sx + q[0] + L.r * 0.55 * layer, p.y + q[1] - L.r * 0.6 * layer];
+}
+function handPos(i, k, n) {
+  const p = L.pits[i];
+  const a = k * 2.4, rad = L.r * 0.95 * Math.sqrt(k);
+  return [p.x + Math.cos(a) * rad * 1.2, p.y - L.r * 1.6 + Math.sin(a) * rad * 0.7];
+}
+
+// ---------- 音 ----------
+let AC = null, master = null;
+function initAudio() {
+  try {
+    if (!AC) {
+      AC = new (window.AudioContext || window.webkitAudioContext)();
+      master = AC.createGain(); master.gain.value = 0.32; master.connect(AC.destination);
+    }
+    if (AC.state === 'suspended') AC.resume();
+  } catch (e) { AC = null; }
+}
+const PENTA = [0, 2, 4, 7, 9];
+function noteFreq(step, base) {
+  const oct = Math.floor(step / 5), k = step % 5;
+  return base * Math.pow(2, (PENTA[k] + 12 * Math.min(oct, 2)) / 12);
+}
+function tone(f, t, dur, vol, type = 'sine') {
+  if (!AC) return;
+  const o = AC.createOscillator(), g = AC.createGain();
+  o.type = type; o.frequency.setValueAtTime(f, t);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.006);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.02);
+}
+function click(t, vol, freq) {
+  if (!AC) return;
+  const len = Math.floor(AC.sampleRate * 0.03);
+  const buf = AC.createBuffer(1, len, AC.sampleRate), d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 6);
+  const s = AC.createBufferSource(); s.buffer = buf;
+  const f = AC.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = 3;
+  const g = AC.createGain(); g.gain.value = vol;
+  s.connect(f); f.connect(g); g.connect(master); s.start(t);
+}
+function sndLand(step, who, isStore) {
+  if (!AC) return;
+  const t = AC.currentTime;
+  const base = who === 0 ? 392 : 261.6;
+  const f = noteFreq(step, base);
+  tone(f, t, 0.35, 0.22, 'triangle');
+  tone(f * 2.01, t, 0.12, 0.05, 'sine');
+  click(t, 0.5, 3200 + Math.random() * 900);
+  if (isStore) { tone(f * 1.5, t + 0.04, 0.6, 0.09, 'sine'); tone(f * 2, t + 0.08, 0.7, 0.06, 'sine'); }
+}
+function sndLift(n) {
+  if (!AC) return;
+  const t = AC.currentTime;
+  for (let i = 0; i < Math.min(n, 6); i++) click(t + i * 0.018, 0.35, 2500 + i * 300);
+}
+function sndAgain() {
+  if (!AC) return;
+  const t = AC.currentTime;
+  [784, 988, 1175].forEach((f, i) => tone(f, t + i * 0.08, 0.4, 0.12, 'triangle'));
+}
+function sndSteal(n) {
+  if (!AC) return;
+  const t = AC.currentTime;
+  tone(220, t, 0.25, 0.15, 'square'); tone(330, t + 0.06, 0.3, 0.08, 'square');
+  for (let i = 0; i < Math.min(n, 10); i++) click(t + 0.1 + i * 0.045, 0.45, 2000 + Math.random() * 2000);
+}
+function sndPick() { if (!AC) return; const t = AC.currentTime; tone(660, t, 0.08, 0.06, 'sine'); }
+function sndEnd(win) {
+  if (!AC) return;
+  const t = AC.currentTime;
+  const seq = win > 0 ? [523, 659, 784, 1047, 1319] : win < 0 ? [392, 330, 262] : [440, 440];
+  seq.forEach((f, i) => tone(f, t + i * 0.13, 0.7, 0.13, 'triangle'));
+}
+
+// ---------- 盤の状態 ----------
+let pits = []; // 14個の配列。中にガラス玉
+let state = 'title';
+let turn = 0, busy = false;
+let hold = null; // {id, p}
+let pops = [];
+let flash = new Array(14).fill(-9999);
+let now = 0;
+let overAt = 0, result = null;
+let hintUntil = 0, introUntil = 0;
+let cpuPreview = -1;
+let warnAt = -9999;
+let firstMatch = true;
+let marbleId = 0;
+let matchToken = 0;
+let lastSwept = 0;
+
+function newMarble(pit, idx) {
+  const m = { id: marbleId++, c: Math.floor(Math.random() * GLASS.length), pit, idx, jx: (Math.random() - 0.5) * 0.24, jy: (Math.random() - 0.5) * 0.24, x: 0, y: 0, lift: 0, resting: true, anim: false };
+  const p = slotPos(pit, idx); m.x = p[0]; m.y = p[1];
+  return m;
+}
+
+function flyTo(m, x, y, lift, dur, arc, delay = 0) {
+  m.ax = m.x; m.ay = m.y; m.al = m.lift; m.bx = x; m.by = y; m.bl = lift;
+  m.t0 = now + delay; m.dur = Math.max(1, dur); m.arc = arc; m.anim = true; m.resting = false;
+}
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+function allMarbles() { const a = []; for (const p of pits) for (const m of p) a.push(m); return a; }
+let loose = []; // 手の中の玉
+const counts = () => pits.map((p) => p.length);
+const restCount = (i) => { let n = 0; for (const m of pits[i]) if (m.resting || !m.anim) n++; return n; };
+
+function startMatch() {
+  matchToken++;
+  cur = prog.stage;
+  const o = OPP[cur];
+  pits = []; loose = [];
+  for (let i = 0; i < 14; i++) pits.push([]);
+  for (let i = 0; i < 14; i++) {
+    if (i === 6 || i === 13) continue;
+    for (let k = 0; k < o.seeds; k++) {
+      const m = newMarble(i, k);
+      pits[i].push(m);
+      const tx = m.x + m.jx * L.r, ty = m.y + m.jy * L.r;
+      m.x = tx + (Math.random() - 0.5) * 30; m.y = -40 - Math.random() * 200; m.lift = 1;
+      flyTo(m, tx, ty, 0, 520 + Math.random() * 380, 0, (i % 7) * 40 + k * 25);
+      m.onland = () => { m.resting = true; };
+    }
+  }
+  turn = 0; busy = false; hold = null; pops = []; cpuPreview = -1; result = null;
+  state = 'play';
+  introUntil = now + 1800;
+  if (firstMatch) hintUntil = now + 6000;
+  firstMatch = false;
+  signal('start');
+}
+
+// ---------- ルール（盤面の計算） ----------
+function simMove(b, p, who) {
+  b = b.slice();
+  let n = b[p]; b[p] = 0; let i = p;
+  const skip = who ? 6 : 13, store = who ? 13 : 6;
+  const path = [];
+  while (n > 0) { i = (i + 1) % 14; if (i === skip) continue; b[i]++; n--; path.push(i); }
+  const extra = i === store;
+  let cap = 0;
+  const mine = who ? (i >= 7 && i <= 12) : (i <= 5);
+  if (!extra && mine && b[i] === 1 && b[12 - i] > 0) { cap = b[12 - i] + 1; b[store] += cap; b[i] = 0; b[12 - i] = 0; }
+  let s0 = 0, s1 = 0;
+  for (let k = 0; k < 6; k++) s0 += b[k];
+  for (let k = 7; k < 13; k++) s1 += b[k];
+  let over = false;
+  if (s0 === 0 || s1 === 0) { b[6] += s0; b[13] += s1; for (let k = 0; k < 14; k++) if (k !== 6 && k !== 13) b[k] = 0; over = true; }
+  return { b, extra, last: i, cap, over, path };
+}
+function movesOf(b, who) { const m = []; const o = who ? 7 : 0; for (let k = 0; k < 6; k++) if (b[o + k] > 0) m.push(o + k); return m; }
+function evalB(b) { return b[13] - b[6]; }
+function search(b, who, depth, alpha, beta) {
+  const ms = movesOf(b, who);
+  if (depth <= 0 || !ms.length) return evalB(b);
+  const res = ms.map((p) => [p, simMove(b, p, who)]);
+  res.sort((a, c) => (c[1].extra - a[1].extra) || (c[1].cap - a[1].cap));
+  if (who === 1) {
+    let best = -1e9;
+    for (const [, r] of res) {
+      const v = r.over ? evalB(r.b) * 10 : search(r.b, r.extra ? 1 : 0, depth - 1, alpha, beta);
+      if (v > best) best = v; if (best > alpha) alpha = best; if (alpha >= beta) break;
+    }
+    return best;
+  } else {
+    let best = 1e9;
+    for (const [, r] of res) {
+      const v = r.over ? evalB(r.b) * 10 : search(r.b, r.extra ? 0 : 1, depth - 1, alpha, beta);
+      if (v < best) best = v; if (best < beta) beta = best; if (alpha >= beta) break;
+    }
+    return best;
+  }
+}
+function cpuChoose(b) {
+  const o = OPP[cur];
+  const ms = movesOf(b, 1);
+  if (ms.length === 1) return ms[0];
+  if (Math.random() < o.rand) return ms[Math.floor(Math.random() * ms.length)];
+  let best = -1e9, pick = ms[0];
+  for (const p of ms) {
+    const r = simMove(b, p, 1);
+    let v;
+    if (o.depth <= 1) v = evalB(r.b) + (r.extra ? 1.5 : 0) + Math.random() * 0.3;
+    else v = r.over ? evalB(r.b) * 10 : search(r.b, r.extra ? 1 : 0, o.depth - 1, -1e9, 1e9) + Math.random() * 0.2;
+    if (v > best) { best = v; pick = p; }
+  }
+  return pick;
+}
+
+// ---------- 石をまく（演出） ----------
+async function sow(src, who) {
+  const tok = matchToken;
+  const hand = pits[src].splice(0);
+  loose = hand;
+  sndLift(hand.length);
+  hand.forEach((m, k) => { m.onland = null; const hp = handPos(src, k, hand.length); flyTo(m, hp[0], hp[1], 1, 170, 0); });
+  await wait(190);
+  if (tok !== matchToken) return -1;
+  let i = src, step = 0;
+  const skip = who === 0 ? 13 : 6;
+  const n = hand.length;
+  const stepDur = Math.max(105, 235 - n * 11);
+  while (hand.length) {
+    i = (i + 1) % 14; if (i === skip) i = (i + 1) % 14;
+    const m = hand.shift();
+    const idx = pits[i].length; pits[i].push(m); m.pit = i; m.idx = idx;
+    const rp = slotPos(i, idx);
+    flyTo(m, rp[0] + m.jx * L.r, rp[1] + m.jy * L.r, 0, stepDur * 0.95, L.r * 1.6);
+    const st = step, ii = i;
+    m.onland = () => { m.resting = true; flash[ii] = now; sndLand(st, who, ii === 6 || ii === 13); };
+    hand.forEach((h, k) => { const hp = handPos(i, k, hand.length); flyTo(h, hp[0], hp[1], 1, stepDur * 0.95, L.r * 0.9); });
+    step++;
+    await wait(stepDur);
+    if (tok !== matchToken) return -1;
+  }
+  loose = [];
+  await wait(140);
+  return i;
+}
+
+async function gather(fromList, store, gap) {
+  const tok = matchToken;
+  let k = 0;
+  for (const i of fromList) {
+    const ms = pits[i].splice(0);
+    for (const m of ms) {
+      const idx = pits[store].length; pits[store].push(m); m.pit = store; m.idx = idx;
+      const rp = slotPos(store, idx);
+      flyTo(m, rp[0] + m.jx * L.r, rp[1] + m.jy * L.r, 0, 420, L.r * 3, k * gap);
+      m.onland = () => { m.resting = true; flash[store] = now; if (AC) click(AC.currentTime, 0.35, 2600 + Math.random() * 1500); };
+      k++;
+    }
+  }
+  await wait(440 + k * gap);
+  return tok === matchToken;
+}
+
+function pop(text, x, y, col, size = 22) { pops.push({ text, x, y, col, t0: now, size }); }
+
+async function doMove(p, who) {
+  busy = true; hold = null; cpuPreview = -1;
+  const tok = matchToken;
+  const pre = simMove(counts(), p, who);
+  const last = await sow(p, who);
+  if (last < 0 || tok !== matchToken) return;
+  const store = who ? 13 : 6;
+  const sp = L.pits[store];
+  if (pre.extra) {
+    sndAgain();
+    pop(T.again, sp.x, sp.y - (who ? -L.storeH * 0.9 : L.storeH * 0.9), who ? OPP[cur].col : '#ffd36b', 26);
+    await wait(380);
+  } else if (pre.cap) {
+    const lp = L.pits[last];
+    pop(T.steal(pre.cap), lp.x, lp.y - L.rowH * 0.5, who ? OPP[cur].col : '#ffd36b', 24);
+    sndSteal(pre.cap);
+    flash[12 - last] = now;
+    await wait(250);
+    if (!(await gather([12 - last, last], store, 45))) return;
+  }
+  if (pre.over) {
+    pop(T.sweep, W / 2, L.by + L.bh / 2, '#fff', 15);
+    await wait(500);
+    const a = [0, 1, 2, 3, 4, 5].filter((k) => pits[k].length);
+    const b = [7, 8, 9, 10, 11, 12].filter((k) => pits[k].length);
+    lastSwept = b.reduce((t, k) => t + pits[k].length, 0) + a.reduce((t, k) => t + pits[k].length, 0);
+    if (a.length && !(await gather(a, 6, 40))) return;
+    if (b.length && !(await gather(b, 13, 40))) return;
+    await wait(300);
+    finish();
+    return;
+  }
+  turn = pre.extra ? who : 1 - who;
+  busy = false;
+  if (turn === 1) cpuTurn();
+}
+
+async function cpuTurn() {
+  const tok = matchToken;
+  busy = true;
+  await wait(420);
+  if (tok !== matchToken) return;
+  const p = cpuChoose(counts());
+  cpuPreview = p; sndPick();
+  await wait(560);
+  if (tok !== matchToken) return;
+  doMove(p, 1);
+}
+
+function finish() {
+  const a = pits[6].length, b = pits[13].length;
+  const win = a > b ? 1 : a < b ? -1 : 0;
+  const diff = a - b;
+  result = { a, b, win, stage: prog.stage, cleared: false, newBest: false, swept: lastSwept >= 3 };
+  lastSwept = 0;
+  if (win > 0) {
+    prog.wins++;
+    if (diff > prog.best) { prog.best = diff; result.newBest = true; }
+    if (prog.stage === 3) { prog.stage = 0; prog.clears++; result.cleared = true; }
+    else prog.stage++;
+  }
+  persist();
+  sndEnd(win);
+  state = 'over'; overAt = now; busy = true;
+  signal('end', { score: a });
+}
+
+// ---------- 入力 ----------
+function toXY(e) { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+function hitPit(x, y) {
+  for (let i = 0; i < 14; i++) {
+    if (i === 6 || i === 13) continue;
+    const p = L.pits[i];
+    if (Math.abs(x - p.x) <= L.colW / 2 + L.pad * 0.5 && Math.abs(y - p.y) <= L.rowH / 2) return i;
+  }
+  return -1;
+}
+cv.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  initAudio();
+  const [x, y] = toXY(e);
+  if (state === 'title') { startMatch(); return; }
+  if (state === 'over') { if (now - overAt > 700) startMatch(); return; }
+  if (state !== 'play' || busy || turn !== 0 || hold) return;
+  const p = hitPit(x, y);
+  if (p >= 0 && p <= 5) {
+    if (pits[p].length) { hold = { id: e.pointerId, p }; sndPick(); try { cv.setPointerCapture(e.pointerId); } catch (er) {} }
+    else { warnAt = now; flash[p] = now; }
+  }
+}, { passive: false });
+cv.addEventListener('pointermove', (e) => {
+  if (!hold || e.pointerId !== hold.id) return;
+  const [x, y] = toXY(e);
+  const p = hitPit(x, y);
+  const np = (p >= 0 && p <= 5 && pits[p].length) ? p : -1;
+  if (np !== hold.p && np >= 0) sndPick();
+  hold.p = np;
+});
+const endHold = (e, ok) => {
+  if (!hold || e.pointerId !== hold.id) return;
+  const p = hold.p; hold = null;
+  if (ok && p >= 0 && state === 'play' && !busy && turn === 0 && pits[p].length) doMove(p, 0);
+};
+cv.addEventListener('pointerup', (e) => endHold(e, true));
+cv.addEventListener('pointercancel', (e) => endHold(e, false));
+addEventListener('resize', resize);
+
+// ---------- 描画 ----------
+let grain = null;
+function makeGrain() {
+  const c = document.createElement('canvas');
+  c.width = Math.max(1, Math.round(L.bw * DPR)); c.height = Math.max(1, Math.round(L.bh * DPR));
+  const g = c.getContext('2d'); g.scale(DPR, DPR);
+  const grd = g.createLinearGradient(0, 0, L.bw, L.bh);
+  grd.addColorStop(0, '#9a6738'); grd.addColorStop(0.5, '#86552c'); grd.addColorStop(1, '#6e4322');
+  g.fillStyle = grd; rr(g, 0, 0, L.bw, L.bh, L.bw * 0.07); g.fill();
+  g.save(); rr(g, 0, 0, L.bw, L.bh, L.bw * 0.07); g.clip();
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  for (let k = 0; k < 46; k++) {
+    const x0 = rnd() * L.bw; g.strokeStyle = `rgba(${rnd() < 0.5 ? '40,20,5' : '255,220,170'},${0.05 + rnd() * 0.07})`;
+    g.lineWidth = 0.6 + rnd() * 1.6; g.beginPath();
+    for (let y = -10; y <= L.bh + 10; y += 12) { const x = x0 + Math.sin(y * 0.02 + k) * (6 + rnd() * 3) + Math.sin(y * 0.005 + k * 3) * 14; y === -10 ? g.moveTo(x, y) : g.lineTo(x, y); }
+    g.stroke();
+  }
+  g.restore();
+  g.strokeStyle = 'rgba(255,225,180,0.35)'; g.lineWidth = 2; rr(g, 1, 1, L.bw - 2, L.bh - 2, L.bw * 0.07); g.stroke();
+  // 穴
+  for (let i = 0; i < 14; i++) {
+    const p = L.pits[i];
+    const x = p.x - L.bx, y = p.y - L.by;
+    g.save();
+    if (p.store) { rr(g, x - p.rx, y - p.ry, p.rx * 2, p.ry * 2, p.ry * 0.9); }
+    else { g.beginPath(); g.ellipse(x, y, p.rx, p.ry, 0, 0, Math.PI * 2); }
+    const gd = g.createRadialGradient(x, y + p.ry * 0.3, 2, x, y, Math.max(p.rx, p.ry));
+    gd.addColorStop(0, '#4a2c15'); gd.addColorStop(0.8, '#3a2210'); gd.addColorStop(1, '#2a180a');
+    g.fillStyle = gd; g.fill();
+    g.clip();
+    g.strokeStyle = 'rgba(0,0,0,0.45)'; g.lineWidth = p.ry * 0.35;
+    if (p.store) rr(g, x - p.rx, y - p.ry - p.ry * 0.12, p.rx * 2, p.ry * 2, p.ry * 0.9); else { g.beginPath(); g.ellipse(x, y - p.ry * 0.1, p.rx, p.ry, 0, 0, Math.PI * 2); }
+    g.stroke();
+    g.restore();
+    g.strokeStyle = 'rgba(255,220,170,0.25)'; g.lineWidth = 1.2;
+    if (p.store) rr(g, x - p.rx, y - p.ry + 1, p.rx * 2, p.ry * 2, p.ry * 0.9); else { g.beginPath(); g.ellipse(x, y + 1, p.rx, p.ry, 0, 0.1, Math.PI - 0.1); }
+    g.stroke();
+  }
+  grain = c;
+}
+function rr(g, x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r);
+  g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
+}
+function fitText(text, maxW, size, weight = 700) {
+  let s = size;
+  cx.font = `${weight} ${s}px ${FONT}`;
+  while (s > 12 && cx.measureText(text).width > maxW) { s -= 1; cx.font = `${weight} ${s}px ${FONT}`; }
+  return s;
+}
+function drawText(text, x, y, size, col, align = 'center', weight = 700, maxW = W - 24) {
+  fitText(text, maxW, size, weight);
+  cx.fillStyle = col; cx.textAlign = align; cx.textBaseline = 'middle';
+  cx.fillText(text, x, y);
+}
+
+function updateMarbles() {
+  const list = allMarbles().concat(loose);
+  for (const m of list) {
+    if (m.anim) {
+      let u = (now - m.t0) / m.dur;
+      if (u < 0) continue;
+      let done = false;
+      if (u >= 1) { u = 1; m.anim = false; done = true; }
+      const e = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+      m.x = m.ax + (m.bx - m.ax) * e;
+      m.y = m.ay + (m.by - m.ay) * e - m.arc * Math.sin(Math.PI * u);
+      m.lift = m.al + (m.bl - m.al) * e + (m.arc > 0 ? Math.sin(Math.PI * u) * 0.6 : 0);
+      if (done) { m.x = m.bx; m.y = m.by; m.lift = m.bl; if (m.onland) { const f = m.onland; m.onland = null; f(); } }
+    } else if (m.resting) {
+      const p = slotPos(m.pit, m.idx); m.x = p[0] + m.jx * L.r; m.y = p[1] + m.jy * L.r; m.lift = 0;
+    }
+  }
+}
+
+function drawMarble(m) {
+  const s = sprites[m.c]; if (!s) return;
+  const sc = 1 + m.lift * 0.22;
+  const sz = (s.R * 2 / DPR) * sc;
+  const off = L.r * (0.2 + m.lift * 0.9);
+  cx.fillStyle = `rgba(0,0,0,${0.38 - m.lift * 0.15})`;
+  cx.beginPath(); cx.ellipse(m.x + off * 0.6, m.y + off, L.r * (1 + m.lift * 0.2), L.r * 0.75, 0, 0, Math.PI * 2); cx.fill();
+  cx.drawImage(s.c, m.x - sz / 2, m.y - sz / 2 - m.lift * L.r * 0.4, sz, sz);
+}
+
+function previewOf(p, who) {
+  const r = simMove(counts(), p, who);
+  const hits = new Map();
+  r.path.forEach((i) => hits.set(i, (hits.get(i) || 0) + 1));
+  return { r, hits };
+}
+
+function drawPreview(p, who) {
+  const { r, hits } = previewOf(p, who);
+  const col = who ? OPP[cur].col : '#ffd36b';
+  const t = now / 1000;
+  // 選んだ穴
+  const sp = L.pits[p];
+  cx.strokeStyle = col; cx.lineWidth = 3;
+  cx.beginPath(); cx.ellipse(sp.x, sp.y, sp.rx + 3, sp.ry + 3, 0, 0, Math.PI * 2); cx.stroke();
+  // 道すじの点
+  const order = [];
+  r.path.forEach((i) => { if (!order.includes(i)) order.push(i); });
+  cx.save();
+  cx.setLineDash([3, 5]); cx.strokeStyle = col; cx.globalAlpha = 0.55; cx.lineWidth = 2;
+  cx.beginPath(); cx.moveTo(sp.x, sp.y);
+  for (const i of r.path.slice(0, 14)) { const q = L.pits[i]; cx.lineTo(q.x, q.y); }
+  cx.stroke(); cx.restore();
+  for (const [i, n] of hits) {
+    const q = L.pits[i];
+    const isLast = i === r.last;
+    cx.fillStyle = isLast ? col : 'rgba(255,255,255,0.18)';
+    if (!isLast) {
+      if (q.store) { rr(cx, q.x - q.rx, q.y - q.ry, q.rx * 2, q.ry * 2, q.ry * 0.9); } else { cx.beginPath(); cx.ellipse(q.x, q.y, q.rx, q.ry, 0, 0, Math.PI * 2); }
+      cx.fill();
+    }
+    const bx = q.store ? q.sx : q.x, by = q.y;
+    cx.fillStyle = 'rgba(20,12,4,0.78)';
+    cx.beginPath(); cx.arc(bx, by, 13, 0, Math.PI * 2); cx.fill();
+    drawText('+' + n, bx, by + 0.5, 14, isLast ? col : '#fff', 'center', 800, 30);
+  }
+  // 最後の穴
+  const lq = L.pits[r.last];
+  const pulse = 0.5 + 0.5 * Math.sin(t * 7);
+  cx.strokeStyle = col; cx.lineWidth = 3 + pulse * 2;
+  if (lq.store) { rr(cx, lq.x - lq.rx - 2, lq.y - lq.ry - 2, lq.rx * 2 + 4, lq.ry * 2 + 4, lq.ry); } else { cx.beginPath(); cx.ellipse(lq.x, lq.y, lq.rx + 4, lq.ry + 4, 0, 0, Math.PI * 2); }
+  cx.stroke();
+  let label = T.end, lcol = '#fff';
+  if (r.over) { const a = r.b[6], b = r.b[13]; label = T.endGame(a, b); lcol = a > b ? '#ffd36b' : a < b ? '#ff8f80' : '#fff'; }
+  else if (r.extra) { label = T.again; lcol = col; }
+  else if (r.cap) {
+    label = T.steal(r.cap); lcol = col;
+    const oq = L.pits[12 - r.last];
+    cx.strokeStyle = '#ff6b5b'; cx.lineWidth = 3 + pulse * 2;
+    cx.beginPath(); cx.ellipse(oq.x, oq.y, oq.rx + 4, oq.ry + 4, 0, 0, Math.PI * 2); cx.stroke();
+    cx.save(); cx.strokeStyle = '#ff6b5b'; cx.globalAlpha = 0.7; cx.lineWidth = 2; cx.setLineDash([6, 4]);
+    cx.beginPath(); cx.moveTo(oq.x, oq.y); cx.lineTo(lq.x, lq.y); cx.stroke(); cx.restore();
+  }
+  // このあと相手に横取りされる穴
+  if (who === 0 && !r.extra && !r.over) {
+    for (const q of movesOf(r.b, 1)) {
+      const s = simMove(r.b, q, 1);
+      if (!s.cap) continue;
+      const mine = 12 - s.last;
+      const mq = L.pits[mine];
+      cx.strokeStyle = '#ff5a4a'; cx.lineWidth = 2.5;
+      cx.save(); cx.setLineDash([5, 4]);
+      cx.beginPath(); cx.ellipse(mq.x, mq.y, mq.rx + 2, mq.ry + 2, 0, 0, Math.PI * 2); cx.stroke(); cx.restore();
+      const tx = mq.x + mq.rx * 0.62, ty = mq.y + mq.ry * 0.55;
+      const lab = T.danger(s.cap);
+      fitText(lab, 110, 13, 800);
+      const w = cx.measureText(lab).width + 14;
+      cx.fillStyle = 'rgba(70,10,5,0.9)'; rr(cx, tx - w / 2, ty - 11, w, 22, 11); cx.fill();
+      drawText(lab, tx, ty + 0.5, 13, '#ffb0a6', 'center', 800, 110);
+    }
+  }
+  // ラベル
+  const ly = lq.store ? (lq.y + (who ? lq.ry + 16 : -lq.ry - 16)) : lq.y - lq.ry - 12;
+  fitText(label, W - 30, 17, 800);
+  const tw = cx.measureText(label).width + 20;
+  const lx = Math.max(tw / 2 + 6, Math.min(W - tw / 2 - 6, lq.x));
+  cx.fillStyle = 'rgba(20,12,4,0.88)'; rr(cx, lx - tw / 2, ly - 14, tw, 28, 14); cx.fill();
+  cx.strokeStyle = lcol; cx.lineWidth = 1.5; cx.stroke();
+  drawText(label, lx, ly + 0.5, 17, lcol, 'center', 800, W - 30);
+}
+
+function drawThreats() {
+  const b = counts();
+  const seen = new Set();
+  for (const q of movesOf(b, 1)) {
+    const s = simMove(b, q, 1);
+    if (!s.cap) continue;
+    const mine = 12 - s.last;
+    if (seen.has(mine)) continue; seen.add(mine);
+    const mq = L.pits[mine];
+    const a = 0.55 + 0.35 * Math.sin(now / 1000 * 5);
+    cx.save(); cx.globalAlpha = a; cx.strokeStyle = '#ff5a4a'; cx.lineWidth = 2; cx.setLineDash([5, 4]);
+    cx.beginPath(); cx.ellipse(mq.x, mq.y, mq.rx + 2, mq.ry + 2, 0, 0, Math.PI * 2); cx.stroke(); cx.restore();
+    const tx = mq.x + mq.rx * 0.62, ty = mq.y + mq.ry * 0.55;
+    cx.fillStyle = 'rgba(70,10,5,0.9)'; cx.beginPath(); cx.arc(tx, ty, 10, 0, Math.PI * 2); cx.fill();
+    drawText('!', tx, ty + 0.5, 14, '#ffb0a6', 'center', 900, 20);
+  }
+}
+
+function drawBoard() {
+  if (!grain) makeGrain();
+  cx.drawImage(grain, L.bx, L.by, L.bw, L.bh);
+  const o = OPP[cur];
+  // 手番の列を光らせる
+  if (state === 'play') {
+    const t = now / 1000;
+    const a = 0.10 + 0.06 * Math.sin(t * 3);
+    const myTurn = turn === 0;
+    const col = myTurn ? '255,211,107' : hexRgb(o.col);
+    const x = myTurn ? L.bx + L.pad * 0.5 : L.bx + L.pad * 1.5 + L.colW;
+    cx.fillStyle = `rgba(${col},${a})`;
+    rr(cx, x, L.pits[0].y - L.rowH / 2 - 2, L.colW + L.pad, L.rowH * 6 + 4, 14); cx.fill();
+  }
+  // 着地の光
+  for (let i = 0; i < 14; i++) {
+    const k = 1 - (now - flash[i]) / 300;
+    if (k <= 0) continue;
+    const p = L.pits[i];
+    cx.fillStyle = `rgba(255,240,200,${0.22 * k})`;
+    if (p.store) rr(cx, p.x - p.rx, p.y - p.ry, p.rx * 2, p.ry * 2, p.ry * 0.9); else { cx.beginPath(); cx.ellipse(p.x, p.y, p.rx, p.ry, 0, 0, Math.PI * 2); }
+    cx.fill();
+  }
+}
+function hexRgb(h) { const n = parseInt(h.slice(1), 16); return `${n >> 16},${(n >> 8) & 255},${n & 255}`; }
+
+function drawCounts() {
+  for (let i = 0; i < 14; i++) {
+    const p = L.pits[i];
+    const n = restCount(i);
+    if (p.store) {
+      const mine = i === 6;
+      const lab = mine ? T.yourStore : T.cpuStore(oppName(OPP[cur]));
+      const col = mine ? '#ffd36b' : OPP[cur].col;
+      const lx = p.x - p.rx + 6, lw = p.labW - 8, lh = Math.min(p.ry * 2 - 10, 62);
+      cx.fillStyle = 'rgba(20,12,4,0.62)';
+      rr(cx, lx, p.y - lh / 2, lw, lh, 12); cx.fill();
+      const k = Math.max(0, 1 - (now - flash[i]) / 400);
+      const total = OPP[cur].seeds * 12, need = Math.floor(total / 2) + 1 - n;
+      const showNeed = state === 'play' && lh >= 50;
+      drawText(lab, lx + lw / 2, p.y - lh * (showNeed ? 0.33 : 0.25), 13, col, 'center', 700, lw - 8);
+      drawText(String(n), lx + lw / 2, p.y + (showNeed ? -lh * 0.02 : lh * 0.18), 24 + k * 6, '#fff', 'center', 900, lw - 8);
+      if (showNeed) drawText(need > 0 ? T.need(need) : T.sure, lx + lw / 2, p.y + lh * 0.32, 12, need > 0 ? 'rgba(255,240,210,0.75)' : col, 'center', 700, lw - 8);
+    } else {
+      const left = i < 6;
+      const bx = left ? p.x - L.colW / 2 + 12 : p.x + L.colW / 2 - 12;
+      const by = p.y - L.rowH / 2 + 12;
+      cx.fillStyle = n ? 'rgba(20,12,4,0.75)' : 'rgba(20,12,4,0.35)';
+      cx.beginPath(); cx.arc(bx, by, 11, 0, Math.PI * 2); cx.fill();
+      drawText(String(n), bx, by + 0.5, 14, n ? (left ? '#ffe7a8' : '#e8f1ff') : 'rgba(255,255,255,0.4)', 'center', 800, 22);
+    }
+  }
+}
+
+function drawHUD() {
+  const o = OPP[cur];
+  cx.fillStyle = 'rgba(0,0,0,0.25)'; cx.fillRect(0, 0, W, L.hud - 4);
+  const vs = T.vs(cur + 1);
+  drawText(vs, 14, 15, 13, 'rgba(255,255,255,0.65)', 'left', 600, W * 0.5);
+  drawText(`${oppName(o)}（${JA ? o.tagJa : o.tagEn}）`.replace('（', JA ? '（' : ' (').replace('）', JA ? '）' : ')'), 14, 33, 16, o.col, 'left', 800, W * 0.62);
+  drawText(T.wins(prog.wins), W - 14, 15, 13, 'rgba(255,255,255,0.65)', 'right', 600, W * 0.35);
+  if (prog.clears) drawText('★'.repeat(Math.min(prog.clears, 5)), W - 14, 33, 15, '#ffd36b', 'right', 800, W * 0.35);
+  else drawText(`${pits[6] ? restCount(6) : 0} : ${pits[13] ? restCount(13) : 0}`, W - 14, 33, 16, '#fff', 'right', 800, W * 0.35);
+}
+
+function drawFooter() {
+  const y = H - L.foot / 2;
+  let txt = '', col = '#fff';
+  if (state === 'play') {
+    if (now < hintUntil && turn === 0 && !busy) { txt = T.hint; col = '#ffe7a8'; }
+    else if (now - warnAt < 1200) { txt = T.noSeeds; col = '#ffb3a8'; }
+    else if (turn === 0 && !busy) { txt = T.yourTurn; col = '#ffd36b'; }
+    else if (turn === 1) { txt = T.thinking(oppName(OPP[cur])); col = OPP[cur].col; }
+  }
+  if (txt) drawText(txt, W / 2, y, 16, col, 'center', 700, W - 24);
+}
+
+function drawPops() {
+  pops = pops.filter((p) => now - p.t0 < 1300);
+  for (const p of pops) {
+    const k = (now - p.t0) / 1300;
+    cx.globalAlpha = k < 0.75 ? 1 : 1 - (k - 0.75) / 0.25;
+    const y = p.y - k * 26;
+    fitText(p.text, W - 30, p.size, 900);
+    cx.lineWidth = 5; cx.strokeStyle = 'rgba(20,10,0,0.85)'; cx.textAlign = 'center'; cx.textBaseline = 'middle';
+    const x = Math.max(cx.measureText(p.text).width / 2 + 8, Math.min(W - cx.measureText(p.text).width / 2 - 8, p.x));
+    cx.strokeText(p.text, x, y); cx.fillStyle = p.col; cx.fillText(p.text, x, y);
+    cx.globalAlpha = 1;
+  }
+}
+
+function drawTitle() {
+  cx.fillStyle = 'rgba(10,6,2,0.72)'; cx.fillRect(0, 0, W, H);
+  const cy = H * 0.3;
+  drawText(T.title, W / 2, cy, 46, '#ffd36b', 'center', 900, W - 30);
+  drawText(T.sub, W / 2, cy + 42, 14, 'rgba(255,240,210,0.75)', 'center', 600, W - 30);
+  // 小さな絵: 玉が並んで流れる
+  const t = now / 1000;
+  for (let k = 0; k < 7; k++) {
+    const s = sprites[k % sprites.length]; if (!s) continue;
+    const ph = (t * 1.2 + k * 0.5) % 3.5;
+    const x = W / 2 - 90 + k * 30, y = cy + 82 - Math.max(0, Math.sin(ph * Math.PI)) * 14 * (ph < 1 ? 1 : 0);
+    const sz = s.R * 2 / DPR;
+    cx.drawImage(s.c, x - sz / 2, y - sz / 2, sz, sz);
+  }
+  const ly = H * 0.56;
+  drawText(T.how1, W / 2, ly, 15, '#fff', 'center', 600, W - 28);
+  drawText(T.how2, W / 2, ly + 28, 15, '#fff', 'center', 600, W - 28);
+  drawText(T.how3, W / 2, ly + 56, 15, '#fff', 'center', 600, W - 28);
+  const o = OPP[cur];
+  if (prog.wins || prog.stage) drawText(`${T.next(oppName(o))}`, W / 2, ly + 96, 15, o.col, 'center', 700, W - 28);
+  const a = 0.55 + 0.45 * Math.sin(t * 3);
+  cx.globalAlpha = a; drawText(T.tap, W / 2, H * 0.84, 22, '#ffd36b', 'center', 800, W - 30); cx.globalAlpha = 1;
+}
+
+function drawOver() {
+  const k = Math.min(1, (now - overAt) / 400);
+  cx.fillStyle = `rgba(10,6,2,${0.7 * k})`; cx.fillRect(0, 0, W, H);
+  if (!result) return;
+  const cy = H * 0.34;
+  const big = result.cleared ? T.allClear : result.win > 0 ? T.win : result.win < 0 ? T.lose : T.draw;
+  const col = result.win > 0 ? '#ffd36b' : result.win < 0 ? '#9fb7d8' : '#fff';
+  cx.globalAlpha = k;
+  drawText(big, W / 2, cy, result.cleared ? 32 : 44, col, 'center', 900, W - 30);
+  drawText(T.score(result.a, result.b), W / 2, cy + 52, 30, '#fff', 'center', 800, W - 30);
+  const oppThen = OPP[result.stage];
+  drawText(`vs ${oppName(oppThen)}`, W / 2, cy + 86, 15, oppThen.col, 'center', 700, W - 30);
+  let y = cy + 126;
+  if (result.cleared) { drawText(T.clearSub(prog.clears), W / 2, y, 17, '#ffd36b', 'center', 800, W - 30); y += 30; }
+  if (result.win > 0) {
+    drawText(result.newBest ? T.newBest + '  ' + T.bestDiff('+' + prog.best) : T.bestDiff('+' + prog.best), W / 2, y, 15, result.newBest ? '#ffd36b' : 'rgba(255,255,255,0.7)', 'center', 700, W - 30);
+    y += 30;
+  }
+  if (result.win <= 0 && result.swept) drawText(T.tipSweep, W / 2, y, 14, 'rgba(255,240,210,0.8)', 'center', 600, W - 30);
+  if (result.win > 0) drawText(T.next(oppName(OPP[prog.stage])), W / 2, y, 16, OPP[prog.stage].col, 'center', 700, W - 30);
+  if (now - overAt > 700) {
+    const a = 0.55 + 0.45 * Math.sin(now / 1000 * 3);
+    cx.globalAlpha = a * k;
+    drawText(result.win > 0 ? T.tapNext : T.tapAgain, W / 2, H * 0.72, 22, '#ffd36b', 'center', 800, W - 30);
+  }
+  cx.globalAlpha = 1;
+}
+
+function drawIntro() {
+  if (state !== 'play' || now > introUntil) return;
+  const k = (introUntil - now) / 1800;
+  const o = OPP[cur];
+  cx.globalAlpha = Math.min(1, k * 3);
+  const y = L.by + L.bh / 2;
+  cx.fillStyle = 'rgba(15,9,3,0.85)'; rr(cx, 20, y - 40, W - 40, 80, 18); cx.fill();
+  drawText(T.vs(cur + 1), W / 2, y - 16, 14, 'rgba(255,255,255,0.7)', 'center', 600, W - 60);
+  drawText(`${oppName(o)} — ${JA ? o.tagJa : o.tagEn}`, W / 2, y + 12, 24, o.col, 'center', 900, W - 60);
+  cx.globalAlpha = 1;
+}
+
+function frame(ts) {
+  now = ts || performance.now();
+  if (!L || W < 2) { requestAnimationFrame(frame); return; }
+  cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  const bg = cx.createRadialGradient(W / 2, H * 0.45, 10, W / 2, H * 0.5, Math.max(W, H) * 0.8);
+  bg.addColorStop(0, '#2c2116'); bg.addColorStop(1, '#120d08');
+  cx.fillStyle = bg; cx.fillRect(0, 0, W, H);
+  if (!pits.length) {
+    for (let i = 0; i < 14; i++) pits.push([]);
+    for (let i = 0; i < 14; i++) if (i !== 6 && i !== 13) for (let k = 0; k < 4; k++) pits[i].push(newMarble(i, k));
+  }
+  updateMarbles();
+  drawBoard();
+  const rest = [], fly = [];
+  for (const p of pits) for (const m of p) (m.lift > 0.02 || m.anim ? fly : rest).push(m);
+  for (const m of loose) fly.push(m);
+  for (const m of rest) drawMarble(m);
+  if (state === 'play') {
+    if (hold && hold.p >= 0 && !busy) drawPreview(hold.p, 0);
+    if (cpuPreview >= 0) drawPreview(cpuPreview, 1);
+    if (turn === 0 && !busy && !hold) drawThreats();
+  }
+  fly.sort((a, b) => a.lift - b.lift);
+  for (const m of fly) drawMarble(m);
+  drawCounts();
+  drawHUD();
+  drawFooter();
+  drawPops();
+  drawIntro();
+  if (state === 'title') drawTitle();
+  if (state === 'over') drawOver();
+  requestAnimationFrame(frame);
+}
+
+resize();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
