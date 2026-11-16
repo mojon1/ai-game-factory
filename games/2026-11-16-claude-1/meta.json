@@ -1,0 +1,550 @@
+{
+  "id": "2026-11-16-claude-1",
+  "status": "published",
+  "title": "金魚すくい 三枚のポイ",
+  "genre": "反射神経",
+  "concept": "紙のポイは水につけるほどふやけ、速く動かすと破れる。金魚も速い動きから逃げる。そっと沈めて待つほど紙は弱るという、急ぎたいのに急げない加減が核。紙はふちほど丈夫で、破れた穴の上の金魚は落ちる。",
+  "howToPlay": "指を置くとポイが水に入り、はなすとすくいます。ゆっくり金魚の下へ動かし、紙が破れる前にすくってください。ポイは3枚。",
+  "libraryDecision": "使わない。水面と紙と金魚の手触りは Canvas 2D の描画で十分に出せ、3Dや物理演算はふやける紙の加減という核を強めないため。",
+  "soundDecision": "ポイを入れる音、すくう水音、紙が裂ける音、お椀に入る音を Web Audio で作り、遠くの祭りのざわめきと風鈴を小さく流す。破れそうな「ピリッ」が手を慎重にさせ、夜店の空気が気持ちを乗せる。",
+  "improvements": [
+    {
+      "found": "ポイを金魚の真上に入れると周りの金魚が全部逃げ、すくえない／どの金魚がすくえる位置にいるか分からない／紙はすぐ乾くので待てば元通りになり、ふやける緊張が薄い",
+      "changed": "入水で驚く範囲を狭め、静かなポイには金魚が寄ってくるようにした。すくえる位置の金魚に光る輪を出した。紙はほとんど乾かないようにし、お椀の金魚を大きくした",
+      "foundEn": "Dipping right on a fish scared every fish away; you could not tell which fish were in scooping position; the paper dried quickly, so waiting reset it and the soaking tension faded",
+      "changedEn": "Narrowed the splash scare, made fish drift toward a still net, added a glowing ring on fish that would be scooped, made the paper barely dry, and enlarged the fish in the bowl"
+    },
+    {
+      "found": "金魚がポイのふちで止まりがちで、寄ってくるまでに紙がふやけきる／すくえる印の輪が白い紙の上で見えない／紙のどこが弱っているか分からず、破れは突然に感じる",
+      "changed": "金魚が静かなポイに早めに寄るようにし、ふやける速さを少しゆるめ、枠の上の金魚もすくえるようにした。印の輪を濃いオレンジにし、弱った紙は灰色に透けて見えるようにした。すくい上げの待ち時間も短くした",
+      "foundEn": "Fish lingered at the rim and the paper was soaked before they came; the scoop ring was invisible on white paper; you could not see where the paper was weak, so tears felt sudden",
+      "changedEn": "Fish now approach a still net sooner, the paper soaks a bit slower and fish over the rim count; the ring is deep orange, weak paper turns grey and see-through, and the lift is shorter"
+    },
+    {
+      "found": "じっと待つと金魚が6匹も群がり、一度で980点になって腕前が関係なくなる／ふやけきった紙がいつまでも破れず、だらだら続く／水槽の金魚がまばらで、ポイの上に来ない",
+      "changed": "一度に乗せた重さの合計で紙が破れるようにし、いっぺん取りの倍率を×匹数から×(1+0.5×増えた匹数)に下げ、寄ってくる金魚は3匹までにした。ふやけきった紙は水の中で少しずつ溶けるようにした。金魚を13匹から19匹に増やし、ふやける速さと弱り方を調整した",
+      "foundEn": "Waiting still drew six fish at once and one lift scored 980, so skill stopped mattering; a fully soaked net never tore and play dragged; the tank was sparse and fish rarely came over the net",
+      "changedEn": "The total weight on the net now tears it, the multi-catch bonus fell from ×count to ×(1+0.5 per extra fish), and only three fish get curious at a time. Soaked paper now slowly dissolves in the water. Raised the fish from 13 to 19 and retuned soaking speed and weakness"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "料理",
+      "en": "Cooking",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "手延べラーメン: 生地を指で引き伸ばして折るたびに麺の本数が倍になる。速く引くと切れ、ゆっくりだと縮む。",
+        "ideaEn": "Hand-pulled noodles: stretch the dough and fold it; each fold doubles the strands. Pull too fast and it snaps, too slow and it shrinks back.",
+        "fromDraw": true
+      },
+      {
+        "idea": "金魚すくい: 紙のポイは水につけるほど弱り、速く動かすと破れる。そっと金魚の下へ入れてすくう。",
+        "ideaEn": "Goldfish scooping: the paper net weakens the longer it is wet and tears if moved fast. Slip it gently under the fish and lift.",
+        "fromDraw": false
+      },
+      {
+        "idea": "夜の影絵: 手の影で壁に動物を作り、通りかかる虫や鳥をおびき寄せて観察する遊び場。",
+        "ideaEn": "Night shadow puppets: shape animal shadows on a wall to lure passing bugs and birds, a playground for observation.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 1
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "limit",
+    "input": [
+      "drag",
+      "hold"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Goldfish Scoop: Three Paper Nets",
+      "concept": "The paper net softens the longer it is in water and tears when moved fast, and the fish flee fast movement. Waiting patiently weakens the paper: the core is wanting to hurry but not being able to. The rim is stronger, and a fish over a hole slips through.",
+      "howToPlay": "Touch to dip the net, lift your finger to scoop. Move slowly under a fish and scoop before the paper tears. You have three nets.",
+      "libraryDecision": "None. Canvas 2D is enough for the water, paper and fish; 3D or physics would not strengthen the core of judging the soaking paper.",
+      "soundDecision": "Web Audio makes the dip, the scooping splash, the paper tearing and the plop into the bowl, plus a quiet festival murmur and wind chimes. The little rip sound makes your hand careful, and the night-stall air sets the mood."
+    }
+  },
+  "createdAt": "2026-11-16T09:06:10+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-16T09:06:10+09:00",
+    "metricsFrom": "2026-11-16T00:05:35.733Z",
+    "transcript": "21fcbbd8-cfff-4d33-941d-adbc90305bb5.jsonl",
+    "validationRuns": 7,
+    "finishedAt": "2026-11-16T09:27:12+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-16T09:23:00+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "41.2KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=151",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=285",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=123",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=287",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 42237,
+    "lines": 901
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "上手くなる道すじが見えにくい。金魚が寄ってくるのを待ってはなすだけでもそこそこ取れてしまい、金魚の動きの気まぐれさで結果が決まる場面が多い",
+    "comment": "出目金のそばにそっと差し入れて、オレンジの輪が光った瞬間にはなすと、ちゃぷんと上がってお椀に飛ぶのが気持ちいい。ふやけた紙で欲張って2匹乗せたら『ポトン…』と落ち、穴が灰色に広がっていくのが見えて、次は乾いた紙のうちに大物を狙おうと思えた。1回目は225点・10匹。ただ数回遊ぶと同じ手順の繰り返しになりやすく、金色の金魚もなかなか出ないので、★3とした",
+    "similar": [
+      {
+        "title": "金魚すくい（夜店の遊び）",
+        "url": "https://www.Wikipedia.org/wiki/Goldfish_scooping",
+        "similarity": "高",
+        "note": "紙のポイで金魚をすくい、ポイが破れたら終わるという遊びそのものが元になっている。違いは、ふやけ具合と紙の弱った場所を見えるようにし、ふちほど丈夫・乗せた重さの合計で破れるといった加減を点数の遊びにしたこと",
+        "note_en": "The festival game itself is the root: scoop goldfish with a paper net until it tears. The difference is that soaking and weak spots are made visible, and the rim strength and total-weight tearing become a scoring game"
+      },
+      {
+        "title": "Kingyosukui -ZERO-",
+        "url": "https://apps.apple.com/mx/app/kingyosukui-zero/id6749288513",
+        "similarity": "中",
+        "note": "スマホで金魚の動きと夏の音を味わう金魚すくいアプリ。題材と操作は近いが、こちらは紙のふやけ・速く動かすと破れる・静かなポイに金魚が寄る、といった手の加減を中心にしている",
+        "note_en": "A phone goldfish-scooping app with realistic fish and summer sounds. Similar theme and controls; this game centres on hand control: soaking paper, tearing when moved fast, and fish approaching a quiet net"
+      }
+    ],
+    "research": "WebSearch で goldfish scooping game kingyo sukui mobile app を1回検索し、元になった遊び（Wikipedia）と近いスマホアプリを確認した",
+    "i18n": {
+      "en": {
+        "worst": "The path to getting better is hard to see. Just waiting for fish to come and lifting works fairly well, and the fishes' whims often decide the outcome",
+        "comment": "Slipping the net beside a black moor and lifting the moment the orange ring glows, the fish splashes up and flies into the bowl, which feels good. Greedily loading two fish on soaked paper made one drop with a 'plop', and I could see the grey holes spreading, which made me want to go for the big one while the next net was still dry. First run: 225 points, 10 fish. But after a few runs it tends to repeat the same routine and the golden fish rarely shows up, so 3 stars",
+        "research": "One WebSearch for goldfish scooping / kingyo sukui mobile apps; checked the original festival game (Wikipedia) and a similar phone app"
+      }
+    },
+    "method": "スマホ縦画面で 15 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 15 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "タイトルからタップで開始。夜店の水槽に金魚がたくさん",
+        "noteEn": "Tap the title to start. A night-stall tank full of goldfish",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "path(0.62,0.52→0.58,0.56→0.55,0.60) 1400ms",
+        "note": "群れの手前にそっと入れて寄せる。上に来た金魚の縁がオレンジに光る",
+        "noteEn": "Dip gently in front of a group; fish over the net get an orange ring",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 500ms",
+        "note": "すくってお椀へ",
+        "noteEn": "Scooped into the bowl",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "path(0.30,0.62→0.32,0.60) 1600ms",
+        "note": "左の出目金が枠にかかるのを待つ。ふちは丈夫",
+        "noteEn": "Wait for the black moor to reach the rim; the rim is strong",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 500ms",
+        "note": "結果を見る",
+        "noteEn": "See the result",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "path(0.24,0.50→0.22,0.48→0.21,0.46) 1300ms",
+        "note": "左上の出目金2匹の間へゆっくり差し入れる",
+        "noteEn": "Slide slowly between the two black moors at upper left",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 500ms",
+        "note": "結果",
+        "noteEn": "Result",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "path(0.62,0.36→0.60,0.38) 1500ms → wait 600ms → path(0.80,0.30→0.78,0.32) 1500ms → wait 600ms",
+        "note": "右上の更紗の群れで2回すくう",
+        "noteEn": "Two scoops by the sarasa group at upper right",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "path(0.30,0.72→0.32,0.70) 1500ms → wait 600ms → path(0.70,0.80→0.68,0.78) 1500ms → wait 600ms",
+        "note": "紙がだいぶふやけた。下の方で小赤を狙う",
+        "noteEn": "The paper is quite soaked; aim at small reds lower down",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "path(0.30,0.48→0.32,0.50) 1600ms → wait 600ms → path(0.55,0.45→0.55,0.47) 1600ms → wait 600ms → path(0.50,0.60→0.50,0.62) 1800ms → wait 1800ms",
+        "note": "ふやけた紙はすくうたびに穴が広がり、ついに破れる",
+        "noteEn": "The soaked paper gets more holes with each scoop and finally tears",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "path(0.62,0.36→0.60,0.38) 1300ms",
+        "note": "2枚目。乾いた紙のうちに大物を狙う",
+        "noteEn": "Second net: go for a big one while the paper is dry",
+        "image": "ai-play/step-11.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "wait 500ms → path(0.45,0.70→0.45,0.72) 2500ms → wait 2000ms",
+        "note": "1枚目が溶けて破れた",
+        "noteEn": "The first net dissolved and tore",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "path(0.50,0.50→0.50,0.52) 1300ms → wait 600ms → path(0.30,0.60→0.30,0.62) 1300ms → wait 600ms → path(0.70,0.45→0.70,0.47) 1300ms → wait 600ms",
+        "note": "2枚目の乾いた紙で、続けてすくう",
+        "noteEn": "Keep scooping with the dry second net",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "path(0.40,0.55→0.40,0.57) 1500ms → wait 600ms → path(0.55,0.75→0.55,0.77) 1500ms → wait 600ms → path(0.35,0.45→0.35,0.47) 4000ms → wait 600ms → path(0.50,0.60→0.50,0.62) 4000ms → wait 2000ms",
+        "note": "2枚目も使い切る",
+        "noteEn": "Use up the second net",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "path(0.50,0.50→0.50,0.52) 1500ms → wait 600ms → path(0.30,0.65→0.30,0.67) 1500ms → wait 600ms → path(0.60,0.40→0.60,0.42) 5000ms → wait 600ms → path(0.50,0.60→0.50,0.62) 5000ms → wait 2500ms",
+        "note": "最後のポイ",
+        "noteEn": "The last net",
+        "image": "ai-play/step-15.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 225
+            }
+          },
+          {
+            "agf": "end",
+            "score": 225
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-16T09:27:12+09:00"
+  },
+  "publishedAt": "2026-11-16T09:27:12+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 20388,
+    "outputTokens": 49925,
+    "contextTokens": 14749571,
+    "turns": 75,
+    "toolCalls": 91,
+    "webSearches": 0,
+    "minutes": 21.6,
+    "from": "2026-11-16T00:05:35.733Z",
+    "to": "2026-11-16T00:27:12.515Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-16T09:27:12+09:00",
+    "validationRuns": 7,
+    "codeKB": 41.2
+  }
+}
