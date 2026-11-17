@@ -1,0 +1,389 @@
+{
+  "id": "2026-11-17-gpt-1",
+  "status": "published",
+  "title": "半歩のカウンター",
+  "genre": "格闘",
+  "concept": "相手は今いる側へ攻撃を予告する。横へ半歩かわし、攻撃後の金色の隙へタップを合わせて反撃する。六回の反撃へ近づくほど予告が短くなり、移動と反撃を焦って混ぜない間合いを読む。",
+  "howToPlay": "赤く予告された側から左右スワイプで移動し、「今だ」の隙にタップで反撃します。六回反撃で勝利、三回被弾で終了です。 後半の二連撃は、二度かわしてから反撃してください。",
+  "libraryDecision": "二つの立ち位置と予告の範囲を一目で読めるCanvas 2Dにする。3Dの奥行きや物理の押し合いより、攻撃の予告と操作を明確にすることを優先し、棚のライブラリは使わない。",
+  "soundDecision": "移動は低い短音、反撃は高くなる音、被弾は低音で区別する。Web Audioで控えめな正弦波を鳴らし、BGMを入れず予告へ集中させる。",
+  "improvements": [
+    {
+      "found": "相手の攻撃が体の色だけで、どこを殴ったか見えない／反撃の輪が自分に出て当てた感覚が薄い／予告が短くなる段階が表示されない。",
+      "changed": "攻撃先へ拳を伸ばす短い動きを追加。反撃は相手までの打撃線と金色の輪、被弾は自分の赤い輪に分けた。予告に段階1～3を表示。",
+      "foundEn": "Strikes lack a visible target motion; counter feedback appears around the player; faster attack stages are not shown.",
+      "changedEn": "Added a brief extended fist, an opponent-centered gold counter effect and player-centered red damage ring, and attack-stage labels."
+    },
+    {
+      "found": "速度が変わるだけで左右移動の反復になる／反撃の隙がいつ閉じるか分からない／無傷と被弾した勝利が同じ結果になる。",
+      "changed": "三・五回目の反撃前は、着地点を狙い直す二連撃にした。二発の予告を別の言葉で示し、金色の反撃残量バーと結果の残り体力を追加。",
+      "foundEn": "The fight repeats alternating dodges; opening duration is unclear; flawless and damaged wins look identical.",
+      "changedEn": "Added retargeting double strikes before counters three and five, distinct first/second warnings, a golden opening timer, and health on results."
+    },
+    {
+      "found": "二発目の予告へ狙いを変えると、直前の一発目の拳も新しい側へ移って見えた。",
+      "changed": "打撃が出た瞬間の立ち位置を別に記憶し、一発目の拳と二発目の予告が混ざらないよう修正。",
+      "foundEn": "Retargeting the second strike also moved the first strike's visible fist.",
+      "changedEn": "Stored the impact lane separately so the first fist remains fixed while the next telegraph targets the new side."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "格闘",
+      "en": "Fighting",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "半歩のカウンター。攻撃予告から横へかわし、隙へ反撃する格闘。2Dの二つの立ち位置で間合いを読みやすくする。",
+        "ideaEn": "Half-Step Counter: dodge telegraphed strikes and counter during openings. Two clear 2D positions make timing readable.",
+        "fromDraw": true
+      },
+      {
+        "idea": "水晶の裏道。3Dの透ける水晶を回し、奥に隠れた通路のつながりから小さな光を出口へ導く。",
+        "ideaEn": "Crystal Backroads: rotate a translucent 3D crystal and infer hidden passage connections to guide a light to an exit.",
+        "fromDraw": false
+      },
+      {
+        "idea": "雨やどりの往復書簡。三人から届く短い手紙のどれに返事をするかで、同じ雨の日の結末が変わる平面の物語。",
+        "ideaEn": "Rain-Shelter Letters: choose which of three correspondents to answer, changing the ending of one rainy day in a flat letter-driven story.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "other",
+    "input": [
+      "swipe",
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Half-Step Counter",
+      "concept": "An opponent telegraphs a strike at your current side. Step sideways, then tap the golden opening to counter. Telegraphs shorten as you approach six counters, asking you to separate movement from a hasty attack.",
+      "howToPlay": "Swipe away from the red strike zone, then tap during the opening. Six counters win; three hits end the match. Later double strikes require two dodges before countering.",
+      "libraryDecision": "Canvas 2D keeps two positions and the strike zone directly readable. Depth and physical pushing would obscure the telegraph, so no shelf library is used.",
+      "soundDecision": "Quiet Web Audio sine tones distinguish movement, rising counter hits, and low damage sounds. No BGM, to keep attention on the telegraph."
+    }
+  },
+  "createdAt": "2026-11-17T11:59:11+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-17T11:59:11+09:00",
+    "metricsFrom": "2026-11-17T02:57:22.531Z",
+    "transcript": null,
+    "validationRuns": 4,
+    "finishedAt": "2026-11-17T12:12:41+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-17T12:09:07+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "7.7KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=39",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=42",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=47",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=58",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 7898,
+    "lines": 35
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0.1,
+    "idleStarts": 1
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 2,
+    "works": "ok",
+    "worst": "相手が一人で攻撃順も固定のため、二連撃の位置を覚えると読み合いが少ない。",
+    "comment": "画像を見て単発と二連撃を区別し、二発目を避けてから反撃する流れで無傷の六回反撃を達成した。反撃線と予告の残量で間合いは読みやすくなったが、相手と攻撃順が固定で展開が少ないため★2。英語iPhoneでも無傷勝利・三被弾敗北・早打ち・再開ガードを確認。",
+    "similar": [
+      {
+        "title": "Punch-Out!!",
+        "url": "https://www.nintendo.co.jp/clv/manuals/en/pdf/CLV-P-NAATE_en.pdf",
+        "similarity": "高",
+        "note": "相手の拳を左右にかわして反撃する中心構造が近い。本作は二つの立ち位置と一種類の反撃だけで、一人の相手の単発・二連撃に絞った。",
+        "note_en": "The central dodge-and-counter boxing structure is close. This game limits play to two positions, one counter action, and a single opponent with single and double strikes."
+      }
+    ],
+    "research": "Punch-Out dodge counter attackを検索し、任天堂公式説明書の回避・パンチ操作とURLを確認。",
+    "i18n": {
+      "en": {
+        "worst": "There is one opponent with a fixed sequence; once the double-strike positions are known, little uncertainty remains.",
+        "comment": "Inspected screenshots to distinguish single and double strikes, landing six counters with full health by waiting for the second dodge. Counter lines and timing meters improve readability, but one fixed opponent lacks variety, hence two stars. English iPhone checks covered a flawless win, three-hit defeat, early taps, and restart guarding.",
+        "research": "Searched for Punch-Out dodge and counter timing and verified dodge/punch controls and the URL in Nintendo's official manual."
+      }
+    },
+    "method": "スマホ縦画面で 11 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 11 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "修正した拳と予告の表示を確かめる。",
+        "noteEn": "Checking the corrected fist and telegraph positions.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "swipe(0.30,0.72→0.70,0.72) 200ms → tap(0.50,0.81) 120ms",
+        "note": "最初の一発をかわして反撃する。",
+        "noteEn": "Dodging and countering the first single strike.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "swipe(0.70,0.72→0.30,0.72) 200ms → tap(0.50,0.81) 120ms",
+        "note": "二回目の反撃後、二連撃に備える。",
+        "noteEn": "Preparing for a double strike after counter two.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "swipe(0.30,0.72→0.70,0.72) 200ms",
+        "note": "一発目の拳は左に残り、二発目だけ右を狙っている。",
+        "noteEn": "The first fist remains left while the next telegraph targets the right.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "swipe(0.70,0.72→0.30,0.72) 200ms",
+        "note": "二発目を左へかわしてから反撃する。",
+        "noteEn": "Dodging the second strike left before countering.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.50,0.81) 120ms",
+        "note": "二発を避けて三回目の反撃。",
+        "noteEn": "Countering after dodging both strikes.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "swipe(0.30,0.72→0.70,0.72) 200ms → tap(0.50,0.81) 120ms",
+        "note": "一発の予告をかわし、次の二連撃へ。",
+        "noteEn": "Dodging the single strike and moving to the next double.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "swipe(0.70,0.72→0.30,0.72) 200ms",
+        "note": "速い一発目は左へ。",
+        "noteEn": "Dodging the faster first strike left.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "swipe(0.30,0.72→0.70,0.72) 200ms",
+        "note": "二発目は右へ。",
+        "noteEn": "Dodging the second strike right.",
+        "image": "ai-play/step-09.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.50,0.81) 120ms",
+        "note": "二連撃の隙へ五回目の反撃。",
+        "noteEn": "Landing counter five after the double strike.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "swipe(0.70,0.72→0.30,0.72) 200ms → tap(0.50,0.81) 120ms",
+        "note": "最後をかわして反撃。残り体力も結果に出る。",
+        "noteEn": "Dodging and countering the final strike; health appears on the result.",
+        "image": "ai-play/step-11.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 6
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-17T12:12:41+09:00"
+  },
+  "publishedAt": "2026-11-17T12:12:41+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 2869,
+    "outputTokens": 9115,
+    "contextTokens": 10737872,
+    "turns": 47,
+    "toolCalls": 47,
+    "webSearches": null,
+    "minutes": 15.4,
+    "from": "2026-11-17T02:57:22.531Z",
+    "to": "2026-11-17T03:12:44.252Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-17T12:12:44+09:00",
+    "validationRuns": 4,
+    "codeKB": 7.7,
+    "evidence": "metrics-evidence.json"
+  }
+}

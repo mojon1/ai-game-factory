@@ -1,0 +1,342 @@
+{
+  "id": "2026-11-17-gpt-2",
+  "status": "published",
+  "title": "鐘と斥候",
+  "genre": "ストラテジー",
+  "concept": "旗を拾う斥候と、番人を引きつける鐘を別々に動かす。番人は二手ごとに鐘へ一歩進むため、旗へ寄り道する前に鐘の逃げ道を残す。二つの駒に使う手番を配分し、三旗を家へ持ち帰る。",
+  "howToPlay": "駒を選んで光る行き先をタップし、斥候は縦横一マス、鐘は二マスまで動かせます。番人に追いつかれず旗三つを集め、左下の家へ帰ってください（一手戻すこともできます）。",
+  "libraryDecision": "全駒と次の一歩を見渡す盤面なのでCanvas 2Dを使う。3Dの奥行きや物理は位置と手番の見比べを妨げるため、共有棚の描画・物理ライブラリを使わない。",
+  "soundDecision": "音は入れず、番人の予告と駒の到達範囲をゆっくり比べる盤にする。移動と旗の消失で一手の結果を示す。",
+  "improvements": [
+    {
+      "found": "番人が休む手でも赤い予告が出て、動く時期を間違えやすい／家が空の枠だけで帰る場所が分かりづらい／失敗時にどちらの駒が捕まったか出ない。",
+      "changed": "赤い予告は次に番人が動く手だけ表示し、鐘が捕まる直前には専用の警告を出す。家の文字と、捕まった駒の名前を追加。",
+      "foundEn": "A red forecast appears even on rest turns; home is only an empty border; failures do not identify which piece was caught.",
+      "changedEn": "Show the red forecast only before guard movement, warn of imminent bell capture, label home, and name the captured piece."
+    },
+    {
+      "found": "光るマスでも番人が届く行き先が同じ色で分かりにくい／一手の間違いで最初からになり試しづらい／旗を拾った後に帰る目標が弱い。",
+      "changed": "次の番人移動で捕まる行き先を橙色に分け、一手戻すボタンを追加。結果から戻す場合も0.7秒待つ。三旗後は家を強調し、帰還のヒントを出す。",
+      "foundEn": "Reachable but fatal squares look safe; a single mistake resets progress; the return-home goal is weak after collecting flags.",
+      "changedEn": "Colored fatal destinations orange, added turn undo (guarded for 0.7 seconds on results), and emphasized home plus a return hint after all flags."
+    },
+    {
+      "found": "英語のタイトル説明の三行目が折り返され、全体が四行になっていた。",
+      "changed": "三行目を短くし、駒選択は開始直後のヒントへ任せて三行に収めた。",
+      "foundEn": "The third English instruction wrapped, making four visible lines.",
+      "changedEn": "Shortened the final line; the opening hint explains piece selection, keeping the title instructions to three lines."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "ストラテジー",
+      "en": "Strategy",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "鐘と斥候。鐘を追う番人を誘い、もう一体で旗を拾って帰る。2Dの全盤面と次の一歩の予告で二駒の手番配分を読む。",
+        "ideaEn": "Bell and Scout: lure a guard with a bell while another unit retrieves flags. A flat full-board view and next-step marker support turn allocation.",
+        "fromDraw": true
+      },
+      {
+        "idea": "月面の反射鏡。3Dの小さな鏡を回転し、岩の裏の受光板へ光を渡す。裏側から見える反射角を探す。",
+        "ideaEn": "Lunar Mirrors: rotate small 3D mirrors to reflect light onto receivers behind rocks, checking angles from the far side.",
+        "fromDraw": false
+      },
+      {
+        "idea": "ほどける結び目。2Dの一本のひもを指で引き、輪の大きさを変えて玉を抜く終わりのない触覚遊び。",
+        "ideaEn": "Unraveling Knot: pull a flat cord to resize loops and free beads in an open-ended tactile toy.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "other",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Bell and Scout",
+      "concept": "Move a flag-collecting scout and a guard-attracting bell separately. Every two turns the guard takes one step toward the bell, so keep an escape route before detouring for flags. Allocate turns between both units to bring three flags home.",
+      "howToPlay": "Choose a piece and a highlighted destination: the scout moves one straight square, the bell up to two. Collect three flags and return to the lower-left home without being caught; Undo lets you reconsider a turn.",
+      "libraryDecision": "Canvas 2D keeps all units and the guard forecast visible. Depth and physics would obscure positions and turn comparisons, so no shelf library is used.",
+      "soundDecision": "No sound: calmly compare the guard forecast with reachable squares. Piece movement and disappearing flags show each turn result."
+    }
+  },
+  "createdAt": "2026-11-17T12:15:20+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-17T12:15:20+09:00",
+    "metricsFrom": "2026-11-17T03:12:48.180Z",
+    "transcript": null,
+    "validationRuns": 4,
+    "finishedAt": "2026-11-17T12:42:23+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-17T12:39:57+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "9.5KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=87",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=86",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=91",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=97",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 9704,
+    "lines": 32
+  },
+  "sound": {
+    "uses": false
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 2,
+    "works": "ok",
+    "worst": "盤面と番人の追い方が一種類だけで、帰還する経路が分かると再挑戦の変化が乏しい。",
+    "comment": "画像を見ながら試すと、斥候だけでは八手目に鐘が捕まった。鐘を左・右・左と振って番人を誘い、三旗を持って18手で帰還できた。危険色と一手戻しで比較はしやすいが、一面だけなので★2。英語iPhoneで旗の巻き戻し、勝利、敗北、敗北後の戻し、再開ガードを確認。最後の記録は確認済み経路を区切って再試遊したもの。",
+    "similar": [
+      {
+        "title": "Hitman GO",
+        "url": "https://play.google.com/store/apps/details?id=com.squareenixmontreal.hitmango",
+        "similarity": "中",
+        "note": "盤面で手番ごとの番人の動きを読み、見つからず目的を果たす点が共通。本作は斥候と鐘の二駒、鐘だけを追う番人、旗の回収と帰還に絞る。",
+        "note_en": "Both use turn-based board movement to avoid guards and complete objectives. This game centers two pieces, a guard that follows only the bell, and retrieving flags before returning home."
+      }
+    ],
+    "research": "Hitman GO official turn based puzzle guardsをウェブ検索し、販売元のGoogle Play紹介でターン制・番人回避とURLを確認。",
+    "i18n": {
+      "en": {
+        "worst": "Only one board and one guard rule exist; replay variety is limited once a return route is known.",
+        "comment": "Screenshot play showed that moving only the scout loses the bell on turn eight. Luring the guard with left/right bell moves enabled an 18-move return with all three flags. Danger colors and undo aid comparison, but one board limits variety, hence two stars. English iPhone checks covered flag restoration, victory, defeat, undo after defeat, and restart guarding. The final log rechecks the known route in sections.",
+        "research": "Searched for official Hitman GO turn-based guard gameplay and verified the mechanics and URL in the publisher's Google Play description."
+      }
+    },
+    "method": "スマホ縦画面で 7 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 7 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "説明を調整した版で、確認済みの経路を区切って再確認する。",
+        "noteEn": "Rechecking the known route in sections after the instruction edit.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.17,0.55) 120ms → tap(0.33,0.55) 120ms → tap(0.33,0.46) 120ms",
+        "note": "中央の旗を回収する三歩。",
+        "noteEn": "The first three steps collect the central flag.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.33,0.37) 120ms → tap(0.17,0.37) 120ms → tap(0.17,0.28) 120ms → tap(0.33,0.28) 120ms",
+        "note": "左上を拾って鐘が危なくなる七手目まで進む。",
+        "noteEn": "Collecting upper-left and reaching the bell-danger checkpoint on turn seven.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.50,0.85) 120ms → tap(0.67,0.28) 120ms → tap(0.22,0.85) 120ms → tap(0.50,0.28) 120ms",
+        "note": "鐘を逃がして、斥候が最後の旗を取る。",
+        "noteEn": "Moving the bell to safety before taking the final flag.",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.50,0.85) 120ms → tap(0.83,0.28) 120ms → tap(0.22,0.85) 120ms → tap(0.50,0.37) 120ms → tap(0.50,0.85) 120ms → tap(0.50,0.28) 120ms",
+        "note": "鐘を右へ振ってから二マス左へ戻し、斥候は下へ出る。",
+        "noteEn": "Swinging the bell right then two squares left while the scout heads down.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.22,0.85) 120ms → tap(0.33,0.37) 120ms → tap(0.50,0.85) 120ms → tap(0.17,0.28) 120ms → tap(0.22,0.85) 120ms → tap(0.33,0.46) 120ms",
+        "note": "鐘を左上へ誘導し、斥候の帰り道を下に作る。",
+        "noteEn": "Using the upper-left bell position to open the scout's downward route.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.33,0.55) 120ms → tap(0.33,0.64) 120ms → tap(0.17,0.64) 120ms",
+        "note": "18手の帰還を再確認。",
+        "noteEn": "Confirming the 18-move return again.",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 3
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-17T12:42:23+09:00"
+  },
+  "publishedAt": "2026-11-17T12:42:23+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 7586,
+    "outputTokens": 10802,
+    "contextTokens": 17425339,
+    "turns": 63,
+    "toolCalls": 63,
+    "webSearches": null,
+    "minutes": 29.6,
+    "from": "2026-11-17T03:12:48.180Z",
+    "to": "2026-11-17T03:42:26.376Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-17T12:42:26+09:00",
+    "validationRuns": 4,
+    "codeKB": 9.5,
+    "evidence": "metrics-evidence.json"
+  }
+}
