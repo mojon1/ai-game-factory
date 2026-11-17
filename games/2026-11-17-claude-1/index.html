@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>ろくろ注文帖</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; }
+html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #221a15; }
+body { font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif; color: #f6ead9; }
+#stage { position: fixed; inset: 0; width: 100vw; height: 100dvh; background: radial-gradient(ellipse at 50% 30%, #5a4232 0%, #33251c 55%, #1b1411 100%); }
+#gl, #ov { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+#ov { pointer-events: none; }
+#hud { position: absolute; left: 0; right: 0; top: 0; padding: 10px 14px 0; display: none; pointer-events: none; }
+#hudRow { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+#score { font-size: 26px; font-weight: 800; line-height: 1; text-shadow: 0 2px 6px #0008; }
+#score small { display: block; font-size: 12px; font-weight: 600; opacity: .75; margin-bottom: 3px; }
+#order { text-align: right; font-size: 15px; font-weight: 700; text-shadow: 0 2px 6px #0008; }
+#order .m { display: block; font-size: 20px; font-weight: 800; margin-top: 2px; transition: color .3s, transform .3s; }
+#order .m.up { color: #ffd76a; transform: scale(1.15); }
+#order .n { display: block; font-size: 13px; font-weight: 700; margin-top: 3px; opacity: .85; }
+#water { margin-top: 8px; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; }
+#wbar { flex: 1; height: 9px; border-radius: 6px; background: #0006; overflow: hidden; box-shadow: inset 0 1px 2px #0008; }
+#wfill { height: 100%; width: 100%; background: linear-gradient(90deg, #4fa3d9, #8fd3ff); border-radius: 6px; }
+#fire { position: absolute; right: 14px; bottom: calc(16px + env(safe-area-inset-bottom)); min-width: 112px; height: 56px; border: 0; border-radius: 28px; font: 800 19px system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif; color: #fff; background: linear-gradient(180deg, #e8743b, #b8441d); box-shadow: 0 4px 14px #0007, inset 0 1px 0 #fff5; display: none; padding: 0 20px; }
+#fire.pulse { animation: pulse 0.9s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.09); box-shadow: 0 0 24px #ff9a55, 0 4px 14px #0007; } }
+#hint { position: absolute; left: 12px; right: 140px; bottom: calc(22px + env(safe-area-inset-bottom)); font-size: 14px; font-weight: 600; line-height: 1.35; text-shadow: 0 2px 5px #000c; opacity: 0; transition: opacity .6s; pointer-events: none; }
+#panel { position: absolute; left: 0; right: 0; top: 0; bottom: 0; display: none; flex-direction: column; align-items: center; text-align: center; pointer-events: none; padding: 0 16px; }
+#panel .big { font-size: 44px; font-weight: 900; letter-spacing: .02em; text-shadow: 0 3px 12px #000a; line-height: 1.1; }
+#panel .mid { font-size: 20px; font-weight: 700; margin-top: 8px; text-shadow: 0 2px 8px #000a; }
+#panel .sm { font-size: 15px; font-weight: 600; margin-top: 8px; opacity: .9; text-shadow: 0 2px 6px #000a; }
+#panel .tap { position: absolute; left: 0; right: 0; bottom: calc(28px + env(safe-area-inset-bottom)); font-size: 18px; font-weight: 700; animation: blink 1.4s ease-in-out infinite; text-shadow: 0 2px 6px #000a; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .45; } }
+#flash { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at 50% 55%, #ffcf7a 0%, #ff6a1a 40%, #6a1a00 100%); opacity: 0; mix-blend-mode: screen; }
+#pop { position: absolute; left: 0; right: 0; top: 42%; text-align: center; font-size: 30px; font-weight: 900; color: #ffd2b0; text-shadow: 0 3px 10px #000c; opacity: 0; pointer-events: none; transition: opacity .3s, transform .6s; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="gl"></canvas>
+  <canvas id="ov"></canvas>
+  <div id="hud">
+    <div id="hudRow">
+      <div id="score"><small id="scoreL"></small><span id="scoreV">0</span></div>
+      <div id="order"><span id="orderV"></span><span class="m" id="matchV"></span><span class="n" id="nextV"></span></div>
+    </div>
+    <div id="water"><span id="waterL"></span><div id="wbar"><div id="wfill"></div></div></div>
+  </div>
+  <div id="hint"></div>
+  <div id="pop"></div>
+  <div id="flash"></div>
+  <div id="panel"></div>
+  <button id="fire"></button>
+</div>
+<script src="../../lib/three-0.186.1.min.js"></script>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const TXT = {
+  ja: {
+    title: 'ろくろ注文帖',
+    how: ['回る土を指で押して器を作る', '横から押すと<b>細く高く</b>、上から押すと<b>低く広く</b>', '点線の見本に形を合わせて焼こう'],
+    tap: 'タップでスタート', again: 'タップでもう一度', next: 'タップで次へ',
+    score: '得点', water: 'みず', fire: '焼く',
+    order: (i, n) => `注文 ${i}/5：${n}`, match: (m) => `一致 ${m}%`, toNext: (r, d) => `${r}まで あと${d}%`,
+    hint: '粘土の横を押すと細く高く、上から押し下げると低く広がる',
+    dry: '土が乾いた。焼こう！', tear: 'ちぎれた！',
+    ranks: ['名品', '上出来', 'まずまず', '味がある'],
+    total: '五つの器', best: (b) => `ベスト ${b}`, newBest: 'ベスト更新！',
+    names: { yunomi: '湯のみ', chawan: '茶わん', tsubo: 'つぼ', kabin: '花びん', tokkuri: 'とっくり', ichirin: '一輪ざし' },
+    glaze: { seiji: '青磁', tenmoku: '天目', shiro: '白釉', ruri: '瑠璃', oribe: '織部', ame: '飴釉' },
+  },
+  en: {
+    title: "Potter's Wheel Orders",
+    how: ['Press the spinning clay to shape it', 'Squeeze the side: <b>taller & thinner</b>. Press the top: <b>lower & wider</b>', 'Match the dotted outline, then fire it'],
+    tap: 'Tap to start', again: 'Tap to play again', next: 'Tap to continue',
+    score: 'SCORE', water: 'WATER', fire: 'FIRE',
+    order: (i, n) => `Order ${i}/5: ${n}`, match: (m) => `Match ${m}%`, toNext: (r, d) => `${d}% to ${r}`,
+    hint: 'Squeeze the side to grow tall; press down on top to spread wide',
+    dry: 'The clay is dry. Fire it!', tear: 'It tore!',
+    ranks: ['Masterpiece', 'Fine work', 'Not bad', 'Has character'],
+    total: 'Five pieces', best: (b) => `Best ${b}`, newBest: 'New best!',
+    names: { yunomi: 'Teacup', chawan: 'Tea bowl', tsubo: 'Jar', kabin: 'Vase', tokkuri: 'Sake bottle', ichirin: 'Bud vase' },
+    glaze: { seiji: 'Celadon', tenmoku: 'Tenmoku', shiro: 'White', ruri: 'Cobalt', oribe: 'Oribe', ame: 'Amber' },
+  },
+}[LANG === 'ja' ? 'ja' : 'en'];
+document.title = TXT.title;
+
+const $ = (id) => document.getElementById(id);
+const stage = $('stage'), glc = $('gl'), ov = $('ov'), octx = ov.getContext('2d');
+const hud = $('hud'), panel = $('panel'), fireBtn = $('fire'), hintEl = $('hint'), flashEl = $('flash'), popEl = $('pop');
+$('scoreL').textContent = TXT.score; $('waterL').textContent = TXT.water; fireBtn.textContent = TXT.fire;
+
+// ---------- save ----------
+let best = 0;
+addEventListener('message', (e) => { if (e.data && e.data.agf === 'loaded' && e.data.data && typeof e.data.data.best === 'number') best = e.data.data.best; });
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+
+// ---------- audio ----------
+let AC = null, master = null, squishG = null, squishF = null, humG = null, noiseBuf = null;
+function initAudio() {
+  if (AC) { if (AC.state !== 'running') AC.resume().catch(() => {}); return; }
+  try {
+    AC = new (window.AudioContext || window.webkitAudioContext)();
+    master = AC.createGain(); master.gain.value = 0.85; master.connect(AC.destination);
+    noiseBuf = AC.createBuffer(1, AC.sampleRate * 2, AC.sampleRate);
+    const d = noiseBuf.getChannelData(0); let b = 0;
+    for (let i = 0; i < d.length; i++) { b = b * 0.6 + (Math.random() * 2 - 1) * 0.4; d[i] = b; }
+    const n1 = AC.createBufferSource(); n1.buffer = noiseBuf; n1.loop = true;
+    squishF = AC.createBiquadFilter(); squishF.type = 'bandpass'; squishF.frequency.value = 700; squishF.Q.value = 1.3;
+    squishG = AC.createGain(); squishG.gain.value = 0;
+    n1.connect(squishF); squishF.connect(squishG); squishG.connect(master); n1.start();
+    const o = AC.createOscillator(); o.type = 'sawtooth'; o.frequency.value = 52;
+    const lp = AC.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 150;
+    humG = AC.createGain(); humG.gain.value = 0;
+    o.connect(lp); lp.connect(humG);
+    const n2 = AC.createBufferSource(); n2.buffer = noiseBuf; n2.loop = true; n2.playbackRate.value = 0.5;
+    const bp = AC.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 240; bp.Q.value = 0.8;
+    const g2 = AC.createGain(); g2.gain.value = 0.5;
+    n2.connect(bp); bp.connect(g2); g2.connect(humG);
+    humG.connect(master); o.start(); n2.start();
+    AC.resume().catch(() => {});
+  } catch (e) { AC = null; }
+}
+function setHum(on) { if (!AC) return; humG.gain.setTargetAtTime(on ? 0.035 : 0, AC.currentTime, 0.4); }
+function setSquish(level, freq) {
+  if (!AC) return;
+  squishG.gain.setTargetAtTime(Math.min(0.2, level), AC.currentTime, 0.04);
+  squishF.frequency.setTargetAtTime(freq, AC.currentTime, 0.05);
+}
+function tone(freq, dur, type = 'sine', vol = 0.2, delay = 0, slide = 0) {
+  if (!AC) return;
+  try {
+    const t = AC.currentTime + delay, o = AC.createOscillator(), g = AC.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(30, freq * slide), t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.05);
+  } catch (e) {}
+}
+function noiseBurst(dur, f0, f1, vol, delay = 0, type = 'lowpass') {
+  if (!AC) return;
+  try {
+    const t = AC.currentTime + delay, s = AC.createBufferSource(), f = AC.createBiquadFilter(), g = AC.createGain();
+    s.buffer = noiseBuf; f.type = type; f.frequency.setValueAtTime(f0, t); f.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + dur * 0.3); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(f); f.connect(g); g.connect(master); s.start(t); s.stop(t + dur + 0.05);
+  } catch (e) {}
+}
+function bell(freq, vol = 0.18, delay = 0) {
+  const parts = [[1, 1, 2.4], [2.76, 0.45, 1.3], [5.4, 0.22, 0.7], [8.93, 0.1, 0.4]];
+  for (const [m, g, d] of parts) tone(freq * m, d, 'sine', vol * g, delay);
+}
+
+// ---------- three ----------
+const renderer = new THREE.WebGLRenderer({ canvas: glc, antialias: true, alpha: true });
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
+scene.add(new THREE.HemisphereLight(0xfff1e0, 0x3a2518, 1.0));
+const key = new THREE.DirectionalLight(0xffe2c0, 2.2); key.position.set(-3, 6, 5); scene.add(key);
+const rim = new THREE.DirectionalLight(0x9fc4ff, 1.1); rim.position.set(4, 3, -4); scene.add(rim);
+const fill = new THREE.DirectionalLight(0xffffff, 0.5); fill.position.set(2, 1, 6); scene.add(fill);
+
+function makeTex(draw, w = 256, h = 256) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const clayTex = makeTex((g, w, h) => {
+  g.fillStyle = '#d9d9d9'; g.fillRect(0, 0, w, h);
+  for (let y = 0; y < h; y += 2) { const v = 200 + Math.sin(y * 0.37) * 18 + Math.random() * 22; g.fillStyle = `rgb(${v},${v},${v})`; g.fillRect(0, y, w, 2); }
+  for (let i = 0; i < 70; i++) { g.fillStyle = `rgba(${Math.random() < 0.5 ? '255,255,255' : '90,90,90'},${0.08 + Math.random() * 0.12})`; g.fillRect(Math.random() * w, Math.random() * h, 6 + Math.random() * 30, 1 + Math.random() * 3); }
+});
+const wheelTex = makeTex((g, w, h) => {
+  g.fillStyle = '#6d757d'; g.fillRect(0, 0, w, h);
+  const cx = w / 2;
+  for (let r = 10; r < cx; r += 14) { g.strokeStyle = `rgba(255,255,255,${0.05 + (r % 28 ? 0.03 : 0.06)})`; g.lineWidth = 2; g.beginPath(); g.arc(cx, cx, r, 0, 7); g.stroke(); }
+  g.strokeStyle = 'rgba(30,30,30,.45)'; g.lineWidth = 5;
+  for (let a = 0; a < 3; a++) { g.beginPath(); g.moveTo(cx, cx); g.lineTo(cx + Math.cos(a * 2.1) * cx, cx + Math.sin(a * 2.1) * cx); g.stroke(); }
+  g.fillStyle = 'rgba(150,100,70,.55)'; for (let i = 0; i < 24; i++) { g.beginPath(); g.arc(Math.random() * w, Math.random() * h, 2 + Math.random() * 6, 0, 7); g.fill(); }
+}, 256, 256);
+
+const wheelGroup = new THREE.Group(); scene.add(wheelGroup);
+const wheel = new THREE.Mesh(new THREE.CylinderGeometry(2.1, 2.15, 0.16, 64), [
+  new THREE.MeshStandardMaterial({ color: 0x7c848c, roughness: 0.45, metalness: 0.6 }),
+  new THREE.MeshStandardMaterial({ map: wheelTex, roughness: 0.5, metalness: 0.4 }),
+  new THREE.MeshStandardMaterial({ color: 0x555b60 }),
+]);
+wheel.position.y = -0.08; wheelGroup.add(wheel);
+const pan = new THREE.Mesh(new THREE.TorusGeometry(2.55, 0.16, 12, 64), new THREE.MeshStandardMaterial({ color: 0x3d4a52, roughness: 0.6, metalness: 0.2 }));
+pan.rotation.x = Math.PI / 2; pan.position.y = -0.18; wheelGroup.add(pan);
+const base = new THREE.Mesh(new THREE.CylinderGeometry(2.6, 2.4, 0.5, 48), new THREE.MeshStandardMaterial({ color: 0x2f383e, roughness: 0.8 }));
+base.position.y = -0.45; wheelGroup.add(base);
+
+const shelf = new THREE.Mesh(new THREE.BoxGeometry(1, 0.18, 1.3), new THREE.MeshStandardMaterial({ color: 0x7a5233, roughness: 0.75 }));
+shelf.position.y = -0.09; shelf.visible = false; scene.add(shelf);
+
+// ---------- clay model (Lagrangian slices: volume V, thickness T) ----------
+const N = 80, SEG = 48, R_TEAR = 0.15, R_MAX = 1.65;
+let V = [], T = [];
+const rOf = (i) => Math.sqrt(V[i] / (Math.PI * T[i]));
+function heightOf() { let h = 0; for (let i = 0; i < T.length; i++) h += T[i]; return h; }
+function resample() {
+  const H = heightOf(), n = T.length, dh = H / N, nv = new Array(N).fill(0);
+  let j = 0, y0 = 0, y1 = T[0];
+  for (let i = 0; i < N; i++) {
+    const a = i * dh, b = (i + 1) * dh; let acc = 0;
+    while (j < n) {
+      const lo = Math.max(a, y0), hi = Math.min(b, y1);
+      if (hi > lo) acc += (hi - lo) * V[j] / T[j];
+      if (y1 <= b + 1e-12) { j++; y0 = y1; y1 = j < n ? y1 + T[j] : y1; } else break;
+    }
+    nv[i] = acc;
+  }
+  V = nv; T = new Array(N).fill(dh);
+}
+let V0 = 0;
+function newLump() {
+  V = []; T = [];
+  const H = 1.0, dh = H / N;
+  for (let i = 0; i < N; i++) {
+    const s = (i + 0.5) / N; let r = 1.0;
+    if (s > 0.8) r -= 0.22 * Math.pow((s - 0.8) / 0.2, 2);
+    if (s < 0.06) r -= 0.03;
+    V.push(Math.PI * r * r * dh); T.push(dh);
+  }
+  V0 = V.reduce((a, b) => a + b, 0);
+}
+newLump();
+const yc = new Float64Array(N + 2), rc = new Float64Array(N + 2);
+function centers() {
+  let y = 0; const n = T.length;
+  for (let i = 0; i < n; i++) { yc[i] = y + T[i] / 2; rc[i] = rOf(i); y += T[i]; }
+  return y;
+}
+function clayR(y, H) {
+  const n = T.length;
+  if (y < 0 || y > H) return 0;
+  if (y <= yc[0]) return rc[0];
+  if (y >= yc[n - 1]) return rc[n - 1];
+  let lo = 0, hi = n - 1;
+  while (hi - lo > 1) { const m = (lo + hi) >> 1; if (yc[m] <= y) lo = m; else hi = m; }
+  const t = (y - yc[lo]) / (yc[hi] - yc[lo]);
+  return rc[lo] + (rc[hi] - rc[lo]) * t;
+}
+
+// ---------- targets ----------
+const SHAPES = {
+  yunomi: { c: [0.86, 0.9, 0.94, 0.98, 1.0], H: 2.0 },
+  chawan: { c: [0.42, 0.72, 0.9, 0.98, 1.0], H: 0.78 },
+  tsubo: { c: [0.62, 0.9, 1.0, 0.96, 0.78, 0.6, 0.64], H: 1.6 },
+  kabin: { c: [0.7, 0.95, 1.0, 0.8, 0.5, 0.44, 0.6], H: 2.4 },
+  tokkuri: { c: [0.85, 1.0, 0.95, 0.68, 0.36, 0.28, 0.31, 0.4], H: 2.8 },
+  ichirin: { c: [0.62, 0.76, 0.62, 0.42, 0.32, 0.3, 0.38], H: 3.3 },
+};
+function catmull(c, s) {
+  const m = c.length - 1, u = Math.min(Math.max(s, 0), 1) * m, k = Math.min(Math.floor(u), m - 1), t = u - k;
+  const p0 = c[Math.max(k - 1, 0)], p1 = c[k], p2 = c[k + 1], p3 = c[Math.min(k + 2, m)];
+  return 0.5 * ((2 * p1) + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t + (-p0 + 3 * p1 - 3 * p2 + p3) * t * t * t);
+}
+let target = null;
+function makeTarget(kind) {
+  const sh = SHAPES[kind], H = sh.H * (0.93 + Math.random() * 0.14);
+  let I = 0; const K = 200; for (let k = 0; k < K; k++) { const f = catmull(sh.c, (k + 0.5) / K); I += f * f / K; }
+  const R = Math.sqrt(V0 / (Math.PI * H * I));
+  return { kind, c: sh.c, H, R };
+}
+const targetR = (y) => (!target || y < 0 || y > target.H) ? 0 : target.R * catmull(target.c, y / target.H);
+function computeMatch(H) {
+  const ymax = Math.max(H, target.H), K = 90; let mn = 0, mx = 0;
+  for (let k = 0; k < K; k++) { const y = (k + 0.5) / K * ymax, a = clayR(y, H), b = targetR(y); mn += Math.min(a, b); mx += Math.max(a, b); }
+  const m = mx > 0 ? mn / mx : 0; return m * m;
+}
+
+// ---------- clay mesh ----------
+const M = N + 5;
+const clayGeo = new THREE.BufferGeometry();
+const cPos = new Float32Array(M * (SEG + 1) * 3), cUv = new Float32Array(M * (SEG + 1) * 2);
+const idx = [];
+for (let j = 0; j < M - 1; j++) for (let k = 0; k < SEG; k++) {
+  const a = j * (SEG + 1) + k, b = a + SEG + 1, c = b + 1, d = a + 1;
+  idx.push(a, b, d, b, c, d);
+}
+clayGeo.setIndex(idx);
+clayGeo.setAttribute('position', new THREE.BufferAttribute(cPos, 3));
+clayGeo.setAttribute('uv', new THREE.BufferAttribute(cUv, 2));
+const clayMat = new THREE.MeshStandardMaterial({ color: 0x9c6644, map: clayTex, roughness: 0.4, metalness: 0.0 });
+const clay = new THREE.Mesh(clayGeo, clayMat); scene.add(clay);
+const prof = [];
+function profilePoints(H) {
+  const n = T.length; prof.length = 0;
+  prof.push([0, 0], [rc[0], 0]);
+  for (let i = 0; i < n; i++) {
+    const r = i > 0 && i < n - 1 ? (rc[i - 1] + 2 * rc[i] + rc[i + 1]) / 4 : rc[i];
+    prof.push([r, yc[i]]);
+  }
+  prof.push([rc[n - 1] * 0.97, H], [rc[n - 1] * 0.97, H], [0, H]);
+  return prof;
+}
+function updateClayMesh(H) {
+  const p = profilePoints(H);
+  for (let j = 0; j < M; j++) {
+    const [r, y] = p[Math.min(j, p.length - 1)];
+    for (let k = 0; k <= SEG; k++) {
+      const th = k / SEG * Math.PI * 2, o = (j * (SEG + 1) + k);
+      cPos[o * 3] = r * Math.cos(th); cPos[o * 3 + 1] = y; cPos[o * 3 + 2] = r * Math.sin(th);
+      cUv[o * 2] = k / SEG * 3; cUv[o * 2 + 1] = j >= M - 2 ? r * 0.6 : y * 0.55;
+    }
+  }
+  clayGeo.attributes.position.needsUpdate = true; clayGeo.attributes.uv.needsUpdate = true;
+  clayGeo.computeVertexNormals(); clayGeo.computeBoundingSphere();
+}
+
+// ---------- fired pots ----------
+const GLAZES = [
+  ['seiji', 0x8fc2ad], ['tenmoku', 0x3a2016], ['shiro', 0xeee7da], ['ruri', 0x1f4fa3], ['oribe', 0x3f7a3c], ['ame', 0xa8581f],
+];
+function firedGeometry(points, H, glaze, gold) {
+  const pts = [];
+  const wall = 0.09, floor = 0.16;
+  for (const [r, y] of points) { if (y < H - 1e-6) pts.push(new THREE.Vector2(Math.max(r, 0.001), y)); }
+  const rTop = points[points.length - 4][0];
+  pts.push(new THREE.Vector2(rTop, H - 0.01), new THREE.Vector2(rTop - wall * 0.5, H + 0.02), new THREE.Vector2(Math.max(rTop - wall, 0.03), H - 0.01));
+  for (let i = points.length - 4; i >= 2; i--) {
+    const [r, y] = points[i];
+    if (y <= floor || y >= H - 0.01) continue;
+    pts.push(new THREE.Vector2(Math.max(r - wall, 0.03), y));
+  }
+  pts.push(new THREE.Vector2(0.001, floor));
+  const g = new THREE.LatheGeometry(pts, 56);
+  const pos = g.attributes.position, col = new Float32Array(pos.count * 3);
+  const gc = new THREE.Color(glaze), cc = new THREE.Color(0xc99b74), gd = new THREE.Color(0xe8c15a), tmp = new THREE.Color();
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i), th = Math.atan2(z, x);
+    if (y < 0.11) tmp.copy(cc);
+    else {
+      const drip = 0.9 + 0.1 * Math.sin(th * 7 + y * 3) + 0.06 * Math.sin(th * 17 - y * 9);
+      const topL = 1 + 0.25 * Math.max(0, (y - H * 0.85) / (H * 0.15));
+      tmp.copy(gc).multiplyScalar(drip * topL);
+      if (y < 0.2) tmp.lerp(cc, (0.2 - y) / 0.09 * 0.6);
+      if (gold && y > H - 0.06) tmp.copy(gd);
+    }
+    col[i * 3] = tmp.r; col[i * 3 + 1] = tmp.g; col[i * 3 + 2] = tmp.b;
+  }
+  g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  return g;
+}
+const firedMat = new THREE.MeshPhysicalMaterial({ vertexColors: true, roughness: 0.18, metalness: 0.02, clearcoat: 1, clearcoatRoughness: 0.12, side: THREE.DoubleSide });
+const fired = [];
+let firedMesh = null;
+
+// flying torn pieces
+const flyers = [];
+function launchPiece(points, y0) {
+  const pts = points.map(([r, y]) => new THREE.Vector2(Math.max(r, 0.001), y - y0));
+  const m = new THREE.Mesh(new THREE.LatheGeometry(pts, 24), clayMat.clone());
+  m.position.y = y0; scene.add(m);
+  const dir = Math.random() < 0.5 ? -1 : 1;
+  flyers.push({ m, vx: dir * (2.2 + Math.random()), vy: 2.5, vz: 1.2, rx: (Math.random() - 0.5) * 8, rz: dir * -6, t: 0 });
+}
+
+// ---------- state ----------
+let state = 'title', stateT = 0, orders = [], orderI = 0, total = 0, wet = 1, match = 0, lastRes = null, dryNotified = false;
+let spin = 6.5, wheelOn = true, camH = 2, camR = 1.2, camFinal = 0;
+const DRY_TIME = 24;
+const fingers = new Map();
+const drops = [];
+let W = 1, Hs = 1, DPR = 1;
+
+function resize() {
+  W = Math.max(1, stage.clientWidth); Hs = Math.max(1, stage.clientHeight); DPR = Math.min(devicePixelRatio || 1, 2);
+  renderer.setPixelRatio(DPR); renderer.setSize(W, Hs, false);
+  ov.width = Math.round(W * DPR); ov.height = Math.round(Hs * DPR);
+  camera.aspect = W / Hs; camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize); resize();
+
+const camLook = new THREE.Vector3();
+function placeCamera(hNeed, rNeed, dt) {
+  const k = dt ? 1 - Math.exp(-dt * 3) : 1;
+  camH += (hNeed - camH) * k; camR += (rNeed - camR) * k;
+  const fov = camera.fov * Math.PI / 180, tn = Math.tan(fov / 2), aspect = W / Hs;
+  const viewH = (camH + 1.0) / 0.66, viewW = Math.max(camR * 2 * 1.45 + 0.5, 2.6);
+  const dist = Math.max(viewH / 2 / tn, viewW / 2 / (tn * aspect));
+  const cy = camH * 0.5 + 0.02 + viewH * 0.02;
+  const el = 0.13;
+  camera.position.set(0, cy + dist * Math.sin(el), dist * Math.cos(el));
+  camLook.set(0, cy, 0); camera.lookAt(camLook);
+}
+const ray = new THREE.Raycaster(), plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0), ndc = new THREE.Vector2(), hit = new THREE.Vector3();
+function toWorld(f) {
+  ndc.set(f.sx / W * 2 - 1, -(f.sy / Hs) * 2 + 1); ray.setFromCamera(ndc, camera);
+  if (ray.ray.intersectPlane(plane, hit)) { f.wx = hit.x; f.wy = hit.y; } else { f.wx = 99; f.wy = -99; }
+}
+const pv = new THREE.Vector3();
+function proj(x, y) { pv.set(x, y, 0).project(camera); return [(pv.x + 1) / 2 * W, (1 - pv.y) / 2 * Hs]; }
+
+// ---------- shaping ----------
+function squeeze(fx, fy, dt) {
+  const n = T.length, tr = Math.abs(fx), rate = 9 * (0.3 + 0.7 * wet); let d = 0;
+  for (let i = 0; i < n; i++) {
+    const w = Math.exp(-Math.pow((yc[i] - fy) / 0.13, 2)); if (w < 0.02) continue;
+    const r = rOf(i); if (r <= tr) continue;
+    let nr = r - (r - tr) * Math.min(1, rate * dt * w); if (nr < 0.1) nr = 0.1;
+    T[i] *= (r / nr) * (r / nr); d += (r - nr) * w;
+  }
+  return d;
+}
+function press(fx, fy, dt, H) {
+  const n = T.length, rTop = rc[n - 1];
+  if (Math.abs(fx) > rTop + 0.4 || fy >= H || H < 0.32) return 0;
+  const dH = Math.min((H - fy) * Math.min(1, 3.2 * dt * (0.3 + 0.7 * wet)), 0.022);
+  let sum = 0; const w = [];
+  for (let i = 0; i < n; i++) { w[i] = Math.exp(-(H - yc[i]) / 0.3); sum += T[i] * w[i]; }
+  const k = dH / sum; let d = 0;
+  for (let i = 0; i < n; i++) {
+    let f = 1 - k * w[i]; if (f < 0.6) f = 0.6;
+    if (rc[i] / Math.sqrt(f) > R_MAX) continue;
+    d += T[i] * (1 - f); T[i] *= f;
+  }
+  return d * 2;
+}
+function checkTear() {
+  const H = centers(), n = T.length;
+  for (let i = 0; i < n; i++) {
+    if (rc[i] >= R_TEAR) continue;
+    if (i < 3 || i > n - 3) { const r = R_TEAR; T[i] = V[i] / (Math.PI * r * r); continue; }
+    // tear: everything above slice i flies away
+    const pts = [[0, yc[i]]];
+    for (let j = i; j < n; j++) pts.push([rc[j], yc[j]]);
+    pts.push([rc[n - 1], H], [0, H]);
+    launchPiece(pts, yc[i]);
+    V = V.slice(0, i); T = T.slice(0, i);
+    resample(); centers();
+    noiseBurst(0.25, 1800, 300, 0.25); tone(320, 0.3, 'sine', 0.22, 0, 0.3);
+    showPop(TXT.tear);
+    return true;
+  }
+  return false;
+}
+let popT = 0;
+function showPop(s) { popEl.textContent = s; popEl.style.opacity = 1; popEl.style.transform = 'translateY(-14px)'; popT = 1.0; }
+
+// ---------- flow ----------
+function hudUpdate() {
+  $('scoreV').textContent = total;
+  $('orderV').textContent = TXT.order(orderI + 1, TXT.names[target.kind]);
+  const pct = Math.round(match * 100), rk = rankOf(pct);
+  $('matchV').textContent = TXT.match(pct);
+  $('nextV').textContent = rk > 0 ? TXT.toNext(TXT.ranks[rk - 1], RANK_TH[rk - 1] - pct) : TXT.ranks[0] + '!';
+  if (state === 'play') {
+    if (rk < liveRank) { tone(660 * Math.pow(1.26, 3 - rk), 0.35, 'triangle', 0.1); tone(990 * Math.pow(1.26, 3 - rk), 0.4, 'sine', 0.06, 0.08); $('matchV').classList.add('up'); upT = 0.5; }
+    liveRank = rk;
+  }
+  $('wfill').style.width = (wet * 100).toFixed(1) + '%';
+}
+function showTitle() {
+  state = 'title'; stateT = 0;
+  hud.style.display = 'none'; fireBtn.style.display = 'none';
+  panel.style.display = 'flex'; panel.style.justifyContent = 'flex-start'; panel.style.paddingTop = '9vh';
+  panel.innerHTML = `<div class="big" style="font-size:${LANG === 'ja' ? 44 : 34}px">${TXT.title}</div>` + TXT.how.map((h) => `<div class="sm">${h}</div>`).join('') + `<div class="tap">${TXT.tap}</div>`;
+  newLump(); centers(); target = null; wheelOn = true; clay.visible = true; wheelGroup.visible = true; shelf.visible = false;
+}
+function startGame() {
+  for (const f of fired) scene.remove(f.mesh);
+  fired.length = 0; total = 0; orderI = 0;
+  const mids = Math.random() < 0.5 ? ['chawan', 'tsubo'] : ['tsubo', 'chawan'];
+  orders = ['yunomi', ...mids, 'kabin', Math.random() < 0.5 ? 'tokkuri' : 'ichirin'];
+  signal('start');
+  startOrder(true);
+}
+function startOrder(first) {
+  state = 'play'; stateT = 0; wet = 1; dryNotified = false;
+  if (firedMesh) { firedMesh.visible = false; firedMesh = null; }
+  newLump(); centers(); target = makeTarget(orders[orderI]);
+  clay.visible = true; wheelGroup.visible = true; shelf.visible = false; wheelOn = true;
+  for (const f of fired) f.mesh.visible = false;
+  panel.style.display = 'none'; hud.style.display = 'block'; fireBtn.style.display = 'block'; fireBtn.classList.remove('pulse');
+  hintEl.textContent = TXT.hint; hintEl.style.opacity = first ? 1 : 0; hintT = first ? 5 : 0;
+  fingers.clear();
+  match = computeMatch(heightOf()); liveRank = rankOf(Math.round(match * 100)); hudUpdate();
+}
+let hintT = 0;
+const RANK_TH = [92, 82, 65];
+let liveRank = 3, upT = 0;
+function rankOf(p) { return p >= RANK_TH[0] ? 0 : p >= RANK_TH[1] ? 1 : p >= RANK_TH[2] ? 2 : 3; }
+function fire() {
+  if (state !== 'play') return;
+  initAudio();
+  state = 'firing'; stateT = 0; fingers.clear(); setSquish(0, 500);
+  fireBtn.style.display = 'none'; hintEl.style.opacity = 0;
+  const H = centers(); match = computeMatch(H);
+  const pct = Math.round(match * 100), rank = rankOf(pct);
+  const [gname, gcol] = GLAZES[Math.floor(Math.random() * GLAZES.length)];
+  const pts = profilePoints(H).map((p) => [p[0], p[1]]);
+  const geo = firedGeometry(pts, H, gcol, rank === 0);
+  firedMesh = new THREE.Mesh(geo, firedMat); firedMesh.visible = false; scene.add(firedMesh);
+  const maxR = Math.max(...pts.map((p) => p[0]));
+  fired.push({ mesh: firedMesh, H, R: maxR, pct });
+  lastRes = { pct, rank, gname, H };
+  total += pct;
+  noiseBurst(1.3, 200, 2200, 0.28); noiseBurst(1.6, 120, 500, 0.2, 0.2);
+}
+function finishFiring() {
+  state = 'result'; stateT = 0;
+  clay.visible = false; firedMesh.visible = true; firedMesh.rotation.y = 0;
+  const { pct, rank, gname, H } = lastRes;
+  const f0 = 880 / (0.7 + H * 0.45);
+  bell(f0, 0.2); if (rank <= 1) bell(f0 * 1.5, 0.12, 0.25); if (rank === 0) bell(f0 * 2, 0.1, 0.5);
+  hudUpdate(); $('matchV').textContent = ''; $('nextV').textContent = '';
+  panel.style.display = 'flex'; panel.style.justifyContent = 'flex-start'; panel.style.paddingTop = '13vh';
+  panel.innerHTML = `<div class="mid">${TXT.names[target.kind]}・${TXT.glaze[gname]}</div><div class="big">${pct}%</div><div class="mid" style="color:${['#ffd76a', '#bfe8a0', '#f6ead9', '#d9c2a8'][rank]}">${TXT.ranks[rank]}</div><div class="tap">${orderI < 4 ? TXT.next : TXT.next}</div>`;
+}
+function showFinal() {
+  state = 'final'; stateT = 0;
+  hud.style.display = 'none'; clay.visible = false; wheelGroup.visible = false; wheelOn = false; setHum(false);
+  let x = 0; const gap = 0.35, widths = fired.map((f) => f.R * 2), tw = widths.reduce((a, b) => a + b, 0) + gap * 4;
+  x = -tw / 2;
+  let hMax = 0;
+  fired.forEach((f, i) => { f.mesh.visible = true; f.mesh.position.set(x + widths[i] / 2, 0, 0); f.mesh.rotation.y = i; x += widths[i] + gap; hMax = Math.max(hMax, f.H); });
+  shelf.visible = true; shelf.scale.x = tw + 0.6;
+  camFinal = { w: tw + 0.6, h: hMax };
+  const isBest = total > best;
+  if (isBest) { best = total; try { parent.postMessage({ agf: 'save', data: { best } }, '*'); } catch (e) {} }
+  signal('end', { score: total });
+  panel.style.display = 'flex'; panel.style.justifyContent = 'flex-start'; panel.style.paddingTop = '9vh';
+  panel.innerHTML = `<div class="mid">${TXT.total}</div><div class="big">${total}</div><div class="sm">${isBest ? `<b style="color:#ffd76a">${TXT.newBest}</b>` : TXT.best(best)}</div><div class="sm">${fired.map((f) => f.pct + '%').join(' · ')}</div><div class="tap">${TXT.again}</div>`;
+  [0, 4, 7, 12].forEach((s, i) => tone(523.25 * Math.pow(2, s / 12), 0.5, 'triangle', 0.12, i * 0.13));
+}
+
+// ---------- input ----------
+stage.addEventListener('pointerdown', (e) => {
+  e.preventDefault(); initAudio();
+  if (state === 'title') { setHum(true); startGame(); return; }
+  if (state === 'result') { if (stateT > 0.7) { orderI++; if (orderI >= 5) showFinal(); else startOrder(false); } return; }
+  if (state === 'final') { if (stateT > 0.7) startGame(); return; }
+  if (state !== 'play') return;
+  if (fingers.size >= 2) return;
+  const f = { sx: e.clientX, sy: e.clientY, wx: 0, wy: 0, mode: 'squeeze' };
+  toWorld(f);
+  const H = centers(), rTop = rc[T.length - 1];
+  f.mode = (f.wy > H - 0.06 && Math.abs(f.wx) < rTop + 0.4) ? 'press' : 'squeeze';
+  fingers.set(e.pointerId, f);
+});
+stage.addEventListener('pointermove', (e) => { const f = fingers.get(e.pointerId); if (f) { f.sx = e.clientX; f.sy = e.clientY; } });
+const lift = (e) => { fingers.delete(e.pointerId); };
+stage.addEventListener('pointerup', lift); stage.addEventListener('pointercancel', lift);
+fireBtn.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); fire(); });
+
+// ---------- overlay drawing ----------
+function drawOverlay(H) {
+  octx.setTransform(DPR, 0, 0, DPR, 0, 0); octx.clearRect(0, 0, W, Hs);
+  if (state !== 'play' || !target) return;
+  const K = 46, L = [], R = [];
+  for (let k = 0; k <= K; k++) {
+    const y = k / K * target.H, rt = targetR(y), ok = Math.abs(clayR(y, H) - rt) < 0.06;
+    L.push([...proj(-rt, y), ok]); R.push([...proj(rt, y), ok]);
+  }
+  octx.lineCap = 'round'; octx.lineWidth = 3;
+  octx.setLineDash([7, 7]);
+  for (const side of [L, R]) {
+    for (let k = 0; k < K; k++) {
+      octx.strokeStyle = side[k][2] && side[k + 1][2] ? 'rgba(140,255,170,.95)' : 'rgba(255,255,255,.85)';
+      octx.beginPath(); octx.moveTo(side[k][0], side[k][1]); octx.lineTo(side[k + 1][0], side[k + 1][1]); octx.stroke();
+    }
+  }
+  const topOk = Math.abs(H - target.H) < 0.06;
+  octx.strokeStyle = topOk ? 'rgba(140,255,170,.95)' : 'rgba(255,255,255,.85)';
+  octx.beginPath(); octx.moveTo(L[K][0], L[K][1]); octx.lineTo(R[K][0], R[K][1]); octx.stroke();
+  octx.setLineDash([]);
+  for (const p of drops) { octx.fillStyle = `rgba(150,96,62,${1 - p.t / 0.6})`; octx.beginPath(); octx.arc(p.x, p.y, p.r, 0, 7); octx.fill(); }
+  for (const f of fingers.values()) {
+    octx.fillStyle = f.mode === 'press' ? 'rgba(255,200,140,.35)' : 'rgba(255,255,255,.28)';
+    octx.strokeStyle = 'rgba(255,255,255,.7)'; octx.lineWidth = 2;
+    octx.beginPath(); octx.arc(f.sx, f.sy, 22, 0, 7); octx.fill(); octx.stroke();
+  }
+}
+
+// ---------- loop ----------
+let last = performance.now(), squishLv = 0;
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(0.05, Math.max(0, (now - last) / 1000)); last = now;
+  stateT += dt;
+  let H = centers();
+  if (state === 'play') {
+    let d = 0, fy = 0;
+    if (wet > 0) {
+      for (const f of fingers.values()) {
+        toWorld(f);
+        const dd = f.mode === 'press' ? press(f.wx, f.wy, dt, H) : squeeze(f.wx, f.wy, dt);
+        if (dd > 1e-4 && drops.length < 90) {
+          const nsp = Math.min(3, 1 + dd * 40 | 0), side = f.wx < 0 ? -1 : 1;
+          for (let q = 0; q < nsp; q++) drops.push({ x: f.sx, y: f.sy, vx: (f.mode === 'press' ? (Math.random() - 0.5) * 260 : side * (60 + Math.random() * 160)), vy: -60 - Math.random() * 120, t: 0, r: 1.5 + Math.random() * 2.5 });
+        }
+        d += dd; fy = f.wy;
+        if (dd > 0) H = centers();
+      }
+    }
+    if (d > 1e-5) {
+      wet = Math.max(0, wet - dt / DRY_TIME);
+      resample(); checkTear(); H = centers();
+      match = computeMatch(H);
+    }
+    squishLv += (Math.min(1, d / Math.max(dt, 1e-3) * 0.35) - squishLv) * Math.min(1, dt * 12);
+    setSquish(squishLv * 0.16, 380 + Math.max(0, fy) * 260 + squishLv * 300);
+    if (wet <= 0 && !dryNotified) { dryNotified = true; fireBtn.classList.add('pulse'); hintEl.textContent = TXT.dry; hintEl.style.opacity = 1; hintT = 99; }
+    if (hintT > 0) { hintT -= dt; if (hintT <= 0) hintEl.style.opacity = 0; }
+    const c = new THREE.Color(0x9c6644).lerp(new THREE.Color(0xc29a76), 1 - wet);
+    clayMat.color.copy(c); clayMat.roughness = 0.35 + (1 - wet) * 0.5;
+    hudUpdate();
+  } else if (state === 'firing') {
+    const p = stateT / 1.4;
+    flashEl.style.opacity = Math.sin(Math.min(1, p) * Math.PI) * 0.85;
+    clayMat.color.lerp(new THREE.Color(0xff8a3a), dt * 3);
+    if (stateT >= 1.4) { flashEl.style.opacity = 0; finishFiring(); }
+  } else if (state === 'title') {
+    clayMat.color.set(0x9c6644); clayMat.roughness = 0.4;
+  }
+  for (let i = drops.length - 1; i >= 0; i--) { const p = drops[i]; p.t += dt; p.vy += 700 * dt; p.x += p.vx * dt; p.y += p.vy * dt; if (p.t > 0.6) drops.splice(i, 1); }
+  if (upT > 0) { upT -= dt; if (upT <= 0) $('matchV').classList.remove('up'); }
+  if (popT > 0) { popT -= dt; if (popT <= 0) { popEl.style.opacity = 0; popEl.style.transform = 'translateY(0)'; } }
+
+  if (wheelOn) { wheel.rotation.y += dt * spin; clay.rotation.y += dt * spin; }
+  if (firedMesh && state === 'result') firedMesh.rotation.y += dt * 0.9;
+  for (let i = flyers.length - 1; i >= 0; i--) {
+    const f = flyers[i]; f.t += dt; f.vy -= 9 * dt;
+    f.m.position.x += f.vx * dt; f.m.position.y += f.vy * dt; f.m.position.z += f.vz * dt;
+    f.m.rotation.x += f.rx * dt; f.m.rotation.z += f.rz * dt;
+    if (f.t > 1.6) { scene.remove(f.m); f.m.geometry.dispose(); flyers.splice(i, 1); }
+  }
+
+  if (clay.visible) updateClayMesh(H);
+  if (state === 'final') {
+    const fov = camera.fov * Math.PI / 180, tn = Math.tan(fov / 2), aspect = W / Hs;
+    const dist = Math.max((camFinal.h + 1) / 0.5 / 2 / tn, camFinal.w * 1.08 / 2 / (tn * aspect));
+    const cy = camFinal.h * 0.5 + (camFinal.h + 1) * 0.28;
+    camera.position.set(0, cy + dist * 0.12, dist); camera.lookAt(0, cy, 0);
+    fired.forEach((f, i) => { f.mesh.rotation.y += dt * 0.4; });
+  } else {
+    let hn, rn;
+    if (state === 'title') { hn = 1.6; rn = 1.3; }
+    else if (state === 'result' || state === 'firing') { hn = Math.max(lastRes ? lastRes.H : H, 1.2) * 1.35; rn = 1.3; }
+    else { const tr = target ? target.R * Math.max(...target.c) : 1; let cr = 0; for (let i = 0; i < T.length; i++) cr = Math.max(cr, rc[i]); hn = Math.max(target ? target.H : 1, H, 1.1); rn = Math.max(tr, cr, 1.05); }
+    placeCamera(hn, rn, dt);
+  }
+  renderer.render(scene, camera);
+  drawOverlay(H);
+}
+showTitle();
+placeCamera(1.6, 1.3, 0);
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

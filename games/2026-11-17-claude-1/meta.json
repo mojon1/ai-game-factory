@@ -1,0 +1,412 @@
+{
+  "id": "2026-11-17-claude-1",
+  "status": "published",
+  "title": "ろくろ注文帖",
+  "genre": "物理おもちゃ",
+  "concept": "回るろくろの土を指で押して器を作る。土の量は変わらないので、横から押せば細く高く伸び、上から押せば低く広がる。どこを押すと別の所がどう動くかを読み、点線の見本に合わせる手触りが核。押しすぎるとちぎれる。",
+  "howToPlay": "回る粘土の横を指で押すと細く高く、上から押し下げると低く広がる。点線の見本に形を合わせて「焼く」。五つの注文で合計点を競う。",
+  "libraryDecision": "three.js を使う。回転する立体の土が指で押されて伸び、焼くと釉薬の器になる手触りは3Dでこそ伝わるため。再考で、焼いたときに内側をくり抜いた器の形と釉薬の色・つやを出し、最後に五つを棚に並べて眺められるようにした。",
+  "soundDecision": "BGMは付けず、ろくろの低いうなりを環境音にした。土を押している間だけ濡れた土のこすれる音が鳴り、押す量と高さで音が変わる。焼き上がりは器の高さで音程が変わる澄んだ鐘の音、評価が上がった瞬間に短いチャイム。手の感触を耳で補うため。",
+  "improvements": [
+    {
+      "found": "上から押すと一瞬で円盤までつぶれて戻せない／広がった円盤の手前を押すと奥行きのずれで指が届かない／湯のみが一なでで89%になり、採点が甘く上達の余地が見えない",
+      "changed": "押し下げは指へゆっくり追いつくようにし、広がりに上限を付けた。カメラを低くして粘土の幅も画面に収めた。一致率を二乗して厳しくし、評価の基準を見直した",
+      "foundEn": "Pressing the top flattened the clay into a disc instantly with no way back / touching the front of a wide disc missed because of perspective / one stroke gave 89% on the teacup, so scoring felt too lenient",
+      "changedEn": "Pressing now follows the finger gradually with a cap on spreading; lowered the camera and framed the clay width too; squared the match ratio and retuned rank thresholds"
+    },
+    {
+      "found": "一致の数字だけで、あとどれだけで良い評価になるか分からない／押している手応えが形の変化だけで薄い／評価が上がっても何も起きず、合わせる楽しさが盛り上がらない",
+      "changed": "一致率の下に「上出来まで あと7%」のように次の評価までの差を出した。指先から泥しぶきが回転方向へ飛ぶようにした。評価が上がった瞬間に数字が金色にふくらみチャイムが鳴るようにした",
+      "foundEn": "Only a match number; no idea how far the next rank is / pushing felt thin with only the shape changing / nothing happened when the rank went up",
+      "changedEn": "Added \"7% to Fine work\" under the match; clay slip now splashes from the fingertip; the number turns gold and a chime plays when the rank improves"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "ボードゲーム",
+      "en": "Board game",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "さいころを盤上で転がして進み、下になった目を刻んでCPUと陣地を取り合う。立方体の回転で次の面を読むボードゲーム（3D）。",
+        "ideaEn": "Roll a die across a board; the face that lands down stamps its number to claim cells against the CPU. Reading the cube rotation is the core (3D).",
+        "fromDraw": true
+      },
+      {
+        "idea": "ろくろの回る土を指で押して器を作り、点線の見本に合わせて焼く。土の量が変わらないので、押した分だけ別の所が伸びる（3D）。",
+        "ideaEn": "Shape spinning clay on a potter's wheel with your finger to match a dotted outline. Volume is conserved, so pressing one place makes another grow (3D).",
+        "fromDraw": false
+      },
+      {
+        "idea": "吹く強さで大きさが決まるシャボン玉を風に流し、くっつけて大きな泡を育てる、目標のない遊び場。",
+        "ideaEn": "A goal-free playground: blow bubbles whose size depends on your breath, let the wind carry them and merge them into giant bubbles.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 1
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "limit",
+    "input": [
+      "drag",
+      "multi"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Potter's Wheel Orders",
+      "concept": "Press spinning clay on a wheel to make pottery. The amount of clay never changes: squeeze the side and it grows tall and thin, press the top and it spreads low and wide. Reading how pushing one place moves another, to match a dotted outline, is the core. Push too far and it tears.",
+      "howToPlay": "Squeeze the side of the spinning clay to make it taller and thinner, press down on top to make it lower and wider. Match the dotted outline and tap FIRE. Five orders make your total score.",
+      "libraryDecision": "Uses three.js: spinning 3D clay that stretches under your finger and turns into a glazed pot only feels right in 3D. The rethink added hollowed fired pots with glossy glazes and a final shelf showing all five pieces.",
+      "soundDecision": "No BGM; the low hum of the wheel is the ambience. A wet clay rub sounds only while you press, changing with pressure and height. Firing ends with a clear bell whose pitch depends on the pot's height, and a short chime marks each rank-up. Sound adds the touch the screen cannot."
+    }
+  },
+  "createdAt": "2026-11-17T09:08:19+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-17T09:08:19+09:00",
+    "metricsFrom": "2026-11-17T00:05:42.318Z",
+    "transcript": "979d3227-9f96-4d16-8833-4fcc7907f632.jsonl",
+    "validationRuns": 4,
+    "finishedAt": "2026-11-17T09:25:38+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-17T09:25:19+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "36.7KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "複数の指を指ごとに扱っている（pointerId）",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Tracks each finger separately (pointerId)"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=122",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=142",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=122",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=141",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 37551,
+    "lines": 660
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "注文が毎回同じ5種の順番で、慣れると押し方の手順が決まってしまい、2周目以降の驚きが少ない。名品を狙う微調整は少し地味。",
+    "comment": "横から一なですると粘土がにゅっと伸び上がり、ふちがきのこのように張り出す。土の量が変わらないので、押した所の代わりに別の所が動くのが分かってくると面白い。茶わんで押し下げすぎて平たくし、根元とふちを寄せて戻したら瑠璃色の茶わんが焼けたのは嬉しかった。首を芯まで押すとちぎれて飛ぶ演出も気持ちいい。数分は普通に遊べるが、もう1周したくなるかは注文の変化しだい。",
+    "similar": [
+      {
+        "title": "Let's Create! Pottery 2",
+        "url": "https://play.google.com/store/apps/eventdetails/4829139992966431165",
+        "similarity": "中",
+        "note": "ろくろで客の見本どおりの器を作る点が同じ。こちらは土の量が変わらない押し方の物理と、5つの注文の合計点にしぼった短い遊び",
+        "note_en": "Same idea of shaping wheel pottery to match a client sample. This one focuses on volume-conserving pressing physics and a short five-order score run."
+      },
+      {
+        "title": "Pottery Master (CrazyGames)",
+        "url": "https://www.crazygames.com/game/pottery-master",
+        "similarity": "高",
+        "note": "見本の輪郭に合わせて粘土を形作り採点される点がほぼ同じ。違いは、押した分だけ別の所が伸びる体積の保存と、押しすぎるとちぎれること",
+        "note_en": "Nearly the same: mold clay to a target silhouette and get graded. Differences: conserved volume so pressing one place grows another, and over-pressing tears the clay."
+      }
+    ],
+    "research": "ウェブ検索1回（pottery wheel game silhouette match）。見本の輪郭に合わせるろくろゲームは既に複数あり、アイデアのルーツは明確。",
+    "i18n": {
+      "en": {
+        "worst": "The five orders come in the same order every run, so once learned the pressing routine is fixed and later runs hold few surprises; fine-tuning for a masterpiece gets a bit dull.",
+        "comment": "One stroke up the side makes the clay surge upward with a mushrooming rim. Since the clay volume is fixed, learning that pressing here moves something there is the fun. Over-pressing the tea bowl flat, then pulling the foot and rim back in and getting a glossy cobalt bowl felt good. Tearing the neck off is a satisfying spectacle. Solid for a few minutes; whether you want another run depends on order variety.",
+        "research": "One web search (pottery wheel game silhouette match). Several wheel games with silhouette matching already exist; the roots are clear."
+      }
+    },
+    "method": "スマホ縦画面で 7 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 7 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "開始",
+        "noteEn": "Start",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "path(0.80,0.66→0.68,0.66→0.68,0.60→0.68,0.54→0.68,0.48→0.68,0.42→0.69,0.38) 1800ms",
+        "note": "横から押して上へなでる。指先から泥がはねる",
+        "noteEn": "Squeeze and slide up; slip splashes from the finger",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "path(0.86,0.60→0.70,0.60→0.70,0.50→0.70,0.45) 900ms → tap(0.82,0.93) 120ms → wait 2400ms → tap(0.50,0.50) 120ms → wait 200ms",
+        "note": "手早く形を作って焼き、次へ（終わりの画面の確認）",
+        "noteEn": "Shape quickly, fire, next (checking the ending)",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "path(0.86,0.60→0.70,0.60→0.70,0.50→0.70,0.45) 900ms → tap(0.82,0.93) 120ms → wait 2400ms → tap(0.50,0.50) 120ms → wait 200ms",
+        "note": "手早く形を作って焼き、次へ（終わりの画面の確認）",
+        "noteEn": "Shape quickly, fire, next (checking the ending)",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "path(0.86,0.60→0.70,0.60→0.70,0.50→0.70,0.45) 900ms → tap(0.82,0.93) 120ms → wait 2400ms → tap(0.50,0.50) 120ms → wait 200ms",
+        "note": "手早く形を作って焼き、次へ（終わりの画面の確認）",
+        "noteEn": "Shape quickly, fire, next (checking the ending)",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "path(0.86,0.60→0.70,0.60→0.70,0.50→0.70,0.45) 900ms → tap(0.82,0.93) 120ms → wait 2400ms → tap(0.50,0.50) 120ms → wait 200ms",
+        "note": "手早く形を作って焼き、次へ（終わりの画面の確認）",
+        "noteEn": "Shape quickly, fire, next (checking the ending)",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "path(0.86,0.60→0.70,0.60→0.70,0.50) 900ms → tap(0.82,0.93) 120ms → wait 2400ms → tap(0.50,0.50) 120ms → wait 800ms",
+        "note": "最後の器を焼いて、棚に並んだ五つの器を見る",
+        "noteEn": "Fire the last piece and see all five on the shelf",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 240
+            }
+          },
+          {
+            "agf": "end",
+            "score": 240
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-17T09:25:38+09:00"
+  },
+  "publishedAt": "2026-11-17T09:25:38+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 23873,
+    "outputTokens": 33440,
+    "contextTokens": 9844246,
+    "turns": 54,
+    "toolCalls": 56,
+    "webSearches": 0,
+    "minutes": 19.9,
+    "from": "2026-11-17T00:05:42.318Z",
+    "to": "2026-11-17T00:25:38.307Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-17T09:25:38+09:00",
+    "validationRuns": 4,
+    "codeKB": 36.7
+  }
+}
