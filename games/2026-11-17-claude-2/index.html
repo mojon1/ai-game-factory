@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>わたれ！木組み橋</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #1d2433; }
+canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+
+/*PHYS-START*/
+const G = 9.8;
+let BEAM_DAMP = 0.1;
+const MAT = {
+  road:  { EA: 3.0e5, F: 3200, rho: 8, cost: 0, max: 99 },
+  wood:  { EA: 3.0e5, F: 5000, rho: 4, cost: 100, max: 4 },
+  steel: { EA: 8.0e5, F: 14000, rho: 8, cost: 300, max: 4 },
+};
+// 地形の多角形を作る
+function cliffL(depth, wallX, wallTop) {
+  if (wallX === undefined) return [[-40, 0], [0, 0], [0, -depth], [-40, -depth]];
+  return [[-40, wallTop], [wallX, wallTop], [wallX, 0], [0, 0], [0, -depth], [-40, -depth]];
+}
+function cliffR(W, depth, wallX, wallTop) {
+  if (wallX === undefined) return [[W, 0], [W + 40, 0], [W + 40, -depth], [W, -depth]];
+  return [[W, 0], [wallX, 0], [wallX, wallTop], [W + 40, wallTop], [W + 40, -depth], [W, -depth]];
+}
+function pillar(x, top, bottom) { return [[x - 0.7, top], [x + 0.7, top], [x + 1.5, bottom], [x - 1.5, bottom]]; }
+const LEVELS = [
+  { name: { ja: '小川', en: 'The Brook' }, W: 8, n: 4, anchors: [[0, -2], [8, -2]], water: -5, top: 4,
+    rocks: (L) => [cliffL(9), cliffR(8, 9)], budget: 2500, stars: [1700, 600],
+    veh: { kind: 'bike', mass: 80, wb: 1.1, vmax: 3.2 }, sky: 0,
+    hint: { ja: '黄色い点から指をのばして、木材で橋を支えよう', en: 'Drag from a yellow joint to add timber' } },
+  { name: { ja: '谷あいの道', en: 'Valley Road' }, W: 12, n: 6, anchors: [[0, -3], [12, -3]], water: -7, top: 5,
+    rocks: (L) => [cliffL(11), cliffR(12, 11)], budget: 5000, stars: [3600, 2700],
+    veh: { kind: 'cart', mass: 160, wb: 1.4, vmax: 2.6 }, sky: 1,
+    hint: { ja: '三角形に組むと、ゆがまない', en: 'Triangles do not bend' } },
+  { name: { ja: '岩の柱', en: 'Rock Pillar' }, W: 16, n: 8, anchors: [[0, -2], [16, -2], [8, -3]], water: -8, top: 5,
+    rocks: (L) => [cliffL(12), cliffR(16, 12), pillar(8, -3, -13)], budget: 7000, stars: [5300, 3500],
+    veh: { kind: 'kei', mass: 250, wb: 1.9, vmax: 3.6 }, sky: 2,
+    hint: { ja: 'まん中の岩にも金具がある', en: 'The rock pillar has a joint too' } },
+  { name: { ja: '切り立つ崖', en: 'Sheer Cliffs' }, W: 14, n: 7, anchors: [[-1, 4], [15, 4], [-1, 2], [15, 2]], water: -8, top: 7,
+    rocks: (L) => [cliffL(12, -1, 7), cliffR(14, 12, 15, 7)], budget: 9000, stars: [7000, 5800],
+    veh: { kind: 'kei', mass: 250, wb: 1.9, vmax: 3.6 }, sky: 3, steel: true,
+    hint: { ja: '下に金具はない。上から吊ろう。鉄骨も使える', en: 'No joints below. Hang it from above. Steel unlocked' } },
+  { name: { ja: 'ふたつの柱', en: 'Twin Pillars' }, W: 24, n: 12, anchors: [[0, -2], [24, -2], [8, -4], [16, -4]], water: -10, top: 6,
+    rocks: (L) => [cliffL(14), cliffR(24, 14), pillar(8, -4, -15), pillar(16, -4, -15)], budget: 13000, stars: [9500, 8000],
+    veh: { kind: 'truck', mass: 400, wb: 3.4, vmax: 3.8 }, sky: 4, steel: true,
+    hint: { ja: '長い谷。柱をうまく使おう', en: 'A long gap. Make use of the pillars' } },
+  { name: { ja: '大きな谷', en: 'The Great Gorge' }, W: 20, n: 10, anchors: [[0, -3], [20, -3], [0, -6], [20, -6]], water: -10, top: 5,
+    rocks: (L) => [cliffL(14), cliffR(20, 14)], budget: 18000, stars: [13000, 10500],
+    veh: { kind: 'bus', mass: 330, wb: 3.0, vmax: 3.8 }, sky: 5, steel: true,
+    hint: { ja: '最後はバス。どこが一番つらいかを見よう', en: 'Last, the bus. Watch where it strains' } },
+];
+// 組んだ橋（design = 置いた部材の両端座標の一覧）から、つなぎ目と部材の一覧を作る
+function buildGraph(L, design) {
+  const J = [], B = [], key = new Map();
+  const add = (x, y, kind) => { const k = x + ',' + y; if (key.has(k)) return key.get(k); J.push({ x, y, kind }); key.set(k, J.length - 1); return J.length - 1; };
+  add(0, 0, 'anchor'); add(L.W, 0, 'anchor');
+  for (const a of L.anchors) add(a[0], a[1], 'anchor');
+  const seg = L.W / L.n; const deck = [];
+  for (let k = 1; k < L.n; k++) add(k * seg, 0, 'deck');
+  for (let k = 0; k < L.n; k++) {
+    const a = key.get((k * seg) + ',0'), b = key.get(((k + 1) * seg) + ',0');
+    B.push({ a, b, m: 'road', deck: k }); deck.push(B.length - 1);
+  }
+  for (const d of design) {
+    const a = add(d[0], d[1], 'user'), b = add(d[2], d[3], 'user');
+    B.push({ a, b, m: d[4], deck: -1, d });
+  }
+  return { J, B, deck, key };
+}
+function makeSim(L, design) {
+  const g = buildGraph(L, design);
+  const N = g.J.map((j) => ({ x: j.x, y: j.y, px: j.x, py: j.y, vx: 0, vy: 0, m: 0.6, fix: j.kind === 'anchor', fx: 0, fy: 0 }));
+  const E = g.B.map((b) => {
+    const A = N[b.a], C = N[b.b], r = Math.hypot(C.x - A.x, C.y - A.y), M = MAT[b.m];
+    A.m += M.rho * r / 2; C.m += M.rho * r / 2;
+    return { a: b.a, b: b.b, m: b.m, r, EA: M.EA, F: M.F, st: 0, load: 0, peak: 0, broken: false, deck: b.deck, d: b.d };
+  });
+  return { N, E, deck: g.deck, t: 0, breaks: [], L };
+}
+function stepSim(S, dt, sub) {
+  const h = dt / sub, damp = Math.exp(-1.2 * h);
+  for (let k = 0; k < sub; k++) {
+    const g = G * Math.min(1, 0.2 + S.t / 0.8);
+    for (const n of S.N) {
+      if (n.fix) continue;
+      n.vx += n.fx / n.m * h; n.vy += (n.fy / n.m - g) * h;
+      n.px = n.x; n.py = n.y; n.x += n.vx * h; n.y += n.vy * h;
+    }
+    for (const e of S.E) {
+      if (e.broken) continue;
+      const A = S.N[e.a], C = S.N[e.b];
+      const wA = A.fix ? 0 : 1 / A.m, wC = C.fix ? 0 : 1 / C.m, w = wA + wC;
+      if (!w) continue;
+      const dx = C.x - A.x, dy = C.y - A.y, len = Math.hypot(dx, dy) || 1e-9;
+      const dl = -(len - e.r) / (w + e.r / e.EA / (h * h));
+      const nx = dx / len * dl, ny = dy / len * dl;
+      A.x -= nx * wA; A.y -= ny * wA; C.x += nx * wC; C.y += ny * wC;
+    }
+    for (const n of S.N) {
+      if (n.fix) continue;
+      n.vx = (n.x - n.px) / h * damp; n.vy = (n.y - n.py) / h * damp;
+    }
+    // 部材ごとの減衰（伸び縮みの振動だけを止める）
+    for (const e of S.E) {
+      if (e.broken) continue;
+      const A = S.N[e.a], C = S.N[e.b];
+      const wA = A.fix ? 0 : 1 / A.m, wC = C.fix ? 0 : 1 / C.m, w = wA + wC;
+      if (!w) continue;
+      const dx = C.x - A.x, dy = C.y - A.y, len = Math.hypot(dx, dy) || 1e-9, nx = dx / len, ny = dy / len;
+      const rv = (C.vx - A.vx) * nx + (C.vy - A.vy) * ny, imp = rv * BEAM_DAMP / w;
+      A.vx += nx * imp * wA; A.vy += ny * imp * wA; C.vx -= nx * imp * wC; C.vy -= ny * imp * wC;
+    }
+    S.t += h;
+  }
+  let maxLoad = 0;
+  for (const e of S.E) {
+    if (e.broken) continue;
+    const A = S.N[e.a], C = S.N[e.b];
+    e.st = (Math.hypot(C.x - A.x, C.y - A.y) - e.r) / e.r;
+    e.load = Math.abs(e.st) * e.EA / e.F;
+    if (e.load > e.peak) e.peak = e.load;
+    if (e.load > maxLoad) maxLoad = e.load;
+    if (e.load > 1) { e.broken = true; S.breaks.push(e); }
+  }
+  S.maxLoad = maxLoad;
+}
+// 車：前輪の位置 s（道板にそった長さ）で進む。重さは乗っている道板の両端のつなぎ目にかかる
+function makeCar(L) { return { s: -1.2, v: 0, state: 'drive', x: -1.2, y: 0, ang: 0, vx: 0, vy: 0, va: 0, t: 0, wheel: 0 }; }
+function carPoint(S, s) {
+  const L = S.L, seg = L.W / L.n;
+  if (s <= 0) return { ok: true, x: s, y: 0 };
+  if (s >= L.W) return { ok: true, x: s, y: 0 };
+  const k = Math.min(L.n - 1, Math.floor(s / seg)), t = s / seg - k, e = S.E[S.deck[k]];
+  if (e.broken) return { ok: false };
+  const A = S.N[e.a], C = S.N[e.b];
+  return { ok: true, x: A.x + (C.x - A.x) * t, y: A.y + (C.y - A.y) * t, A, C, t };
+}
+function stepCar(S, car, dt) {
+  const L = S.L, V = L.veh;
+  for (const n of S.N) { n.fx = 0; n.fy = 0; }
+  car.t += dt;
+  if (car.state === 'drive') {
+    const f = carPoint(S, car.s), r = carPoint(S, car.s - V.wb);
+    if (!f.ok || !r.ok) {
+      car.state = 'fall'; car.vx = car.v * Math.cos(car.ang); car.vy = car.v * Math.sin(car.ang) - 0.5; car.va = f.ok ? 1.2 : -1.6;
+      return;
+    }
+    const ramp = Math.min(1, car.t / 0.4);
+    for (const p of [f, r]) if (p.A) {
+      const F = V.mass * G * 0.5 * ramp;
+      p.A.fy -= F * (1 - p.t); p.C.fy -= F * p.t;
+    }
+    car.ang = Math.atan2(f.y - r.y, f.x - r.x);
+    car.x = (f.x + r.x) / 2; car.y = (f.y + r.y) / 2;
+    const slope = Math.sin(car.ang);
+    car.v += (1.6 * (1 - car.v / V.vmax) - G * slope * 0.45) * dt;
+    if (car.v < 0.35) car.v = 0.35;
+    car.s += car.v * dt; car.wheel += car.v * dt;
+    if (car.s - V.wb > L.W + 0.6) { car.state = 'done'; car.arrived = true; }
+  } else if (car.state === 'fall') {
+    car.vy -= G * dt; car.x += car.vx * dt; car.y += car.vy * dt; car.ang += car.va * dt;
+    if (car.y < L.water + 0.3) { car.state = 'sunk'; }
+  } else if (car.state === 'done') {
+    car.v = Math.max(0, car.v - 2 * dt); car.s += car.v * dt; car.x = car.s - V.wb / 2; car.y = 0; car.ang = 0; car.wheel += car.v * dt;
+  }
+}
+function designCost(design) {
+  let c = 0;
+  for (const d of design) c += Math.hypot(d[2] - d[0], d[3] - d[1]) * MAT[d[4]].cost;
+  return Math.round(c / 10) * 10;
+}
+/*PHYS-END*/
+
+// ===== 文言 =====
+const T = {
+  ja: {
+    title: 'わたれ！木組み橋', sub: '谷に橋をかけて、車をわたらせよう',
+    how1: '点から指をのばすと木材を置ける', how2: '部材をタップで外す ／ ▶で車が走る',
+    start: 'タップでスタート', bridge: '橋', budget: '予算', go: 'わたらせる', back: '組みなおす', undo: 'もどす',
+    wood: '木材', steel: '鉄骨', over: '予算オーバー', tooLong: '4mまで', inRock: '岩の中',
+    ok: 'わたれた！', used: '使った材料', best: 'ベスト', newBest: 'ベスト更新！', next: 'タップで次へ',
+    fail: '橋がもたなかった…', failSink: '車が川に落ちた', failTap: 'タップで組みなおす',
+    broke: 'ここが折れた', all: '全部の橋をかけた！', allSub: '安く組めるか、もう一度挑戦しよう', again: 'タップで最初の橋へ',
+    load: '負荷', stars3: '★★★', total: '合計', unlock: '鉄骨が使えるようになった（強いが高い）',
+    sym: '対称', tipRoad: '道板が折れた。下か上から三角形で支えよう', tipWood: '赤い部材に力が集まった。三角形を足して分けよう', tipSteel: '折れた所だけ鉄骨にするのも手',
+  },
+  en: {
+    title: 'Cross It! Timber Bridge', sub: 'Span the gorge and get the car across',
+    how1: 'Drag from a joint to add timber', how2: 'Tap a beam to remove it / ▶ sends the car',
+    start: 'Tap to start', bridge: 'Bridge', budget: 'Budget', go: 'Send it', back: 'Rebuild', undo: 'Undo',
+    wood: 'Timber', steel: 'Steel', over: 'Over budget', tooLong: 'Max 4m', inRock: 'Inside rock',
+    ok: 'Made it!', used: 'Cost', best: 'Best', newBest: 'New best!', next: 'Tap to continue',
+    fail: 'The bridge gave way…', failSink: 'Into the river', failTap: 'Tap to rebuild',
+    broke: 'Broke here', all: 'Every gap is bridged!', allSub: 'Try again for cheaper bridges', again: 'Tap for bridge 1',
+    load: 'Load', stars3: '★★★', total: 'Total', unlock: 'Steel unlocked (strong but pricey)',
+    sym: 'Mirror', tipRoad: 'The road snapped. Brace it with triangles', tipWood: 'Force piled up there. Add triangles to share it', tipSteel: 'Or swap just that beam for steel',
+  },
+}[LANG === 'ja' ? 'ja' : 'en'];
+const NM = (o) => (LANG === 'ja' ? o.ja : o.en);
+
+// ===== 画面 =====
+const cv = document.getElementById('c'), cx = cv.getContext('2d');
+let CW = 360, CH = 640, DPR = 1;
+function resize() {
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  CW = Math.max(1, window.innerWidth || 360); CH = Math.max(1, window.innerHeight || 640);
+  cv.width = Math.round(CW * DPR); cv.height = Math.round(CH * DPR);
+  layoutView();
+}
+addEventListener('resize', resize);
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+const font = (px, w = 700) => `${w} ${px}px ${FONT}`;
+function fitText(txt, px, maxW, w = 700) {
+  cx.font = font(px, w);
+  let m = cx.measureText(txt).width;
+  if (m > maxW && m > 0) { px = Math.max(12, Math.floor(px * maxW / m)); cx.font = font(px, w); }
+  return px;
+}
+
+// ===== 状態 =====
+let mode = 'title'; // title / build / test / result / clear / all
+let lvl = 0, L = LEVELS[0];
+let design = [], history = [], mat = 'wood', mirror = true;
+let sim = null, car = null, graph = null;
+let save = { st: [], best: [], d: {} };
+let markBroke = []; // 前回折れた部材の座標
+let modeT = 0, hintT = 0, msg = '', msgT = 0, resultInfo = null, failKind = '';
+let view = { sc: 16, ox: 0, oy: 0 };
+let debris = [], splashes = [], dust = [];
+let unlockShown = false;
+let slowT = 0, shake = 0, confetti = [];
+
+addEventListener('message', (e) => {
+  if (e.data && e.data.agf === 'loaded' && e.data.data) {
+    const d = e.data.data;
+    save = { st: d.st || [], best: d.best || [], d: d.d || {} };
+    if (mode === 'title') { lvl = firstOpen(); setLevel(lvl, false); }
+  }
+});
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+function persist() { try { parent.postMessage({ agf: 'save', data: save }, '*'); } catch (e) {} }
+function firstOpen() { for (let i = 0; i < LEVELS.length; i++) if (!save.st[i]) return i; return 0; }
+function unlocked(i) { return i === 0 || !!save.st[i - 1] || !!save.st[i]; }
+
+function setLevel(i, keep = true) {
+  lvl = i; L = LEVELS[i];
+  design = (save.d[i] || []).map((d) => d.slice());
+  history = []; markBroke = []; mat = 'wood';
+  graph = buildGraph(L, design);
+  sim = null; car = null; debris = []; splashes = [];
+  layoutView();
+  hintT = 6;
+}
+function layoutView() {
+  if (!L) return;
+  const top = 74, bot = 104;
+  const availH = Math.max(50, CH - top - bot);
+  const wW = L.W + 5.5, yMin = L.water - 1.5, yMax = L.top;
+  const sc = Math.min(CW / wW, availH / (yMax - yMin));
+  view.sc = sc;
+  view.ox = CW / 2 - (L.W / 2) * sc;
+  view.oy = top + (availH - (yMax - yMin) * sc) / 2 + yMax * sc;
+}
+const WX = (x) => view.ox + x * view.sc, WY = (y) => view.oy - y * view.sc;
+const SX = (px) => (px - view.ox) / view.sc, SY = (py) => (view.oy - py) / view.sc;
+
+// ===== 音 =====
+let AC = null, master = null, river = null;
+function audio() {
+  if (!AC) {
+    try {
+      AC = new (window.AudioContext || window.webkitAudioContext)();
+      master = AC.createGain(); master.gain.value = 0.55; master.connect(AC.destination);
+      // 川のせせらぎ（とても小さく）
+      const len = AC.sampleRate * 2, buf = AC.createBuffer(1, len, AC.sampleRate), ch = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) ch[i] = Math.random() * 2 - 1;
+      const src = AC.createBufferSource(); src.buffer = buf; src.loop = true;
+      const lp = AC.createBiquadFilter(); lp.type = 'bandpass'; lp.frequency.value = 700; lp.Q.value = 0.6;
+      river = AC.createGain(); river.gain.value = 0.018;
+      src.connect(lp); lp.connect(river); river.connect(master); src.start();
+    } catch (e) { AC = null; }
+  }
+  if (AC && AC.state === 'suspended') { try { AC.resume(); } catch (e) {} }
+}
+let noiseBuf = null;
+function noise(dur, f, q, gain, type = 'bandpass', when = 0) {
+  if (!AC) return;
+  try {
+    if (!noiseBuf) { const n = AC.sampleRate; noiseBuf = AC.createBuffer(1, n, n); const c = noiseBuf.getChannelData(0); for (let i = 0; i < n; i++) c[i] = Math.random() * 2 - 1; }
+    const t = AC.currentTime + when, s = AC.createBufferSource(); s.buffer = noiseBuf;
+    const fl = AC.createBiquadFilter(); fl.type = type; fl.frequency.value = f; fl.Q.value = q;
+    const g = AC.createGain(); g.gain.setValueAtTime(gain, t); g.gain.exponentialRampToValueAtTime(0.0005, t + dur);
+    s.connect(fl); fl.connect(g); g.connect(master); s.start(t, Math.random() * 0.5); s.stop(t + dur + 0.05);
+  } catch (e) {}
+}
+function tone(f, dur, gain, type = 'sine', when = 0, f2 = 0) {
+  if (!AC) return;
+  try {
+    const t = AC.currentTime + when, o = AC.createOscillator(), g = AC.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(gain, t + 0.008); g.gain.exponentialRampToValueAtTime(0.0005, t + dur);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.05);
+  } catch (e) {}
+}
+const sKnock = (m) => { if (m === 'steel') { tone(880, 0.25, 0.08, 'triangle'); tone(1320, 0.18, 0.04, 'sine'); noise(0.03, 3000, 2, 0.08); } else { tone(210, 0.09, 0.22, 'sine', 0, 140); noise(0.035, 1400, 3, 0.2); } };
+const sDel = () => { tone(520, 0.12, 0.1, 'sine', 0, 260); };
+const sSnap = () => { noise(0.16, 2200, 0.7, 0.5, 'highpass'); tone(110, 0.25, 0.3, 'sine', 0, 50); noise(0.4, 500, 1, 0.12, 'bandpass', 0.03); };
+const sCreak = (v) => { noise(0.05 + Math.random() * 0.05, 300 + Math.random() * 500, 8, 0.05 + 0.1 * v); };
+const sSplash = () => { noise(0.9, 900, 0.5, 0.35, 'lowpass'); noise(0.5, 2500, 1, 0.12, 'bandpass', 0.1); };
+const sWin = () => { [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.35, 0.12, 'triangle', i * 0.09)); tone(1568, 0.5, 0.05, 'sine', 0.36); };
+const sFail = () => { tone(330, 0.3, 0.1, 'triangle', 0, 220); tone(220, 0.5, 0.1, 'triangle', 0.25, 150); };
+const sGo = (kind) => { if (kind === 'bike') { tone(2100, 0.5, 0.06, 'sine'); tone(2100, 0.5, 0.05, 'sine', 0.14); } else { tone(70, 0.35, 0.12, 'sawtooth', 0, 110); } };
+let engine = null;
+function engineOn(kind) {
+  if (!AC || kind === 'bike' || kind === 'cart') return;
+  try {
+    const o = AC.createOscillator(), f = AC.createBiquadFilter(), g = AC.createGain();
+    o.type = 'sawtooth'; o.frequency.value = 45; f.type = 'lowpass'; f.frequency.value = 260; g.gain.value = 0.0;
+    o.connect(f); f.connect(g); g.connect(master); o.start();
+    g.gain.linearRampToValueAtTime(0.05, AC.currentTime + 0.3);
+    engine = { o, g };
+  } catch (e) {}
+}
+function engineOff() { if (engine && AC) { try { engine.g.gain.linearRampToValueAtTime(0.0001, AC.currentTime + 0.25); engine.o.stop(AC.currentTime + 0.3); } catch (e) {} } engine = null; }
+
+// ===== 入力 =====
+const btn = {};
+let drag = null; // {from:joint index, x,y (screen), end:{x,y,valid,why,snap}}
+let press = null;
+cv.addEventListener('pointerdown', (e) => {
+  e.preventDefault(); audio();
+  const x = e.clientX, y = e.clientY;
+  try { cv.setPointerCapture(e.pointerId); } catch (er) {}
+  if (drag || press) return;
+  if (mode === 'title') { if (modeT > 0.3) { startLevel(lvl); } return; }
+  if (mode === 'result' || mode === 'clear' || mode === 'all') { if (modeT > 0.7) afterResult(); return; }
+  for (const k in btn) { const b = btn[k]; if (b && b.on && x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h) { press = { btn: k, id: e.pointerId }; return; } }
+  if (mode !== 'build') return;
+  // つなぎ目を探す
+  let best = -1, bd = Math.max(22, view.sc * 1.0);
+  graph.J.forEach((j, i) => { const d = Math.hypot(WX(j.x) - x, WY(j.y) - y); if (d < bd) { bd = d; best = i; } });
+  if (best >= 0) { drag = { id: e.pointerId, from: best, x, y, end: null }; updateDrag(x, y); return; }
+  press = { id: e.pointerId, beam: true, x, y };
+});
+cv.addEventListener('pointermove', (e) => {
+  if (drag && e.pointerId === drag.id) updateDrag(e.clientX, e.clientY);
+});
+function endPointer(e, cancel) {
+  if (drag && e.pointerId === drag.id) {
+    const d = drag; drag = null;
+    if (!cancel && d.end && d.end.valid) placeBeam(d);
+    else if (!cancel && d.end && d.end.why && d.end.len > 0.5) { msg = d.end.why; msgT = 1.6; tone(180, 0.12, 0.08, 'square'); }
+    return;
+  }
+  if (press && e.pointerId === press.id) {
+    const p = press; press = null;
+    if (cancel) return;
+    if (p.btn) { const b = btn[p.btn]; const x = e.clientX, y = e.clientY; if (b && b.on && x >= b.x - 10 && x <= b.x + b.w + 10 && y >= b.y - 10 && y <= b.y + b.h + 10) b.fn(); return; }
+    if (p.beam && Math.hypot(e.clientX - p.x, e.clientY - p.y) < 14) tapBeam(p.x, p.y);
+  }
+}
+cv.addEventListener('pointerup', (e) => endPointer(e, false));
+cv.addEventListener('pointercancel', (e) => endPointer(e, true));
+
+function insideRock(x, y) {
+  for (const poly of L.rocks(L)) {
+    let inside = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const [xi, yi] = poly[i], [xj, yj] = poly[j];
+      if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
+    }
+    if (inside) return true;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const [x1, y1] = poly[j], [x2, y2] = poly[i];
+      const dx = x2 - x1, dy = y2 - y1, l2 = dx * dx + dy * dy || 1;
+      const t = Math.max(0, Math.min(1, ((x - x1) * dx + (y - y1) * dy) / l2));
+      if (Math.hypot(x - x1 - dx * t, y - y1 - dy * t) < 0.3) return true;
+    }
+  }
+  return false;
+}
+function updateDrag(x, y) {
+  drag.x = x; drag.y = y;
+  const J = graph.J[drag.from], M = MAT[mat];
+  // 指の少し上を先端にする（指で隠れないように）
+  const fy = y - 34;
+  const wx = SX(x), wy = SY(fy);
+  let end = null;
+  // つなぎ目はすべて1mの格子の上にある。格子に丸めれば、既存のつなぎ目にも自然に合う
+  {
+    let gx = Math.round(wx), gy = Math.round(wy);
+    let len = Math.hypot(gx - J.x, gy - J.y);
+    if (len > M.max + 1e-6) {
+      // 方向にそって最大長に縮め、その近くの格子点で最大長以内のものを選ぶ
+      const dl = Math.hypot(wx - J.x, wy - J.y) || 1, tx = J.x + (wx - J.x) / dl * M.max, ty = J.y + (wy - J.y) / dl * M.max;
+      let bb = null, bdd = 1e9;
+      for (let ix = -2; ix <= 2; ix++) for (let iy = -2; iy <= 2; iy++) {
+        const px = Math.round(tx) + ix, py = Math.round(ty) + iy;
+        const l = Math.hypot(px - J.x, py - J.y); if (l > M.max + 1e-6 || l < 0.9) continue;
+        const dd = Math.hypot(px - tx, py - ty); if (dd < bdd) { bdd = dd; bb = [px, py]; }
+      }
+      if (bb) { gx = bb[0]; gy = bb[1]; }
+    }
+    end = { x: gx, y: gy, snap: -1 };
+  }
+  if (graph.key.has(end.x + ',' + end.y)) end.snap = graph.key.get(end.x + ',' + end.y);
+  const len = Math.hypot(end.x - J.x, end.y - J.y);
+  end.len = len; end.valid = true; end.why = '';
+  if (len < 0.9) { end.valid = false; }
+  else if (len > M.max + 1e-6) { end.valid = false; end.why = T.tooLong; }
+  else if (end.snap < 0 && insideRock(end.x, end.y)) { end.valid = false; end.why = T.inRock; }
+  else if (graph.B.some((b) => b.m !== 'road' && ((b.a === drag.from && b.b === end.snap) || (b.b === drag.from && b.a === end.snap)))) { end.valid = false; }
+  else {
+    const mm = mirrorNeeded([J.x, J.y, end.x, end.y, mat]);
+    end.mirror = mm;
+    const add = Math.round(len * M.cost / 10) * 10 * (end.mirror ? 2 : 1);
+    if (designCost(design) + add > L.budget) {
+      if (end.mirror && designCost(design) + add / 2 <= L.budget) end.mirror = null;
+      else { end.valid = false; end.why = T.over; }
+    }
+  }
+  drag.end = end;
+}
+const mirrorOf = (d) => [L.W - d[0], d[1], L.W - d[2], d[3], d[4]];
+const sameBeam = (a, b) => (a[0] === b[0] && a[1] === b[1] && a[2] === b[2] && a[3] === b[3]) || (a[0] === b[2] && a[1] === b[3] && a[2] === b[0] && a[3] === b[1]);
+function mirrorNeeded(d) { if (!mirror) return null; const m = mirrorOf(d); if (sameBeam(m, d)) return null; if (design.some((x) => x[4] !== 'road' && sameBeam(x, m))) return null; return m; }
+function snapshot() { history.push(design.map((d) => d.slice())); if (history.length > 60) history.shift(); }
+function commitDesign() { graph = buildGraph(L, design); save.d[lvl] = design; }
+function placeBeam(d) {
+  const J = graph.J[d.from], e = d.end;
+  snapshot();
+  design.push([J.x, J.y, e.x, e.y, mat]);
+  if (e.mirror) design.push(e.mirror);
+  commitDesign();
+  sKnock(mat);
+  const b = { x: (J.x + e.x) / 2, y: (J.y + e.y) / 2 };
+  for (let i = 0; i < 5; i++) dust.push({ x: e.x, y: e.y, vx: (Math.random() - 0.5) * 2, vy: Math.random() * 1.5, t: 0.5 });
+  void b;
+}
+function tapBeam(x, y) {
+  let best = -1, bd = 16;
+  design.forEach((d, i) => {
+    const x1 = WX(d[0]), y1 = WY(d[1]), x2 = WX(d[2]), y2 = WY(d[3]);
+    const dx = x2 - x1, dy = y2 - y1, l2 = dx * dx + dy * dy || 1;
+    const t = Math.max(0, Math.min(1, ((x - x1) * dx + (y - y1) * dy) / l2));
+    const dd = Math.hypot(x - x1 - dx * t, y - y1 - dy * t); if (dd < bd) { bd = dd; best = i; }
+  });
+  if (best >= 0) {
+    snapshot();
+    const d = design[best];
+    design.splice(best, 1);
+    if (mirror) { const m = mirrorOf(d); const j = design.findIndex((x) => sameBeam(x, m)); if (j >= 0) design.splice(j, 1); }
+    commitDesign(); sDel();
+  }
+}
+function undo() { if (!history.length) return; design = history.pop(); commitDesign(); sDel(); }
+
+function startLevel(i) {
+  setLevel(i);
+  mode = 'build'; modeT = 0;
+  signal('start');
+  if (L.steel && !save.st[3] && !unlockShown) { unlockShown = true; msg = T.unlock; msgT = 3.5; }
+}
+function startTest() {
+  if (mode !== 'build') return;
+  sim = makeSim(L, design); car = makeCar(L);
+  mode = 'test'; modeT = 0; debris = []; splashes = []; failKind = '';
+  sGo(L.veh.kind); engineOn(L.veh.kind);
+  hintT = 0;
+}
+function stopTest() {
+  engineOff();
+  if (sim) markBroke = sim.breaks.slice(0, 3).map((e) => { const A = graph.J[e.a], C = graph.J[e.b]; return [A.x, A.y, C.x, C.y]; });
+  sim = null; car = null; mode = 'build'; modeT = 0; debris = [];
+}
+function finishTest(ok) {
+  engineOff();
+  const cost = designCost(design);
+  if (ok) {
+    const stars = 1 + (cost <= L.stars[0] ? 1 : 0) + (cost <= L.stars[1] ? 1 : 0);
+    const prevBest = save.best[lvl];
+    const nb = prevBest === undefined || cost < prevBest;
+    save.st[lvl] = Math.max(save.st[lvl] || 0, stars);
+    if (nb) save.best[lvl] = cost;
+    persist();
+    resultInfo = { cost, stars, best: save.best[lvl], nb, peak: sim.E.reduce((m, e) => Math.max(m, e.broken ? 0 : e.peak), 0) };
+    sWin();
+    const cols = ['#ffd23f', '#ff6b6b', '#4ecdc4', '#7ee07a', '#f7a1ff', '#fff'];
+    for (let i = 0; i < 80; i++) confetti.push({ x: CW * Math.random(), y: -10 - Math.random() * 120, vx: (Math.random() - 0.5) * 120, vy: Math.random() * 80, a: Math.random() * 6, va: (Math.random() - 0.5) * 12, c: cols[i % cols.length], t: 0 });
+    mode = 'clear'; modeT = 0;
+    signal('end', { score: save.st.reduce((a, b) => a + (b || 0), 0) });
+  } else {
+    sFail();
+    resultInfo = { firstBreak: sim.breaks[0] ? sim.breaks[0].m : '' };
+    persist();
+    mode = 'result'; modeT = 0;
+    signal('end', { score: save.st.reduce((a, b) => a + (b || 0), 0) });
+  }
+}
+function afterResult() {
+  if (mode === 'result') { stopTest(); return; }
+  if (mode === 'clear') {
+    sim = null; car = null;
+    if (lvl + 1 < LEVELS.length) { startLevel(lvl + 1); }
+    else { mode = 'all'; modeT = 0; }
+    return;
+  }
+  if (mode === 'all') { startLevel(0); }
+}
+
+// ===== 更新 =====
+let last = 0, acc = 0, creakT = 0;
+function update(dt) {
+  modeT += dt; if (hintT > 0) hintT -= dt; if (msgT > 0) msgT -= dt;
+  for (const p of dust) { p.t -= dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy -= 4 * dt; }
+  dust = dust.filter((p) => p.t > 0);
+  for (const s of splashes) s.t += dt;
+  shake *= Math.exp(-8 * dt);
+  for (const c of confetti) { c.t += dt; c.vy += 260 * dt; c.vx *= 0.99; c.x += c.vx * dt; c.y += c.vy * dt; c.a += c.va * dt; }
+  confetti = confetti.filter((c) => c.t < 3 && c.y < CH + 20);
+  splashes = splashes.filter((s) => s.t < 1.5);
+  for (const d of debris) {
+    d.vy -= G * dt; d.x += d.vx * dt; d.y += d.vy * dt; d.a += d.va * dt;
+    if (!d.wet && d.y < L.water) { d.wet = true; d.vy *= 0.1; d.vx *= 0.3; d.va *= 0.3; splashes.push({ x: d.x, t: 0, s: 0.6 }); }
+    if (d.wet) { d.vy = Math.max(d.vy, -0.4); d.vy += (L.water - d.y) * 3 * dt; d.vx *= 0.98; }
+  }
+  if (mode === 'test' || (mode === 'result' && sim) || (mode === 'clear' && sim)) {
+    if (slowT > 0) slowT -= dt;
+    acc += dt * (slowT > 0 ? 0.3 : 1);
+    while (acc >= 1 / 60) {
+      acc -= 1 / 60;
+      const nb = sim.breaks.length;
+      if (mode === 'test' && modeT > 0.9) stepCar(sim, car, 1 / 60);
+      else if (car && car.state !== 'drive') stepCar(sim, car, 1 / 60);
+      else for (const n of sim.N) { n.fx = 0; n.fy = 0; }
+      stepSim(sim, 1 / 60, 40);
+      for (let i = nb; i < sim.breaks.length; i++) {
+        const e = sim.breaks[i], A = sim.N[e.a], C = sim.N[e.b];
+        sSnap();
+        const mx = (A.x + C.x) / 2, my = (A.y + C.y) / 2, ang = Math.atan2(C.y - A.y, C.x - A.x);
+        for (let h = 0; h < 2; h++) {
+          const s = h ? 1 : -1;
+          debris.push({ x: mx + s * Math.cos(ang) * e.r / 4, y: my + s * Math.sin(ang) * e.r / 4, vx: (A.vx + C.vx) / 2 + s * 0.6, vy: 1.2, a: ang, va: s * 2.5, len: e.r / 2, m: e.m, wet: false, fade: 1 });
+        }
+        e.hide = true;
+        if (sim.breaks.length === 1 && mode === 'test') slowT = 1.3;
+        shake = Math.min(10, shake + 6);
+        for (let k = 0; k < 8; k++) dust.push({ x: mx, y: my, vx: (Math.random() - 0.5) * 4, vy: Math.random() * 3, t: 0.6 });
+      }
+    }
+    if (mode === 'test') {
+      creakT -= dt;
+      if (sim.maxLoad > 0.55 && creakT <= 0) { sCreak(sim.maxLoad); creakT = 0.25 + Math.random() * 0.5 * (1.5 - sim.maxLoad); }
+      if (engine && car) { try { engine.o.frequency.setTargetAtTime(40 + car.v * 18, AC.currentTime, 0.1); } catch (e) {} }
+      if (car.state === 'sunk' && !car.splashed) { car.splashed = true; sSplash(); splashes.push({ x: car.x, t: 0, s: 1.6 }); failKind = 'sink'; }
+      if (car.splashed && car.t > 0) { car.sinkT = (car.sinkT || 0) + dt; if (car.sinkT > 1.0) finishTest(false); }
+      if (car.arrived && !car.honked) { car.honked = true; if (L.veh.kind === 'bike') { tone(2100, 0.4, 0.06); tone(2100, 0.4, 0.05, 'sine', 0.12); } else { tone(392, 0.18, 0.07, 'square'); tone(494, 0.25, 0.07, 'square', 0.2); } }
+      if (car.state === 'done' && car.v < 0.3) finishTest(true);
+      if (modeT > 40) finishTest(false);
+      if (car.state === 'fall' && car.y < L.water - 3) { car.state = 'sunk'; }
+    }
+    if (car && car.state === 'sunk') car.y = Math.max(car.y - 0.6 * dt, L.water - 2.5);
+  }
+}
+
+// ===== 描画 =====
+const SKY = [
+  ['#9fd3f0', '#e8f4e0'], ['#f7c98b', '#fbe9c9'], ['#7fb1e0', '#cfe3ee'], ['#5c6fa8', '#c3a6c9'], ['#ff9a6b', '#ffd59e'], ['#283a6b', '#7d6aa8'],
+];
+function drawBG(t) {
+  const sk = SKY[L.sky];
+  const g = cx.createLinearGradient(0, 0, 0, CH);
+  g.addColorStop(0, sk[0]); g.addColorStop(1, sk[1]);
+  cx.fillStyle = g; cx.fillRect(0, 0, CW, CH);
+  // 遠くの山
+  cx.fillStyle = 'rgba(70,90,110,0.18)';
+  cx.beginPath(); cx.moveTo(0, WY(L.water + 2));
+  for (let i = 0; i <= 12; i++) { const x = i / 12 * CW; cx.lineTo(x, WY(L.water + 2) - (Math.sin(i * 1.7 + L.sky) * 0.5 + 0.8) * view.sc * 4 - 40); }
+  cx.lineTo(CW, WY(L.water + 2)); cx.closePath(); cx.fill();
+  if (L.sky === 5) { cx.fillStyle = 'rgba(255,255,230,0.8)'; for (let i = 0; i < 30; i++) { cx.fillRect((i * 97.3) % CW, (i * 53.1) % (CH * 0.4), 1.5, 1.5); } }
+  // 川
+  const wy = WY(L.water);
+  const wg = cx.createLinearGradient(0, wy, 0, CH);
+  wg.addColorStop(0, '#4f8fb3'); wg.addColorStop(1, '#1f4a66');
+  cx.fillStyle = wg; cx.fillRect(0, wy, CW, CH - wy);
+  cx.strokeStyle = 'rgba(255,255,255,0.35)'; cx.lineWidth = 1.5;
+  for (let i = 0; i < 9; i++) {
+    const y = wy + 6 + i * 9, off = (t * 18 * (1 + i * 0.15) + i * 40) % 60;
+    cx.beginPath();
+    for (let x = -60 + off; x < CW; x += 60) { cx.moveTo(x, y); cx.lineTo(x + 18, y); }
+    cx.stroke();
+  }
+  // 岩
+  for (const poly of L.rocks(L)) {
+    cx.beginPath(); poly.forEach((p, i) => (i ? cx.lineTo(WX(p[0]), WY(p[1])) : cx.moveTo(WX(p[0]), WY(p[1])))); cx.closePath();
+    const rg = cx.createLinearGradient(0, WY(L.top), 0, WY(L.water));
+    rg.addColorStop(0, '#8a6f55'); rg.addColorStop(1, '#5a4636');
+    cx.fillStyle = rg; cx.fill();
+    cx.save(); cx.clip();
+    cx.strokeStyle = 'rgba(40,25,15,0.22)'; cx.lineWidth = 2;
+    for (let yy = Math.floor(L.water) - 6; yy < L.top + 3; yy += 1.3) { cx.beginPath(); cx.moveTo(0, WY(yy)); for (let x = 0; x <= CW; x += 30) cx.lineTo(x, WY(yy + Math.sin(x * 0.05 + yy) * 0.15)); cx.stroke(); }
+    cx.restore();
+    // 草
+    cx.strokeStyle = '#6b9a4a'; cx.lineWidth = 4; cx.lineJoin = 'round';
+    cx.beginPath();
+    for (let i = 0; i < poly.length; i++) { const p = poly[i], q = poly[(i + 1) % poly.length]; if (Math.abs(p[1] - q[1]) < 1e-6 && p[0] < q[0] && Math.abs(p[1] - L.water) > 3) { cx.moveTo(WX(p[0]), WY(p[1]) + 1); cx.lineTo(WX(q[0]), WY(q[1]) + 1); } }
+    cx.stroke();
+  }
+  // 地面の道
+  cx.fillStyle = '#4a4a52';
+  cx.fillRect(0, WY(0) - 3, WX(0), 6); cx.fillRect(WX(L.W), WY(0) - 3, CW - WX(L.W), 6);
+}
+function centerLine() {
+  if (!mirror) return;
+  cx.strokeStyle = 'rgba(63,127,191,0.35)'; cx.lineWidth = 1.5; cx.setLineDash([6, 6]);
+  cx.beginPath(); cx.moveTo(WX(L.W / 2), WY(L.top)); cx.lineTo(WX(L.W / 2), WY(L.water)); cx.stroke(); cx.setLineDash([]);
+}
+function grid() {
+  cx.fillStyle = 'rgba(255,255,255,0.35)';
+  const x0 = Math.floor(SX(0)), x1 = Math.ceil(SX(CW)), y0 = Math.floor(SY(CH - 100)), y1 = Math.ceil(SY(74));
+  for (let x = x0; x <= x1; x++) for (let y = y0; y <= y1; y++) {
+    if (y < L.water) continue;
+    cx.fillRect(WX(x) - 1, WY(y) - 1, 2, 2);
+  }
+}
+function beamColor(m, load) {
+  const base = m === 'road' ? [74, 74, 84] : m === 'steel' ? [130, 150, 172] : [196, 140, 84];
+  if (load === undefined) return `rgb(${base})`;
+  const l = Math.min(1, load);
+  let c;
+  if (l < 0.5) { const k = l / 0.5; c = base.map((v, i) => v + ([235, 200, 60][i] - v) * k * 0.7); }
+  else { const k = (l - 0.5) / 0.5; const y = base.map((v, i) => v + ([235, 200, 60][i] - v) * 0.7); c = y.map((v, i) => v + ([230, 40, 30][i] - v) * k); }
+  return `rgb(${c.map(Math.round)})`;
+}
+function drawBeam(x1, y1, x2, y2, m, load, alpha = 1) {
+  const w = m === 'road' ? Math.max(5, view.sc * 0.38) : Math.max(4, view.sc * 0.26);
+  cx.globalAlpha = alpha;
+  cx.lineCap = 'round';
+  cx.strokeStyle = 'rgba(30,20,10,0.55)'; cx.lineWidth = w + 2.5;
+  cx.beginPath(); cx.moveTo(x1, y1); cx.lineTo(x2, y2); cx.stroke();
+  cx.strokeStyle = beamColor(m, load); cx.lineWidth = w;
+  cx.beginPath(); cx.moveTo(x1, y1); cx.lineTo(x2, y2); cx.stroke();
+  if (m === 'road') {
+    cx.strokeStyle = 'rgba(255,220,90,0.7)'; cx.lineWidth = 1.2; cx.setLineDash([4, 5]);
+    cx.beginPath(); cx.moveTo(x1, y1); cx.lineTo(x2, y2); cx.stroke(); cx.setLineDash([]);
+  } else if (m === 'wood') {
+    cx.strokeStyle = 'rgba(255,240,210,0.35)'; cx.lineWidth = 1;
+    cx.beginPath(); cx.moveTo(x1, y1 - w * 0.2); cx.lineTo(x2, y2 - w * 0.2); cx.stroke();
+  }
+  cx.globalAlpha = 1;
+}
+function drawJoint(x, y, kind, hot) {
+  const r = Math.max(4, view.sc * 0.22);
+  if (kind === 'anchor') {
+    cx.fillStyle = '#3b2f28'; cx.fillRect(x - r - 2, y - r - 2, (r + 2) * 2, (r + 2) * 2);
+    cx.fillStyle = hot ? '#fff27a' : '#ffc93c'; cx.fillRect(x - r, y - r, r * 2, r * 2);
+    cx.fillStyle = '#3b2f28'; cx.beginPath(); cx.arc(x, y, r * 0.35, 0, 7); cx.fill();
+  } else {
+    cx.fillStyle = '#3b2f28'; cx.beginPath(); cx.arc(x, y, r + 1.5, 0, 7); cx.fill();
+    cx.fillStyle = hot ? '#fff27a' : (kind === 'deck' ? '#ffc93c' : '#f3e2c4'); cx.beginPath(); cx.arc(x, y, r, 0, 7); cx.fill();
+  }
+}
+const alongDeck = (d) => !!d && d[1] === 0 && d[3] === 0 && d[0] >= 0 && d[2] >= 0 && d[0] <= L.W && d[2] <= L.W;
+function drawBridgeBuild(t) {
+  const off = Math.max(5, view.sc * 0.38) * 0.75;
+  graph.B.forEach((b) => { if (!alongDeck(b.d)) return; const A = graph.J[b.a], C = graph.J[b.b]; drawBeam(WX(A.x), WY(A.y) + off, WX(C.x), WY(C.y) + off, b.m); });
+  graph.B.forEach((b) => { if (alongDeck(b.d)) return; const A = graph.J[b.a], C = graph.J[b.b]; drawBeam(WX(A.x), WY(A.y), WX(C.x), WY(C.y), b.m); });
+  // 前回折れたところ
+  for (const m of markBroke) {
+    const x1 = WX(m[0]), y1 = WY(m[1]), x2 = WX(m[2]), y2 = WY(m[3]);
+    cx.strokeStyle = `rgba(255,40,30,${0.45 + 0.35 * Math.sin(t * 6)})`; cx.lineWidth = Math.max(10, view.sc * 0.7); cx.lineCap = 'round';
+    cx.beginPath(); cx.moveTo(x1, y1); cx.lineTo(x2, y2); cx.stroke();
+  }
+  if (markBroke.length) {
+    const m = markBroke[0], x = WX((m[0] + m[2]) / 2), y = WY((m[1] + m[3]) / 2);
+    cx.font = font(12); const tw = cx.measureText(T.broke).width + 12;
+    const bx = Math.max(4, Math.min(CW - tw - 4, x - tw / 2)), by = y - 34;
+    cx.fillStyle = 'rgba(200,30,20,0.9)'; roundRect(bx, by, tw, 20, 6); cx.fill();
+    cx.fillStyle = '#fff'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillText(T.broke, bx + tw / 2, by + 10);
+  }
+  const fromIdx = drag ? drag.from : -1;
+  graph.J.forEach((j, i) => drawJoint(WX(j.x), WY(j.y), j.kind, i === fromIdx || (drag && drag.end && drag.end.snap === i)));
+  if (drag && drag.end) {
+    const J = graph.J[drag.from], e = drag.end;
+    const x1 = WX(J.x), y1 = WY(J.y), x2 = WX(e.x), y2 = WY(e.y);
+    if (e.len >= 0.9) {
+      drawBeam(x1, y1, x2, y2, mat, undefined, e.valid ? 0.8 : 0.45);
+      if (!e.valid) { cx.strokeStyle = 'rgba(230,40,30,0.9)'; cx.lineWidth = 2; cx.setLineDash([5, 4]); cx.beginPath(); cx.moveTo(x1, y1); cx.lineTo(x2, y2); cx.stroke(); cx.setLineDash([]); }
+      drawJoint(x2, y2, e.snap >= 0 ? graph.J[e.snap].kind : 'user', true);
+      if (e.valid && e.mirror) { const m = e.mirror; drawBeam(WX(m[0]), WY(m[1]), WX(m[2]), WY(m[3]), mat, undefined, 0.4); }
+      // 長さと値段
+      const price = Math.round(e.len * MAT[mat].cost / 10) * 10;
+      const lab = e.valid ? `${e.len.toFixed(1)}m  ¥${price.toLocaleString()}` : (e.why || `${e.len.toFixed(1)}m`);
+      cx.font = font(13); const tw = cx.measureText(lab).width + 14;
+      const bx = Math.max(4, Math.min(CW - tw - 4, x2 - tw / 2)), by = Math.max(78, y2 - 40);
+      cx.fillStyle = e.valid ? 'rgba(30,30,40,0.82)' : 'rgba(190,30,20,0.9)'; roundRect(bx, by, tw, 22, 7); cx.fill();
+      cx.fillStyle = '#fff'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillText(lab, bx + tw / 2, by + 11);
+    }
+    // 指の位置の輪
+    cx.strokeStyle = 'rgba(255,255,255,0.5)'; cx.lineWidth = 2; cx.beginPath(); cx.arc(drag.x, drag.y, 16, 0, 7); cx.stroke();
+  }
+}
+function drawBridgeSim() {
+  const off = Math.max(5, view.sc * 0.38) * 0.75;
+  for (const pass of [true, false]) sim.E.forEach((e) => {
+    if (e.broken || alongDeck(e.d) !== pass) return;
+    const A = sim.N[e.a], C = sim.N[e.b];
+    const nx = -(C.y - A.y), ny = C.x - A.x, nl = Math.hypot(nx, ny) || 1, o = pass ? off : 0;
+    drawBeam(WX(A.x) - nx / nl * o * 0, WY(A.y) + o, WX(C.x), WY(C.y) + o, e.m, e.load);
+  });
+  for (const d of debris) {
+    const c = Math.cos(d.a) * d.len / 2, s = Math.sin(d.a) * d.len / 2;
+    drawBeam(WX(d.x - c), WY(d.y - s), WX(d.x + c), WY(d.y + s), d.m, 1.0, d.wet ? 0.6 : 1);
+  }
+  sim.N.forEach((n, i) => { const kind = graph.J[i] ? graph.J[i].kind : 'user'; drawJoint(WX(n.x), WY(n.y), kind, false); });
+}
+function drawCar() {
+  if (!car) return;
+  const V = L.veh, sc = view.sc;
+  let x, y, ang = car.ang;
+  if (car.state === 'drive' || car.state === 'done') {
+    const f = carPoint(sim, car.s), r = carPoint(sim, car.s - V.wb);
+    if (f.ok && r.ok) { x = (f.x + r.x) / 2; y = (f.y + r.y) / 2; ang = Math.atan2(f.y - r.y, f.x - r.x); } else { x = car.x; y = car.y; }
+  } else { x = car.x; y = car.y; }
+  cx.save();
+  cx.translate(WX(x), WY(y)); cx.rotate(-ang);
+  const u = sc; // 1m
+  const wb = V.wb * u, wr = { bike: 0.34, cart: 0.32, kei: 0.3, bus: 0.42, truck: 0.45 }[V.kind] * u;
+  const roadOff = Math.max(5, sc * 0.38) / 2;
+  const wy = -roadOff - wr;
+  const wheel = (wx) => {
+    cx.fillStyle = '#222'; cx.beginPath(); cx.arc(wx, wy, wr, 0, 7); cx.fill();
+    cx.fillStyle = '#bbb'; cx.beginPath(); cx.arc(wx, wy, wr * 0.45, 0, 7); cx.fill();
+    const a = -car.wheel / (wr / u);
+    cx.strokeStyle = '#555'; cx.lineWidth = 1.5; cx.beginPath(); cx.moveTo(wx, wy); cx.lineTo(wx + Math.cos(a) * wr * 0.9, wy + Math.sin(a) * wr * 0.9); cx.stroke();
+  };
+  if (V.kind === 'bike') {
+    wheel(-wb / 2); wheel(wb / 2);
+    cx.strokeStyle = '#d63b3b'; cx.lineWidth = 2.5; cx.lineJoin = 'round';
+    cx.beginPath(); cx.moveTo(-wb / 2, wy); cx.lineTo(-wb * 0.05, wy); cx.lineTo(wb * 0.3, wy - wr * 1.4); cx.lineTo(-wb * 0.15, wy - wr * 1.4); cx.closePath(); cx.stroke();
+    cx.beginPath(); cx.moveTo(wb / 2, wy); cx.lineTo(wb * 0.3, wy - wr * 1.4); cx.lineTo(wb * 0.32, wy - wr * 2); cx.stroke();
+    // 人
+    cx.strokeStyle = '#2b3a67'; cx.lineWidth = 3;
+    cx.beginPath(); cx.moveTo(-wb * 0.12, wy - wr * 1.5); cx.lineTo(wb * 0.05, wy - wr * 3.1); cx.lineTo(wb * 0.3, wy - wr * 2.1); cx.stroke();
+    cx.fillStyle = '#f2c9a0'; cx.beginPath(); cx.arc(wb * 0.1, wy - wr * 3.6, wr * 0.55, 0, 7); cx.fill();
+    cx.fillStyle = '#ffd23f'; cx.beginPath(); cx.arc(wb * 0.1, wy - wr * 3.75, wr * 0.58, Math.PI, 0); cx.fill();
+  } else if (V.kind === 'cart') {
+    cx.fillStyle = '#8b5a2b'; cx.fillRect(-wb * 0.75, wy - wr * 2.2, wb * 1.2, wr * 1.6);
+    cx.fillStyle = '#c98a4b'; cx.fillRect(-wb * 0.7, wy - wr * 3.2, wb * 0.5, wr * 1.1); cx.fillStyle = '#e8b04a'; cx.fillRect(-wb * 0.15, wy - wr * 2.9, wb * 0.45, wr * 0.8);
+    cx.strokeStyle = '#5b3a1c'; cx.lineWidth = 2; cx.beginPath(); cx.moveTo(wb * 0.45, wy - wr * 1.6); cx.lineTo(wb * 0.75, wy - wr * 2.2); cx.stroke();
+    // 引く人
+    cx.strokeStyle = '#3a6b3a'; cx.lineWidth = 3; cx.beginPath(); cx.moveTo(wb * 0.75, wy + wr); cx.lineTo(wb * 0.8, wy - wr * 2.4); cx.stroke();
+    cx.fillStyle = '#f2c9a0'; cx.beginPath(); cx.arc(wb * 0.82, wy - wr * 3.1, wr * 0.6, 0, 7); cx.fill();
+    wheel(-wb / 2); wheel(wb * 0.2);
+  } else {
+    const col = { kei: '#f4f1ea', bus: '#e85d3a', truck: '#3a7bd5' }[V.kind];
+    const h = { kei: 1.0, bus: 2.1, truck: 1.6 }[V.kind] * u;
+    const L0 = -wb / 2 - wr * 1.4, L1 = wb / 2 + wr * 1.4;
+    cx.fillStyle = col; cx.strokeStyle = '#333'; cx.lineWidth = 1.5;
+    if (V.kind === 'kei') {
+      const cw = (L1 - L0) * 0.4, c0 = L1 - cw;
+      roundRect(c0, wy - h, cw, h, 4); cx.fill(); cx.stroke();
+      cx.fillStyle = '#9fd0ea'; roundRect(c0 + 4, wy - h + 3, cw - 7, h * 0.4, 2); cx.fill();
+      cx.fillStyle = '#ddd8cc'; cx.fillRect(L0, wy - h * 0.55, (L1 - L0) * 0.6, h * 0.45); cx.strokeRect(L0, wy - h * 0.55, (L1 - L0) * 0.6, h * 0.45);
+      cx.fillStyle = '#c0412f'; cx.fillRect(L0 + (L1 - L0) * 0.08, wy - h * 0.95, (L1 - L0) * 0.4, h * 0.4);
+    } else if (V.kind === 'bus') {
+      roundRect(L0, wy - h, L1 - L0, h * 0.95, 6); cx.fill(); cx.stroke();
+      cx.fillStyle = '#fff6d6'; cx.fillRect(L0, wy - h * 0.45, L1 - L0, h * 0.12);
+      cx.fillStyle = '#9fd0ea';
+      for (let i = 0; i < 5; i++) cx.fillRect(L0 + 4 + i * (L1 - L0 - 8) / 5, wy - h * 0.88, (L1 - L0 - 8) / 5 - 3, h * 0.35);
+    } else {
+      cx.fillStyle = '#e9e4d8'; roundRect(L0, wy - h, (L1 - L0) * 0.68, h * 0.9, 3); cx.fill(); cx.stroke();
+      cx.fillStyle = col; roundRect(L0 + (L1 - L0) * 0.7, wy - h * 0.8, (L1 - L0) * 0.3, h * 0.7, 5); cx.fill(); cx.stroke();
+      cx.fillStyle = '#9fd0ea'; cx.fillRect(L0 + (L1 - L0) * 0.78, wy - h * 0.72, (L1 - L0) * 0.17, h * 0.28);
+    }
+    wheel(-wb / 2); wheel(wb / 2);
+  }
+  cx.restore();
+}
+function drawFX() {
+  for (const p of dust) { cx.fillStyle = `rgba(240,220,180,${p.t / 0.6})`; cx.fillRect(WX(p.x) - 2, WY(p.y) - 2, 3, 3); }
+  for (const s of splashes) {
+    const k = s.t / 1.5, x = WX(s.x), y = WY(L.water);
+    cx.strokeStyle = `rgba(255,255,255,${0.8 * (1 - k)})`; cx.lineWidth = 2;
+    cx.beginPath(); cx.ellipse(x, y + 2, (10 + 60 * k) * s.s, (3 + 10 * k) * s.s, 0, 0, 7); cx.stroke();
+    if (s.t < 0.6) { cx.fillStyle = `rgba(255,255,255,${0.9 - s.t})`; for (let i = 0; i < 7; i++) { const a = -Math.PI * (0.15 + 0.7 * i / 6); const r = s.t * 80 * s.s; cx.beginPath(); cx.arc(x + Math.cos(a) * r, y + Math.sin(a) * r * 1.2 + s.t * s.t * 200, 3 * s.s, 0, 7); cx.fill(); } }
+  }
+}
+function roundRect(x, y, w, h, r) { cx.beginPath(); cx.moveTo(x + r, y); cx.arcTo(x + w, y, x + w, y + h, r); cx.arcTo(x + w, y + h, x, y + h, r); cx.arcTo(x, y + h, x, y, r); cx.arcTo(x, y, x + w, y, r); cx.closePath(); }
+function button(key, x, y, w, h, label, col, on = true, fn) {
+  btn[key] = { x, y, w, h, on, fn };
+  const pr = press && press.btn === key;
+  cx.globalAlpha = on ? 1 : 0.4;
+  cx.fillStyle = 'rgba(0,0,0,0.25)'; roundRect(x, y + 3, w, h, 12); cx.fill();
+  cx.fillStyle = col; roundRect(x, y + (pr ? 2 : 0), w, h, 12); cx.fill();
+  const px = fitText(label, label.length === 1 ? 28 : 17, w - 12);
+  cx.fillStyle = '#fff'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.font = font(px);
+  cx.fillText(label, x + w / 2, y + h / 2 + (pr ? 2 : 0));
+  cx.globalAlpha = 1;
+}
+function smallBtn(key, x, y, w, h, label, on, fn) {
+  btn[key] = { x, y, w, h, on, fn };
+  cx.globalAlpha = on ? 1 : 0.25;
+  cx.fillStyle = press && press.btn === key ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.14)'; roundRect(x, y, w, h, 10); cx.fill();
+  cx.fillStyle = '#fff'; cx.font = font(16); cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillText(label, x + w / 2, y + h / 2);
+  cx.globalAlpha = 1;
+}
+function hud() {
+  // 上の帯
+  cx.fillStyle = 'rgba(20,24,36,0.72)'; cx.fillRect(0, 0, CW, 66);
+  cx.textBaseline = 'middle'; cx.textAlign = 'left';
+  let tx0 = 12;
+  if (mode === 'build') {
+    const can = (i) => i >= 0 && i < LEVELS.length && unlocked(i);
+    smallBtn('prev', 4, 8, 40, 50, '◀', can(lvl - 1), () => startLevel(lvl - 1));
+    smallBtn('next', 46, 8, 40, 50, '▶', can(lvl + 1), () => startLevel(lvl + 1));
+    tx0 = 94;
+  } else btn.prev = btn.next = null;
+  cx.textAlign = 'left'; cx.textBaseline = 'middle';
+  cx.fillStyle = '#ffd36b'; cx.font = font(14);
+  const st = save.st[lvl] || 0;
+  cx.fillText(`${T.bridge} ${lvl + 1}/${LEVELS.length}  ${'★'.repeat(st)}${'☆'.repeat(3 - st)}`, tx0, 20);
+  cx.fillStyle = '#fff'; const nm = NM(L.name); fitText(nm, 17, CW - 175 - tx0); cx.fillText(nm, tx0, 45);
+  // 予算
+  const cost = designCost(design), bw = Math.min(150, CW * 0.4), bx = CW - bw - 12;
+  cx.textAlign = 'right'; cx.font = font(14); cx.fillStyle = cost > L.budget ? '#ff7a6b' : '#fff';
+  cx.fillText(`¥${cost.toLocaleString()} / ¥${L.budget.toLocaleString()}`, CW - 12, 18);
+  cx.fillStyle = 'rgba(255,255,255,0.18)'; cx.fillRect(bx, 32, bw, 8);
+  const k = Math.min(1, cost / L.budget);
+  cx.fillStyle = cost <= L.stars[1] ? '#7ee07a' : cost <= L.stars[0] ? '#ffd36b' : '#ff9a6b'; cx.fillRect(bx, 32, bw * k, 8);
+  for (const th of L.stars) { const tx = bx + bw * th / L.budget; cx.fillStyle = '#fff'; cx.fillRect(tx - 1, 29, 2, 14); }
+  cx.font = font(12); cx.textAlign = 'right'; cx.fillStyle = '#ffd36b';
+  cx.fillText(`★3 ¥${L.stars[1].toLocaleString()}  ★2 ¥${L.stars[0].toLocaleString()}`, CW - 12, 55);
+}
+function bottomBar() {
+  const y = CH - 88, h = 60;
+  if (mode === 'build') {
+    const w1 = Math.min(56, CW * 0.15);
+    button('undo', 10, y, w1, h, '↶', '#5b6475', history.length > 0, undo);
+    let x = 10 + w1 + 6;
+    const w3 = Math.min(64, CW * 0.17);
+    button('sym', x, y, w3, h, T.sym, mirror ? '#3f7fbf' : '#5b6475', true, () => { mirror = !mirror; tone(mirror ? 700 : 400, 0.08, 0.08, 'triangle'); });
+    if (mirror) { cx.strokeStyle = 'rgba(255,255,255,0.9)'; cx.lineWidth = 2; roundRect(x + 1, y + 1, w3 - 2, h - 2, 11); cx.stroke(); }
+    x += w3 + 6;
+    if (L.steel) {
+      const w2 = Math.min(72, CW * 0.2);
+      button('mat', x, y, w2, h, mat === 'wood' ? T.wood : T.steel, mat === 'wood' ? '#a8703c' : '#6f86a3', true, () => { mat = mat === 'wood' ? 'steel' : 'wood'; tone(mat === 'steel' ? 900 : 300, 0.08, 0.08, 'triangle'); });
+      x += w2 + 6;
+    } else btn.mat = null;
+    button('go', x, y, CW - x - 10, h, '▶ ' + T.go, '#2f9e5b', true, startTest);
+    btn.back = null;
+  } else if (mode === 'test') {
+    btn.undo = btn.mat = btn.go = btn.sym = null;
+    button('back', CW * 0.25, y, CW * 0.5, h, '■ ' + T.back, '#5b6475', true, () => { engineOff(); stopTest(); });
+  } else { btn.undo = btn.mat = btn.go = btn.back = btn.sym = null; }
+}
+function centerText(txt, y, px, col, w = 800) {
+  cx.textAlign = 'center'; cx.textBaseline = 'middle';
+  fitText(txt, px, CW - 32, w); cx.fillStyle = col; cx.fillText(txt, CW / 2, y);
+}
+function panel(y, h) {
+  cx.fillStyle = 'rgba(20,24,36,0.84)'; roundRect(16, y, CW - 32, h, 18); cx.fill();
+}
+function stars(n, y, size) {
+  for (let i = 0; i < 3; i++) {
+    const x = CW / 2 + (i - 1) * size * 1.25;
+    const pop = mode === 'clear' ? Math.min(1, Math.max(0, (modeT - 0.25 - i * 0.22) * 5)) : 1;
+    cx.font = font(size * (i < n ? (1 + 0.3 * Math.sin(pop * Math.PI)) : 1));
+    cx.textAlign = 'center'; cx.textBaseline = 'middle';
+    cx.fillStyle = i < n && pop > 0 ? '#ffd23f' : 'rgba(255,255,255,0.25)';
+    cx.fillText('★', x, y);
+    if (i < n && pop > 0 && pop < 1 && !stars['p' + i]) { stars['p' + i] = 1; tone(880 + i * 220, 0.15, 0.1, 'triangle'); }
+  }
+}
+function draw(t) {
+  cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  drawBG(t);
+  if (mode === 'title') {
+    drawBridgeBuild(t);
+    cx.fillStyle = 'rgba(15,20,35,0.45)'; cx.fillRect(0, 0, CW, CH);
+    const y0 = CH * 0.2;
+    centerText(T.title, y0, 34, '#fff');
+    centerText(T.sub, y0 + 40, 15, '#ffe7b0', 600);
+    panel(CH * 0.48, 96);
+    centerText(T.how1, CH * 0.48 + 32, 15, '#fff', 600);
+    centerText(T.how2, CH * 0.48 + 64, 14, '#fff', 600);
+    const tot = save.st.reduce((a, b) => a + (b || 0), 0);
+    if (tot) centerText(`★ ${tot} / ${LEVELS.length * 3}`, CH * 0.48 + 124, 16, '#ffd23f');
+    cx.globalAlpha = 0.6 + 0.4 * Math.sin(t * 3);
+    centerText(T.start, CH * 0.82, 20, '#fff');
+    cx.globalAlpha = 1;
+    return;
+  }
+  if (mode === 'build') { grid(); centerLine(); }
+  const shx = shake > 0.3 ? (Math.random() - 0.5) * shake : 0, shy = shake > 0.3 ? (Math.random() - 0.5) * shake : 0;
+  cx.translate(shx, shy);
+  if (sim) drawBridgeSim(); else drawBridgeBuild(t);
+  drawCar();
+  drawFX();
+  cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  if (slowT > 0) { cx.fillStyle = `rgba(255,60,40,${0.12 * Math.min(1, slowT)})`; cx.fillRect(0, 0, CW, CH); }
+  hud();
+  bottomBar();
+  if (mode === 'build' && hintT > 0 && !drag) {
+    cx.globalAlpha = Math.min(1, hintT);
+    const hy = CH - 112;
+    const txt = NM(L.hint);
+    const px = fitText(txt, 14, CW - 40, 700);
+    const tw = cx.measureText(txt).width + 20;
+    cx.fillStyle = 'rgba(20,24,36,0.8)'; roundRect(CW / 2 - tw / 2, hy - 14, tw, 28, 10); cx.fill();
+    cx.fillStyle = '#fff'; cx.font = font(px); cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillText(txt, CW / 2, hy);
+    cx.globalAlpha = 1;
+  }
+  if (msgT > 0) {
+    cx.globalAlpha = Math.min(1, msgT * 2);
+    const px = fitText(msg, 14, CW - 40);
+    const tw = cx.measureText(msg).width + 20;
+    cx.fillStyle = 'rgba(190,40,30,0.9)'; roundRect(CW / 2 - tw / 2, 80, tw, 28, 10); cx.fill();
+    cx.fillStyle = '#fff'; cx.font = font(px); cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillText(msg, CW / 2, 94);
+    cx.globalAlpha = 1;
+  }
+  if (mode === 'test' && sim) {
+    // 負荷メーター
+    const k = Math.min(1, sim.maxLoad || 0);
+    cx.fillStyle = 'rgba(20,24,36,0.7)'; roundRect(CW / 2 - 90, 74, 180, 26, 8); cx.fill();
+    cx.fillStyle = '#fff'; cx.font = font(12); cx.textAlign = 'left'; cx.textBaseline = 'middle'; cx.fillText(T.load, CW / 2 - 82, 87);
+    cx.fillStyle = beamColor('wood', k); cx.fillRect(CW / 2 - 40, 83, 120 * k, 8);
+    cx.strokeStyle = 'rgba(255,255,255,0.5)'; cx.lineWidth = 1; cx.strokeRect(CW / 2 - 40, 83, 120, 8);
+  }
+  if (mode === 'result') {
+    const k = Math.min(1, modeT * 3);
+    cx.globalAlpha = k;
+    panel(CH * 0.3, 150);
+    centerText(failKind === 'sink' ? T.failSink : T.fail, CH * 0.3 + 44, 24, '#ff9a8a');
+    const fb = resultInfo && resultInfo.firstBreak;
+    const tip = fb ? (fb === 'road' ? T.tipRoad : T.tipWood) : '';
+    if (tip) centerText(tip, CH * 0.3 + 78, 13, '#ffe7b0', 600);
+    if (fb && fb !== 'steel' && L.steel) centerText(T.tipSteel, CH * 0.3 + 98, 13, '#cfd6e6', 600);
+    centerText(T.failTap, CH * 0.3 + 124, 17, '#fff', 600);
+    cx.globalAlpha = 1;
+  }
+  if (mode === 'clear' && resultInfo) {
+    const k = Math.min(1, modeT * 3);
+    cx.globalAlpha = k;
+    panel(CH * 0.22, 250);
+    const y = CH * 0.22;
+    centerText(T.ok, y + 38, 28, '#fff');
+    stars(resultInfo.stars, y + 90, 40);
+    centerText(`${T.used} ¥${resultInfo.cost.toLocaleString()}`, y + 140, 20, '#fff', 700);
+    centerText(resultInfo.nb ? T.newBest : `${T.best} ¥${resultInfo.best.toLocaleString()}`, y + 172, 16, resultInfo.nb ? '#7ee07a' : '#ffe7b0', 700);
+    centerText(`★2 ≤ ¥${L.stars[0].toLocaleString()}   ★3 ≤ ¥${L.stars[1].toLocaleString()}`, y + 200, 13, '#cfd6e6', 600);
+    if (modeT > 0.7) centerText(T.next, y + 232, 15, '#fff', 600);
+    cx.globalAlpha = 1;
+  } else { stars.p0 = stars.p1 = stars.p2 = 0; }
+  for (const c of confetti) { cx.save(); cx.translate(c.x, c.y); cx.rotate(c.a); cx.fillStyle = c.c; cx.fillRect(-4, -2.5, 8, 5); cx.restore(); }
+  if (mode === 'all') {
+    panel(CH * 0.25, 210);
+    const tot = save.st.reduce((a, b) => a + (b || 0), 0);
+    centerText(T.all, CH * 0.25 + 44, 22, '#fff');
+    centerText(`★ ${tot} / ${LEVELS.length * 3}`, CH * 0.25 + 96, 32, '#ffd23f');
+    centerText(T.allSub, CH * 0.25 + 144, 14, '#ffe7b0', 600);
+    if (modeT > 0.7) centerText(T.again, CH * 0.25 + 182, 15, '#fff', 600);
+  }
+}
+function frame(ts) {
+  const dt = Math.min(0.05, last ? (ts - last) / 1000 : 0.016); last = ts;
+  try { update(dt); draw(ts / 1000); } catch (e) { console.error(e); }
+  requestAnimationFrame(frame);
+}
+resize();
+setLevel(0, false);
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

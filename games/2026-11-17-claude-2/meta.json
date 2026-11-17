@@ -1,0 +1,5985 @@
+{
+  "id": "2026-11-17-claude-2",
+  "status": "published",
+  "title": "わたれ！木組み橋",
+  "genre": "組み立て・建築",
+  "concept": "谷に木の部材を組んで橋をかけ、車を走らせて試す。部材は力に応じて黄から赤へ色づき、限界を超えるとバキッと折れて車は川へ。折れた所が光って残るので、三角形を足す・鉄骨に替える・削って安くする、と直しては走らせる試行錯誤が核。",
+  "howToPlay": "点から指をのばして部材を置き（対称がオンなら左右同時）、▶で車を走らせる。落ちたら折れた所を直し、なるべく安く渡らせて★3を目指す。",
+  "libraryDecision": "使わない。部材ごとの伸び縮みから負荷を正確に読み取って色と折れる判定に使いたいので、ばね付きの位置補正（XPBD）を自作した。matter-js の拘束では負荷の値が読みにくく調整しにくいため。",
+  "soundDecision": "BGMはなし。部材を置くとコトッ（鉄骨はカン）、走行中は負荷が高いほどギシギシ鳴り、折れるとバキッ、川に落ちるとザブン。音で「危ない」が先に分かることが緊張感になる。小さな川のせせらぎだけを流す。",
+  "improvements": [
+    {
+      "found": "①折れる瞬間が一瞬で、何が起きたか分からない ②負荷メーターに何の表示か書いてない ③1面が支え2本で簡単に★3になり基準が甘い",
+      "changed": "最初の部材が折れた瞬間に1.3秒のスローモーションと画面の揺れ。メーターに「負荷」と表示。クリア時に紙吹雪とクラクション。1面の★3基準を¥600に下げた",
+      "foundEn": "(1) The snap is too fast to see what went wrong (2) The load meter is unlabelled (3) Bridge 1 gave 3 stars too easily",
+      "changedEn": "Slow motion (1.3s) and screen shake on the first snap, labelled the meter, confetti and a horn on success, tightened bridge 1's 3-star cost to ¥600"
+    },
+    {
+      "found": "①つなぎ目への吸いつきが強く、1m隣に点を置けない ②部材を1本ずつ全部引くのが面倒 ③落ちたあと、どう直せばいいか分からない",
+      "changed": "吸いつきをやめ1mの格子に丸める方式に。左右対称に置く「対称」ボタン（初期オン）で作業が半分に。失敗画面に折れた部材に応じた直し方のヒントを表示。後ろ向きだった軽トラの絵も直した",
+      "foundEn": "(1) Joint snapping was so strong you could not place a point 1m from another (2) Drawing every beam one by one is tedious (3) After a fall it is unclear how to fix it",
+      "changedEn": "Replaced snapping with rounding to a 1m grid, added a Mirror toggle (on by default) that halves the work, and a fix-it tip on the failure screen based on what broke. Also fixed the kei truck facing backwards"
+    },
+    {
+      "found": "①★2で終わった面に戻って★3を狙えない ②予算バーの★2・★3の文字が重なって読めない ③今の面で取った★がHUDに無い",
+      "changed": "HUDに◀▶を付け、解放済みの面を行き来できるように。★の基準は金額つきの1行にまとめ、面名の横に取った★を表示",
+      "foundEn": "(1) No way to go back to a 2-star bridge to try for 3 (2) The ★2/★3 labels on the budget bar overlapped (3) The HUD did not show stars earned",
+      "changedEn": "Added ◀▶ to move between unlocked bridges, put the star costs on one readable line, and show earned stars next to the bridge name"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "組み立て・建築",
+      "en": "Building / construction",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "組み立て・建築: 谷に木材で橋を組み、車を走らせて試す。負荷が色で見え、折れた所を直してなるべく安く渡らせる。2D横から。",
+        "ideaEn": "Building: assemble a timber bridge over a gorge and drive a vehicle across. Stress shows as colour; fix what snapped and aim for the cheapest bridge. 2D side view.",
+        "fromDraw": true
+      },
+      {
+        "idea": "終わりのない水琴窟の庭。指で水滴の通り道をつくると、落ちる滴が音階を鳴らす。3Dの石庭で、置いた石で響きが変わる。",
+        "ideaEn": "An endless suikinkutsu garden: route water drops with your finger so they chime notes; stones in a 3D garden change the echo.",
+        "fromDraw": false
+      },
+      {
+        "idea": "鏡と光の反射パズル。指で鏡を回して一本の光を全部の燭台に届ける。光が当たると部屋が少しずつ色づく。",
+        "ideaEn": "A mirror puzzle: rotate mirrors to bounce one beam to every candle; the room gains colour as each lights.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "drag",
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Cross It! Timber Bridge",
+      "concept": "Build a timber bridge over a gorge, then send a vehicle across. Beams glow from yellow to red with load and snap past the limit, dropping the vehicle into the river. The snapped spot stays marked, so you add triangles, swap in steel or trim cost and try again; that build-test-fix loop is the core.",
+      "howToPlay": "Drag from a joint to place beams (Mirror places both sides), tap ▶ to send the vehicle. If it falls, fix what broke and go for the cheapest bridge for 3 stars.",
+      "libraryDecision": "None. I wrote a small spring-based position solver (XPBD) so each beam's stretch reads as a precise load for colouring and snapping; matter-js constraints make that value hard to read and tune.",
+      "soundDecision": "No music. Placing a beam knocks (steel rings), beams creak more as load rises, crack when they snap, and the vehicle splashes into the river. Hearing danger before seeing it builds tension. Only a quiet brook plays underneath."
+    }
+  },
+  "createdAt": "2026-11-17T12:07:22+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-17T12:07:22+09:00",
+    "metricsFrom": "2026-11-17T03:05:43.781Z",
+    "transcript": "36670355-d006-4f60-a1c8-391ca380f860.jsonl",
+    "validationRuns": 10,
+    "finishedAt": "2026-11-17T13:01:54+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-17T12:55:55+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "54.0KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=94",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=175",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=79",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=156",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 55286,
+    "lines": 989
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "遊びの仕組みはPoly Bridgeなど既存の橋づくりゲームとほぼ同じで、この作品ならではの驚きが薄い。後半の面は部材を何本も引く必要があり、スマホでは手間がかかる",
+    "comment": "何も組まずに走らせると道板がしなって左端がバキッと折れ、スローの中で自転車が川へ落ちる。赤く光る『ここが折れた』を見て斜めの支えを1本引くと、対称で両側に入り、¥570で★3。4面では橋ごと振り子のように崩れたあと、鉄骨で吊って渡れたが★1で、もっと安い組み方を探したくなった。負荷メーターが赤に近づくなかでリヤカーが渡りきる瞬間は手に汗をにぎる。一方、6面しかなく、部材を引く作業は単調になりやすい",
+    "similar": [
+      {
+        "title": "Poly Bridge",
+        "url": "https://store.steampowered.com/app/367450",
+        "similarity": "高",
+        "note": "予算内で橋を組み、車を走らせて負荷を見て直す点は同じ。こちらはスマホ縦画面で、左右対称の自動配置・折れた所の印・失敗時の直し方ヒントで手数を減らした6面の短い作品",
+        "note_en": "Same core of building on a budget, running vehicles and reading stress. This is a short six-bridge portrait phone game that cuts effort with auto-mirroring, a broke-here marker and fix-it tips"
+      },
+      {
+        "title": "Bridge Constructor",
+        "url": "https://store.epicgames.com/p/bridge-constructor-c3ef67",
+        "similarity": "高",
+        "note": "木材・鉄骨で谷に橋をかけて車で試す構造は同じ。こちらは材料が木と鉄骨の2種だけで、★の基準を「使った金額」だけにしている",
+        "note_en": "Same idea of timber and steel bridges tested by vehicles. Here there are only two materials and stars depend only on cost"
+      }
+    ],
+    "research": "WebSearchで『Poly Bridge bridge building physics game stress budget』『Bridge Constructor game』を検索し、ストアページの実在を確認した。橋づくりゲームというジャンルそのものがルーツ",
+    "i18n": {
+      "en": {
+        "worst": "The mechanics closely follow existing bridge builders like Poly Bridge, so there is little surprise unique to this game; later bridges need many drags, which is fiddly on a phone",
+        "comment": "Sending it bare makes the deck sag and snap at the left end; in slow motion the bike drops into the river. Seeing the red 'broke here' marker, one strut (mirrored) gets 3 stars at ¥570. On bridge 4 the whole span swung down like a pendulum; steel hangers got the truck across but only 1 star, which made me want a cheaper design. Watching the cart cross as the load meter nears red is tense. But there are only six bridges and drawing beams can get repetitive",
+        "research": "Searched the web for Poly Bridge and Bridge Constructor and confirmed their store pages. The bridge-building genre itself is the root"
+      }
+    },
+    "method": "スマホ縦画面で 16 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 16 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.80) 120ms",
+        "note": "タイトルをタップ。小川に道板だけが渡してある",
+        "noteEn": "Tap the title. Only a bare deck spans the brook",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.70,0.91) 120ms → wait 3600ms",
+        "note": "何も組まずに▶。道板がしなって左端がバキッと折れ、スローになる",
+        "noteEn": "Send it bare. The deck sags, the left end snaps and time slows",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 3500ms",
+        "note": "自転車ごと川へ。失敗画面に「道板が折れた。下か上から三角形で支えよう」と出る",
+        "noteEn": "Into the river. The banner suggests bracing the deck with triangles",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [],
+              "best": [],
+              "d": {}
+            }
+          },
+          {
+            "agf": "end",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.50,0.50) 120ms → wait 500ms → path(0.20,0.51→0.28,0.49→0.35,0.48) 350ms",
+        "note": "組みなおし。折れた所が赤く光っている。下の金具から斜めに1本引くと、対称で右にも入った（¥570）",
+        "noteEn": "Rebuild. The broken spot glows red. One strut from the low anchor, mirrored to the right (¥570)",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [],
+              "best": [],
+              "d": {}
+            }
+          },
+          {
+            "agf": "end",
+            "score": 0
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.70,0.91) 120ms → wait 9500ms",
+        "note": "▶。道板は黄色くなるが持ちこたえ、自転車が渡りきった。★3と紙吹雪",
+        "noteEn": "Send it. The deck turns yellow but holds; the bike makes it. 3 stars and confetti",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [],
+              "best": [],
+              "d": {}
+            }
+          },
+          {
+            "agf": "end",
+            "score": 0
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3
+              ],
+              "best": [
+                570
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 800ms → tap(0.50,0.50) 120ms → wait 500ms → path(0.16,0.52→0.21,0.51→0.27,0.51) 350ms → path(0.27,0.45→0.27,0.46→0.27,0.47) 350ms → path(0.27,0.45→0.33,0.46→0.39,0.47) 350ms → path(0.27,0.45→0.39,0.48→0.50,0.51) 350ms → path(0.50,0.45→0.50,0.46→0.50,0.47) 350ms → path(0.50,0.45→0.44,0.46→0.39,0.47) 350ms",
+        "note": "2面は12m。下の金具から道板の下に三角形の骨組みを半分だけ組むと、対称で全体ができた（¥2,560）",
+        "noteEn": "Bridge 2 is 12m. Build half a triangulated frame under the deck; mirror completes it (¥2,560)",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [],
+              "best": [],
+              "d": {}
+            }
+          },
+          {
+            "agf": "end",
+            "score": 0
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3
+              ],
+              "best": [
+                570
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.70,0.91) 120ms → wait 5200ms",
+        "note": "リヤカーがまん中に来ると、まん中の部材が赤くなり負荷メーターも赤近く。ギシギシ鳴る",
+        "noteEn": "As the cart reaches the middle, the centre members redden and the meter nears red. Creaks",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [],
+              "best": [],
+              "d": {}
+            }
+          },
+          {
+            "agf": "end",
+            "score": 0
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3
+              ],
+              "best": [
+                570
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 5000ms",
+        "note": "持ちこたえて★3",
+        "noteEn": "It holds. 3 stars",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [],
+              "best": [],
+              "d": {}
+            }
+          },
+          {
+            "agf": "end",
+            "score": 0
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3
+              ],
+              "best": [
+                570
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3,
+                3
+              ],
+              "best": [
+                570,
+                2560
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "1": [
+                  [
+                    0,
+                    -3,
+                    2,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    -3,
+                    10,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 800ms → tap(0.50,0.50) 120ms → wait 500ms → path(0.13,0.47→0.17,0.47→0.22,0.47) 350ms → path(0.50,0.50→0.50,0.48→0.50,0.47) 350ms → path(0.50,0.50→0.45,0.48→0.41,0.47) 350ms → tap(0.70,0.91) 120ms → wait 4300ms",
+        "note": "3面は岩の柱。柱と崖から支えるだけで試すと、4mあいた区間で道板がしなる",
+        "noteEn": "Bridge 3 has a rock pillar. With only struts, the 4m gaps sag",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [],
+              "best": [],
+              "d": {}
+            }
+          },
+          {
+            "agf": "end",
+            "score": 0
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3
+              ],
+              "best": [
+                570
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3,
+                3
+              ],
+              "best": [
+                570,
+                2560
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "1": [
+                  [
+                    0,
+                    -3,
+                    2,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    -3,
+                    10,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 4000ms",
+        "note": "左の区間で道板が折れ、軽トラが川へ",
+        "noteEn": "The left span snaps; the kei truck goes in the river",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [],
+              "best": [],
+              "d": {}
+            }
+          },
+          {
+            "agf": "end",
+            "score": 0
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3
+              ],
+              "best": [
+                570
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3,
+                3
+              ],
+              "best": [
+                570,
+                2560
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "1": [
+                  [
+                    0,
+                    -3,
+                    2,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    -3,
+                    10,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3,
+                3
+              ],
+              "best": [
+                570,
+                2560
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "1": [
+                  [
+                    0,
+                    -3,
+                    2,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    -3,
+                    10,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "2": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    16,
+                    -2,
+                    14,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    10,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.50,0.50) 120ms → wait 500ms → path(0.22,0.42→0.27,0.42→0.31,0.42) 350ms → path(0.31,0.37→0.31,0.42→0.31,0.47) 350ms → path(0.31,0.37→0.36,0.42→0.41,0.47) 350ms → tap(0.70,0.91) 120ms → wait 6000ms",
+        "note": "折れた4mの区間の上に小さな三角形（対称で両側）。¥3,120で再挑戦、軽トラがまん中を通過中",
+        "noteEn": "Add small triangles above the 4m spans (mirrored). Retry at ¥3,120; the truck is mid-bridge",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [],
+              "best": [],
+              "d": {}
+            }
+          },
+          {
+            "agf": "end",
+            "score": 0
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3
+              ],
+              "best": [
+                570
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3,
+                3
+              ],
+              "best": [
+                570,
+                2560
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "1": [
+                  [
+                    0,
+                    -3,
+                    2,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    -3,
+                    10,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3,
+                3
+              ],
+              "best": [
+                570,
+                2560
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "1": [
+                  [
+                    0,
+                    -3,
+                    2,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    -3,
+                    10,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "2": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    16,
+                    -2,
+                    14,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    10,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "wait 5000ms",
+        "note": "渡りきって★3（基準¥3,500）",
+        "noteEn": "Across with 3 stars (target ¥3,500)",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [],
+              "best": [],
+              "d": {}
+            }
+          },
+          {
+            "agf": "end",
+            "score": 0
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3
+              ],
+              "best": [
+                570
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3,
+                3
+              ],
+              "best": [
+                570,
+                2560
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "1": [
+                  [
+                    0,
+                    -3,
+                    2,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    -3,
+                    10,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3,
+                3
+              ],
+              "best": [
+                570,
+                2560
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "1": [
+                  [
+                    0,
+                    -3,
+                    2,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    -3,
+                    10,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "2": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    16,
+                    -2,
+                    14,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    10,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3,
+                3,
+                3
+              ],
+              "best": [
+                570,
+                2560,
+                3120
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "1": [
+                  [
+                    0,
+                    -3,
+                    2,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    -3,
+                    10,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "2": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    16,
+                    -2,
+                    14,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    0,
+                    4,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    14,
+                    0,
+                    12,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    12,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    10,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 9
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "wait 800ms → tap(0.50,0.50) 120ms → wait 500ms → path(0.09,0.38→0.17,0.41→0.24,0.44) 350ms → path(0.09,0.38→0.17,0.44→0.24,0.49) 350ms → path(0.24,0.44→0.24,0.44→0.24,0.44) 350ms → path(0.35,0.44→0.35,0.44→0.35,0.44) 350ms → path(0.45,0.44→0.45,0.44→0.45,0.44) 350ms → path(0.24,0.38→0.29,0.41→0.35,0.44) 350ms → path(0.35,0.38→0.40,0.41→0.45,0.44) 350ms → path(0.45,0.38→0.50,0.41→0.55,0.44) 350ms → path(0.24,0.38→0.29,0.44→0.35,0.49) 350ms → path(0.35,0.38→0.40,0.44→0.45,0.49) 350ms → path(0.45,0.38→0.50,0.44→0.55,0.49) 350ms → tap(0.80,0.91) 120ms → wait 6500ms",
+        "note": "4面は下に金具がない。中段の金具から上に骨組みを組んで試す（¥5,520）。まん中を過ぎたところで負荷が上がる",
+        "noteEn": "Bridge 4: no joints below. A top frame from the middle anchors (¥5,520). Load climbs past the middle",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [],
+              "best": [],
+              "d": {}
+            }
+          },
+          {
+            "agf": "end",
+            "score": 0
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3
+              ],
+              "best": [
+                570
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3,
+                3
+              ],
+              "best": [
+                570,
+                2560
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "1": [
+                  [
+                    0,
+                    -3,
+                    2,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    -3,
+                    10,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3,
+                3
+              ],
+              "best": [
+                570,
+                2560
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "1": [
+                  [
+                    0,
+                    -3,
+                    2,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    -3,
+                    10,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "2": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    16,
+                    -2,
+                    14,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    10,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3,
+                3,
+                3
+              ],
+              "best": [
+                570,
+                2560,
+                3120
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "1": [
+                  [
+                    0,
+                    -3,
+                    2,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    -3,
+                    10,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "2": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    16,
+                    -2,
+                    14,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    0,
+                    4,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    14,
+                    0,
+                    12,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    12,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    10,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 9
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3,
+                3,
+                3
+              ],
+              "best": [
+                570,
+                2560,
+                3120
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "1": [
+                  [
+                    0,
+                    -3,
+                    2,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    -3,
+                    10,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "2": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    16,
+                    -2,
+                    14,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    0,
+                    4,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    14,
+                    0,
+                    12,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    12,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    10,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "3": [
+                  [
+                    -1,
+                    2,
+                    2,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    15,
+                    2,
+                    12,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    -1,
+                    2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    15,
+                    2,
+                    12,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    0,
+                    2,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    0,
+                    12,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    0,
+                    4,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    0,
+                    10,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    0,
+                    6,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    0,
+                    8,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    2,
+                    4,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    10,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    6,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    2,
+                    8,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    2,
+                    8,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    2,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    2,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    2,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 9
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "wait 800ms → tap(0.50,0.50) 120ms → wait 500ms → tap(0.48,0.91) 120ms → path(0.09,0.33→0.17,0.38→0.24,0.44) 350ms",
+        "note": "左の付け根から崩れて、橋ごと振り子のように落ちた。鉄骨に切り替え、いちばん上の金具から吊る1本を足す",
+        "noteEn": "It tore off at the left root and swung down whole. Switch to steel and add a hanger from the top anchor",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [],
+              "best": [],
+              "d": {}
+            }
+          },
+          {
+            "agf": "end",
+            "score": 0
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3
+              ],
+              "best": [
+                570
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3,
+                3
+              ],
+              "best": [
+                570,
+                2560
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "1": [
+                  [
+                    0,
+                    -3,
+                    2,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    -3,
+                    10,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3,
+                3
+              ],
+              "best": [
+                570,
+                2560
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "1": [
+                  [
+                    0,
+                    -3,
+                    2,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    -3,
+                    10,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "2": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    16,
+                    -2,
+                    14,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    10,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3,
+                3,
+                3
+              ],
+              "best": [
+                570,
+                2560,
+                3120
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "1": [
+                  [
+                    0,
+                    -3,
+                    2,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    -3,
+                    10,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "2": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    16,
+                    -2,
+                    14,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    0,
+                    4,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    14,
+                    0,
+                    12,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    12,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    10,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 9
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3,
+                3,
+                3
+              ],
+              "best": [
+                570,
+                2560,
+                3120
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "1": [
+                  [
+                    0,
+                    -3,
+                    2,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    -3,
+                    10,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "2": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    16,
+                    -2,
+                    14,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    0,
+                    4,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    14,
+                    0,
+                    12,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    12,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    10,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "3": [
+                  [
+                    -1,
+                    2,
+                    2,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    15,
+                    2,
+                    12,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    -1,
+                    2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    15,
+                    2,
+                    12,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    0,
+                    2,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    0,
+                    12,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    0,
+                    4,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    0,
+                    10,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    0,
+                    6,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    0,
+                    8,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    2,
+                    4,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    10,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    6,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    2,
+                    8,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    2,
+                    8,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    2,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    2,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    2,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 9
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "tap(0.80,0.91) 120ms → wait 7000ms",
+        "note": "鉄骨の吊りで¥7,380。軽トラが渡っていく",
+        "noteEn": "Steel hangers, ¥7,380. The truck rolls across",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [],
+              "best": [],
+              "d": {}
+            }
+          },
+          {
+            "agf": "end",
+            "score": 0
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3
+              ],
+              "best": [
+                570
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3,
+                3
+              ],
+              "best": [
+                570,
+                2560
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "1": [
+                  [
+                    0,
+                    -3,
+                    2,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    -3,
+                    10,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3,
+                3
+              ],
+              "best": [
+                570,
+                2560
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "1": [
+                  [
+                    0,
+                    -3,
+                    2,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    -3,
+                    10,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "2": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    16,
+                    -2,
+                    14,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    10,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3,
+                3,
+                3
+              ],
+              "best": [
+                570,
+                2560,
+                3120
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "1": [
+                  [
+                    0,
+                    -3,
+                    2,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    -3,
+                    10,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "2": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    16,
+                    -2,
+                    14,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    0,
+                    4,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    14,
+                    0,
+                    12,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    12,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    10,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 9
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3,
+                3,
+                3
+              ],
+              "best": [
+                570,
+                2560,
+                3120
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "1": [
+                  [
+                    0,
+                    -3,
+                    2,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    -3,
+                    10,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "2": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    16,
+                    -2,
+                    14,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    0,
+                    4,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    14,
+                    0,
+                    12,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    12,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    10,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "3": [
+                  [
+                    -1,
+                    2,
+                    2,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    15,
+                    2,
+                    12,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    -1,
+                    2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    15,
+                    2,
+                    12,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    0,
+                    2,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    0,
+                    12,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    0,
+                    4,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    0,
+                    10,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    0,
+                    6,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    0,
+                    8,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    2,
+                    4,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    10,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    6,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    2,
+                    8,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    2,
+                    8,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    2,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    2,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    2,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 9
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "wait 5000ms",
+        "note": "渡れたが★1。鉄骨は高い。もっと安い組み方があるはず",
+        "noteEn": "Made it but only 1 star. Steel is pricey; there must be a cheaper way",
+        "image": "ai-play/step-16.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [],
+              "best": [],
+              "d": {}
+            }
+          },
+          {
+            "agf": "end",
+            "score": 0
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3
+              ],
+              "best": [
+                570
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3,
+                3
+              ],
+              "best": [
+                570,
+                2560
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "1": [
+                  [
+                    0,
+                    -3,
+                    2,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    -3,
+                    10,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3,
+                3
+              ],
+              "best": [
+                570,
+                2560
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "1": [
+                  [
+                    0,
+                    -3,
+                    2,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    -3,
+                    10,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "2": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    16,
+                    -2,
+                    14,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    10,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3,
+                3,
+                3
+              ],
+              "best": [
+                570,
+                2560,
+                3120
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "1": [
+                  [
+                    0,
+                    -3,
+                    2,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    -3,
+                    10,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "2": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    16,
+                    -2,
+                    14,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    0,
+                    4,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    14,
+                    0,
+                    12,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    12,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    10,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 9
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3,
+                3,
+                3
+              ],
+              "best": [
+                570,
+                2560,
+                3120
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "1": [
+                  [
+                    0,
+                    -3,
+                    2,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    -3,
+                    10,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "2": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    16,
+                    -2,
+                    14,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    0,
+                    4,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    14,
+                    0,
+                    12,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    12,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    10,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "3": [
+                  [
+                    -1,
+                    2,
+                    2,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    15,
+                    2,
+                    12,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    -1,
+                    2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    15,
+                    2,
+                    12,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    0,
+                    2,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    0,
+                    12,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    0,
+                    4,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    0,
+                    10,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    0,
+                    6,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    0,
+                    8,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    2,
+                    4,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    10,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    6,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    2,
+                    8,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    2,
+                    8,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    2,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    2,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    2,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 9
+          },
+          {
+            "agf": "save",
+            "data": {
+              "st": [
+                3,
+                3,
+                3,
+                1
+              ],
+              "best": [
+                570,
+                2560,
+                3120,
+                7380
+              ],
+              "d": {
+                "0": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -2,
+                    6,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "1": [
+                  [
+                    0,
+                    -3,
+                    2,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    -3,
+                    10,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    -1,
+                    6,
+                    -1,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    -1,
+                    8,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "2": [
+                  [
+                    0,
+                    -2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    16,
+                    -2,
+                    14,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    -3,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    0,
+                    4,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    14,
+                    0,
+                    12,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    12,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    10,
+                    0,
+                    "wood"
+                  ]
+                ],
+                "3": [
+                  [
+                    -1,
+                    2,
+                    2,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    15,
+                    2,
+                    12,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    -1,
+                    2,
+                    2,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    15,
+                    2,
+                    12,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    0,
+                    2,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    0,
+                    12,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    0,
+                    4,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    0,
+                    10,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    0,
+                    6,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    0,
+                    8,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    2,
+                    4,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    10,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    6,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    2,
+                    8,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    2,
+                    8,
+                    2,
+                    "wood"
+                  ],
+                  [
+                    2,
+                    2,
+                    4,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    12,
+                    2,
+                    10,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    4,
+                    2,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    10,
+                    2,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    6,
+                    2,
+                    8,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    8,
+                    2,
+                    6,
+                    0,
+                    "wood"
+                  ],
+                  [
+                    -1,
+                    4,
+                    2,
+                    2,
+                    "steel"
+                  ],
+                  [
+                    15,
+                    4,
+                    12,
+                    2,
+                    "steel"
+                  ]
+                ]
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 10
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-17T13:01:54+09:00"
+  },
+  "publishedAt": "2026-11-17T12:48:46+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 39062,
+    "outputTokens": 77930,
+    "contextTokens": 27083405,
+    "turns": 111,
+    "toolCalls": 122,
+    "webSearches": 0,
+    "minutes": 56.2,
+    "from": "2026-11-17T03:05:43.781Z",
+    "to": "2026-11-17T04:01:54.170Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-17T13:01:54+09:00",
+    "validationRuns": 10,
+    "codeKB": 54
+  }
+}
