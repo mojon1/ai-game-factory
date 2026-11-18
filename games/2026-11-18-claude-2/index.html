@@ -1,0 +1,1015 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>ぺったん！もちつき相方 / Pettan! Mochi Partners</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #1b1530; }
+canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+'use strict';
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const DICT = {
+  ja: {
+    title1: 'ぺったん！', title2: 'もちつき相方',
+    how1: '拍に合わせてタップで、ぺったん',
+    how2: '相方の手が臼にある間は、ついちゃダメ',
+    how3: '「みず！」は一拍休み、「それそれ！」は二連打',
+    start: 'タップでスタート',
+    hint: '白い輪が重なった瞬間にタップ。青い点線の輪は休み',
+    usu: '臼', combo: 'コンボ', best: 'ベスト', newBest: 'ベスト更新！',
+    mood: '相方', again: 'タップでもう一度',
+    over: '相方が帰っちゃった…', made: 'ついたおもち',
+    perfect: 'ぺったん！', good: 'ぺたん', off: 'ぼてっ', kara: 'スカッ', ouch: 'いたっ！！', miss: '…',
+    hai: 'はいっ', mizu: 'みず！', sore: 'それそれ！', yo: 'ため…よっ！', done: 'できあがり！',
+    count: ['いち', 'に', 'さん', 'はいっ'],
+    rank: ['つぶつぶ', 'ぼこぼこ', 'もちもち', 'つやつや！'],
+    newUsu: (n, bpm) => `${n}臼目  ♩=${bpm}`,
+    fever: 'フィーバー！ 得点1.5倍',
+    tipD: '「それそれ！」は2回つく', tipS: '「ため…」は半拍おくれて、よっ！', tipW: '「みず！」の拍は、手が入ったまま。休む'
+  },
+  en: {
+    title1: 'Pettan!', title2: 'Mochi Partners',
+    how1: 'Tap on the beat to pound the mochi',
+    how2: "Never pound while your partner's hand is in",
+    how3: '"Water!" = rest a beat. "Go go!" = pound twice',
+    start: 'Tap to start',
+    hint: 'Tap when a white ring closes. Blue dashed ring = rest',
+    usu: 'Batch', combo: 'Combo', best: 'Best', newBest: 'New best!',
+    mood: 'Partner', again: 'Tap to play again',
+    over: 'Your partner went home…', made: 'Mochi made',
+    perfect: 'PETTAN!', good: 'Pettan', off: 'Thud', kara: 'Whiff', ouch: 'OUCH!!', miss: '…',
+    hai: 'Hai!', mizu: 'Water!', sore: 'Go go!', yo: 'Wait… now!', done: 'Done!',
+    count: ['One', 'Two', 'Three', 'Hai!'],
+    rank: ['Lumpy', 'Bumpy', 'Chewy', 'Silky!'],
+    newUsu: (n, bpm) => `Batch ${n}  ♩=${bpm}`,
+    fever: 'FEVER! Points x1.5',
+    tipD: '"Go go!" means two quick pounds', tipS: '"Wait…" means pound half a beat late', tipW: '"Water!" keeps the hand in. Rest that beat'
+  }
+};
+const T = DICT[LANG] || DICT.en;
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+
+// ---------- save ----------
+let best = 0, bestMochi = 0;
+addEventListener('message', (e) => {
+  if (e.data && e.data.agf === 'loaded' && e.data.data) {
+    best = Math.max(best, e.data.data.best | 0);
+    bestMochi = Math.max(bestMochi, e.data.data.bestMochi | 0);
+  }
+});
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+const saveData = () => { try { parent.postMessage({ agf: 'save', data: { best, bestMochi } }, '*'); } catch (e) {} };
+
+// ---------- canvas ----------
+const cv = document.getElementById('c');
+const g = cv.getContext('2d');
+let W = 360, H = 640, DPR = 1;
+function resize() {
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = Math.max(1, cv.clientWidth || innerWidth || 360);
+  H = Math.max(1, cv.clientHeight || innerHeight || 640);
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+}
+addEventListener('resize', resize);
+resize();
+
+const now = () => performance.now() / 1000;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const ease = (t) => 1 - Math.pow(1 - clamp(t, 0, 1), 3);
+
+// ---------- audio ----------
+let AC = null, master = null, audioOffs = 0, audioLat = 0, noiseBuf = null;
+function initAudio() {
+  try {
+    if (!AC) {
+      const C = window.AudioContext || window.webkitAudioContext;
+      if (!C) return;
+      AC = new C();
+      master = AC.createGain(); master.gain.value = 0.55;
+      const comp = AC.createDynamicsCompressor();
+      master.connect(comp); comp.connect(AC.destination);
+      noiseBuf = AC.createBuffer(1, AC.sampleRate * 0.5, AC.sampleRate);
+      const d = noiseBuf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    }
+    if (AC.state !== 'running') AC.resume();
+    syncAudio();
+  } catch (e) { AC = null; }
+}
+function syncAudio() {
+  if (!AC) return;
+  audioOffs = AC.currentTime - now();
+  audioLat = Math.min(0.1, (AC.outputLatency || 0) + (AC.baseLatency || 0) * 0.5);
+}
+// game time -> audio time
+const at = (t) => (AC ? Math.max(AC.currentTime, t + audioOffs - audioLat) : 0);
+
+function tone(t, freq, dur, { type = 'sine', vol = 0.3, f2 = null, attack = 0.004, filter = null, q = 1 } = {}) {
+  if (!AC) return;
+  try {
+    const o = AC.createOscillator(), gn = AC.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur);
+    gn.gain.setValueAtTime(0.0001, t);
+    gn.gain.exponentialRampToValueAtTime(vol, t + attack);
+    gn.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    let last = o;
+    if (filter) { const f = AC.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = filter; f.Q.value = q; o.connect(f); last = f; }
+    last.connect(gn); gn.connect(master);
+    o.start(t); o.stop(t + dur + 0.02);
+  } catch (e) {}
+}
+function noise(t, dur, { vol = 0.2, type = 'lowpass', freq = 1000, f2 = null, q = 1 } = {}) {
+  if (!AC || !noiseBuf) return;
+  try {
+    const s = AC.createBufferSource(); s.buffer = noiseBuf;
+    const f = AC.createBiquadFilter(); f.type = type; f.frequency.setValueAtTime(freq, t); f.Q.value = q;
+    if (f2) f.frequency.exponentialRampToValueAtTime(f2, t + dur);
+    const gn = AC.createGain();
+    gn.gain.setValueAtTime(vol, t); gn.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(f); f.connect(gn); gn.connect(master);
+    s.start(t, Math.random() * 0.3); s.stop(t + dur + 0.02);
+  } catch (e) {}
+}
+// a crude synthesized voice: a glottal saw through two formants
+function voice(t, f0, f1end, dur, formants, vol = 0.22) {
+  if (!AC) return;
+  try {
+    const o = AC.createOscillator(); o.type = 'sawtooth';
+    o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1end, t + dur);
+    const gn = AC.createGain();
+    gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(vol, t + 0.015);
+    gn.gain.setValueAtTime(vol, t + dur * 0.6); gn.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    for (const [ff, qq, vv] of formants) {
+      const f = AC.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = ff; f.Q.value = qq;
+      const gg = AC.createGain(); gg.gain.value = vv;
+      o.connect(f); f.connect(gg); gg.connect(gn);
+    }
+    gn.connect(master);
+    o.start(t); o.stop(t + dur + 0.02);
+  } catch (e) {}
+}
+const sfx = {
+  pound(t, quality) { // quality: 2 perfect, 1 good, 0 off
+    tone(t, 150, 0.18, { f2: 45, vol: 0.55 });
+    noise(t, 0.07, { vol: 0.35, freq: 900, f2: 200 });
+    tone(t + 0.035, 420, 0.07, { type: 'triangle', vol: 0.08, f2: 300 }); // sticky "tan"
+    if (quality === 2) { tone(t + 0.01, 1568, 0.25, { type: 'sine', vol: 0.06 }); tone(t + 0.04, 2093, 0.3, { type: 'sine', vol: 0.05 }); }
+  },
+  thud(t) { tone(t, 110, 0.15, { f2: 60, vol: 0.4 }); noise(t, 0.05, { vol: 0.15, freq: 400 }); },
+  whiff(t) { noise(t, 0.12, { vol: 0.12, type: 'bandpass', freq: 600, f2: 2400, q: 2 }); },
+  ouch(t) {
+    tone(t, 150, 0.16, { f2: 50, vol: 0.5 });
+    voice(t + 0.03, 520, 260, 0.32, [[850, 6, 1], [1250, 8, 0.6]], 0.3);
+    tone(t + 0.02, 880, 0.08, { type: 'square', vol: 0.05, f2: 440 });
+  },
+  hai(t) { voice(t, 230, 300, 0.11, [[750, 5, 1], [1150, 7, 0.6]]); voice(t + 0.1, 300, 270, 0.12, [[320, 6, 1], [2300, 10, 0.5]]); },
+  mizu(t) {
+    voice(t, 250, 280, 0.12, [[300, 6, 1], [2200, 10, 0.4]]); voice(t + 0.12, 280, 240, 0.15, [[330, 6, 1], [1000, 8, 0.4]]);
+    noise(t + 0.12, 0.25, { vol: 0.1, type: 'bandpass', freq: 3000, f2: 900, q: 3 });
+  },
+  sore(t) { voice(t, 260, 300, 0.09, [[500, 6, 1], [900, 8, 0.6]]); voice(t + 0.12, 300, 330, 0.09, [[500, 6, 1], [900, 8, 0.6]]); },
+  yo(t) { voice(t, 280, 240, 0.2, [[400, 6, 1], [800, 8, 0.6]], 0.2); },
+  count(t, i) { tone(t, i === 3 ? 1320 : 990, 0.06, { type: 'square', vol: 0.06, filter: 2500 }); },
+  done(t) { [784, 988, 1175, 1568].forEach((f, i) => tone(t + i * 0.07, f, 0.35, { type: 'triangle', vol: 0.1 })); },
+  over(t) { [523, 440, 392, 330].forEach((f, i) => tone(t + i * 0.16, f, 0.35, { type: 'triangle', vol: 0.12 })); }
+};
+// music: taiko + koto-ish pentatonic ostinato, claps when on fire
+const PENTA = [0, 2, 4, 7, 9];
+function koto(t, semi, vol = 0.07) {
+  const f = 293.66 * Math.pow(2, semi / 12);
+  tone(t, f, 0.5, { type: 'triangle', vol, attack: 0.002 });
+  tone(t, f * 2, 0.18, { type: 'sine', vol: vol * 0.4, attack: 0.002 });
+}
+function taiko(t, strong) {
+  tone(t, strong ? 95 : 80, 0.3, { f2: 50, vol: strong ? 0.3 : 0.18 });
+  noise(t, 0.04, { vol: 0.05, freq: 500 });
+}
+function clap(t) { noise(t, 0.06, { vol: 0.12, type: 'bandpass', freq: 1500, q: 1.2 }); noise(t + 0.012, 0.05, { vol: 0.09, type: 'bandpass', freq: 1800, q: 1.2 }); }
+
+// ---------- game state ----------
+let state = 'title', stateT = 0;
+let feverT = -9, squashT = -9, tl, usus, genEnd, score, combo, maxCombo, mood, mochiDone, tray, fx, shake, kineT, lastHandHit, hintUntil, gameT0, tip, tipT, overInfo;
+const P_PERFECT = 0.05, P_GOOD = 0.095, P_OFF = 0.14;
+
+function rng() { return Math.random(); }
+
+function newGame() {
+  tl = { pounds: [], hands: [], cues: [], beats: [], rests: [] };
+  usus = []; genEnd = now() + 0.6; score = 0; combo = 0; maxCombo = 0; mood = 100; mochiDone = 0; tray = [];
+  fx = []; shake = 0; kineT = -9; lastHandHit = -9; tip = null; tipT = -9;
+  gameT0 = now(); hintUntil = gameT0 + 7;
+  genUsu(0);
+  genUsu(1);
+  signal('start');
+}
+
+// one batch ("usu"): 4 count-in beats, 32 body beats, 4 finishing beats
+function genUsu(k) {
+  const bpm = k <= 5 ? 84 + k * 14 : Math.min(180, 154 + (k - 5) * 6);
+  const B = 60 / bpm;
+  const t0 = genEnd;
+  const NB = k === 0 ? 24 : 32;
+  const u = { k, bpm, B, t0, n: NB, body: t0 + 4 * B, end: t0 + (NB + 8) * B, total: 0, sum: 0, judged: 0, perfect: 0, finished: false, phrase: [] };
+  // ostinato phrase for this batch
+  const base = [0, 2, 4, 2, 3, 2, 1, 2];
+  for (let i = 0; i < 16; i++) {
+    const deg = (base[i % 8] + (i >= 8 ? (k % 3) : 0) + (rng() < 0.25 ? 1 : 0)) % 7;
+    u.phrase.push(deg);
+  }
+  // count-in
+  for (let i = 0; i < 4; i++) {
+    tl.beats.push({ t: t0 + i * B, kind: 'cbeat', i, u });
+    tl.cues.push({ t: t0 + i * B, kind: 'count', i, u });
+  }
+  // body pattern
+  const types = [];
+  const pW = k === 0 ? 0.13 : 0.15 + 0.01 * k, pD = k >= 1 ? Math.min(0.24, 0.1 + 0.03 * k) : 0, pS = k >= 3 ? Math.min(0.16, 0.06 + 0.02 * (k - 3)) : 0;
+  for (let i = 0; i < NB; i++) {
+    let ty = 'N';
+    const prev = types[i - 1], prev2 = types[i - 2];
+    if (i >= 4 && i <= NB - 2 && prev !== 'D' && prev !== 'S') {
+      const r = rng();
+      if (k === 0) ty = 'N';
+      else if (r < pW && !(prev === 'W' && (k < 2 || prev2 === 'W'))) ty = 'W';
+      else if (r < pW + pD && prev !== 'W') ty = 'D';
+      else if (r < pW + pD + pS && prev !== 'W') ty = 'S';
+    }
+    if (k === 0 && (i === 10 || i === 15 || i === 19)) ty = 'W';
+    if (k === 1 && (i === 6 || i === 14)) ty = 'D';
+    if (k === 3 && i === 8) ty = 'S';
+    if (prev === 'D' || prev === 'S') ty = 'N';
+    if (i === NB - 1) ty = 'N';
+    types.push(ty);
+  }
+  u.types = types;
+  let lastHand = null;
+  for (let i = 0; i < NB; i++) {
+    const b = u.body + i * B, ty = types[i];
+    tl.beats.push({ t: b, kind: 'body', i, u });
+    if (ty === 'W') tl.rests.push({ t: b, u });
+    if (ty === 'N') {
+      tl.pounds.push({ t: b, u, done: false });
+      lastHand = { t0: b + 0.3 * B, t1: b + 0.72 * B, wet: false };
+      tl.hands.push(lastHand);
+      if (types[i + 1] === 'W') {
+        lastHand.wet = true; lastHand.t1 = b + 1.72 * B;
+        if (types[i + 2] === 'W') lastHand.t1 = b + 2.72 * B;
+        tl.cues.push({ t: b + 0.3 * B, kind: 'mizu', u });
+      } else if (types[i + 1] === 'D') {
+        tl.cues.push({ t: b + 0.5 * B, kind: 'sore', u });
+      } else if (types[i + 1] === 'S') {
+        lastHand.t1 = b + 1.22 * B;
+        tl.cues.push({ t: b + 0.4 * B, kind: 'yo', u });
+      } else if (i < NB - 1) {
+        tl.cues.push({ t: b + 0.45 * B, kind: 'hai', u });
+      }
+    } else if (ty === 'D') {
+      tl.pounds.push({ t: b, u, done: false, dbl: true });
+      tl.pounds.push({ t: b + 0.5 * B, u, done: false, dbl: true });
+      if (i < NB - 1) tl.cues.push({ t: b + 0.62 * B, kind: 'hai', u, quick: true });
+      lastHand = { t0: b + 0.6 * B, t1: b + 0.84 * B, wet: false }; tl.hands.push(lastHand);
+    } else if (ty === 'S') {
+      tl.pounds.push({ t: b + 0.5 * B, u, done: false, syn: true });
+      if (i < NB - 1) tl.cues.push({ t: b + 0.66 * B, kind: 'hai', u, quick: true });
+      lastHand = { t0: b + 0.68 * B, t1: b + 0.86 * B, wet: false }; tl.hands.push(lastHand);
+    }
+  }
+  // remove the final hand turn after the last pound (mochi is done)
+  if (lastHand && lastHand.t0 > u.body + (NB - 1) * B) tl.hands.splice(tl.hands.indexOf(lastHand), 1);
+  u.total = tl.pounds.filter((p) => p.u === u).length;
+  for (let i = 0; i < 4; i++) tl.beats.push({ t: u.body + (NB + i) * B, kind: 'fin', i: NB + i, u });
+  tl.cues.push({ t: u.body + NB * B, kind: 'done', u });
+  usus.push(u);
+  genEnd = u.end;
+  if (k === 1) u.tip = T.tipD;
+  if (k === 3) u.tip = T.tipS;
+  if (k === 0) u.tip = null;
+}
+
+function curUsu(t) {
+  let u = usus[0];
+  for (const x of usus) if (x.t0 <= t) u = x;
+  return u;
+}
+function handDanger(t) {
+  for (const h of tl.hands) if (t > h.t0 + 0.015 && t < h.t1 - 0.015) return h;
+  return null;
+}
+// 0..1 how far the hand is into the mortar, plus which hand
+function handPose(t) {
+  let best = 0, wet = false, which = null;
+  for (const h of tl.hands) {
+    if (t < h.t0 - 0.2 || t > h.t1 + 0.2) continue;
+    const ramp = Math.min(0.08, (h.t1 - h.t0) * 0.3);
+    let v = 0;
+    if (t < h.t0) v = 1 - (h.t0 - t) / ramp;
+    else if (t > h.t1) v = 1 - (t - h.t1) / ramp;
+    else v = 1;
+    v = clamp(v, 0, 1);
+    if (v > best) { best = v; wet = h.wet; which = h; }
+  }
+  return { v: ease(best), wet, h: which };
+}
+
+function addFx(text, color, size = 30, life = 0.7, slot = 'judge') {
+  fx = fx.filter((f) => !(f.kind === 'text' && f.slot === slot));
+  fx.push({ kind: 'text', text, color, size, t: now(), life, slot });
+}
+function particles(n, color, spread = 1, up = 1) {
+  for (let i = 0; i < n; i++) {
+    const a = -Math.PI / 2 + (rng() - 0.5) * 2.4 * spread;
+    const sp = (80 + rng() * 180) * up;
+    fx.push({ kind: 'p', x: 0, y: 0, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, color, t: now(), life: 0.5 + rng() * 0.4, r: 2 + rng() * 3 });
+  }
+}
+
+function judgeTap(t) {
+  kineT = t;
+  const u = curUsu(t);
+  const hd = handDanger(t);
+  if (hd) {
+    // hit the partner's hand
+    lastHandHit = t; shake = 0.35; combo = 0; mood -= 28;
+    const p = nearestPound(t, P_OFF);
+    if (p) { p.done = true; p.res = 'ouch'; p.u.judged++; }
+    u.sum = Math.max(0, u.sum - 1.5);
+    sfx.ouch(at(t));
+    addFx(T.ouch, '#ff5a4a', 38, 0.9);
+    particles(10, '#ffd36b', 1.2, 1);
+    if (navigator.vibrate) try { navigator.vibrate(80); } catch (e) {}
+    return;
+  }
+  const p = nearestPound(t, P_OFF);
+  if (!p) {
+    mood -= 3; sfx.whiff(at(t)); addFx(T.kara, '#b9c0d8', 24, 0.5);
+    return;
+  }
+  p.done = true; p.u.judged++;
+  const d = Math.abs(t - p.t);
+  let q, pts, val;
+  if (d <= P_PERFECT) { q = 2; pts = 100; val = 1; p.res = 'perfect'; }
+  else if (d <= P_GOOD) { q = 1; pts = 60; val = 0.6; p.res = 'good'; }
+  else { q = 0; pts = 15; val = 0.2; p.res = 'off'; }
+  if (q > 0) { combo++; maxCombo = Math.max(maxCombo, combo); } else combo = 0;
+  mood = Math.min(100, mood + (q === 2 ? 3 : q === 1 ? 1 : -7));
+  score += Math.round(pts * (1 + Math.min(combo, 60) / 20) * (1 + u.k * 0.15) * (combo >= 16 ? 1.5 : 1));
+  if (combo === 16) { addFx(T.fever, '#ff8fc8', 30, 1.4, 'combo'); feverT = t; }
+  p.u.sum += val; if (q === 2) p.u.perfect++;
+  if (q > 0) sfx.pound(at(t), q); else sfx.thud(at(t));
+  if (q === 2) { addFx(T.perfect, '#ffe27a', 34, 0.6); particles(9, '#ffffff', 1, 1); particles(5, '#ffe27a', 0.6, 1.4); }
+  else if (q === 1) { addFx(T.good, '#ffffff', 26, 0.5); particles(5, '#ffffff', 1, 0.8); }
+  else { addFx(T.off, '#c9b48a', 24, 0.5); particles(3, '#e8dcc0', 1, 0.5); }
+  if (combo > 0 && combo % 10 === 0 && combo !== 16) addFx(`${combo} ${T.combo}!`, '#ff9fd0', 26, 1.0, 'combo');
+  squashT = t; if (q === 2) shake = Math.max(shake, 0.1);
+}
+function nearestPound(t, win) {
+  let best = null, bd = 1e9;
+  for (const p of tl.pounds) {
+    if (p.done) continue;
+    const d = Math.abs(t - p.t);
+    if (d <= win && d < bd) { bd = d; best = p; }
+    if (p.t > t + win) break;
+  }
+  return best;
+}
+
+// ---------- update ----------
+let schedT = 0;
+function update(t) {
+  if (state !== 'play') return;
+  if (genEnd - t < 6) genUsu(usus.length);
+  // missed pounds
+  for (const p of tl.pounds) {
+    if (p.t > t) break;
+    if (!p.done && t > p.t + P_OFF) {
+      p.done = true; p.res = 'miss'; p.u.judged++;
+      combo = 0; mood -= 10;
+      addFx(T.miss, '#9aa3c0', 30, 0.5);
+    }
+  }
+  // batch finished?
+  for (const u of usus) {
+    if (!u.finished && t >= u.body + u.n * u.B) {
+      u.finished = true;
+      const q = u.total ? u.sum / u.total : 0;
+      u.q = q;
+      const r = q >= 0.88 ? 3 : q >= 0.66 ? 2 : q >= 0.4 ? 1 : 0;
+      u.rank = r;
+      score += Math.round(q * 1000 * (u.k + 1));
+      mochiDone++;
+      tray.push({ q, r, t });
+      u.doneT = t;
+    }
+  }
+  // schedule audio (lookahead)
+  if (AC) {
+    const horizon = t + 0.18;
+    const fire = (list) => {
+      for (const e of list) {
+        if (e.sched) continue;
+        if (e.t > horizon) continue;
+        e.sched = true;
+        if (e.t < t - 0.05) continue;
+        playEvent(e);
+      }
+    };
+    fire(tl.beats); fire(tl.cues);
+  }
+  // tips
+  const u = curUsu(t);
+  if (u.tip && !u.tipShown && t > u.t0) { u.tipShown = true; tip = u.tip; tipT = t; }
+  if (!tip && u.k === 0 && !u.tipW && u.types && t > u.body + 8 * u.B) { u.tipW = true; tip = T.tipW; tipT = t; }
+  if (tip && t - tipT > 3.2) tip = null;
+  // prune
+  if (tl.pounds.length > 200) { tl.pounds = tl.pounds.filter((p) => p.t > t - 5); }
+  if (tl.hands.length > 200) { tl.hands = tl.hands.filter((h) => h.t1 > t - 5); tl.rests = tl.rests.filter((r) => r.t > t - 5); }
+  if (tl.beats.length > 300) { tl.beats = tl.beats.filter((b) => b.t > t - 5); tl.cues = tl.cues.filter((c) => c.t > t - 5); }
+  fx = fx.filter((f) => t - f.t < f.life);
+  if (mood <= 0) gameOver(t);
+}
+function playEvent(e) {
+  const a = at(e.t);
+  const fever = combo >= 16;
+  if (e.kind === 'cbeat') { sfx.count(a, e.i); return; }
+  if (e.kind === 'count') { if (e.i === 3) sfx.hai(a); return; }
+  if (e.kind === 'body' || e.kind === 'fin') {
+    const u = e.u, B = u.B;
+    taiko(a, e.i % 4 === 0);
+    const idx = (e.i * 2) % 16;
+    const vol = e.kind === 'fin' ? 0.05 : 0.065;
+    const n1 = u.phrase[idx], n2 = u.phrase[idx + 1];
+    const semi = (d) => PENTA[d % 5] + 12 * Math.floor(d / 5);
+    koto(a, semi(n1), vol);
+    koto(at(e.t + B / 2), semi(n2), vol * 0.75);
+    if (fever) { clap(at(e.t + B / 2)); }
+    if (e.i % 8 === 0) tone(a, 1760, 0.6, { type: 'sine', vol: 0.025 });
+    return;
+  }
+  if (e.kind === 'hai') sfx.hai(a);
+  else if (e.kind === 'mizu') sfx.mizu(a);
+  else if (e.kind === 'sore') sfx.sore(a);
+  else if (e.kind === 'yo') sfx.yo(a);
+  else if (e.kind === 'done') sfx.done(a);
+}
+
+function gameOver(t) {
+  state = 'over'; stateT = t;
+  const isBest = score > best;
+  if (isBest) best = score;
+  bestMochi = Math.max(bestMochi, mochiDone);
+  overInfo = { isBest };
+  saveData();
+  sfx.over(at(t));
+  signal('end', { score });
+}
+
+// ---------- input ----------
+cv.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  initAudio();
+  const t = now();
+  if (state === 'title') { state = 'play'; stateT = t; syncAudio(); newGame(); return; }
+  if (state === 'over') { if (t - stateT > 0.7) { state = 'play'; stateT = t; syncAudio(); newGame(); } return; }
+  if (state === 'play') judgeTap(t);
+}, { passive: false });
+
+// ---------- drawing ----------
+function fitText(txt, maxW, size, weight = 'bold') {
+  let s = size;
+  g.font = `${weight} ${s}px ${FONT}`;
+  while (s > 12 && g.measureText(txt).width > maxW) { s -= 1; g.font = `${weight} ${s}px ${FONT}`; }
+  return s;
+}
+function text(txt, x, y, size, color, align = 'center', maxW = W - 24, weight = 'bold') {
+  fitText(txt, maxW, size, weight);
+  g.textAlign = align; g.textBaseline = 'middle';
+  g.fillStyle = color; g.fillText(txt, x, y);
+}
+function rr(x, y, w, h, r) {
+  g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
+}
+
+// layout
+function L() {
+  const s = Math.min(W / 360, H / 640);
+  const cx = W * 0.54, rimY = H * 0.66, rx = Math.min(W * 0.3, 140 * s * 1.1), ry = rx * 0.3;
+  return { s, cx, rimY, rx, ry };
+}
+
+const snow = Array.from({ length: 40 }, () => ({ x: Math.random(), y: Math.random(), r: 0.6 + Math.random() * 1.6, v: 0.02 + Math.random() * 0.04 }));
+function drawBG(t, fever) {
+  const gr = g.createLinearGradient(0, 0, 0, H);
+  gr.addColorStop(0, '#1b1538'); gr.addColorStop(0.55, '#3a2347'); gr.addColorStop(1, '#5a3a3a');
+  g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  // snow
+  g.fillStyle = 'rgba(255,255,255,0.55)';
+  for (const f of snow) {
+    const y = ((f.y + t * f.v) % 1) * H, x = (f.x + Math.sin(t * 0.5 + f.y * 9) * 0.01) * W;
+    g.beginPath(); g.arc(x, y, f.r, 0, 7); g.fill();
+  }
+  // lantern string
+  const { s } = L();
+  const ly = H * 0.17;
+  g.strokeStyle = 'rgba(30,20,20,0.8)'; g.lineWidth = 1.5;
+  g.beginPath(); g.moveTo(0, ly - 10); g.quadraticCurveTo(W / 2, ly + 18, W, ly - 10); g.stroke();
+  const n = 6;
+  for (let i = 0; i < n; i++) {
+    const x = (i + 0.5) / n * W, y = ly - 10 + 28 * (1 - Math.pow((x / W - 0.5) * 2, 2)) * 0.5 + 12;
+    const pulse = fever ? 0.75 + 0.25 * Math.sin(t * 8 + i) : 0.55;
+    const glow = g.createRadialGradient(x, y, 2, x, y, 34 * s);
+    glow.addColorStop(0, `rgba(255,170,90,${0.45 * pulse})`); glow.addColorStop(1, 'rgba(255,120,60,0)');
+    g.fillStyle = glow; g.beginPath(); g.arc(x, y, 34 * s, 0, 7); g.fill();
+    g.fillStyle = i % 2 ? '#d8432f' : '#e8623a';
+    g.beginPath(); g.ellipse(x, y, 9 * s, 12 * s, 0, 0, 7); g.fill();
+    g.fillStyle = '#2a1a14'; g.fillRect(x - 5 * s, y - 14 * s, 10 * s, 3 * s); g.fillRect(x - 5 * s, y + 11 * s, 10 * s, 3 * s);
+  }
+  if (fever) {
+    const fg = g.createRadialGradient(W / 2, H * 0.6, 10, W / 2, H * 0.6, H * 0.6);
+    fg.addColorStop(0, `rgba(255,150,80,${0.18 + 0.08 * Math.sin(t * 9)})`); fg.addColorStop(1, 'rgba(255,90,120,0)');
+    g.fillStyle = fg; g.fillRect(0, 0, W, H);
+    g.fillStyle = 'rgba(255,200,230,0.6)'; g.font = `bold 18px ${FONT}`; g.textAlign = 'center'; g.textBaseline = 'middle';
+    for (let i = 0; i < 6; i++) {
+      const ph = (t * 0.35 + i / 6) % 1;
+      g.globalAlpha = Math.sin(ph * Math.PI) * 0.8;
+      g.fillText(i % 2 ? '♪' : '♫', W * (0.1 + 0.8 * ((i * 0.37) % 1)) + Math.sin(t * 2 + i) * 10, H * (0.7 - ph * 0.45));
+    }
+    g.globalAlpha = 1;
+  }
+  // ground
+  const gy = H * 0.74;
+  const gg = g.createLinearGradient(0, gy, 0, H);
+  gg.addColorStop(0, '#6b5a52'); gg.addColorStop(1, '#3b302c');
+  g.fillStyle = gg; g.fillRect(0, gy, W, H - gy);
+  g.fillStyle = 'rgba(255,255,255,0.08)';
+  g.fillRect(0, gy, W, 3);
+}
+
+function drawMochi(t, lay, u, squash, handV) {
+  const { cx, rimY, rx, ry } = lay;
+  const smooth = u ? clamp(u.total ? u.sum / u.total : 0, 0, 1) : 0;
+  const lumps = 1 - smooth;
+  const mw = rx * 0.82 * (1 + squash * 0.18), mh = rx * 0.42 * (1 - squash * 0.35);
+  const skew = handV * rx * 0.08;
+  const seed = u ? u.k * 7.3 : 0;
+  g.save();
+  g.beginPath();
+  const N = 28;
+  for (let i = 0; i <= N; i++) {
+    const a = Math.PI + (i / N) * Math.PI;
+    let r = 1 + lumps * 0.22 * (Math.sin(a * 5 + seed) * 0.6 + Math.sin(a * 9 + seed * 2) * 0.4);
+    const x = cx + Math.cos(a) * mw * r + skew * Math.sin(a) * -1;
+    const y = rimY - ry * 0.2 + Math.sin(a) * mh * r;
+    if (i === 0) g.moveTo(x, y); else g.lineTo(x, y);
+  }
+  g.ellipse(cx, rimY - ry * 0.2, mw, ry * 0.65, 0, 0, Math.PI);
+  g.closePath();
+  const mg = g.createRadialGradient(cx - mw * 0.3, rimY - mh * 0.8, 4, cx, rimY - mh * 0.2, mw * 1.2);
+  const mix = (a, b) => `rgb(${a.map((v, i) => Math.round(lerp(v, b[i], smooth))).join(',')})`;
+  mg.addColorStop(0, mix([238, 230, 214], [255, 255, 255])); mg.addColorStop(0.6, mix([222, 210, 190], [250, 248, 244])); mg.addColorStop(1, mix([190, 175, 150], [222, 214, 204]));
+  g.fillStyle = mg; g.fill();
+  g.strokeStyle = 'rgba(150,130,110,0.5)'; g.lineWidth = 1.5; g.stroke();
+  // grains when lumpy
+  if (lumps > 0.08) {
+    // visible rice grains that melt away as the mochi gets pounded well
+    const ng = Math.round(34 * lumps);
+    for (let i = 0; i < ng; i++) {
+      const a = Math.PI + ((i * 0.377 + seed * 0.13) % 1) * Math.PI;
+      const rr2 = 0.15 + ((i * 0.613) % 0.8);
+      const x = cx + Math.cos(a) * mw * rr2, y = rimY - ry * 0.2 + Math.sin(a) * mh * rr2;
+      g.fillStyle = `rgba(185,170,145,${0.35 + lumps * 0.5})`;
+      g.beginPath(); g.ellipse(x, y, 3.4, 1.9, (i * 1.3) % 3, 0, 7); g.fill();
+      g.fillStyle = `rgba(255,255,255,${lumps * 0.8})`;
+      g.beginPath(); g.ellipse(x - 0.8, y - 0.8, 1.6, 0.9, (i * 1.3) % 3, 0, 7); g.fill();
+    }
+  }
+  // gloss
+  g.globalAlpha = 0.25 + smooth * 0.7;
+  g.fillStyle = '#ffffff';
+  g.beginPath(); g.ellipse(cx - mw * 0.32, rimY - mh * 0.72, mw * 0.22, mh * 0.12, -0.3, 0, 7); g.fill();
+  if (smooth > 0.7) {
+    g.globalAlpha = (smooth - 0.7) * 2;
+    const sp = (t * 1.5) % 1;
+    g.beginPath(); g.arc(cx + mw * (0.2 - sp * 0.1), rimY - mh * 0.85, 3 + Math.sin(t * 6) * 1.5, 0, 7); g.fill();
+  }
+  g.restore();
+}
+
+function drawUsu(lay) {
+  const { cx, rimY, rx, ry } = lay;
+  const bh = rx * 0.95;
+  // shadow
+  g.fillStyle = 'rgba(0,0,0,0.3)';
+  g.beginPath(); g.ellipse(cx, rimY + bh, rx * 1.1, ry * 0.8, 0, 0, 7); g.fill();
+  // body
+  const bg = g.createLinearGradient(cx - rx, 0, cx + rx, 0);
+  bg.addColorStop(0, '#6e4428'); bg.addColorStop(0.4, '#a8703f'); bg.addColorStop(1, '#5a361f');
+  g.fillStyle = bg;
+  g.beginPath();
+  g.moveTo(cx - rx, rimY);
+  g.bezierCurveTo(cx - rx * 0.82, rimY + bh * 0.5, cx - rx * 0.78, rimY + bh * 0.6, cx - rx * 0.88, rimY + bh);
+  g.ellipse(cx, rimY + bh, rx * 0.88, ry * 0.6, 0, Math.PI, 0, true);
+  g.bezierCurveTo(cx + rx * 0.78, rimY + bh * 0.6, cx + rx * 0.82, rimY + bh * 0.5, cx + rx, rimY);
+  g.closePath(); g.fill();
+  // bands
+  g.strokeStyle = 'rgba(40,20,10,0.45)'; g.lineWidth = 3;
+  for (const f of [0.3, 0.75]) {
+    g.beginPath(); g.ellipse(cx, rimY + bh * f, rx * (f < 0.5 ? 0.9 : 0.82), ry * 0.7, 0, 0.1, Math.PI - 0.1); g.stroke();
+  }
+  // rim
+  g.fillStyle = '#c08a55';
+  g.beginPath(); g.ellipse(cx, rimY, rx, ry, 0, 0, 7); g.fill();
+  g.fillStyle = '#4a2c18';
+  g.beginPath(); g.ellipse(cx, rimY + 2, rx * 0.86, ry * 0.75, 0, 0, 7); g.fill();
+}
+// the rim's front edge (drawn over the mochi bottom)
+function drawRimFront(lay) {
+  const { cx, rimY, rx, ry } = lay;
+  g.strokeStyle = '#c08a55'; g.lineWidth = ry * 0.28;
+  g.beginPath(); g.ellipse(cx, rimY, rx * 0.93, ry * 0.86, 0, 0.05, Math.PI - 0.05); g.stroke();
+}
+
+function drawKine(t, lay) {
+  const { cx, rimY, rx, ry, s } = lay;
+  // slam: 0..0.06 down, 0.06..0.32 back up
+  const dt = t - kineT;
+  let down;
+  if (dt < 0) down = 0;
+  else if (dt < 0.035) down = dt / 0.035;
+  else if (dt < 0.14) down = 1;
+  else down = 1 - ease((dt - 0.14) / 0.26);
+  down = clamp(down, 0, 1);
+  // stopped on the partner's hand
+  const onHand = t - lastHandHit < 0.4 && Math.abs(kineT - lastHandHit) < 0.001;
+  if (onHand) down *= 0.72;
+  // wind-up: the kine rises as the next pound approaches (a visual metronome)
+  let lift = 0;
+  if (state === 'play' && tl) {
+    for (const p of tl.pounds) {
+      if (p.done) continue;
+      if (p.t < t - 0.05) continue;
+      const lead = p.u.B * (p.dbl ? 0.45 : 0.7);
+      lift = clamp(1 - (p.t - t) / lead, 0, 1);
+      break;
+    }
+    if (dt >= 0 && dt < 0.4) lift *= clamp((dt - 0.14) / 0.26, 0, 1);
+  }
+  const hx = lerp(cx + rx * 0.55 + lift * rx * 0.12, cx + rx * 0.12, down);
+  const hy = lerp(rimY - rx * 1.55 - lift * rx * 0.45, rimY - rx * 0.62, down);
+  const ang = lerp(-0.55 - lift * 0.35, -0.12, down);
+  const hl = rx * 0.62, hr = rx * 0.25;
+  // handle
+  g.save();
+  g.translate(hx, hy); g.rotate(ang);
+  g.strokeStyle = '#b98a54'; g.lineWidth = 9 * s; g.lineCap = 'round';
+  g.beginPath(); g.moveTo(0, 0); g.lineTo(W * 1.2, W * 0.15); g.stroke();
+  g.strokeStyle = 'rgba(0,0,0,0.18)'; g.lineWidth = 3 * s;
+  g.beginPath(); g.moveTo(0, 4 * s); g.lineTo(W * 1.2, W * 0.15 + 4 * s); g.stroke();
+  // head (barrel)
+  const hg = g.createLinearGradient(0, -hr, 0, hr);
+  hg.addColorStop(0, '#d9a56c'); hg.addColorStop(0.5, '#b07a45'); hg.addColorStop(1, '#7a4f2b');
+  g.fillStyle = hg;
+  rr(-hl / 2, -hr, hl, hr * 2, hr * 0.35); g.fill();
+  g.fillStyle = '#e6be8a';
+  g.beginPath(); g.ellipse(-hl / 2, 0, hr * 0.32, hr, 0, 0, 7); g.fill();
+  g.strokeStyle = 'rgba(60,30,10,0.5)'; g.lineWidth = 2;
+  g.beginPath(); g.moveTo(-hl * 0.25, -hr); g.lineTo(-hl * 0.25, hr); g.moveTo(hl * 0.25, -hr); g.lineTo(hl * 0.25, hr); g.stroke();
+  g.restore();
+  return down;
+}
+
+function drawPartner(t, lay, pose, moodV, talking) {
+  const { cx, rimY, rx, ry, s } = lay;
+  const hit = t - lastHandHit < 0.6;
+  const hx0 = W * 0.13, hy0 = H * 0.47; // head
+  const R = 30 * s;
+  // body
+  g.fillStyle = '#2f4f8a';
+  g.beginPath(); g.ellipse(hx0 - 4 * s, hy0 + R * 2.2, R * 1.35, R * 1.5, 0, 0, 7); g.fill();
+  g.fillStyle = '#f2efe6'; // apron-ish collar
+  g.beginPath(); g.moveTo(hx0 - R * 0.5, hy0 + R * 0.9); g.lineTo(hx0 + R * 0.2, hy0 + R * 1.7); g.lineTo(hx0 + R * 0.6, hy0 + R * 0.9); g.fill();
+  // bucket
+  const bx = W * 0.12, by = H * 0.79;
+  g.fillStyle = '#8a5a32'; rr(bx - 22 * s, by - 20 * s, 44 * s, 32 * s, 6 * s); g.fill();
+  g.fillStyle = '#5ba7d9'; g.beginPath(); g.ellipse(bx, by - 19 * s, 21 * s, 6 * s, 0, 0, 7); g.fill();
+  g.strokeStyle = '#3b2412'; g.lineWidth = 2; g.beginPath(); g.moveTo(bx - 22 * s, by - 8 * s); g.lineTo(bx + 22 * s, by - 8 * s); g.stroke();
+  // arm
+  const sx = hx0 + R * 0.7, sy = hy0 + R * 1.3;
+  const rest = pose.wet ? { x: bx + 6 * s, y: by - 24 * s } : { x: hx0 + R * 1.6, y: hy0 + R * 2.6 };
+  const into = { x: cx - rx * 0.12, y: rimY - rx * 0.36 };
+  let hxp = lerp(rest.x, into.x, pose.v), hyp = lerp(rest.y, into.y, pose.v) - Math.sin(pose.v * Math.PI) * 18 * s;
+  if (hit) { hxp -= 14 * s * (1 - (t - lastHandHit) / 0.6); hyp -= 20 * s * (1 - (t - lastHandHit) / 0.6); }
+  g.strokeStyle = '#2f4f8a'; g.lineWidth = 16 * s; g.lineCap = 'round';
+  const ex = lerp(sx, hxp, 0.5) - 6 * s, ey = Math.max(sy, hyp) + 14 * s;
+  g.beginPath(); g.moveTo(sx, sy); g.quadraticCurveTo(ex, ey, hxp, hyp); g.stroke();
+  // hand
+  g.fillStyle = hit ? '#ff9a8a' : '#f4c9a0';
+  g.beginPath(); g.ellipse(hxp, hyp, 13 * s, 10 * s, -0.4, 0, 7); g.fill();
+  g.beginPath(); g.ellipse(hxp + 7 * s, hyp - 7 * s, 5 * s, 4 * s, -0.8, 0, 7); g.fill();
+  if (pose.wet && pose.v > 0.2) {
+    g.fillStyle = 'rgba(140,200,255,0.9)';
+    for (let i = 0; i < 4; i++) {
+      const ph = (t * 2.5 + i * 0.25) % 1;
+      g.beginPath(); g.arc(hxp - 8 * s + i * 6 * s, hyp + 8 * s + ph * 18 * s, 2.2 * s, 0, 7); g.fill();
+    }
+  }
+  // "hand in" warning glow
+  if (pose.v > 0.8) {
+    g.strokeStyle = `rgba(255,90,70,${0.35 + 0.25 * Math.sin(t * 20)})`; g.lineWidth = 3;
+    g.beginPath(); g.ellipse(hxp, hyp, 20 * s, 16 * s, 0, 0, 7); g.stroke();
+  }
+  if (hit) {
+    const k = (t - lastHandHit) / 0.6;
+    g.strokeStyle = `rgba(255,220,90,${1 - k})`; g.lineWidth = 3;
+    for (let i = 0; i < 6; i++) {
+      const a = i / 6 * Math.PI * 2 + k;
+      g.beginPath(); g.moveTo(hxp + Math.cos(a) * 16 * s, hyp + Math.sin(a) * 16 * s); g.lineTo(hxp + Math.cos(a) * (26 + 14 * k) * s, hyp + Math.sin(a) * (26 + 14 * k) * s); g.stroke();
+    }
+  }
+  // head
+  g.fillStyle = '#f4c9a0';
+  g.beginPath(); g.arc(hx0, hy0, R, 0, 7); g.fill();
+  g.fillStyle = '#2a1d18';
+  g.beginPath(); g.arc(hx0, hy0 - R * 0.25, R * 1.0, Math.PI * 1.05, Math.PI * 1.95); g.fill();
+  // hachimaki
+  g.fillStyle = '#e8e3da'; g.fillRect(hx0 - R, hy0 - R * 0.42, R * 2, R * 0.24);
+  g.fillStyle = '#d23a2c'; g.beginPath(); g.arc(hx0, hy0 - R * 0.3, R * 0.12, 0, 7); g.fill();
+  // face
+  const ex2 = hx0 + R * 0.2;
+  g.fillStyle = '#2a1d18';
+  if (hit) {
+    g.lineWidth = 2; g.strokeStyle = '#2a1d18';
+    for (const dx of [-R * 0.35, R * 0.35]) { g.beginPath(); g.moveTo(ex2 + dx - 4, hy0 - 4); g.lineTo(ex2 + dx + 4, hy0 + 2); g.moveTo(ex2 + dx + 4, hy0 - 4); g.lineTo(ex2 + dx - 4, hy0 + 2); g.stroke(); }
+  } else {
+    for (const dx of [-R * 0.35, R * 0.35]) { g.beginPath(); g.arc(ex2 + dx, hy0, 2.6 * s, 0, 7); g.fill(); }
+  }
+  // brows by mood
+  g.strokeStyle = '#2a1d18'; g.lineWidth = 2;
+  const angry = moodV < 40 ? (40 - moodV) / 40 : 0;
+  for (const sgn of [-1, 1]) {
+    const bx2 = ex2 + sgn * R * 0.35;
+    g.beginPath(); g.moveTo(bx2 - 5 * s, hy0 - 8 * s - (sgn > 0 ? -angry * 3 : angry * 3) * s * (sgn)); g.lineTo(bx2 + 5 * s, hy0 - 8 * s + angry * 3 * s * sgn); g.stroke();
+  }
+  // mouth
+  g.fillStyle = '#7a2a22';
+  if (talking || hit) { g.beginPath(); g.ellipse(ex2, hy0 + R * 0.45, 5 * s, (hit ? 7 : 5) * s, 0, 0, 7); g.fill(); }
+  else {
+    g.strokeStyle = '#7a2a22'; g.lineWidth = 2;
+    g.beginPath();
+    if (moodV > 50) g.arc(ex2, hy0 + R * 0.3, 6 * s, 0.2, Math.PI - 0.2);
+    else g.arc(ex2, hy0 + R * 0.6, 6 * s, Math.PI + 0.3, -0.3);
+    g.stroke();
+  }
+  // cheeks
+  g.fillStyle = 'rgba(255,120,120,0.3)';
+  g.beginPath(); g.arc(ex2 - R * 0.55, hy0 + R * 0.25, 5 * s, 0, 7); g.arc(ex2 + R * 0.55, hy0 + R * 0.25, 5 * s, 0, 7); g.fill();
+  return { hx: hx0, hy: hy0, R };
+}
+
+function bubble(x, y, txt, t0, t, color = '#fff', tc = '#2a1d18') {
+  const age = t - t0;
+  const sc = age < 0.08 ? 0.6 + age / 0.08 * 0.5 : age < 0.16 ? 1.1 - (age - 0.08) / 0.08 * 0.1 : 1;
+  const size = 20;
+  g.font = `bold ${size}px ${FONT}`;
+  const w = Math.min(W * 0.55, g.measureText(txt).width + 22);
+  g.save(); g.translate(x, y); g.scale(sc, sc);
+  g.fillStyle = color; rr(0, -20, w, 40, 14); g.fill();
+  g.beginPath(); g.moveTo(10, 14); g.lineTo(-4, 26); g.lineTo(22, 18); g.fill();
+  text(txt, w / 2, 0, size, tc, 'center', w - 12);
+  g.restore();
+}
+
+function drawRings(t, lay) {
+  const { cx, rimY, rx } = lay;
+  const my = rimY - rx * 0.32;
+  for (const p of tl.pounds) {
+    if (p.done) continue;
+    const B = p.u.B;
+    const lead = B * 1.6;
+    if (p.t - t > lead) break;
+    const k = clamp(1 - (p.t - t) / lead, 0, 1);
+    const r = lerp(rx * 1.5, rx * 0.5, k);
+    g.strokeStyle = p.syn ? `rgba(255,170,240,${0.25 + k * 0.6})` : p.dbl ? `rgba(255,220,120,${0.25 + k * 0.6})` : `rgba(255,255,255,${0.2 + k * 0.6})`;
+    g.lineWidth = 2 + k * 3;
+    g.beginPath(); g.ellipse(cx, my, r, r * 0.42, 0, 0, 7); g.stroke();
+  }
+  // rest markers: a blue hand that closes in on the beat you must skip
+  for (const r of tl.rests) {
+    const lead = r.u.B * 1.6;
+    if (r.t - t > lead) break;
+    if (r.t < t - 0.25) continue;
+    const k = clamp(1 - (r.t - t) / lead, 0, 1);
+    const rad = lerp(rx * 1.5, rx * 0.5, k);
+    const a = r.t < t ? 1 - (t - r.t) / 0.25 : 0.3 + k * 0.6;
+    g.setLineDash([7, 6]);
+    g.strokeStyle = `rgba(120,200,255,${a})`; g.lineWidth = 2 + k * 2;
+    g.beginPath(); g.ellipse(cx, my, rad, rad * 0.42, 0, 0, 7); g.stroke();
+    g.setLineDash([]);
+    if (k > 0.55) {
+      g.globalAlpha = clamp(a, 0, 1);
+      g.fillStyle = '#7cc8ff';
+      g.font = `bold ${Math.round(16 + 6 * k)}px ${FONT}`; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText('✋', cx + rad * 0.95, my - rad * 0.42);
+      g.globalAlpha = 1;
+    }
+  }
+  // target ring
+  g.strokeStyle = 'rgba(255,255,255,0.18)'; g.lineWidth = 2;
+  g.beginPath(); g.ellipse(cx, my, rx * 0.5, rx * 0.21, 0, 0, 7); g.stroke();
+}
+
+function drawHUD(t, u) {
+  const { s } = L();
+  text(`${score}`, 16, 26, 26, '#fff', 'left', W * 0.45);
+  text(`${T.best} ${Math.max(best, score)}`, W - 16, 22, 15, '#ffd9a0', 'right', W * 0.45, 'bold');
+  if (u) text(`${T.usu} ${u.k + 1}  ♩${u.bpm}`, W - 16, 44, 14, '#e8d8ff', 'right', W * 0.45, 'bold');
+  if (combo >= 3) text(`${combo} ${T.combo}`, 16, 52, 16, combo >= 16 ? '#ff9fd0' : '#ffe9b0', 'left', W * 0.45);
+  // mood gauge
+  const gx = 16, gy = 70, gw = W * 0.4, gh = 10;
+  text(T.mood, gx, gy + 5, 13, '#cfc6e6', 'left', 60, 'bold');
+  g.font = `bold 13px ${FONT}`;
+  const lw = Math.min(60, g.measureText(T.mood).width) + 8;
+  g.fillStyle = 'rgba(255,255,255,0.15)'; rr(gx + lw, gy, gw - lw, gh, 5); g.fill();
+  const m = clamp(mood / 100, 0, 1);
+  g.fillStyle = m > 0.5 ? '#7ee08a' : m > 0.25 ? '#f2c14e' : '#ff5a4a';
+  if (m > 0) { rr(gx + lw, gy, (gw - lw) * m, gh, 5); g.fill(); }
+  // tray of finished mochi
+  const ty = 74;
+  for (let i = 0; i < tray.length && i < 12; i++) {
+    const m2 = tray[tray.length - 1 - i];
+    const x = W - 22 - i * 22 * s, y = ty;
+    if (x < W * 0.5 + 20) break;
+    const pop = clamp((t - m2.t) / 0.3, 0, 1);
+    g.fillStyle = ['#d9cdb8', '#e8dfcf', '#f6f2ea', '#ffffff'][m2.r];
+    g.beginPath(); g.ellipse(x, y, 9 * s * pop, 6.5 * s * pop, 0, 0, 7); g.fill();
+    if (m2.r === 3) { g.fillStyle = '#ffe27a'; g.beginPath(); g.arc(x + 4 * s, y - 3 * s, 1.6 * s * pop, 0, 7); g.fill(); }
+  }
+}
+
+function drawFx(t, lay) {
+  const { cx, rimY, rx } = lay;
+  const my = rimY - rx * 0.45;
+  for (const f of fx) {
+    const age = (t - f.t), k = age / f.life;
+    if (f.kind === 'text') {
+      const y = f.slot === 'combo' ? H * 0.235 - ease(k * 2) * 10 : my - rx * 0.78 - ease(k * 2) * 26;
+      g.globalAlpha = 1 - Math.max(0, k - 0.6) / 0.4;
+      const sc = age < 0.08 ? 1.4 - age / 0.08 * 0.4 : 1;
+      g.save(); g.translate(f.slot === 'combo' ? W / 2 : cx + rx * 0.2, y); g.scale(sc, sc);
+      g.lineWidth = 5; g.strokeStyle = 'rgba(30,15,30,0.7)';
+      fitText(f.text, W - 40, f.size); g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.strokeText(f.text, 0, 0); g.fillStyle = f.color; g.fillText(f.text, 0, 0);
+      g.restore(); g.globalAlpha = 1;
+    } else {
+      const x = cx + f.vx * age, y = my + f.vy * age + 300 * age * age;
+      g.globalAlpha = 1 - k; g.fillStyle = f.color;
+      g.beginPath(); g.arc(x, y, f.r, 0, 7); g.fill(); g.globalAlpha = 1;
+    }
+  }
+}
+
+function frame() {
+  const t = now();
+  if (cv.width !== Math.round((cv.clientWidth || W) * DPR)) resize();
+  update(t);
+  g.setTransform(DPR, 0, 0, DPR, 0, 0);
+  const lay = L();
+  const u = state === 'title' ? null : curUsu(t);
+  const fever = state === 'play' && combo >= 16;
+  // shake
+  let sx = 0, sy = 0;
+  if (shake > 0) { shake = Math.max(0, shake - 1 / 60); sx = (Math.random() - 0.5) * 14 * shake; sy = (Math.random() - 0.5) * 14 * shake; }
+  g.save(); g.translate(sx, sy);
+  drawBG(t, fever);
+
+  if (state === 'title') {
+    drawTitle(t, lay);
+    g.restore();
+    requestAnimationFrame(frame);
+    return;
+  }
+
+  const pose = handPose(t);
+  // which cue is speaking
+  let speak = null;
+  for (const c of tl.cues) {
+    if (c.t <= t && t - c.t < (c.kind === 'done' ? 1.4 : c.kind === 'count' ? 0.5 : 0.42)) speak = c;
+    if (c.t > t) break;
+  }
+  const kineDown = (() => { const dt = t - squashT; return dt >= 0.02 && dt < 0.3 ? (dt < 0.1 ? 1 : 1 - (dt - 0.1) / 0.2) : 0; })();
+  drawUsu(lay);
+  // mochi (swap at finish)
+  let mu = u;
+  if (u && u.finished && t - u.doneT < 4 * u.B) {
+    // lift out finished mochi in the last beats
+    const k = (t - u.doneT) / (4 * u.B);
+    if (k < 0.6) drawMochi(t, lay, u, 0, 0);
+  } else drawMochi(t, lay, mu, kineDown, pose.v);
+  drawRimFront(lay);
+  if (state === 'play') drawRings(t, lay);
+  const ph = drawPartner(t, lay, pose, mood, speak && speak.kind !== 'done' ? true : false);
+  drawKine(t, lay);
+  // speech bubble
+  if (speak && state === 'play') {
+    let txt = '';
+    if (speak.kind === 'count') txt = T.count[speak.i];
+    else txt = T[speak.kind] || '';
+    const col = speak.kind === 'mizu' ? '#bfe6ff' : speak.kind === 'sore' ? '#ffe9a8' : speak.kind === 'yo' ? '#ffd0f0' : speak.kind === 'done' ? '#ffe27a' : '#ffffff';
+    bubble(ph.hx + ph.R * 0.6, ph.hy - ph.R * 1.6, txt, speak.t, t, col);
+  }
+  drawFx(t, lay);
+  // batch banner
+  if (u && t - u.t0 < 4 * u.B && state === 'play') {
+    const k = (t - u.t0) / (4 * u.B);
+    g.globalAlpha = k < 0.8 ? 1 : (1 - k) / 0.2;
+    text(T.newUsu(u.k + 1, u.bpm), W / 2, H * 0.3, 28, '#ffe9b0');
+    g.globalAlpha = 1;
+  }
+  // finished batch rating
+  if (u && u.finished && t - u.doneT < 4 * u.B) {
+    const k = (t - u.doneT) / (4 * u.B);
+    g.globalAlpha = k < 0.85 ? 1 : (1 - k) / 0.15;
+    text(T.rank[u.rank], W / 2, H * 0.25, 34, ['#c9b48a', '#e8dcc0', '#ffffff', '#ffe27a'][u.rank]);
+    text(`${Math.round(u.q * 100)}%`, W / 2, H * 0.25 + 30, 18, '#ffffff');
+    g.globalAlpha = 1;
+  }
+  drawHUD(t, u);
+  // hint / tip
+  if (state === 'play') {
+    let msg = null, a = 0;
+    if (tip) { msg = tip; a = Math.min(1, (3.2 - (t - tipT)) / 0.5); }
+    else if (t < hintUntil) { msg = T.hint; a = Math.min(1, (hintUntil - t) / 0.6); }
+    if (msg) {
+      g.globalAlpha = clamp(a, 0, 1);
+      g.fillStyle = 'rgba(20,10,30,0.6)'; rr(12, H - 58, W - 24, 40, 12); g.fill();
+      text(msg, W / 2, H - 38, 15, '#fff', 'center', W - 40);
+      g.globalAlpha = 1;
+    }
+  }
+  if (state === 'over') drawOver(t);
+  g.restore();
+  requestAnimationFrame(frame);
+}
+
+function drawTitle(t, lay) {
+  // a calm demo: kine bobbing over a lumpy mochi
+  const demoU = { k: 0, total: 1, sum: 0.5 + 0.5 * Math.sin(t * 0.7) * 0.5 };
+  const beat = 60 / 90;
+  const ph = (t % beat) / beat;
+  kineT = t - ph * beat;
+  drawUsu(lay);
+  drawMochi(t, lay, demoU, ph < 0.15 ? 1 - ph / 0.15 : 0, 0);
+  drawRimFront(lay);
+  drawPartner(t, lay, { v: ph > 0.35 && ph < 0.75 ? Math.sin((ph - 0.35) / 0.4 * Math.PI) : 0, wet: false }, 100, ph > 0.4 && ph < 0.6);
+  drawKine(t, lay);
+  g.fillStyle = 'rgba(20,10,30,0.55)'; g.fillRect(0, H * 0.18, W, H * 0.3);
+  text(T.title1, W / 2, H * 0.24, 44, '#ffe27a');
+  text(T.title2, W / 2, H * 0.31, 32, '#ffffff');
+  text(T.how1, W / 2, H * 0.37, 15, '#f2e9ff', 'center', W - 28, 'bold');
+  text(T.how2, W / 2, H * 0.41, 15, '#ffb3a8', 'center', W - 28, 'bold');
+  text(T.how3, W / 2, H * 0.45, 14, '#cfe8ff', 'center', W - 28, 'bold');
+  const a = 0.6 + 0.4 * Math.sin(t * 4);
+  g.globalAlpha = a;
+  text(T.start, W / 2, H * 0.93, 22, '#fff');
+  g.globalAlpha = 1;
+  if (best > 0) text(`${T.best} ${best}`, W / 2, H * 0.12, 16, '#ffd9a0');
+}
+
+function drawOver(t) {
+  const age = t - stateT;
+  g.fillStyle = `rgba(15,8,25,${Math.min(0.75, age * 2)})`; g.fillRect(0, 0, W, H);
+  text(T.over, W / 2, H * 0.26, 26, '#ffb3a8');
+  text(`${score}`, W / 2, H * 0.36, 56, '#fff');
+  if (overInfo && overInfo.isBest && score > 0) text(T.newBest, W / 2, H * 0.44, 22, '#ffe27a');
+  else text(`${T.best} ${best}`, W / 2, H * 0.44, 18, '#ffd9a0');
+  text(`${T.made}: ${mochiDone}  /  ${T.combo} ${maxCombo}`, W / 2, H * 0.51, 17, '#e8d8ff');
+  // finished mochi row
+  const s = Math.min(W / 360, H / 640);
+  const n = Math.min(tray.length, 10);
+  for (let i = 0; i < n; i++) {
+    const m = tray[i];
+    const x = W / 2 + (i - (n - 1) / 2) * 26 * s, y = H * 0.58;
+    g.fillStyle = ['#d9cdb8', '#e8dfcf', '#f6f2ea', '#ffffff'][m.r];
+    g.beginPath(); g.ellipse(x, y, 11 * s, 8 * s, 0, 0, 7); g.fill();
+  }
+  if (age > 0.7) {
+    g.globalAlpha = 0.6 + 0.4 * Math.sin(t * 4);
+    text(T.again, W / 2, H * 0.72, 22, '#fff');
+    g.globalAlpha = 1;
+  }
+}
+
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
