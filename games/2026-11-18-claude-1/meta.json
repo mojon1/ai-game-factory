@@ -1,0 +1,450 @@
+{
+  "id": "2026-11-18-claude-1",
+  "status": "published",
+  "title": "かえってこい！ブーメラン",
+  "genre": "アクション",
+  "concept": "ブーメランは投げた場所ではなく「今の自分」へ戻ってくる。投げたあとに立ち位置を動かすと戻り道が変わり、行きと帰りの二度、敵の列を巻きこめる。前が固いカブトも、戻り道なら背中を打てる。投げてから動く、その位置取りが核。",
+  "howToPlay": "タップした所へブーメランを投げ、ドラッグで動く。戻ってくる道に敵が並ぶよう立ち位置を変え、1回の投げでまとめて倒す。",
+  "libraryDecision": "使わない。敵は多くても30体ほどの2D俯瞰で、Canvas 2Dで十分なめらかに動き、物理演算も軌道は自作の方が「狙った所で折り返す」手触りを作りやすいため。",
+  "soundDecision": "BGMは入れず、飛んでいる間だけ回転に合わせて「ヒュンヒュン」と鳴る風切り音を出す。1回の投げで倒すたびに音階が1段ずつ上がるので、まとめて倒すと旋律になり、連続の気持ちよさが耳でも分かる。",
+  "improvements": [
+    {
+      "found": "①戻ってくる途中にタップしても何も起きず、投げたい瞬間が無駄になる ②敵が1体ずつゆっくり来るので、まとめて巻きこむ場面がほとんど無く最初が退屈 ③2体以上倒しても手応えが小さい",
+      "changed": "飛んでいる間のタップを「投げ予約」にして、受け取った瞬間に自動で投げる。敵を横一列・縦一列・V字の群れで出し、最初のウェーブから3〜4体の列を巻きこめるようにした。倒すたびに輪が広がり、ブーメランの下に今の連続数（×2、×3…）を出す。",
+      "foundEn": "(1) Tapping while it is returning did nothing, wasting the moment. (2) Enemies trickled in one by one, so there were few chances to sweep several, and the start was dull. (3) Multi-kills felt small.",
+      "changedEn": "Taps during flight now queue the next throw, fired the instant you catch it. Enemies come in rows, columns and V formations so even wave 1 offers lines of 3-4 to sweep. Each kill now sends out a ring, and the current chain (x2, x3...) follows the boomerang."
+    },
+    {
+      "found": "①立ったまま上へ投げるだけでウェーブ3まで一度も当たらず、緊張感がない ②敵が上からしか来ないので、動いて戻り道を変える理由がない ③行きの間に出る「戻り道の予告線」が薄く、動けば戻り道が曲がることに気づきにくい",
+      "changed": "敵の速さを2割上げ、群れの数と出る間隔を詰めた。ウェーブ2から左右、ウェーブ5から背後（下）からも群れが来るので、立ち位置を変えないと戻り道に並ばない。行きの間の予告線を太く濃くした。",
+      "foundEn": "(1) Standing still and throwing upward cleared to wave 3 without a hit; no tension. (2) Enemies only came from the top, so there was no reason to move and bend the return. (3) The return preview line during the outbound was faint, so it was hard to notice that moving bends the way back.",
+      "changedEn": "Enemies are 20% faster, with more groups at shorter intervals. From wave 2 groups come from the sides, and from wave 5 from behind (the bottom), so you must reposition to line them up on the return. The preview line is now thicker and brighter."
+    },
+    {
+      "found": "①連続で倒すと得点の文字が何重にも重なって読めない ②カブトがすぐこちらへ向き直るので、回りこんで背中を見せる遊びが成り立たず「カン！」ばかりになる ③縦列を貫いて6連続を出しても、普通の一撃と見た目が変わらず山場がない",
+      "changed": "得点の表示を1体につき1つにまとめた。カブトの向き直りを約半分の速さにし、盾を前の約130度に狭めた（絵も合わせた）。連続が増えるほどブーメランが大きくなり、軌跡が金から橙へ熱を帯びる。受け取った瞬間に連続数の2乗のボーナスが入り、3連以上は「ナイス」、6連以上は「すごい」、10連以上は「伝説」と和音で祝う。",
+      "foundEn": "(1) Score popups stacked into an unreadable pile during chains. (2) Beetles turned to face you so fast that circling to expose their backs never worked, and it was all \"Clank!\". (3) Piercing a column for a 6-chain looked the same as a single hit; no climax.",
+      "changedEn": "One popup per kill. Beetles turn about half as fast, and the shield covers only ~130 degrees in front (art matches). The boomerang grows and its trail heats from gold to orange as the chain rises. Catching it pays a bonus of chain squared; 3+ is \"Nice!\", 6+ \"Great!\", 10+ \"Legendary!\" with a chord."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "アクション",
+      "en": "Action",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "投げると自分の今いる所へ戻ってくるブーメランで、戻り道を立ち位置で曲げて敵をまとめて倒すアクション。",
+        "ideaEn": "An action game where the boomerang returns to wherever you are now, so you bend its way back by moving and sweep enemies twice.",
+        "fromDraw": true
+      },
+      {
+        "idea": "雲をなぞって雨を降らせ、葉や池が楽器のように鳴る、終わりのない雨の遊び場。",
+        "ideaEn": "An endless playground: trace clouds to make rain, and leaves and ponds ring like instruments.",
+        "fromDraw": false
+      },
+      {
+        "idea": "3Dの町の上を紙ひこうきで滑空し、煙突の上昇気流を乗りついで遠くまで飛ぶ。",
+        "ideaEn": "Glide a paper plane over a 3D town, riding chimney updrafts as far as you can.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "fail",
+    "input": [
+      "tap",
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Come Back, Boomerang!",
+      "concept": "The boomerang returns not to where you threw it, but to where you are now. Move after throwing and its way back bends, sweeping lines of enemies on the way out and back. Armored beetles can be hit from behind on the return. Throw, then move — positioning is the core.",
+      "howToPlay": "Tap to throw the boomerang there, drag to move. Stand so the way back lines up enemies, and take many down with one throw.",
+      "libraryDecision": "None. About 30 enemies in a 2D top-down view runs smoothly with Canvas 2D, and a hand-made flight path makes the \"turn exactly where I aimed\" feel easier than a physics engine.",
+      "soundDecision": "No BGM. While flying, a whoosh pulses with the spin. Each kill in one throw goes one note up the scale, so a sweep becomes a melody you can hear."
+    }
+  },
+  "createdAt": "2026-11-18T09:06:39+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-18T09:06:39+09:00",
+    "metricsFrom": "2026-11-18T00:05:49.288Z",
+    "transcript": "5d9365c6-1006-4859-8723-e49142545da8.jsonl",
+    "validationRuns": 6,
+    "finishedAt": "2026-11-18T09:22:06+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-18T09:22:22+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "38.0KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=123",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=169",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=103",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=144",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 38949,
+    "lines": 789
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "戻り道は投げてからしか見えないので、狙いどおりに列をなめるには慣れが要り、最初の数回は1体ずつ当てるだけの単調な遊びに見えやすい。敵の種類も5つと少ない。",
+    "comment": "ウェーブ1で左の縦列の真上へ投げ、真下へ一歩入ると、戻り道が縦列を上から貫いて5連続、受け取った瞬間に「ナイス！+125」。音階が上がりながら軌跡が橙に焼ける場面は気持ちよく、もう一度狙いたくなった。ウェーブ2ではカブトの真後ろへ投げて少し横へずれ、戻り道で背中を打てた。一方、何も考えず上へ投げ続けると単調で、立ち止まっているとカブトに追いつかれてすぐ終わる。",
+    "similar": [
+      {
+        "title": "Boomerang X",
+        "url": "https://shacknews.com/article/125477/boomerang-x-review-its-all-coming-back?amphtml=1",
+        "similarity": "中",
+        "note": "投げたブーメランが動いた自分を追って戻る点が同じ。あちらはPCの3D一人称アリーナシューター、こちらはスマホ縦画面の見下ろしで、戻り道で敵の列を巻きこむ連続とカブトの背中打ちが中心。",
+        "note_en": "Same idea that the boomerang follows you as you move. That is a 3D first-person PC arena shooter; this is a top-down portrait phone game centered on sweeping enemy lines on the return and hitting beetles from behind."
+      },
+      {
+        "title": "Boomerang Chang",
+        "url": "https://www.pocketgamer.com/boomerang-chang/boomerang-chang-asks-you-to-prove-your-boomerang-throwing-skills-quickly",
+        "similarity": "低",
+        "note": "スマホのブーメラン・アクションで、戻ってくる軌道で反対側の敵を狙う点が近い。あちらは横画面の固定位置、こちらは自由に動いて戻り道そのものを曲げる。",
+        "note_en": "A mobile boomerang action game that also uses the return arc for enemies on the other side. It uses a fixed side view; here you move freely and bend the return path itself."
+      }
+    ],
+    "research": "ウェブで「戻ってくるブーメランで敵に当てるアクション」を1回検索し、似ている作品を2つ選んだ。",
+    "i18n": {
+      "en": {
+        "worst": "The return line only appears after you throw, so sweeping a line takes practice; the first few tries can feel like plain one-at-a-time hits. Only five enemy types.",
+        "comment": "In wave 1 I threw right above the left column and stepped under it; the return pierced the column for a 5-chain and the catch gave \"Nice! +125\". The rising notes and the trail heating to orange felt great and made me want to aim again. In wave 2 I threw behind a beetle, slid sideways, and hit its back on the return. Throwing upward without thinking is monotonous, though, and standing still gets you caught by beetles fast.",
+        "research": "One web search for boomerang action games that hit enemies on the return; picked two similar works."
+      }
+    },
+    "method": "スマホ縦画面で 10 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 10 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 2600ms → tap(0.30,0.06) 120ms → wait 120ms → swipe(0.60,0.85→0.40,0.85) 250ms → wait 300ms",
+        "note": "開始。左の縦列の上へ投げ、下に入る",
+        "noteEn": "Start; throw above the left column and step under it",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "wait 350ms",
+        "note": "戻り道でさらに巻きこむ",
+        "noteEn": "Sweeping more on the return",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 300ms",
+        "note": "受け取り",
+        "noteEn": "Catch",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 250ms",
+        "note": "キャッチでボーナス",
+        "noteEn": "Catch bonus",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.40,0.05) 120ms → wait 120ms → swipe(0.30,0.85→0.45,0.85) 200ms → wait 1000ms → tap(0.30,0.10) 120ms → wait 1100ms → tap(0.60,0.10) 120ms → wait 1100ms → tap(0.50,0.20) 120ms → wait 1100ms",
+        "note": "上の群れへ",
+        "noteEn": "At the top groups",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 800ms",
+        "note": "ウェーブ2",
+        "noteEn": "Wave 2",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.08,0.10) 120ms → wait 500ms",
+        "note": "カブトの真後ろへ投げる。行きは右に膨らんで盾をよける",
+        "noteEn": "Throw right behind the beetle; the outbound bulges right around the shield",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 300ms",
+        "note": "戻りで背中",
+        "noteEn": "Back hit on the return",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "swipe(0.50,0.85→0.38,0.85) 150ms → wait 250ms",
+        "note": "少し左へずれて戻り道を背中に合わせる",
+        "noteEn": "Slide a bit left to line the return up with its back",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 300ms",
+        "note": "結果",
+        "noteEn": "Result",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-18T09:22:06+09:00"
+  },
+  "publishedAt": "2026-11-18T09:22:06+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 18903,
+    "outputTokens": 45741,
+    "contextTokens": 12498333,
+    "turns": 65,
+    "toolCalls": 99,
+    "webSearches": 0,
+    "minutes": 16.3,
+    "from": "2026-11-18T00:05:49.288Z",
+    "to": "2026-11-18T00:22:06.111Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-18T09:22:06+09:00",
+    "validationRuns": 5,
+    "codeKB": 38
+  }
+}
