@@ -1,0 +1,366 @@
+{
+  "id": "2026-11-18-gpt-1",
+  "status": "published",
+  "title": "雨玉の分け板",
+  "genre": "物理おもちゃ",
+  "concept": "一枚の板を左右へ傾け、転がってきた二色の雨玉を別々の器へ流す。次の玉を見て板を返したくなるが、まだ板に残った玉は反対へ戻る。転がり終わりを待つ間合いと傾きの加減で十個を振り分ける。",
+  "howToPlay": "指を左右へ動かして板を傾け、青丸を左、金のひし形を右の器へ送ります。十個中八個が目標で、最初の二個以外は毎回順番が変わります。",
+  "libraryDecision": "Matter.jsで板との接触、転がり、玉同士の衝突を扱う。核を再考し、板を返すと残った玉も向きを変える状況を作り、平面の左右の傾きを読みやすく見せる。",
+  "soundDecision": "正しい器へ入ったときだけ上がる短い正弦波、取り逃しは控えめな低音で知らせる。雨のBGMは入れず、転がる玉の行き先へ注意を残す。",
+  "improvements": [
+    {
+      "found": "板から飛び出す勢いで器より先に画面外へ出る／取り逃しが音だけで分かりにくい／次の落下のタイミングが見えない。",
+      "changed": "左右に見える物理壁と広い受け口を置き、反射して器へ届く経路にした。正解・取り逃しの短い表示と落下間隔の目盛りを追加。",
+      "foundEn": "Marbles fly offscreen before reaching bowls; misses only have a sound cue; the next-drop timing is invisible.",
+      "changedEn": "Added visible physical side walls and wider mouths, brief success/miss text, and a drop-interval meter."
+    },
+    {
+      "found": "玉の並びが固定で二度目から覚えた傾きを繰り返せる／落下中の玉と次の予告が混同しやすい／高得点でも低得点でも同じ雨あがりだけで目標が弱い。",
+      "changed": "青二個の後は残りを毎回シャッフル。今の玉と次二個を分け、初回の落下目盛りも正しい長さにした。八個で虹の結果、足りない場合は目標までの個数を表示。",
+      "foundEn": "Fixed drop order becomes memorized; current drops and future previews are easily confused; all scores get the same ending without a goal.",
+      "changedEn": "Shuffle the tail after two opening blues, separate Now from two Next previews, normalize the first drop meter, and award a rainbow result for eight correct drops."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "ステルス",
+      "en": "Stealth",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "眠り猫の廊下。灯りの間を一歩ずつ進み、猫が目を閉じる間だけ影を渡る2Dステルス。明暗の重なりを俯瞰で読む。",
+        "ideaEn": "Sleeping-Cat Corridor: a flat stealth path between lamps, crossing shadows while a cat closes its eyes; overhead light overlaps guide timing.",
+        "fromDraw": true
+      },
+      {
+        "idea": "雨玉の分け板。傾けた板で二色の玉を器へ振り分ける。2Dの接触と転がりで、次の玉へ返すタイミングを読む。",
+        "ideaEn": "Rain-Marble Board: tilt a plank to sort two colors into bowls, reading flat contact and rolling to time the next reversal.",
+        "fromDraw": false
+      },
+      {
+        "idea": "三層の透かし窓。3Dの色ガラスを回し、奥の窓へ重なる色の形を合わせる。前後の層を回り込んで比べる。",
+        "ideaEn": "Three Glass Windows: rotate colored 3D panes to align layered color shapes, comparing front and rear layers from different views.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 1
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "limit",
+    "input": [
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Rain-Marble Board",
+      "concept": "Tilt one board to roll two colors of rain marbles into separate bowls. The next marble invites an early reversal, but a marble still on the board rolls back too. Read the rolling interval and tilt to sort ten.",
+      "howToPlay": "Move your finger horizontally to tilt the board: blue circles go left, gold diamonds right. Aim for eight of ten; the order after the first two blues changes each round.",
+      "libraryDecision": "Matter.js handles plank contact, rolling, and marble collisions. The core was refined around reversing a board while a previous marble remains on it, with flat side-to-side views for readability.",
+      "soundDecision": "Short rising sine tones confirm correct catches, and a quiet low tone marks misses. No rain BGM, leaving attention on rolling trajectories."
+    }
+  },
+  "createdAt": "2026-11-18T12:07:40+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-18T12:07:40+09:00",
+    "metricsFrom": "2026-11-18T03:05:45.432Z",
+    "transcript": null,
+    "validationRuns": 3,
+    "finishedAt": "2026-11-18T12:19:24+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-18T12:15:44+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "8.8KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=25",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=38",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=18",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=32",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 9011,
+    "lines": 38
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "matter-js",
+      "version": "0.20.0",
+      "file": "matter-0.20.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 2,
+    "works": "ok",
+    "worst": "端へ傾けるだけで間に合う猶予が広く、板の細かな角度を使い分ける必要が薄い。",
+    "comment": "画像を見ながら落下と板離れを待ち、並び替え後も十個すべて正解できた。初版の画面外への飛び出しは物理壁で直り、板を返す時期が結果へつながった。ただし操作の猶予が広く、角度の工夫が少ないので★2。英語iPhoneでも10/10、再開、左固定なら青五個のみ正解になることを確認。",
+    "similar": [
+      {
+        "title": "Enigmo",
+        "url": "https://www.pangeasoft.net/iphone/enigmo/info.html",
+        "similarity": "中",
+        "note": "反射・滑りを使って落下物を対応する器へ導く物理の核が共通。本作は部品を配置せず、一枚の板をリアルタイムに傾けて二色十個を振り分ける。",
+        "note_en": "Both route falling objects into matching containers through physical deflection. This game uses one real-time tilting plank rather than placing multiple puzzle pieces."
+      }
+    ],
+    "research": "Enigmo Pangea official droplets bumpers containers physicsで検索し、開発元公式紹介・説明書で物理的な誘導とURLを確認。",
+    "i18n": {
+      "en": {
+        "worst": "Timing is forgiving and a strong tilt usually suffices, so fine angle control has little purpose.",
+        "comment": "Inspected screenshots while waiting for marbles to leave the board, sorting all ten in the shuffled version. Physical walls fixed the initial offscreen losses, making reversal timing meaningful. Forgiving timing and limited angle choices keep this at two stars. English iPhone checks confirmed 10/10, restart, and exactly five blue successes when held left throughout.",
+        "research": "Searched for Enigmo, Pangea, droplets and bumpers; verified physical routing and the URL in the developer's official information and instructions."
+      }
+    },
+    "method": "スマホ縦画面で 9 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 9 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "並びが変わる版で八個以上を狙う。",
+        "noteEn": "Aiming for at least eight in the shuffled version.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.15,0.70) 120ms",
+        "note": "最初の青二個は左へ。",
+        "noteEn": "Tilting left for the opening blues.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 1000ms",
+        "note": "青が板を離れた後、金へ切り替える。",
+        "noteEn": "Waiting for blue to leave the board before switching to gold.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.85,0.70) 120ms",
+        "note": "金が続いているので右下がりを保つ。",
+        "noteEn": "Keeping the right side low for consecutive gold drops.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 1800ms",
+        "note": "もう一個の金が落ち切るまで待つ。",
+        "noteEn": "Waiting for one more gold to roll clear.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.15,0.70) 120ms",
+        "note": "青一個の間だけ左へ返す。",
+        "noteEn": "Reversing left for a single blue drop.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.85,0.70) 120ms",
+        "note": "次の金は右へ。",
+        "noteEn": "Sending the next gold right.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.15,0.70) 120ms",
+        "note": "青二個を左へ流し、最後の金へ備える。",
+        "noteEn": "Sending two blues left before the final gold.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.85,0.70) 120ms",
+        "note": "最後も正しく入れて目標達成を確かめる。",
+        "noteEn": "Finishing the final gold and checking the goal result.",
+        "image": "ai-play/step-09.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 10
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-18T12:19:24+09:00"
+  },
+  "publishedAt": "2026-11-18T12:19:24+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 5084,
+    "outputTokens": 8055,
+    "contextTokens": 10793933,
+    "turns": 31,
+    "toolCalls": 31,
+    "webSearches": null,
+    "minutes": 13.7,
+    "from": "2026-11-18T03:05:45.432Z",
+    "to": "2026-11-18T03:19:27.428Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-18T12:19:27+09:00",
+    "validationRuns": 3,
+    "codeKB": 8.8,
+    "evidence": "metrics-evidence.json"
+  }
+}

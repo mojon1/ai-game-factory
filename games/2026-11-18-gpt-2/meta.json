@@ -1,0 +1,362 @@
+{
+  "id": "2026-11-18-gpt-2",
+  "status": "published",
+  "title": "見える棟だけの街",
+  "genre": "街づくり",
+  "concept": "九つの敷地を一～三階に増築し、通りの向こうに隠れる建物を読む。縦横に同じ高さを重ねず、周囲から見える棟数をそろえる。三つの街で手がかりが減り、立体を回して手前と奥の関係を確かめる。",
+  "howToPlay": "敷地をタップして高さを0～3階に変え、各行と列を1・2・3階一棟ずつにします。周囲の数字と見える棟数が合えば次の街へ進めます（一手戻しと立体の回転も使えます）。",
+  "libraryDecision": "three.jsで建物の手前・奥と高さによる隠れ方を表現する。核を再考し、平面の高さ編集と回せる立体を組み合わせ、窓と階ごとの段で高さを数えられるようにした。",
+  "soundDecision": "増築する高さに応じて上がる短い正弦波を鳴らす。BGMは入れず、周囲の数字と建物を考える間を保つ。",
+  "improvements": [
+    {
+      "found": "同じ高さを重ねても違反が目立たない／街を回すと平面表のどこか分からない／未完成の通りでも手がかりが緑になり、完成との区別が弱い。",
+      "changed": "重複する建物を赤枠にし、平面と屋上に同じ番地を付けた。手がかりの色は通りが埋まってから判定し、一致数と縦横の完成数を表示。",
+      "foundEn": "Duplicate heights are not marked; rotation obscures map correspondence; unfinished streets can show green clues.",
+      "changedEn": "Outlined duplicate heights red, added matching lot and rooftop addresses, delayed clue colors until a street is filled, and displayed clue/row-column completion counts."
+    },
+    {
+      "found": "立体側の番地が小さく読みにくい／増築し過ぎると一周タップしないと戻れない／三階の次に空き地へ戻る操作が説明から分からない。",
+      "changed": "屋上の番地を大きくした。一手戻すボタンを追加し、タップ数には戻す操作も数える。タイトルで1→2→3→空き地の循環を明示。",
+      "foundEn": "Rooftop addresses are too small; overshooting needs a full tap cycle; returning from three floors to empty is not explained.",
+      "changedEn": "Enlarged rooftop labels, added undo (counted as a tap), and explicitly showed the 1→2→3→empty cycle."
+    },
+    {
+      "found": "大きくした屋上の番地が、高さの違う建物同士で重なって見える角度がある。",
+      "changed": "立体側は最後に編集した敷地の番地だけを示し、平面表の同じ敷地も明るく強調した。文字を小さくせず対応を追えるようにした。",
+      "foundEn": "Enlarged rooftop labels overlap at some angles when buildings differ in height.",
+      "changedEn": "Show only the last-edited lot's address in 3D and brighten the corresponding map tile, retaining readable text without overlap."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "街づくり",
+      "en": "City building",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "見える棟だけの街。街の敷地へ高さを置き、外から見える棟数をそろえる。3Dの隠れ方を回して見て、平面の高さ表へ戻って推理する。",
+        "ideaEn": "A City in Sight: set building heights to match skyline counts. Rotate a 3D city to inspect occlusion, then reason on a flat height map.",
+        "fromDraw": true
+      },
+      {
+        "idea": "昼寝の音庭。風鈴を指で置き、風の向きを変えて和音を作る終わりのない2D音の遊び場。重なる振れと響きを楽しむ。",
+        "ideaEn": "Nap-Time Chimes: place wind chimes and redirect wind in an endless flat musical garden, enjoying overlapping motion and chords.",
+        "fromDraw": false
+      },
+      {
+        "idea": "夜間の渡し船。3Dの潮の流れを読み、船を手で押し出して対岸の小さな灯りへ運ぶ。水面の奥行きと漂流で航路を読む。",
+        "ideaEn": "Night Ferry: push a boat through 3D currents toward a distant light, reading water depth and drift to plan the crossing.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "tap",
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "A City in Sight",
+      "concept": "Build nine lots one to three floors high and read which buildings hide behind others. Use each height once per row and column and match edge visibility clues. Three cities gradually remove clues; rotate the model to inspect depth.",
+      "howToPlay": "Tap lots to cycle 0–3 floors, using heights 1, 2, 3 once per row and column. Match the visible-building clues to continue; Undo and the rotatable 3D model help you check changes.",
+      "libraryDecision": "three.js expresses foreground/background occlusion by height. The core was refined into a flat height editor paired with a rotatable model, with windows and floor gaps to make levels countable.",
+      "soundDecision": "Short sine notes rise with the edited height. No BGM, leaving quiet time to compare buildings and clues."
+    }
+  },
+  "createdAt": "2026-11-18T12:22:34+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-18T12:22:34+09:00",
+    "metricsFrom": "2026-11-18T03:19:30.618Z",
+    "transcript": null,
+    "validationRuns": 4,
+    "finishedAt": "2026-11-18T12:46:15+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-18T12:42:31+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "11.4KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=10",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=65",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=11",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=51",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 11707,
+    "lines": 36
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol (Codex)",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "固定の3×3が三面だけで、慣れると短い。立体は確認の補助で、主な推理は平面表で済む。",
+    "comment": "三つの街を画像で試遊し、最終記録は番地表示を直した一面目の再確認。三面目では左から一棟の中央通りを3・1・2階と決め、下側の手がかりと縦列の残りで街を完成できた。手がかりが12→8→5と減り、一手戻しで試し直せる三つの短い推理は数分遊べると感じ★3。英語iPhoneで全三面の一意解、完成と再開、回転のキャンセルを確認。",
+    "similar": [
+      {
+        "title": "Towers / Skyscrapers（Simon Tatham版）",
+        "url": "https://www.chiark.greenend.org.uk/~sgtatham/puzzles/doc/towers.html",
+        "similarity": "高",
+        "note": "縦横に高さを一つずつ置き、周囲から見える棟数を合わせるルールは同じ。本作は3×3の固定三面、タップで増築する編集と回せる3Dの街に絞った。",
+        "note_en": "The Latin-height and edge-visibility rules are the same. This version uses three fixed 3×3 boards, tap-to-build editing, and a rotatable 3D city."
+      }
+    ],
+    "research": "Simon Tatham Towers visible towersで検索し、作者の公式説明で高さと周囲の可視棟数のルール、Skyscrapersの別名とURLを確認。",
+    "i18n": {
+      "en": {
+        "worst": "There are only three fixed 3×3 boards, so experienced play is brief. The 3D view is an aid; most deductions can be made from the flat map.",
+        "comment": "Played all three cities while inspecting screenshots; the final log rechecks city one after the address-label fix. In city three, a one-building left clue fixes the middle row to 3, 1, 2; bottom clues and remaining column heights finish it. Clues decrease 12→8→5, and undo supports three short deductions worth a few minutes, hence three stars. English iPhone tests verified unique solutions, all clears, restart guards, and rotation cancellation.",
+        "research": "Searched Simon Tatham Towers and visible towers; verified height/edge-count rules, the Skyscrapers alternate name, and the URL in the author's official documentation."
+      }
+    },
+    "method": "スマホ縦画面で 8 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 8 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "番地を一つだけ示す完成版で、最初の街を再確認する。",
+        "noteEn": "Rechecking the first city with a single focused address label.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.33,0.64) 120ms → tap(0.50,0.64) 120ms → tap(0.50,0.64) 120ms → tap(0.67,0.64) 120ms → tap(0.67,0.64) 120ms → tap(0.67,0.64) 120ms",
+        "note": "一列目を1・2・3階にし、A3の対応を見る。",
+        "noteEn": "Setting row one to 1, 2, 3 and checking the focused A3 label.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.33,0.71) 120ms → tap(0.33,0.71) 120ms → tap(0.50,0.71) 120ms → tap(0.50,0.71) 120ms → tap(0.50,0.71) 120ms → tap(0.67,0.71) 120ms",
+        "note": "二列目の2・3・1階もそろえる。",
+        "noteEn": "Completing row two with 2, 3, 1.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.33,0.78) 120ms → tap(0.33,0.78) 120ms → tap(0.33,0.78) 120ms → tap(0.50,0.78) 120ms",
+        "note": "最後の通りの二棟を置く。",
+        "noteEn": "Placing the first two buildings on the final street.",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "swipe(0.30,0.34→0.65,0.35) 400ms",
+        "note": "回転後もC2だけを追えるので文字が重ならない。",
+        "noteEn": "After rotating, only C2 remains labeled, avoiding overlaps.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.67,0.78) 120ms",
+        "note": "最後を一階にすると重複が見つかる。",
+        "noteEn": "A one-floor entry on the final lot produces duplicate warnings.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.50,0.04) 120ms",
+        "note": "一手戻して修正する。",
+        "noteEn": "Undoing the last entry to correct it.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.67,0.78) 120ms → tap(0.67,0.78) 120ms",
+        "note": "二階に直し、全条件の完成を再確認。",
+        "noteEn": "Correcting to two floors and confirming all conditions again.",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-18T12:46:15+09:00"
+  },
+  "publishedAt": "2026-11-18T12:46:15+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 10734,
+    "outputTokens": 11534,
+    "contextTokens": 18928854,
+    "turns": 48,
+    "toolCalls": 48,
+    "webSearches": null,
+    "minutes": 26.8,
+    "from": "2026-11-18T03:19:30.618Z",
+    "to": "2026-11-18T03:46:18.444Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-18T12:46:18+09:00",
+    "validationRuns": 4,
+    "codeKB": 11.4,
+    "evidence": "metrics-evidence.json"
+  }
+}

@@ -1,0 +1,261 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-11-18T03:42:35.303Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.5
+        ]
+      },
+      "desc": "tap(0.50,0.50) 120ms",
+      "note": "番地を一つだけ示す完成版で、最初の街を再確認する。",
+      "noteEn": "Rechecking the first city with a single focused address label.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": [
+        {
+          "tap": [
+            0.3333333333333333,
+            0.6378125
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.6378125
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.6378125
+          ]
+        },
+        {
+          "tap": [
+            0.6666666666666666,
+            0.6378125
+          ]
+        },
+        {
+          "tap": [
+            0.6666666666666666,
+            0.6378125
+          ]
+        },
+        {
+          "tap": [
+            0.6666666666666666,
+            0.6378125
+          ]
+        }
+      ],
+      "desc": "tap(0.33,0.64) 120ms → tap(0.50,0.64) 120ms → tap(0.50,0.64) 120ms → tap(0.67,0.64) 120ms → tap(0.67,0.64) 120ms → tap(0.67,0.64) 120ms",
+      "note": "一列目を1・2・3階にし、A3の対応を見る。",
+      "noteEn": "Setting row one to 1, 2, 3 and checking the focused A3 label.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "tap": [
+            0.3333333333333333,
+            0.7096875
+          ]
+        },
+        {
+          "tap": [
+            0.3333333333333333,
+            0.7096875
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.7096875
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.7096875
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.7096875
+          ]
+        },
+        {
+          "tap": [
+            0.6666666666666666,
+            0.7096875
+          ]
+        }
+      ],
+      "desc": "tap(0.33,0.71) 120ms → tap(0.33,0.71) 120ms → tap(0.50,0.71) 120ms → tap(0.50,0.71) 120ms → tap(0.50,0.71) 120ms → tap(0.67,0.71) 120ms",
+      "note": "二列目の2・3・1階もそろえる。",
+      "noteEn": "Completing row two with 2, 3, 1.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "tap": [
+            0.3333333333333333,
+            0.7815625
+          ]
+        },
+        {
+          "tap": [
+            0.3333333333333333,
+            0.7815625
+          ]
+        },
+        {
+          "tap": [
+            0.3333333333333333,
+            0.7815625
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.7815625
+          ]
+        }
+      ],
+      "desc": "tap(0.33,0.78) 120ms → tap(0.33,0.78) 120ms → tap(0.33,0.78) 120ms → tap(0.50,0.78) 120ms",
+      "note": "最後の通りの二棟を置く。",
+      "noteEn": "Placing the first two buildings on the final street.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": {
+        "swipe": [
+          0.3,
+          0.34,
+          0.65,
+          0.35
+        ],
+        "hold": 400
+      },
+      "desc": "swipe(0.30,0.34→0.65,0.35) 400ms",
+      "note": "回転後もC2だけを追えるので文字が重ならない。",
+      "noteEn": "After rotating, only C2 remains labeled, avoiding overlaps.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "tap": [
+            0.6666666666666666,
+            0.7815625
+          ]
+        }
+      ],
+      "desc": "tap(0.67,0.78) 120ms",
+      "note": "最後を一階にすると重複が見つかる。",
+      "noteEn": "A one-floor entry on the final lot produces duplicate warnings.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": {
+        "tap": [
+          0.5,
+          0.04
+        ]
+      },
+      "desc": "tap(0.50,0.04) 120ms",
+      "note": "一手戻して修正する。",
+      "noteEn": "Undoing the last entry to correct it.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": [
+        {
+          "tap": [
+            0.6666666666666666,
+            0.7815625
+          ]
+        },
+        {
+          "tap": [
+            0.6666666666666666,
+            0.7815625
+          ]
+        }
+      ],
+      "desc": "tap(0.67,0.78) 120ms → tap(0.67,0.78) 120ms",
+      "note": "二階に直し、全条件の完成を再確認。",
+      "noteEn": "Correcting to two floors and confirming all conditions again.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 1
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}
