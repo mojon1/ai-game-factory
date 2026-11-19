@@ -1,0 +1,338 @@
+{
+  "id": "2026-11-19-gpt-1",
+  "status": "published",
+  "title": "潮目の旗取り",
+  "genre": "陣取り",
+  "concept": "白い旗の海を色で広げ、相手の次の取り込みを先に塞ぐ。今すぐ多く取れる色と、次に大きな群れへ届く色を比べる。十二手の後に、島の数で二つの海の広さを競う。 先に過半数を取れば早く決着する。",
+  "howToPlay": "下の色で上下左右につながる島を取ります。先に22島取るか、十二手の後に相手より多ければ勝ち。",
+  "libraryDecision": "平面で全ての接続を同時に読みたいのでCanvasも3Dも使わず、CSSの色と旗の枠で表す。物理や効果のライブラリは判断を強めない。",
+  "soundDecision": "取り込みで短い上昇音だけを鳴らし、領地が増えた手応えを添える。色を考える時間を邪魔しないようBGMは入れない。",
+  "improvements": [
+    {
+      "found": "斜めでも取れるように見えて空振りした／色を選ぶ前に増える島数が分からない／相手の大きな取り込みが一瞬で、何が起きたか読みにくい。",
+      "changed": "上下左右の接続を開始時に明記し、色ボタンへ即時獲得数を表示。自分と相手の直前の獲得数も盤面上に残す。",
+      "foundEn": "Diagonal contact looked valid; gains were hard to count; the rival's capture happened without a readable summary.",
+      "changedEn": "Clarified orthogonal adjacency, added gain previews to color buttons, and kept the previous gains visible above the board."
+    },
+    {
+      "found": "無効な色にも獲得数が出て押したくなる／数字は見えるが接する島を探し直す／大半が埋まると残り手数が単調になる。",
+      "changed": "相手と自分の色は獲得数の代わりに横棒を表示。すぐ触れる中立島に内側の白線を付け、先に過半数の22島で決着するルールを追加した。",
+      "foundEn": "Disabled colors still advertised gains; matching a preview to its islands took effort; the late game could drag after a majority was secured.",
+      "changedEn": "Disabled colors now show a dash, directly reachable neutral islands have an inner white outline, and reaching the majority of 22 ends the game early."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "陣取り",
+      "en": "Territory control",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "色を変えて隣接する島をまとめて取り、相手と海を分け合う。2Dで全接続を見せ、3Dの高さは接続を隠すため使わない。",
+        "ideaEn": "Change color to claim connected islands against a rival. A flat chart exposes all connections; height would obscure them.",
+        "fromDraw": true
+      },
+      {
+        "idea": "折り返す音を聞いて洞窟の壁の距離を当てる。3Dの暗闇と立体音で距離の感覚を遊ぶ。",
+        "ideaEn": "Estimate cave walls from echoes in a dark 3D space with positional sound.",
+        "fromDraw": false
+      },
+      {
+        "idea": "二つの滑車のひもを交互に引いて、水平な皿の上の果物を運ぶ。3Dの傾きと転がる重さを見せる。",
+        "ideaEn": "Pull two pulley ropes to carry fruit on a level tray, showing tilt and rolling weight in 3D.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "limit",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Flags at the Tide",
+      "concept": "Expand a white-flag sea by color while denying the rival access to large groups. Compare an immediate gain with reaching a valuable group on the next turn, then compare island totals after twelve turns. A majority ends the match early.",
+      "howToPlay": "Choose colors to claim orthogonally connected islands. Reach 22 first, or own more islands after twelve turns.",
+      "libraryDecision": "CSS colors and flag borders expose every planar connection. 3D, physics and effects would not strengthen this decision.",
+      "soundDecision": "A short rising note acknowledges each claim. No background music interrupts thinking."
+    }
+  },
+  "createdAt": "2026-11-19T12:08:09+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "gpt-6.1-sol",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-19T12:08:09+09:00",
+    "metricsFrom": "2026-11-19T03:07:23.358Z",
+    "transcript": null,
+    "validationRuns": 3,
+    "finishedAt": "2026-11-19T12:15:45+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-19T12:13:41+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "7.4KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 7530,
+    "lines": 23
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 2,
+    "works": "ok",
+    "worst": "即時獲得数の最大を追うだけでも勝てる場面が多く、相手の読みを崩す深さが薄い。",
+    "comment": "赤から水色の列へ入り、黄色四島、緑四島と中央へ伸ばす筋は読みやすくなった。六手で23対16の勝利を確認。ただし盤面が小さく、予告数があると最大値を押す作業へ寄りやすいので★2。",
+    "similar": [
+      {
+        "title": "Filler (SparkChat)",
+        "url": "https://www.sparkchat.family/games/filler",
+        "similarity": "高",
+        "note": "対角の領地から色を変えて連結マスを取り、互いの現在色を禁止する核は同じ。こちらはCPU戦・五色・42島・十二手上限・獲得数予告を備える。",
+        "note_en": "The core of expanding opposite-corner regions by color while banning both current colors is the same. This version uses a CPU rival, five colors, 42 islands, a twelve-turn limit and gain previews."
+      }
+    ],
+    "research": "ウェブ検索でFillerとcolor floodの規則を確認し、提供元SparkChatのゲーム説明を参照した。",
+    "i18n": {
+      "en": {
+        "worst": "Following the largest immediate gain often wins; disrupting the rival's plan has limited depth.",
+        "comment": "Entering through coral and cyan, then taking four yellow and four green islands made the route readable. I confirmed a 23–16 win in six turns. The small board and gain previews often reduce choices to picking the largest number, so I rate it two stars.",
+        "research": "Searched for Filler and color-flood rules and consulted the game provider SparkChat's rules."
+      }
+    },
+    "method": "スマホ縦画面で 7 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 7 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "先に22島という目標を見て再開する。",
+        "noteEn": "I restart with the visible target of 22 islands.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.13,0.81) 120ms",
+        "note": "白い内線で接する赤が見える。左の縦列を目指す入口にする。",
+        "noteEn": "The inner outline marks the touching coral island. I use it as an entry toward the left column.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.32,0.81) 120ms",
+        "note": "水色のプラス三を選ぶ。相手の紫は横棒なので、押せない理由も色で対応できる。",
+        "noteEn": "I choose cyan's +3. Purple has a dash matching the rival's current color.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.87,0.81) 120ms",
+        "note": "黄色は四島。中央へ広く接する列を先に取る。",
+        "noteEn": "Yellow gains four and opens a long frontier toward the center.",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.68,0.81) 120ms",
+        "note": "緑を取り、右下にも足場を残す。四島と二島の交換なら先行できる。",
+        "noteEn": "I take green, keeping a foothold at bottom right; a four-for-two exchange gives a lead.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.13,0.81) 120ms",
+        "note": "赤の縦列を取る。白線がある島から奥まで同じ赤がつながり、四島に広がるのが分かる。",
+        "noteEn": "I take the coral column; its outlined entry connects through to four islands.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.32,0.81) 120ms",
+        "note": "水色の四島で目標22を超えられる。最後まで消化しなくても勝負が決まるか確かめる。",
+        "noteEn": "Four cyan islands should cross the target of 22. I check that the majority ends the match.",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 23
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-19T12:15:45+09:00"
+  },
+  "publishedAt": "2026-11-19T12:15:45+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 1032,
+    "outputTokens": 7575,
+    "contextTokens": 2252883,
+    "turns": 25,
+    "toolCalls": 25,
+    "webSearches": null,
+    "minutes": 8.4,
+    "from": "2026-11-19T03:07:23.358Z",
+    "to": "2026-11-19T03:15:49.591Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-19T12:15:50+09:00",
+    "validationRuns": 3,
+    "codeKB": 7.4,
+    "evidence": "metrics-evidence.json"
+  }
+}
