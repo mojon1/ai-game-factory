@@ -1,0 +1,347 @@
+{
+  "id": "2026-11-19-claude-1",
+  "status": "published",
+  "title": "いまだ！池のシャッター",
+  "genre": "観察・写真",
+  "concept": "池の生き物は「いまだ！」の直前に必ず予兆を見せる（波紋、首をすくめる、喉をふくらます）。予兆を見つけたら長押しでズームを始め、決定的な瞬間に指を離す。動く相手を指で追いながら撮れば背景だけ流れる「流し撮り」になる、観察と構えの手触りが核。",
+  "howToPlay": "長押しでその場所へズームし、離すとシャッター。押したまま指を動かすとカメラが向きを変える。フィルム12枚で夕暮れまでに良い写真を撮る。",
+  "libraryDecision": "使わない。ベクターで描く2Dキャンバスはどの倍率でもくっきりし、露光中の数フレームを重ねるだけで本物のブレと流し撮りが作れるため、three.jsや物理演算は核を強めない。",
+  "soundDecision": "Web Audio で自作。水の環境音と遠くの小鳥に加え、ツバメの鳴き声やカエルの鳴き声・茂みのざわめきを「もうすぐ来る」予兆として鳴らす。シャッターの「カシャ」と巻き上げ音、ズームのモーター音で、構えて撮る手触りを耳でも感じられるようにした。",
+  "improvements": [
+    {
+      "found": "カモが枝の上に並んで見え、カワセミと重なって何がどこにいるか分かりにくい／結果の文字が明るい空に重なって読みにくく、よく撮れたサギでも「記録写真」になる／ズーム中は指を動かしてもカメラが遅く、速いツバメを追いかけられない",
+      "changed": "カモの泳ぐ帯と枝の高さを分けた。結果を暗い下地の上に出し、評価を写真の質（大きさ・構図・ブレ・はみ出し）と決定的瞬間かで決めるようにした。指の動きを倍率に関係なく実際の位置に合わせ、指でそのまま生き物を追えるようにした。カワセミのダイブ前と魚の跳ねる前に予兆の音を足した",
+      "foundEn": "Ducks looked like they were sitting on the branch, overlapping the kingfisher / result text was hard to read on the bright sky, and a well-framed heron still rated only “Snapshot” / while zoomed, the camera moved too slowly to follow a fast swallow",
+      "changedEn": "Separated the ducks’ swimming band from the branch. Results now sit on a dark panel, and the grade is based on photo quality (size, framing, blur, cropping) plus whether it caught a moment. Finger motion now maps to the real-world position at any zoom so you can follow a creature directly. Added audio tells before the kingfisher dive and the fish leap"
+    },
+    {
+      "found": "全体を見る画面では生き物も予兆も小さく、「瞬間を撮るゲーム」だと気づきにくい／ズームが最大まで2.2秒かかり、速い瞬間に間に合わない／遠くのシカは最大ズームでも小さく点が低い。さらに、ポーズが変わった瞬間の写真が「ブレた」と誤判定された",
+      "changed": "予兆（カワセミの首振り、カエルの喉、サギの溜め）を大きく長くし、最初の1枚が普通の写真なら「何かする瞬間を撮ると高得点」と一度だけ教える。ズームを1.6秒に短縮、シカを大きくした。ブレは体の位置の動きで測るよう直した。傑作は金色の額と紙吹雪で祝うようにした",
+      "foundEn": "In the wide view the creatures and their tells are tiny, so it is hard to realize the game is about moments / zoom took 2.2 s to max, too slow for fast moments / the far deer stayed tiny even at max zoom. Also, a pose change during the exposure was misjudged as blur",
+      "changedEn": "Made the tells (kingfisher bobbing, frog throat, heron coiling) bigger and longer, and a one-time tip appears if the first photo has no action. Zoom now maxes in 1.6 s; the deer is bigger. Blur is measured from body movement. Masterpieces get a gold frame and confetti"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "観察・写真",
+      "en": "Observation / photography",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "池の生き物を長押しズーム＆離してシャッターで撮る。予兆を観察して構え、動く相手は追いながら撮って流し撮りにする。",
+        "ideaEn": "Photograph pond wildlife: hold to zoom, release to shoot. Read each creature’s tell to get ready, and track moving subjects for a panning shot.",
+        "fromDraw": true
+      },
+      {
+        "idea": "砂浜に指で水路を引き、満ちてくる潮の流れを眺める終わりのない遊び場。",
+        "ideaEn": "An endless sandbox: draw channels in the beach and watch the incoming tide flow through them.",
+        "fromDraw": false
+      },
+      {
+        "idea": "一本の糸でつながった二つの風船を、風の中で交互に引っぱって谷を越えさせる。",
+        "ideaEn": "Two balloons tied by one string; tug them alternately through the wind to cross a valley.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "limit",
+    "input": [
+      "hold",
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Now! Pond Shutter",
+      "concept": "Every pond creature shows a tell right before its big moment (ripples, a coiled neck, a puffed throat). Spot the tell, start holding to zoom, and let go at the decisive instant. Track a moving subject with your finger and the background streaks while the subject stays sharp: a panning shot. Observing and getting ready is the core.",
+      "howToPlay": "Hold to zoom toward that spot, release to take the photo. Move your finger while holding to aim. Get the best shots on 12 frames of film before sunset.",
+      "libraryDecision": "None. Vector drawing on a 2D canvas stays crisp at any zoom, and averaging a few frames during the exposure gives real motion blur and panning shots, so three.js or physics would not strengthen the core.",
+      "soundDecision": "Hand-made Web Audio. Water ambience and distant birds, plus swallow calls, frog croaks and rustling bushes as audible tells that something is coming. A shutter click, film wind and a zoom motor make getting ready and shooting feel physical."
+    }
+  },
+  "createdAt": "2026-11-19T09:08:04+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-19T09:08:04+09:00",
+    "metricsFrom": "2026-11-19T00:06:11.206Z",
+    "transcript": "3640ca42-9170-468b-8707-e13a07c49f0d.jsonl",
+    "validationRuns": 5,
+    "finishedAt": "2026-11-19T09:26:27+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-19T09:26:15+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "62.9KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=156",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=262",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=143",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=105",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 64414,
+    "lines": 1076
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 2
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "全体を見る画面では生き物と予兆が小さく、スマホの画面だと「いまだ」に気づく前に終わってしまうことがある。ツバメの流し撮りは難しすぎて、狙って成功させるのは慣れが要る",
+    "comment": "サギが首をすくめたのを見て長押しを始め、くちばしが水に入った直後に離すと、魚をくわえた姿が金色の額の「傑作！」になって思わず声が出た。枝のカワセミを最大ズームで撮るとくちばしまでくっきり写り、アルバムに12枚並ぶのも楽しい。一方で、何も起きていない時間に適当に撮ると点が低く、最初の数枚は何が良いのか分かりにくい。数分は普通に楽しく遊べるが、もう1回を強く引っぱるほどではない",
+    "similar": [
+      {
+        "title": "Pokémon Snap",
+        "url": "https://en.wikipedia.org/wiki/Pok%C3%A9mon_Snap",
+        "similarity": "中",
+        "note": "生き物を撮り、大きさ・中央・向きなどで写真を採点して図鑑を埋める点が同じ。こちらはレールではなく固定の池で、予兆を見て長押しズームで構える・指で追って流し撮りする点が違う",
+        "note_en": "Same idea of photographing creatures, scoring photos by size, centering and pose, and filling a photo dex. Differs by using a fixed pond instead of a rail, reading tells and holding to zoom, and tracking with a finger for panning shots"
+      }
+    ],
+    "research": "WebSearchで「wildlife photography game scored photos」を検索し、写真採点型の代表作ポケモンスナップを確認した",
+    "i18n": {
+      "en": {
+        "worst": "In the wide view the creatures and their tells are small, so on a phone the moment can pass before you notice it. The swallow panning shot is very hard to pull off on purpose",
+        "comment": "I saw the heron coil its neck, started holding, and released right after its beak hit the water: the photo of it holding a fish came out as a gold-framed Masterpiece and that felt great. The kingfisher at max zoom is crisp down to its beak, and seeing 12 prints lined up in the album is fun. But random shots in quiet moments score low, and the first few photos don't make it clear what a good shot is. Fun for a few minutes, not a strong pull to replay",
+        "research": "Searched the web for wildlife photography games with scored photos and confirmed Pokémon Snap as the main precedent"
+      }
+    },
+    "method": "スマホ縦画面で 5 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 5 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 6950ms",
+        "note": "開始してサギを待つ",
+        "noteEn": "Start and wait for the heron",
+        "image": "ai-play/step-01.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.79,0.60) 900ms",
+        "note": "首をすくめた瞬間から構えて離す",
+        "noteEn": "Hold from the coil, release on the strike",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 300ms",
+        "note": "結果",
+        "noteEn": "Result",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 1200ms → tap(0.16,0.47) 1700ms",
+        "note": "枝のカワセミを最大ズーム。くちばしまでくっきり",
+        "noteEn": "Kingfisher on the branch at max zoom, beak crisp",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 400ms",
+        "note": "結果",
+        "noteEn": "Result",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-19T09:26:27+09:00"
+  },
+  "publishedAt": "2026-11-19T09:26:27+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 34881,
+    "outputTokens": 51991,
+    "contextTokens": 10835919,
+    "turns": 53,
+    "toolCalls": 60,
+    "webSearches": 0,
+    "minutes": 20.3,
+    "from": "2026-11-19T00:06:11.206Z",
+    "to": "2026-11-19T00:26:27.837Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-19T09:26:27+09:00",
+    "validationRuns": 5,
+    "codeKB": 62.9
+  }
+}
