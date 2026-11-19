@@ -1,0 +1,425 @@
+{
+  "id": "2026-11-19-gpt-2",
+  "status": "published",
+  "title": "影をほどく手",
+  "genre": "その他",
+  "concept": "翼や椅子の立体を指で回し、下に落ちる影を金の見本へ重ねる。見えている厚みが回転で消え、離れていた面が一つの形につながる瞬間を核に、三つの角度を探す。",
+  "howToPlay": "横になぞると回転、縦になぞると傾きます。下の白い影を金の見本へ重ね、指を離して一秒保つと次へ進めます。",
+  "libraryDecision": "three.jsで立体の奥行きと面のつながりを実際に回して見せる。核を強めるため、立体を斜めから見つつ同じ形の正面投影を下に並べ、回転と影の関係を比較できる構成にした。",
+  "soundDecision": "開始と影が合った瞬間に柔らかい単音を鳴らす。連続BGMは使わず、静かに形を見る時間を残す。",
+  "improvements": [
+    {
+      "found": "最後の数度を動かすには感度が高い／金の見本が暗く、白の下のずれを追いにくい／表示93%で未達になり、必要な重なりが不明。",
+      "changed": "上の立体は通常回転、下の影は四分の一感度の微調整に分けた。金を明るくし、目標92%と一秒保持を明記。表示は切り捨てて判定とそろえた。",
+      "foundEn": "Fine alignment was too sensitive; the gold target was dim; a rounded 93% still failed without a visible target threshold.",
+      "changedEn": "The lower shadow now rotates at one-quarter sensitivity, gold is brighter, and the 92% target with a one-second release is explicit. Display rounding now agrees with the threshold."
+    },
+    {
+      "found": "椅子の影が上下にはみ出し、見本まで欠けた／成功すると全画面が覆われて完成形を眺められない／一秒の保持がどこまで進んだか見えない。",
+      "changed": "影の窓を広くし、縦横の両方から縮尺を決めて全形を収めた。成功画面は下端の小さな札にして立体と影を残し、保持の進捗を百分率で表示する。",
+      "foundEn": "The chair's shadow and target were clipped; the success overlay hid the completed form; the one-second hold had no progress feedback.",
+      "changedEn": "Enlarged the projection panel and fitted scale to both dimensions. Success now uses a compact footer, leaving the sculpture and shadow visible, and the release hold shows progress."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "その他",
+      "en": "Other",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "指で立体を回し、その白い影を金の見本に重ねる。3Dの厚みが影では消える意外さを、立体と投影の二画面で見せる。",
+        "ideaEn": "Rotate a sculpture to match its shadow. A 3D view and projection reveal how thickness disappears in silhouette.",
+        "fromDraw": true
+      },
+      {
+        "idea": "音を返す洞窟で反響の長さから壁までの距離を当てる。暗い3D空間と音の定位で感覚を試す。",
+        "ideaEn": "Estimate cave-wall distances from echoes in a dark 3D space with positional sound.",
+        "fromDraw": false
+      },
+      {
+        "idea": "流れる川の渡し舟で、上流へ向けた角度と着岸位置を調節する。俯瞰2Dで流れを読み、3Dは水流の関係を隠すため使わない。",
+        "ideaEn": "Steer a ferry upstream to land on a target. A top-down 2D view exposes the current; 3D would obscure its relationship to the route.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "complete",
+    "ending": "goal",
+    "input": [
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Hands Untangle Shadows",
+      "concept": "Turn wing and chair sculptures until their white shadows overlap a gold target. Explore the moment when thickness disappears and separate surfaces join into one silhouette across three angles.",
+      "howToPlay": "Drag sideways to rotate and vertically to tilt. Overlap the white shadow with gold, release, and hold the angle for one second.",
+      "libraryDecision": "Three.js shows real depth and connected surfaces. An oblique sculpture view above a frontal projection makes the relationship between rotation and shadow directly comparable.",
+      "soundDecision": "Soft notes mark the start and alignment. No continuous music interrupts quiet observation."
+    }
+  },
+  "createdAt": "2026-11-19T12:16:54+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "gpt-6.1-sol",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-19T12:16:54+09:00",
+    "metricsFrom": "2026-11-19T03:15:54.449Z",
+    "transcript": null,
+    "validationRuns": 3,
+    "finishedAt": "2026-11-19T12:27:26+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-19T12:23:50+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "9.5KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=1",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=14",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=1",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=13",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 9748,
+    "lines": 32
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "GPT-6.1 Sol",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 2,
+    "works": "ok",
+    "worst": "三つとも初めから分かる形で、意外なシルエットを発見する驚きが乏しく、一巡後に戻る理由が弱い。",
+    "comment": "翼の胴体の厚みを縦の微調整で消す感触と、椅子が立体では正面に見えても影は斜めになる関係は確かめられた。三形を最後まで遊び、99%・99%・95%でクリアしたが、数分遊ぶ量と発見の厚みが不足するので★2。",
+    "similar": [
+      {
+        "title": "Shadowmatic",
+        "url": "https://www.triadastudiogames.com/shadowmatic",
+        "similarity": "高",
+        "note": "立体を回して投影の形を探す核が同じ。こちらは既知の箱組み三形と金の見本を初めから見せ、上下の二画面・微調整・重なり率で合わせる小規模な遊び。",
+        "note_en": "Both rotate 3D objects to find a projected shape. This smaller game shows three recognizable box sculptures and a gold target upfront, using two views, fine control and an overlap percentage."
+      }
+    ],
+    "research": "ウェブ検索でShadowmaticを調べ、開発元Triada Studioの公式ゲーム説明で立体回転と影の規則を確認した。",
+    "i18n": {
+      "en": {
+        "worst": "All three objects are recognizable immediately, so surprising silhouette discoveries and reasons to return are weak.",
+        "comment": "Fine vertical control made the wing's fuselage thickness disappear, and the chair looked frontal in 3D while its shadow tilted. I completed all three forms at 99%, 99%, and 95%, but the short sequence lacks enough discoveries for several minutes of play, so I rate it two stars.",
+        "research": "Searched for Shadowmatic and verified its object-rotation and silhouette premise in developer Triada Studio's official game description."
+      }
+    },
+    "method": "スマホ縦画面で 9 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 9 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "影の窓を広くした版で三つの形を順に確かめる。",
+        "noteEn": "I replay all three forms with the larger projection window.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "swipe(0.25,0.43→0.55,0.25) 650ms",
+        "note": "まず右上へ大きく動かし、翼の向きを見本へ近づける。",
+        "noteEn": "I turn up and right to bring the wings close to the target.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "swipe(0.40,0.73→0.48,0.67) 600ms",
+        "note": "下の影を少し動かして合わせ、成功後に立体と影が残るか確かめる。",
+        "noteEn": "I fine-tune the lower shadow and check that both views remain visible after success.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "完成した緑の影と立体が残るようになった。椅子の上下が収まるか、次へ進めて見る。",
+        "noteEn": "The green shadow and sculpture remain visible. I continue to check whether the chair fits.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "swipe(0.25,0.43→0.60,0.20) 700ms",
+        "note": "椅子の全形は収まった。見本の脚が斜めなので、右上へ回して四本の脚の重なりを変える。",
+        "noteEn": "The whole chair now fits. I turn up and right to change how its four legs overlap the angled target.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "swipe(0.40,0.72→0.56,0.64) 650ms",
+        "note": "背もたれの左側に金が少し残る。下の影を右上へ細かく動かして、脚の位置も合わせる。",
+        "noteEn": "A narrow gold strip remains left of the chair back. I fine-tune up and right to align the legs as well.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "椅子は99%で成功。立体では正面らしく見えても、影では傾いた形になる違いを確かめ、最後の階段へ。",
+        "noteEn": "The chair clears at 99%. Its sculpture looks frontal while its projection is tilted; I continue to the stairs.",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "swipe(0.70,0.18→0.35,0.41) 700ms",
+        "note": "階段は初めから86%と近いが、金の右端と段の斜めが違う。逆向きへ大きく回して輪郭を見直す。",
+        "noteEn": "The stairs begin near 86%, but the right edge and steps differ. I turn in the opposite direction to inspect the outline.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 1800ms",
+        "note": "95%で影が緑になり、保持14%も見える。そのまま離して三つ目の区切りまで待つ。",
+        "noteEn": "At 95% the shadow is green and hold progress reads 14%. I leave it released to finish the third form.",
+        "image": "ai-play/step-09.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-19T12:27:26+09:00"
+  },
+  "publishedAt": "2026-11-19T12:27:26+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 4353,
+    "outputTokens": 8710,
+    "contextTokens": 4005663,
+    "turns": 33,
+    "toolCalls": 33,
+    "webSearches": null,
+    "minutes": 11.6,
+    "from": "2026-11-19T03:15:54.449Z",
+    "to": "2026-11-19T03:27:30.209Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-19T12:27:30+09:00",
+    "validationRuns": 3,
+    "codeKB": 9.5,
+    "evidence": "metrics-evidence.json"
+  }
+}
