@@ -1,0 +1,1199 @@
+{
+  "id": "2026-11-19-claude-2",
+  "status": "published",
+  "title": "どすこい！鬼押し土俵",
+  "genre": "ターン制タクティクス",
+  "concept": "円い土俵の上で、鬼を一歩ずつ押し出す詰め相撲。鬼の次の一手は矢印で見えていて、向きは変えられない。押すだけでなく、突進をかわして勝手に飛び出させる「いなし」、鬼同士をぶつける仲間割れなど、決まり手を読み当てる気持ちよさが核。",
+  "howToPlay": "スワイプで一歩動き、鬼へ向かえば押す。矢印を読んで、鬼を全員土俵の外へ出せば勝ち。",
+  "libraryDecision": "three.js を使う。土俵を斜め上から見下ろす立体にすると、押された鬼が俵を越えて砂かぶりへ転げ落ちる瞬間が気持ちよく、矢印の向きも盤面で読みやすい。効果音は ZzFX。物理演算はマスの規則が大事なので使わない。",
+  "soundDecision": "BGM は付けない。拍子木で取組が始まり、押す音・突進の風切り・土俵下へ落ちる重い音と歓声で、決まり手が出た瞬間を盛り上げる。静かな間が、次の一手を考える時間になる。",
+  "improvements": [
+    {
+      "found": "①押しても鬼は次の番にすぐ一歩戻ってきて、押し合いが堂々巡りになり外へ出せない ②決まり手の大きな文字が、鬼が俵を越えて飛ぶ瞬間を隠していた ③簡易AIで試すと危険がほとんど無く、急ぐ理由も無いので緊張感がない",
+      "changed": "押した力士は空いたマスへ前に出る「寄り」にし、押された鬼はその番よろけて動けないようにした（寄り切りで俵ぎわまで運べる）。決まり手の文字を盤の下へ移した。番付ごとに手数の制限（8〜13手）を付け、右上に残り手数を出した。",
+      "foundEn": "(1) A shoved oni simply stepped back next turn, so pushing went in circles. (2) The big technique text hid the oni flying over the bales. (3) A simple AI showed almost no danger and no reason to hurry.",
+      "changedEn": "Your wrestler now follows into the vacated cell and a shoved oni loses its turn, so you can drive it to the bales. Moved the technique text below the ring. Added a move limit per rank (8-13) shown top right."
+    },
+    {
+      "found": "①奥向き（上向き）の矢印や青鬼の突進の筋が、鬼や力士の体に隠れて読めないことがある ②勝った直後の画面で、上の表示がもう次の番付になっていて混乱する ③寄って押し出したのに決まり手が「突き出し」で、手応えと名前が合わない（土俵下へ落ちた鬼に番号も残っていた）",
+      "changed": "矢印・突進の筋を体より手前に描くようにした。番付はタップして次の取組を始めたときに上がるようにした。前へ出て押し出す決まり手を「寄り切り」に改め、外へ落ちた鬼の番号を消した。",
+      "foundEn": "(1) North-pointing arrows and the blue charge path were sometimes hidden behind bodies. (2) Right after a win, the HUD already showed the next rank. (3) Driving an oni out was named Tsukidashi, which did not match the feel, and fallen oni kept their numbers.",
+      "changedEn": "Arrows and charge paths now draw in front of bodies. The rank advances only when you start the next bout. The follow-through push-out is now Yorikiri, and fallen oni lose their numbers."
+    },
+    {
+      "found": "①東や西へ押し出した鬼が画面の外まで飛んでいき、決まった瞬間が見えない ②鬼の番に、外へ落ちた鬼の番号を動かそうとしてエラーになり進行が止まることがあった ③決まり手図鑑が「？？？」だけで、次に何を狙えばいいか分からない",
+      "changed": "横へ飛ぶ距離を縮めて土俵のすぐ外に落ちるようにした。エラーの原因を直し、演出の失敗で進行が止まらないようにした。まだ出していない決まり手には「？（青鬼の突進をかわす）」のように狙い方のヒントを出した。",
+      "foundEn": "(1) Oni pushed east or west flew off screen, so the finishing moment was not visible. (2) An error when animating a fallen oni's number could freeze the turn. (3) The technique list showed only ??? so there was nothing to aim for.",
+      "changedEn": "Sideways falls are shorter and land just outside the ring. Fixed the error and made animations unable to freeze the game. Undiscovered techniques now show a hint such as ? (dodge a blue charge)."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "ターン制タクティクス",
+      "en": "Turn-based tactics",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "円い土俵の詰め相撲。鬼の次の一手が矢印で見え、押す・かわす・ぶつけ合わせて全員を土俵の外へ出す（3D）。",
+        "ideaEn": "A sumo tactics puzzle: oni show their next move as arrows; shove, dodge and make them collide to push all of them out of the ring (3D).",
+        "fromDraw": true
+      },
+      {
+        "idea": "長押しで花火玉を打ち上げ、離した高さで開く。開いた火花に触れた玉も連鎖して開き、夜空を埋める。",
+        "ideaEn": "Hold to launch a firework shell and release to burst it; sparks set off other shells in a chain across the night sky.",
+        "fromDraw": false
+      },
+      {
+        "idea": "なぞった折り線で紙飛行機の形が変わり、飛び方が変わる。風の部屋を抜けて的へ届ける。",
+        "ideaEn": "The fold lines you trace change your paper plane and how it flies through windy rooms to a target.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "swipe",
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Oni Sumo Shove!",
+      "concept": "A sumo tactics puzzle on a round ring. Every oni shows its next move as a locked arrow. Beyond shoving, you dodge a charge so it runs out by itself, or make oni shove each other; reading which technique will land is the core.",
+      "howToPlay": "Swipe to step; walk into an oni to shove it. Read the arrows and push every oni out of the ring.",
+      "libraryDecision": "three.js: a raised 3D ring seen from above makes oni tumbling over the straw bales satisfying and keeps arrows easy to read. ZzFX for sound. No physics engine; the grid rules matter more.",
+      "soundDecision": "No BGM. Wooden clappers open each bout; slaps, whooshes, heavy landings and crowd cheers celebrate each technique, and the quiet between moves is thinking time."
+    }
+  },
+  "createdAt": "2026-11-19T12:07:47+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-19T12:07:47+09:00",
+    "metricsFrom": "2026-11-19T03:06:06.220Z",
+    "transcript": "4163337d-42ec-41fb-b75c-9a162734c847.jsonl",
+    "validationRuns": 6,
+    "finishedAt": "2026-11-19T13:32:08+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-19T13:11:48+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "46.8KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=174",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=153",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=143",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=129",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 47886,
+    "lines": 888
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js"
+    },
+    {
+      "name": "ZzFX",
+      "version": "1.4.0",
+      "file": "zzfx-1.4.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "配置がランダムなので、序盤の番付は「横に回って3回押す」だけで終わる取組もあり、手応えが薄い。自分で遊べたのは8番中3番まで（後半は簡易AIでの試算のみ）",
+    "comment": "序二段で、青鬼をわざと同じ段にそろえさせてから赤鬼を押して列を外れると、突進が空を切って土俵下へ転げ落ちた『いなし！』の瞬間は狙いが当たった気持ちよさがあった。三段目では俵ぎわまで追い込まれたのを逆に使い、真下に来た赤鬼を押し出して『うっちゃり』。手数制限のおかげで1手ずつ読む緊張がある。一方で矢印の連鎖（突進が鬼を2マス押す等）を頭の中で追うのは少し難しい。",
+    "similar": [
+      {
+        "title": "Into the Breach",
+        "url": "https://en.wikipedia.org/wiki/Into_the_Breach",
+        "similarity": "中",
+        "note": "敵の次の行動が予告され、押して位置をずらす・敵同士をぶつけるのが中心の戦術ゲーム。こちらは相撲の土俵で、押し出しが唯一の勝ち方、突進を『かわす』ことが大きな武器、手数制限つきの1人用詰め将棋に近い形。",
+        "note_en": "Tactics built on telegraphed enemy actions, pushing and enemy-on-enemy collisions. This game uses a sumo ring where ring-outs are the only win, dodging charges is a key weapon, and each bout is a short move-limited puzzle."
+      },
+      {
+        "title": "Dohyō（ボードゲーム）",
+        "url": "https://sites.google.com/site/theowlsnest02/home/dohyo",
+        "similarity": "低",
+        "note": "土俵から相手の駒を押し出す対人の抽象ボードゲーム。こちらは1人用で、鬼の予告された一手を読むパズル。",
+        "note_en": "A multiplayer abstract board game about pushing pieces out of a sumo ring. Mine is single-player and about reading the oni moves shown in advance."
+      }
+    ],
+    "research": "WebSearchで「Into the Breach 予告 押す」「相撲 押し出し ターン制 グリッド」を検索した",
+    "i18n": {
+      "en": {
+        "worst": "Layouts are random, so some early bouts are just 'step beside it and push three times'. I personally played only 3 of the 8 bouts; the later ones were checked only with a simple AI.",
+        "comment": "In Jonidan I let the blue oni line up on purpose, then shoved the red one and stepped out of the column; the charge whiffed and the oni tumbled off the ring (Inashi!), a real 'my read paid off' moment. In Sandanme I turned being cornered at the edge into an Utchari. The move limit keeps every move tense, though following chained effects (a charge shoving an oni two cells) in your head is a bit hard.",
+        "research": "Searched the web for Into the Breach telegraphs/pushing and for turn-based sumo ring-out grid games"
+      }
+    },
+    "method": "スマホ縦画面で 15 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 15 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 1600ms",
+        "note": "序ノ口。赤鬼2体。矢印が次の一手",
+        "noteEn": "Jonokuchi: two red oni; arrows show their next move",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "swipe(0.50,0.60→0.35,0.60) 150ms → wait 1900ms → tap(0.39,0.47) 120ms → wait 1900ms → swipe(0.50,0.60→0.50,0.45) 150ms → wait 1900ms → swipe(0.50,0.60→0.50,0.45) 150ms → wait 1900ms → swipe(0.50,0.60→0.50,0.45) 150ms → wait 2500ms → swipe(0.50,0.50→0.50,0.65) 150ms → wait 1900ms → swipe(0.40,0.60→0.60,0.60) 150ms → wait 1900ms → swipe(0.40,0.60→0.60,0.60) 150ms → wait 1900ms → swipe(0.40,0.60→0.60,0.60) 150ms → wait 3000ms",
+        "note": "鬼2を上へ、鬼1を右へ寄り切り、9手で勝ち",
+        "noteEn": "Drove oni 2 up and oni 1 right; won in 9 moves",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": -1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": 1,
+              "yusho": 0
+            }
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.50,0.50) 120ms → wait 1600ms",
+        "note": "序二段。青鬼は同じ列にそろうと突進してくる",
+        "noteEn": "Jonidan: the blue oni charges once it lines up with me",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": -1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": 1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "swipe(0.50,0.60→0.50,0.45) 150ms → wait 1900ms → swipe(0.40,0.60→0.60,0.60) 150ms → wait 1900ms",
+        "note": "上、右と動き、青鬼をわざと同じ段にそろえさせる",
+        "noteEn": "Up, right: let the blue oni line up on purpose",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": -1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": 1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "swipe(0.50,0.50→0.50,0.65) 150ms → wait 900ms",
+        "note": "下へよけると、青鬼の突進が赤鬼にぶつかって2マス飛ばす",
+        "noteEn": "Dodge down; the blue charge slams the red oni two cells",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": -1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": 1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 1200ms → tap(0.60,0.47) 120ms → wait 1900ms",
+        "note": "待つ。赤鬼が横に、青鬼が真上にそろう",
+        "noteEn": "Wait: red beside me, blue right above",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": -1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": 1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "swipe(0.40,0.60→0.60,0.60) 150ms → wait 1300ms",
+        "note": "赤鬼を押して列を外れると、青鬼の突進が空を切って土俵の外へ。いなし！",
+        "noteEn": "Shove red and leave the column; the blue charge runs out: Inashi!",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": -1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": 1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 1200ms → swipe(0.40,0.60→0.60,0.60) 150ms → wait 3000ms",
+        "note": "赤鬼を寄り切って2勝目",
+        "noteEn": "Drive red out for the second win",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": -1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": 1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki",
+                "inashi"
+              ],
+              "best": 1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki",
+                "inashi"
+              ],
+              "best": 2,
+              "yusho": 0
+            }
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.50,0.50) 120ms → wait 1600ms",
+        "note": "三段目。赤2・青1",
+        "noteEn": "Sandanme: two red, one blue",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": -1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": 1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki",
+                "inashi"
+              ],
+              "best": 1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki",
+                "inashi"
+              ],
+              "best": 2,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "swipe(0.50,0.60→0.35,0.60) 150ms → wait 1900ms → tap(0.39,0.47) 120ms → wait 1900ms",
+        "note": "左へ出て待つ。青鬼が自分の列で突進の構え",
+        "noteEn": "Step left and wait; the blue oni aims down my column",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": -1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": 1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki",
+                "inashi"
+              ],
+              "best": 1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki",
+                "inashi"
+              ],
+              "best": 2,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "swipe(0.50,0.60→0.35,0.60) 150ms → wait 1500ms",
+        "note": "赤鬼2を押して列を外れ、2度目のいなし",
+        "noteEn": "Shove red 2 out of the way: Inashi again",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": -1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": 1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki",
+                "inashi"
+              ],
+              "best": 1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki",
+                "inashi"
+              ],
+              "best": 2,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "wait 1200ms → swipe(0.50,0.60→0.35,0.60) 150ms → wait 2200ms",
+        "note": "西の俵から赤鬼2を寄り切り。自分も俵ぎわ",
+        "noteEn": "Drive red 2 out west; now I'm on the edge",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": -1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": 1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki",
+                "inashi"
+              ],
+              "best": 1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki",
+                "inashi"
+              ],
+              "best": 2,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "swipe(0.50,0.50→0.50,0.35) 150ms → wait 1900ms → tap(0.19,0.43) 120ms → wait 1900ms",
+        "note": "上へよけて待つと、赤鬼1が俵ぎわの真下に来た",
+        "noteEn": "Step up and wait; red 1 walks to the edge below me",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": -1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": 1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki",
+                "inashi"
+              ],
+              "best": 1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki",
+                "inashi"
+              ],
+              "best": 2,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "swipe(0.50,0.50→0.50,0.65) 150ms → wait 1900ms → swipe(0.50,0.50→0.50,0.65) 150ms → wait 800ms",
+        "note": "俵ぎわから押し出して、うっちゃり！",
+        "noteEn": "Push it out from the edge: Utchari!",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": -1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": 1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki",
+                "inashi"
+              ],
+              "best": 1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki",
+                "inashi"
+              ],
+              "best": 2,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki",
+                "inashi",
+                "utchari"
+              ],
+              "best": 2,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "wait 2500ms",
+        "note": "3連勝。手数は残り2",
+        "noteEn": "Three straight wins with 2 moves to spare",
+        "image": "ai-play/step-15.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": -1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki"
+              ],
+              "best": 1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki",
+                "inashi"
+              ],
+              "best": 1,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 2
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki",
+                "inashi"
+              ],
+              "best": 2,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki",
+                "inashi",
+                "utchari"
+              ],
+              "best": 2,
+              "yusho": 0
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "save",
+            "data": {
+              "z": [
+                "tsuki",
+                "inashi",
+                "utchari"
+              ],
+              "best": 3,
+              "yusho": 0
+            }
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-19T13:32:08+09:00"
+  },
+  "publishedAt": "2026-11-19T13:32:08+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 40968,
+    "outputTokens": 52681,
+    "contextTokens": 18902395,
+    "turns": 87,
+    "toolCalls": 90,
+    "webSearches": 0,
+    "minutes": 86,
+    "from": "2026-11-19T03:06:06.220Z",
+    "to": "2026-11-19T04:32:08.072Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-19T13:32:08+09:00",
+    "validationRuns": 6,
+    "codeKB": 46.8
+  }
+}

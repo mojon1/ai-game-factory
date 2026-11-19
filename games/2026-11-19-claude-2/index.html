@@ -1,0 +1,887 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>どすこい！鬼押し土俵</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #1a1210; }
+body { font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif; color: #fff; }
+#c { position: fixed; inset: 0; width: 100vw; height: 100dvh; display: block; }
+#hud { position: fixed; left: 0; right: 0; top: 0; display: flex; justify-content: space-between; align-items: flex-start; padding: 10px 12px; font-size: 16px; font-weight: 700; text-shadow: 0 1px 3px #000; pointer-events: none; }
+#hud .sub { font-size: 13px; font-weight: 500; opacity: .85; margin-top: 2px; }
+#hudR { text-align: right; }
+#left { font-size: 18px; }
+#left.low { color: #ff8a6a; }
+#stars { letter-spacing: 2px; }
+#turnInfo { position: fixed; left: 0; right: 0; top: 54px; text-align: center; font-size: 14px; font-weight: 700; text-shadow: 0 1px 3px #000; pointer-events: none; opacity: .9; }
+#hint { position: fixed; left: 8px; right: 110px; bottom: 22px; text-align: center; font-size: 14px; text-shadow: 0 1px 3px #000; pointer-events: none; transition: opacity .6s; }
+#kima { position: fixed; left: 0; right: 0; top: 71%; text-align: center; pointer-events: none; opacity: 0; }
+#kima .k { display: inline-block; font-family: "Hiragino Mincho ProN", "Yu Mincho", serif; font-weight: 900; font-size: 46px; color: #fff4d6; text-shadow: 0 0 2px #000, 0 3px 0 #7a1d12, 0 6px 14px rgba(0,0,0,.8); }
+#kima .e { font-size: 14px; color: #ffe3a6; text-shadow: 0 1px 3px #000; margin-top: 2px; }
+#matta { position: fixed; right: 12px; bottom: 14px; min-width: 88px; height: 48px; border-radius: 12px; border: 2px solid #f3d9a4; background: rgba(60,30,18,.82); color: #fff4d6; font: 700 16px system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif; display: none; }
+#matta:disabled { opacity: .35; }
+#ov { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: rgba(20,12,8,.72); padding: 20px; box-sizing: border-box; }
+#ov h1 { font-family: "Hiragino Mincho ProN", "Yu Mincho", serif; font-size: 38px; margin: 0 0 4px; color: #fff4d6; text-shadow: 0 3px 0 #7a1d12, 0 6px 16px #000; line-height: 1.15; }
+#ov h2 { font-size: 26px; margin: 0 0 8px; color: #fff4d6; }
+#ov p { margin: 4px 0; font-size: 15px; line-height: 1.5; max-width: 330px; }
+#ov .big { font-size: 20px; font-weight: 700; }
+#ov .tap { margin-top: 18px; font-size: 17px; font-weight: 700; color: #ffd98a; animation: blink 1.2s infinite; }
+#ov .zk { font-size: 13px; opacity: .9; margin-top: 10px; max-width: 320px; line-height: 1.6; }
+#ov .zk span { display: inline-block; margin: 0 4px; }
+#ov .zk .no { opacity: .6; }
+@keyframes blink { 50% { opacity: .45; } }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud"><div><div id="rank"></div><div class="sub" id="boutNo"></div></div><div id="hudR"><div id="left"></div><div class="sub" id="stars"></div></div></div>
+<div id="turnInfo"></div>
+<div id="kima"><div class="k" id="kimaJ"></div><div class="e" id="kimaE"></div></div>
+<div id="hint"></div>
+<button id="matta"></button>
+<div id="ov"></div>
+<script src="../../lib/three-0.186.1.min.js"></script>
+<script src="../../lib/zzfx-1.4.0.min.js"></script>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+
+const T = {
+  ja: {
+    title: 'どすこい！<br>鬼押し土俵',
+    how1: 'スワイプで一歩。鬼に当たれば押して前へ出る（押された鬼はその番よろける）。',
+    how2: '矢印は鬼の次の一手。かわせば鬼は勝手に飛び出す。',
+    how3: '決められた手数のうちに、鬼を全員土俵の外へ出せば勝ち。',
+    tap: 'タップでスタート', again: 'タップでもう一度', next: 'タップで次へ',
+    hint: 'スワイプで動く・鬼へ向かえば押す・自分をタップで待つ',
+    bout: (n) => `${n} 番目 / 8`,
+    loss: (n) => `黒星 ${n}（3つで場所終了）`,
+    yourTurn: 'あなたの番', enemyTurn: '鬼の番',
+    win: '勝ち！', lose: '負け…', lostBy: { push: '押し出された', time: '水入り（手数切れ）' },
+    left: (n) => `残り ${n} 手`,
+    turns: (n) => `${n} 手で勝ち`,
+    retry: '同じ番付でもう一度',
+    yusho: '優勝！', zensho: '全勝優勝！',
+    record: (w, l) => `${w} 勝 ${l} 敗`,
+    over: '場所終了', reached: (r) => `${r} まで勝ち進んだ`,
+    best: (r) => `最高: ${r}`,
+    zukan: '決まり手', hakkeyoi: 'はっけよい！', nokotta: 'のこった！',
+    matta: (n) => `待った ${n}`,
+    wobble: 'びくともしない！もう一押し', danger: 'このままだと押し出される！',
+    newKim: '新しい決まり手！',
+    two: 'まとめて二人！',
+  },
+  en: {
+    title: 'Oni Sumo<br>Shove!',
+    how1: 'Swipe to step. Walk into an oni to shove it and follow through (a shoved oni loses its turn).',
+    how2: 'Arrows show each oni\'s next move. Dodge and they run out on their own.',
+    how3: 'Push every oni out of the ring within the move limit.',
+    tap: 'Tap to start', again: 'Tap to play again', next: 'Tap to continue',
+    hint: 'Swipe to move · walk into oni to shove · tap yourself to wait',
+    bout: (n) => `Bout ${n} / 8`,
+    loss: (n) => `Losses ${n} (3 ends the tournament)`,
+    yourTurn: 'Your move', enemyTurn: 'Oni move',
+    win: 'Victory!', lose: 'Defeat…', lostBy: { push: 'You were pushed out', time: 'Out of moves' },
+    left: (n) => `${n} moves left`,
+    turns: (n) => `Won in ${n} moves`,
+    retry: 'Retry the same rank',
+    yusho: 'Champion!', zensho: 'Perfect Champion!',
+    record: (w, l) => `${w} wins ${l} losses`,
+    over: 'Tournament over', reached: (r) => `Reached ${r}`,
+    best: (r) => `Best: ${r}`,
+    zukan: 'Techniques', hakkeyoi: 'Hakkeyoi!', nokotta: 'Nokotta!',
+    matta: (n) => `Undo ${n}`,
+    wobble: 'It won\'t budge! Push again', danger: 'Stay here and you\'re out!',
+    newKim: 'New technique!',
+    two: 'Two at once!',
+  }
+}[LANG === 'ja' ? 'ja' : 'en'];
+
+const RANKS = [
+  { ja: '序ノ口', en: 'Jonokuchi', e: 'ss', lim: 12 },
+  { ja: '序二段', en: 'Jonidan', e: 'sc', lim: 9 },
+  { ja: '三段目', en: 'Sandanme', e: 'ssc', lim: 10 },
+  { ja: '幕下', en: 'Makushita', e: 'scc', lim: 8 },
+  { ja: '十両', en: 'Juryo', e: 'hss', lim: 13 },
+  { ja: '前頭', en: 'Maegashira', e: 'hscc', lim: 10 },
+  { ja: '大関', en: 'Ozeki', e: 'hhsc', lim: 13 },
+  { ja: '横綱', en: 'Yokozuna', e: 'hhscc', lim: 12 },
+];
+const rankName = (i) => (LANG === 'ja' ? RANKS[i].ja : RANKS[i].en);
+const KIM = {
+  tsuki: { ja: '寄り切り', en: 'Yorikiri — drove it out', hj: '押して前へ出る', he: 'shove and follow' },
+  densha: { ja: '電車道', en: 'Densha-michi — pushed the whole line', hj: '並んだ鬼をまとめて押す', he: 'push a line of oni' },
+  isami: { ja: '勇み足', en: 'Isamiashi — stepped out by itself', hj: '外向きの鬼を俵ぎわへ', he: 'oni facing out at the edge' },
+  inashi: { ja: 'いなし', en: 'Inashi — dodged, it charged out', hj: '青鬼の突進をかわす', he: 'dodge a blue charge' },
+  nakama: { ja: '仲間割れ', en: 'Friendly fire — oni shoved oni', hj: '鬼に鬼を押させる', he: 'let oni shove oni' },
+  utchari: { ja: 'うっちゃり', en: 'Utchari — won at the very edge', hj: '自分が俵ぎわで押し出す', he: 'win from the edge' },
+  futari: { ja: '二人出し', en: 'Double ring-out', hj: '1手で2体', he: 'two in one turn' },
+};
+const KIM_KEYS = Object.keys(KIM);
+const kimJ = (k) => KIM[k].ja;
+const kimE = (k) => (LANG === 'ja' ? KIM[k].en.split(' — ')[0] : KIM[k].en);
+
+// ---------- save ----------
+let save = { z: [], best: -1, yusho: 0 };
+addEventListener('message', (e) => {
+  if (e.data && e.data.agf === 'loaded' && e.data.data) {
+    const d = e.data.data;
+    save = { z: Array.isArray(d.z) ? d.z.filter((k) => KIM[k]) : [], best: d.best | 0, yusho: d.yusho | 0 };
+    if (mode === 'title') showTitle();
+  }
+});
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+const persist = () => { try { parent.postMessage({ agf: 'save', data: save }, '*'); } catch (e) {} };
+
+// ---------- rng ----------
+let seed = (Math.random() * 1e9) | 0;
+const rng = () => { seed |= 0; seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+
+// ---------- rules ----------
+const DIRS = [[0, -1], [1, 0], [0, 1], [-1, 0]]; // N E S W
+const inRing = (x, y) => { const dx = x - 3, dy = y - 3; return dx * dx + dy * dy <= 10.5; };
+const isEdge = (x, y) => DIRS.some(([dx, dy]) => !inRing(x + dx, y + dy));
+let S = null;
+const at = (St, x, y) => St.ents.find((e) => !e.out && e.x === x && e.y === y);
+const foes = (St) => St.ents.filter((e) => e.t !== 'p');
+const allOut = (St) => foes(St).every((e) => e.out);
+
+function kimFor(pusher, q, i) {
+  if (pusher.t === 'p') { if (isEdge(pusher.x, pusher.y)) return 'utchari'; return i > 0 ? 'densha' : 'tsuki'; }
+  return 'nakama';
+}
+
+function pushLine(St, sx, sy, d, n, pusher, G, follow) {
+  const [dx, dy] = DIRS[d];
+  for (let k = 0; k < n; k++) {
+    const line = []; let x = sx, y = sy, e;
+    while ((e = at(St, x, y))) { line.push(e); x += dx; y += dy; }
+    if (!line.length) return;
+    if (pusher.t === 'p') {
+      const hv = line.filter((q) => q.t === 'h' && !q.stg);
+      if (hv.length) {
+        hv.forEach((q) => (q.stg = 2));
+        G.push({ moves: [{ id: pusher.id, k: 'slap', d }, ...hv.map((q) => ({ id: q.id, k: 'wobble' }))], sfx: 'wobble', shake: 0.06, note: 'wobble' });
+        return;
+      }
+      line.forEach((q) => { if (q.t === 'h') q.stg = 0; });
+    }
+    const g = { moves: [{ id: pusher.id, k: 'slap', d }], sfx: 'push', shake: 0.1 + 0.04 * line.length, kim: [] };
+    for (let i = line.length - 1; i >= 0; i--) {
+      const q = line[i]; const nx = q.x + dx, ny = q.y + dy;
+      if (!inRing(nx, ny)) {
+        q.out = true;
+        g.moves.push({ id: q.id, k: 'out', fx: q.x, fy: q.y, tx: nx, ty: ny, d });
+        if (q.t === 'p') St.lost = 'push'; else { g.kim.push(kimFor(pusher, q, i)); St.outsThisTurn++; }
+        q.x = nx; q.y = ny;
+      } else { g.moves.push({ id: q.id, k: 'shove', fx: q.x, fy: q.y, tx: nx, ty: ny }); q.x = nx; q.y = ny; if (q.t !== 'p') q.stun = true; }
+    }
+    G.push(g);
+    if (St.lost) return;
+    if (pusher.t === 'p') { // yori: the wrestler follows into the vacated cell
+      if (!at(St, sx, sy)) { G.push({ moves: [{ id: 0, k: 'step', fx: pusher.x, fy: pusher.y, tx: sx, ty: sy }], sfx: null }); pusher.x = sx; pusher.y = sy; }
+      return;
+    }
+    if (follow && k < n - 1 && !pusher.out) {
+      G.push({ moves: [{ id: pusher.id, k: 'dash', fx: pusher.x, fy: pusher.y, tx: sx, ty: sy }], sfx: null });
+      pusher.x = sx; pusher.y = sy; sx += dx; sy += dy;
+    }
+  }
+}
+
+function doPlayer(St, d, G) {
+  const p = St.ents[0];
+  if (d < 0) { G.push({ moves: [{ id: 0, k: 'shiko' }], sfx: 'shiko', shake: 0.05 }); return true; }
+  const [dx, dy] = DIRS[d]; const nx = p.x + dx, ny = p.y + dy;
+  if (!inRing(nx, ny)) return false;
+  p.face = d;
+  if (at(St, nx, ny)) pushLine(St, nx, ny, d, 1, p, G, false);
+  else { G.push({ moves: [{ id: 0, k: 'step', fx: p.x, fy: p.y, tx: nx, ty: ny }], sfx: 'step' }); p.x = nx; p.y = ny; }
+  return true;
+}
+
+function actFoe(St, e, G) {
+  if (e.out) return;
+  if (e.stg === 2) { e.stg = 1; G.push({ moves: [{ id: e.id, k: 'wobble' }], sfx: null }); return; }
+  if (e.stg === 1) e.stg = 0;
+  if (e.stun) { e.stun = false; G.push({ moves: [{ id: e.id, k: 'wobble' }], sfx: null }); return; }
+  const d = e.dir, [dx, dy] = DIRS[d];
+  if (e.t === 'c' && e.mode === 'charge') {
+    let x = e.x, y = e.y;
+    for (;;) {
+      const nx = x + dx, ny = y + dy;
+      if (!inRing(nx, ny)) {
+        G.push({ moves: [{ id: e.id, k: 'out', fx: e.x, fy: e.y, tx: nx, ty: ny, d }], sfx: 'dash', kim: ['inashi'] });
+        e.out = true; e.x = nx; e.y = ny; St.outsThisTurn++; return;
+      }
+      if (at(St, nx, ny)) break;
+      x = nx; y = ny;
+    }
+    if (x !== e.x || y !== e.y) { G.push({ moves: [{ id: e.id, k: 'dash', fx: e.x, fy: e.y, tx: x, ty: y }], sfx: 'dash' }); e.x = x; e.y = y; }
+    pushLine(St, x + dx, y + dy, d, 2, e, G, true);
+  } else {
+    const nx = e.x + dx, ny = e.y + dy;
+    if (!inRing(nx, ny)) { G.push({ moves: [{ id: e.id, k: 'out', fx: e.x, fy: e.y, tx: nx, ty: ny, d }], sfx: 'step', kim: ['isami'] }); e.out = true; e.x = nx; e.y = ny; St.outsThisTurn++; }
+    else if (at(St, nx, ny)) pushLine(St, nx, ny, d, 1, e, G, false);
+    else { G.push({ moves: [{ id: e.id, k: 'step', fx: e.x, fy: e.y, tx: nx, ty: ny }], sfx: 'step' }); e.x = nx; e.y = ny; }
+  }
+}
+
+function dirTo(a, b) { if (a.x === b.x) return b.y < a.y ? 0 : 2; return b.x > a.x ? 1 : 3; }
+function plan(St) {
+  const p = St.ents[0];
+  for (const e of foes(St)) {
+    if (e.out) continue;
+    const opts = [0, 1, 2, 3].filter((d) => inRing(e.x + DIRS[d][0], e.y + DIRS[d][1]));
+    if (e.t === 'c') {
+      if (e.x === p.x || e.y === p.y) { e.mode = 'charge'; e.dir = dirTo(e, p); continue; }
+      e.mode = 'step';
+      const ax = Math.abs(p.x - e.x), ay = Math.abs(p.y - e.y);
+      const hx = p.x > e.x ? 1 : 3, vy = p.y > e.y ? 2 : 0;
+      const c = ax <= ay ? [hx, vy] : [vy, hx];
+      e.dir = c.find((d) => opts.includes(d)) ?? opts[0];
+    } else {
+      e.mode = 'step';
+      let best = 1e9, bd = [];
+      for (const d of opts) {
+        const m = Math.abs(p.x - e.x - DIRS[d][0]) + Math.abs(p.y - e.y - DIRS[d][1]);
+        if (m < best) { best = m; bd = [d]; } else if (m === best) bd.push(d);
+      }
+      e.dir = bd[(rng() * bd.length) | 0];
+    }
+  }
+}
+
+const cloneState = (St) => ({ ...St, ents: St.ents.map((e) => ({ ...e })) });
+function simulate(d) {
+  const St = cloneState(S); St.outsThisTurn = 0; St.lost = null; const G = [];
+  if (!doPlayer(St, d, G)) return { invalid: true };
+  if (!St.lost && !allOut(St)) for (const e of foes(St)) { if (St.lost || allOut(St)) break; actFoe(St, e, G); }
+  const p = St.ents[0];
+  return { lost: !!St.lost, won: !St.lost && allOut(St), px: p.x, py: p.y };
+}
+
+// ---------- three.js ----------
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1a1210);
+scene.fog = new THREE.Fog(0x1a1210, 18, 34);
+const camera = new THREE.PerspectiveCamera(42, 0.56, 0.1, 80);
+const camTarget = new THREE.Vector3(0, 0, 0.35);
+let camBase = new THREE.Vector3();
+scene.add(new THREE.HemisphereLight(0xfff0d8, 0x2a1a10, 1.1));
+const sun = new THREE.DirectionalLight(0xfff4e0, 2.2);
+sun.position.set(3.5, 11, 5); sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024);
+Object.assign(sun.shadow.camera, { left: -7, right: 7, top: 7, bottom: -7, near: 1, far: 30 });
+scene.add(sun);
+const W = (x) => x - 3;
+
+// arena
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.MeshLambertMaterial({ color: 0x6b4a32 }));
+floor.rotation.x = -Math.PI / 2; floor.position.y = -0.7; floor.receiveShadow = true; scene.add(floor);
+const plat = new THREE.Mesh(new THREE.BoxGeometry(8.6, 0.7, 8.6), new THREE.MeshLambertMaterial({ color: 0xb48a5a }));
+plat.position.y = -0.35; plat.receiveShadow = true; scene.add(plat);
+const plat2 = new THREE.Mesh(new THREE.BoxGeometry(9.6, 0.25, 9.6), new THREE.MeshLambertMaterial({ color: 0x9a7248 }));
+plat2.position.y = -0.58; plat2.receiveShadow = true; scene.add(plat2);
+const tileGeo = new THREE.PlaneGeometry(0.97, 0.97);
+const tileA = new THREE.MeshLambertMaterial({ color: 0xe8cc98 }), tileB = new THREE.MeshLambertMaterial({ color: 0xdfc08a });
+const edgeMat = new THREE.MeshLambertMaterial({ color: 0xd9bb84 });
+for (let y = 0; y < 7; y++) for (let x = 0; x < 7; x++) {
+  if (!inRing(x, y)) continue;
+  const m = new THREE.Mesh(tileGeo, isEdge(x, y) ? edgeMat : ((x + y) % 2 ? tileA : tileB));
+  m.rotation.x = -Math.PI / 2; m.position.set(W(x), 0.004, W(y)); m.receiveShadow = true; scene.add(m);
+}
+// tawara (straw bales) along the ring boundary
+const baleMat = new THREE.MeshLambertMaterial({ color: 0xd8c27a });
+const baleGeo = new THREE.CylinderGeometry(0.11, 0.11, 1.04, 10);
+for (let y = 0; y < 7; y++) for (let x = 0; x < 7; x++) {
+  if (!inRing(x, y)) continue;
+  DIRS.forEach(([dx, dy]) => {
+    if (inRing(x + dx, y + dy)) return;
+    const b = new THREE.Mesh(baleGeo, baleMat);
+    b.castShadow = true;
+    b.position.set(W(x) + dx * 0.5, 0.09, W(y) + dy * 0.5);
+    if (dx) b.rotation.x = Math.PI / 2; else b.rotation.z = Math.PI / 2;
+    scene.add(b);
+  });
+}
+// shikiri lines
+const lineMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+for (const s of [-1, 1]) { const l = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.06), lineMat); l.rotation.x = -Math.PI / 2; l.position.set(0, 0.008, s * 0.32); scene.add(l); }
+// corner tassels (fusa)
+[[0x2a5bd7, -1, -1], [0xd73a2a, 1, -1], [0xeeeeee, 1, 1], [0x222222, -1, 1]].forEach(([c, sx, sz]) => {
+  const f = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.24, 0.9, 10), new THREE.MeshLambertMaterial({ color: c }));
+  f.position.set(sx * 5.1, -0.25, sz * 5.1); f.castShadow = true; scene.add(f);
+});
+
+// ---------- characters ----------
+const mats = {
+  skin: new THREE.MeshLambertMaterial({ color: 0xf0c49c }),
+  hair: new THREE.MeshLambertMaterial({ color: 0x1b1612 }),
+  mawashi: new THREE.MeshLambertMaterial({ color: 0x23306e }),
+  white: new THREE.MeshLambertMaterial({ color: 0xffffff }),
+  black: new THREE.MeshBasicMaterial({ color: 0x111111 }),
+  horn: new THREE.MeshLambertMaterial({ color: 0xf3e3b0 }),
+  tiger: new THREE.MeshLambertMaterial({ color: 0xf0b631 }),
+  s: new THREE.MeshLambertMaterial({ color: 0xe0483e }),
+  c: new THREE.MeshLambertMaterial({ color: 0x3a7bd5 }),
+  h: new THREE.MeshLambertMaterial({ color: 0x8b4fc8 }),
+};
+const sph = new THREE.SphereGeometry(1, 22, 16);
+const cone = new THREE.ConeGeometry(1, 1, 12);
+const cyl = new THREE.CylinderGeometry(1, 1, 1, 20);
+function part(geo, mat, sx, sy, sz, x, y, z, parent) {
+  const m = new THREE.Mesh(geo, mat); m.scale.set(sx, sy, sz); m.position.set(x, y, z); m.castShadow = true; parent.add(m); return m;
+}
+function makeWrestler() {
+  const root = new THREE.Group(); const g = new THREE.Group(); root.add(g);
+  part(sph, mats.skin, 0.44, 0.42, 0.4, 0, 0.5, 0, g);
+  part(cyl, mats.mawashi, 0.43, 0.17, 0.39, 0, 0.27, 0, g);
+  part(cyl, mats.skin, 0.1, 0.2, 0.1, -0.18, 0.1, 0, g); part(cyl, mats.skin, 0.1, 0.2, 0.1, 0.18, 0.1, 0, g);
+  part(sph, mats.skin, 0.13, 0.13, 0.13, -0.44, 0.58, 0.05, g); part(sph, mats.skin, 0.13, 0.13, 0.13, 0.44, 0.58, 0.05, g);
+  part(sph, mats.skin, 0.2, 0.2, 0.2, 0, 0.98, 0.02, g);
+  part(sph, mats.hair, 0.19, 0.12, 0.19, 0, 1.08, -0.02, g);
+  part(sph, mats.hair, 0.07, 0.05, 0.12, 0, 1.2, 0.02, g);
+  part(sph, mats.black, 0.03, 0.03, 0.03, -0.07, 1.0, 0.19, g); part(sph, mats.black, 0.03, 0.03, 0.03, 0.07, 1.0, 0.19, g);
+  const ring = new THREE.Mesh(new THREE.RingGeometry(0.36, 0.46, 32), new THREE.MeshBasicMaterial({ color: 0xffd54a, transparent: true, opacity: 0.9 }));
+  ring.rotation.x = -Math.PI / 2; ring.position.y = 0.012; root.add(ring);
+  root.userData = { body: g, ring };
+  return root;
+}
+function makeOni(t) {
+  const r = t === 's' ? 0.33 : t === 'c' ? 0.36 : 0.5;
+  const root = new THREE.Group(); const g = new THREE.Group(); root.add(g);
+  const m = mats[t];
+  part(sph, m, r, r * 1.02, r * 0.95, 0, r, 0, g);
+  part(cyl, mats.tiger, r * 0.98, r * 0.32, r * 0.92, 0, r * 0.55, 0, g);
+  part(cyl, m, r * 0.22, r * 0.4, r * 0.22, -r * 0.42, r * 0.12, 0, g); part(cyl, m, r * 0.22, r * 0.4, r * 0.22, r * 0.42, r * 0.12, 0, g);
+  for (const s of [-1, 1]) {
+    part(sph, mats.white, r * 0.2, r * 0.22, r * 0.12, s * r * 0.3, r * 1.3, r * 0.82, g);
+    part(sph, mats.black, r * 0.09, r * 0.1, r * 0.08, s * r * 0.28, r * 1.3, r * 0.92, g);
+  }
+  if (t === 'c') {
+    const h = part(cone, mats.horn, 0.09, 0.42, 0.09, 0, r * 1.75, r * 0.35, g); h.rotation.x = 0.9;
+  } else {
+    for (const s of [-1, 1]) { const h = part(cone, mats.horn, r * 0.16, r * 0.55, r * 0.16, s * r * 0.45, r * 1.85, 0, g); h.rotation.z = -s * 0.35; }
+  }
+  if (t === 'h') part(sph, mats.horn, r * 0.4, r * 0.08, r * 0.1, 0, r * 0.95, r * 0.9, g);
+  else part(sph, mats.white, r * 0.28, r * 0.06, r * 0.1, 0, r * 0.95, r * 0.88, g);
+  root.userData = { body: g, r };
+  return root;
+}
+// number sprites
+const numTex = {};
+function numSprite(n, color) {
+  const key = n + '_' + color;
+  if (!numTex[key]) {
+    const cv = document.createElement('canvas'); cv.width = cv.height = 64; const x = cv.getContext('2d');
+    x.fillStyle = color; x.beginPath(); x.arc(32, 32, 28, 0, Math.PI * 2); x.fill();
+    x.lineWidth = 5; x.strokeStyle = '#fff'; x.stroke();
+    x.fillStyle = '#fff'; x.font = 'bold 38px system-ui, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(String(n), 32, 34);
+    numTex[key] = new THREE.CanvasTexture(cv); numTex[key].colorSpace = THREE.SRGBColorSpace;
+  }
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: numTex[key], depthTest: false, transparent: true }));
+  s.scale.set(0.36, 0.36, 1); s.renderOrder = 10; return s;
+}
+const COL = { s: '#d8392f', c: '#2d6cc4', h: '#7c3fba' };
+const COLHEX = { s: 0xff5a4a, c: 0x56a0ff, h: 0xb47cff };
+
+// intent marks
+const intentLayer = new THREE.Group(); scene.add(intentLayer);
+const arrowShape = new THREE.Shape();
+arrowShape.moveTo(-0.11, -0.2); arrowShape.lineTo(0.11, -0.2); arrowShape.lineTo(0.11, 0.02); arrowShape.lineTo(0.24, 0.02); arrowShape.lineTo(0, 0.28); arrowShape.lineTo(-0.24, 0.02); arrowShape.lineTo(-0.11, 0.02); arrowShape.closePath();
+const arrowGeo = new THREE.ShapeGeometry(arrowShape);
+const chevShape = new THREE.Shape();
+chevShape.moveTo(-0.26, -0.08); chevShape.lineTo(0, 0.16); chevShape.lineTo(0.26, -0.08); chevShape.lineTo(0.26, -0.2); chevShape.lineTo(0, 0.04); chevShape.lineTo(-0.26, -0.2); chevShape.closePath();
+const chevGeo = new THREE.ShapeGeometry(chevShape);
+const sqGeo = new THREE.PlaneGeometry(0.9, 0.9);
+const markMats = {};
+const markMat = (hex, op = 0.9) => (markMats[hex + '_' + op] ||= new THREE.MeshBasicMaterial({ color: hex, transparent: true, opacity: op, depthWrite: false, depthTest: op > 0.5 ? false : true }));
+function flat(geo, mat, x, z, d, y = 0.02) {
+  const m = new THREE.Mesh(geo, mat); m.rotation.x = -Math.PI / 2; m.rotation.z = [0, -Math.PI / 2, Math.PI, Math.PI / 2][d] ?? 0; m.position.set(x, y, z); m.renderOrder = mat.depthTest ? 2 : 6; intentLayer.add(m); return m;
+}
+let dangerOn = false;
+function showIntents() {
+  clearIntents();
+  let n = 1;
+  for (const e of foes(S)) {
+    const vis = vmap[e.id];
+    if (vis.userData.num) { vis.remove(vis.userData.num); vis.userData.num = null; }
+    if (e.out) continue;
+    const num = numSprite(n++, COL[e.t]); num.position.y = vis.userData.r * 2 + 0.55; vis.add(num); vis.userData.num = num;
+    if (e.stg === 2) continue;
+    const [dx, dy] = DIRS[e.dir]; const mat = markMat(COLHEX[e.t]);
+    if (e.t === 'c' && e.mode === 'charge') {
+      let x = e.x, y = e.y, out = false;
+      for (;;) { const nx = x + dx, ny = y + dy; if (!inRing(nx, ny)) { out = true; break; } if (at(S, nx, ny)) break; x = nx; y = ny; flat(chevGeo, mat, W(x), W(y), e.dir); }
+      if (out) flat(chevGeo, mat, W(x + dx * 0.6), W(y + dy * 0.6), e.dir, 0.03);
+      else { flat(sqGeo, markMat(0xff2a1a, 0.42), W(x + dx), W(y + dy), 0, 0.015); flat(chevGeo, mat, W(x + dx), W(y + dy), e.dir, 0.03); flat(chevGeo, mat, W(x + dx * 1.35), W(y + dy * 1.35), e.dir, 0.03); }
+      vis.rotation.y = Math.atan2(dx, dy);
+    } else {
+      const nx = e.x + dx, ny = e.y + dy;
+      flat(arrowGeo, mat, W(e.x + dx * 0.68), W(e.y + dy * 0.68), e.dir).scale.set(1.35, 1.35, 1);
+      if (at(S, nx, ny)) { flat(sqGeo, markMat(0xff2a1a, 0.42), W(nx), W(ny), 0, 0.015); }
+      vis.rotation.y = Math.atan2(dx, dy);
+    }
+  }
+  const sim = simulate(-1);
+  dangerOn = sim.lost;
+}
+function clearIntents() { while (intentLayer.children.length) intentLayer.remove(intentLayer.children[0]); }
+const preview = new THREE.Mesh(sqGeo, new THREE.MeshBasicMaterial({ color: 0x55ff88, transparent: true, opacity: 0.5, depthWrite: false }));
+preview.rotation.x = -Math.PI / 2; preview.position.y = 0.025; preview.visible = false; preview.renderOrder = 3; scene.add(preview);
+
+// dust particles
+const dustGeo = new THREE.SphereGeometry(1, 8, 6);
+const dust = [];
+for (let i = 0; i < 40; i++) { const m = new THREE.Mesh(dustGeo, new THREE.MeshBasicMaterial({ color: 0xe9d2a6, transparent: true, opacity: 0 })); m.visible = false; scene.add(m); dust.push({ m, life: 0, v: new THREE.Vector3() }); }
+let dustI = 0;
+function puff(x, y, z, n = 8, spd = 1.6) {
+  for (let i = 0; i < n; i++) {
+    const p = dust[dustI++ % dust.length]; const a = rng() * Math.PI * 2;
+    p.m.position.set(x, y + 0.05, z); p.v.set(Math.cos(a) * spd * (0.5 + rng()), 0.6 + rng() * 1.2, Math.sin(a) * spd * (0.5 + rng()));
+    p.life = 1; p.m.visible = true; p.m.scale.setScalar(0.07 + rng() * 0.07);
+  }
+}
+
+// ---------- tween / timers ----------
+let gtime = 0; const tweens = []; const timers = [];
+const sleep = (ms) => new Promise((r) => timers.push({ at: gtime + ms / 1000, r }));
+const tween = (dur, fn) => { tweens.push({ s: gtime, dur, fn }); fn(0); };
+let shakeAmt = 0;
+
+// ---------- audio ----------
+let AC = null, master = null, noiseBuf = null;
+function initAudio() {
+  try { ZZFX.audioContext?.resume(); } catch (e) {}
+  try {
+    if (!AC) {
+      AC = ZZFX.audioContext || new (window.AudioContext || window.webkitAudioContext)();
+      master = AC.createGain(); master.gain.value = 0.5; master.connect(AC.destination);
+      noiseBuf = AC.createBuffer(1, AC.sampleRate * 2, AC.sampleRate);
+      const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    }
+    AC.resume?.();
+  } catch (e) { AC = null; }
+}
+const Z = (p) => { try { zzfx(...p); } catch (e) {} };
+function cheer(amount = 1) {
+  if (!AC || !noiseBuf) return;
+  try {
+    const t = AC.currentTime; const src = AC.createBufferSource(); src.buffer = noiseBuf;
+    const bp = AC.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 900; bp.Q.value = 0.7;
+    const g = AC.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.25 * amount, t + 0.12); g.gain.exponentialRampToValueAtTime(0.001, t + 1.1 + amount * 0.4);
+    const lfo = AC.createOscillator(); lfo.frequency.value = 7; const lg = AC.createGain(); lg.gain.value = 0.06 * amount; lfo.connect(lg); lg.connect(g.gain);
+    src.connect(bp); bp.connect(g); g.connect(master); src.start(t, Math.random()); src.stop(t + 1.8); lfo.start(t); lfo.stop(t + 1.8);
+  } catch (e) {}
+}
+function clack() { // hyoshigi
+  Z([0.9, 0, 1900, 0, 0.004, 0.05, 3, 1, , , , , , , , , 0.06]);
+}
+const SFX = {
+  step: () => Z([0.5, 0.05, 90, 0, 0.02, 0.09, 0, 2, -3]),
+  push: () => { Z([1.1, 0.1, 160, 0, 0.01, 0.07, 4, 1, , , , , , 6]); Z([0.8, 0.05, 60, 0, 0.03, 0.14, 0, 2, -2]); },
+  wobble: () => Z([0.9, 0, 55, 0.02, 0.12, 0.22, 1, 1, , , , , , , 9]),
+  dash: () => Z([0.6, 0.05, 220, 0.02, 0.08, 0.16, 4, 1, -6, , , , , 3]),
+  shiko: () => { Z([1.2, 0, 50, 0, 0.05, 0.3, 0, 2, -1.5]); },
+  land: () => Z([1.2, 0.1, 45, 0, 0.06, 0.35, 0, 2, -1]),
+  whoosh: () => Z([0.5, 0.05, 600, 0.04, 0.08, 0.2, 0, 1, -24]),
+  taiko: () => { Z([1.4, 0, 58, 0, 0.06, 0.45, 0, 1.6, -0.8]); },
+  lose: () => Z([0.7, 0, 220, 0.05, 0.25, 0.5, 1, 1, -3]),
+  bump: () => Z([0.4, 0, 300, 0, 0.01, 0.05, 1, 1]),
+  newk: () => { Z([0.5, 0, 880, 0, 0.05, 0.25, 0, 1, , , 440, 0.08]); },
+};
+
+// ---------- DOM ----------
+const $ = (id) => document.getElementById(id);
+const ov = $('ov'), hint = $('hint'), matta = $('matta'), turnInfo = $('turnInfo');
+let kimaTimer = 0;
+function showKima(j, e, dur = 1.2) {
+  $('kimaJ').textContent = j; $('kimaE').textContent = e;
+  const k = $('kima'); k.style.transition = 'none'; k.style.opacity = '1'; k.style.transform = 'scale(1.35)';
+  void k.offsetWidth; k.style.transition = 'transform .25s cubic-bezier(.2,1.6,.4,1), opacity .4s'; k.style.transform = 'scale(1)';
+  kimaTimer = dur;
+}
+function fitText(el) { el.style.fontSize = ''; const w = innerWidth - 24; let fs = parseFloat(getComputedStyle(el).fontSize); while (el.scrollWidth > w && fs > 14) { fs -= 2; el.style.fontSize = fs + 'px'; } }
+
+// ---------- game flow ----------
+let mode = 'title', busy = false, ovReadyAt = 0, advance = false;
+let bout = 0, wins = 0, losses = 0, mattaLeft = 1, lastSnap = null, boutKims = [], turnCount = 0;
+const vmap = {};
+let entGroup = new THREE.Group(); scene.add(entGroup);
+
+function updateHud() {
+  $('rank').textContent = mode === 'title' ? '' : rankName(bout);
+  $('boutNo').textContent = mode === 'title' ? '' : T.bout(bout + 1);
+  const lim = RANKS[bout].lim, rem = lim - turnCount;
+  $('left').textContent = mode === 'title' ? '' : T.left(Math.max(0, rem));
+  $('left').className = rem <= 2 ? 'low' : '';
+  $('stars').textContent = mode === 'title' ? '' : (LANG === 'ja' ? '星 ' : '') + ('○'.repeat(wins) + '●'.repeat(losses) || '—');
+  matta.textContent = T.matta(mattaLeft);
+  matta.disabled = !(mattaLeft > 0 && lastSnap && !busy && mode === 'play');
+  matta.style.display = mode === 'play' ? 'block' : 'none';
+}
+
+function zukanHtml() {
+  return `<div class="zk">${T.zukan} ${save.z.length}/${KIM_KEYS.length}<br>` + KIM_KEYS.map((k) => `<span class="${save.z.includes(k) ? '' : 'no'}">${save.z.includes(k) ? kimJ(k) : '？（' + (LANG === 'ja' ? KIM[k].hj : KIM[k].he) + '）'}</span>`).join('') + '</div>';
+}
+function showTitle() {
+  mode = 'title'; ov.style.display = 'flex';
+  ov.innerHTML = `<h1>${T.title}</h1><p style="margin-top:14px">${T.how1}</p><p>${T.how2}</p><p>${T.how3}</p>${save.best >= 0 ? `<p class="zk">${T.best(rankName(Math.min(save.best, 7)))}</p>` : ''}${zukanHtml()}<div class="tap">${T.tap}</div>`;
+  fitText(ov.querySelector('h1'));
+  ovReadyAt = gtime + 0.3; updateHud(); setupDemo();
+}
+
+function setupDemo() {
+  // a calm arena behind the title
+  S = { ents: [{ id: 0, t: 'p', x: 3, y: 4, face: 2 }, { id: 1, t: 's', x: 2, y: 1, dir: 2 }, { id: 2, t: 'c', x: 5, y: 2, dir: 3 }, { id: 3, t: 'h', x: 4, y: 0, dir: 2 }], outsThisTurn: 0 };
+  buildVisuals(); clearIntents();
+}
+
+function buildVisuals() {
+  scene.remove(entGroup); entGroup = new THREE.Group(); scene.add(entGroup);
+  for (const e of S.ents) {
+    const v = e.t === 'p' ? makeWrestler() : makeOni(e.t);
+    if (e.t === 'p') v.userData.r = 0.5;
+    v.position.set(W(e.x), 0, W(e.y)); v.rotation.y = e.t === 'p' ? 0 : Math.atan2(DIRS[e.dir][0], DIRS[e.dir][1]);
+    entGroup.add(v); vmap[e.id] = v;
+  }
+}
+
+function startBasho() { advance = false; bout = 0; wins = 0; losses = 0; startBout(); }
+function startBout() {
+  mode = 'play'; ov.style.display = 'none'; mattaLeft = 1; lastSnap = null; boutKims = []; turnCount = 0;
+  const comp = RANKS[bout].e;
+  const ents = [{ id: 0, t: 'p', x: 3, y: 3, face: 0 }];
+  const cells = [];
+  for (let y = 0; y < 7; y++) for (let x = 0; x < 7; x++) if (inRing(x, y) && Math.max(Math.abs(x - 3), Math.abs(y - 3)) >= 2) cells.push([x, y]);
+  // place enemies; avoid chargers lined up with the player at the start
+  let tries = 0;
+  for (;;) {
+    tries++;
+    const pool = cells.slice(); const list = [];
+    let ok = true;
+    for (let i = 0; i < comp.length; i++) {
+      const t = comp[i];
+      const cand = pool.filter(([x, y]) => (t !== 'c' || tries > 40 || (x !== 3 && y !== 3)) && (t !== 'h' || !isEdge(x, y) || tries > 40));
+      if (!cand.length) { ok = false; break; }
+      const [x, y] = cand[(rng() * cand.length) | 0];
+      pool.splice(pool.findIndex((c) => c[0] === x && c[1] === y), 1);
+      list.push({ id: i + 1, t, x, y, dir: 0, mode: 'step', stg: 0 });
+    }
+    if (ok) { ents.push(...list); break; }
+  }
+  S = { ents, outsThisTurn: 0, lost: null };
+  buildVisuals(); plan(S); showIntents();
+  busy = true; updateHud();
+  hint.textContent = T.hint; hint.style.opacity = bout === 0 && wins === 0 ? '1' : '0';
+  hintTimer = 6;
+  showKima(T.hakkeyoi, '', 0.9); clack(); setTimeout(clack, 120);
+  signal('start');
+  sleep(500).then(() => { busy = false; turnInfo.textContent = T.yourTurn; updateHud(); });
+}
+let hintTimer = 0;
+
+function snapshot() { return { ents: S.ents.map((e) => ({ ...e })), turnCount, boutKims: boutKims.slice() }; }
+function restoreSnap(sn) {
+  S.ents = sn.ents.map((e) => ({ ...e })); turnCount = sn.turnCount; boutKims = sn.boutKims;
+  for (const e of S.ents) { const v = vmap[e.id]; v.visible = true; v.position.set(W(e.x), 0, W(e.y)); v.rotation.set(0, e.t === 'p' ? v.rotation.y : Math.atan2(DIRS[e.dir][0], DIRS[e.dir][1]), 0); v.userData.body.rotation.set(0, 0, 0); v.userData.body.position.set(0, 0, 0); }
+  showIntents();
+}
+
+const lerp = (a, b, t) => a + (b - a) * t;
+const ease = (t) => 1 - (1 - t) * (1 - t);
+function animMove(mv) {
+  const v = vmap[mv.id]; if (!v) return 0;
+  const body = v.userData.body;
+  switch (mv.k) {
+    case 'step': {
+      const d = 0.17; const fx = W(mv.fx), fz = W(mv.fy), tx = W(mv.tx), tz = W(mv.ty);
+      v.rotation.y = Math.atan2(tx - fx, tz - fz);
+      tween(d, (t) => { const e = ease(t); v.position.set(lerp(fx, tx, e), Math.sin(Math.PI * t) * 0.14, lerp(fz, tz, e)); });
+      return d;
+    }
+    case 'dash': {
+      const fx = W(mv.fx), fz = W(mv.fy), tx = W(mv.tx), tz = W(mv.ty);
+      const dist = Math.hypot(tx - fx, tz - fz); const d = 0.05 + dist * 0.06;
+      v.rotation.y = Math.atan2(tx - fx, tz - fz);
+      tween(d, (t) => { v.position.set(lerp(fx, tx, t), 0, lerp(fz, tz, t)); body.rotation.x = Math.sin(Math.PI * t) * 0.35; });
+      if (dist > 0.5) puff(fx, 0, fz, 4, 0.8);
+      return d;
+    }
+    case 'shove': {
+      const d = 0.15; const fx = W(mv.fx), fz = W(mv.fy), tx = W(mv.tx), tz = W(mv.ty);
+      tween(d, (t) => { const e = ease(t); v.position.set(lerp(fx, tx, e), 0, lerp(fz, tz, e)); body.rotation.z = Math.sin(Math.PI * t) * 0.25; });
+      puff(tx, 0, tz, 3, 0.7);
+      return d;
+    }
+    case 'slap': {
+      const d = 0.16; const [dx, dy] = DIRS[mv.d]; const bx = v.position.x, bz = v.position.z;
+      v.rotation.y = Math.atan2(dx, dy);
+      tween(d, (t) => { const k = Math.sin(Math.PI * t) * 0.28; v.position.set(bx + dx * k, 0, bz + dy * k); });
+      return d * 0.6;
+    }
+    case 'wobble': {
+      const d = 0.4;
+      tween(d, (t) => { body.rotation.z = Math.sin(t * Math.PI * 4) * 0.22 * (1 - t); });
+      return d * 0.5;
+    }
+    case 'shiko': {
+      const d = 0.34;
+      tween(d, (t) => { body.rotation.z = Math.sin(Math.PI * t) * 0.3; body.position.y = Math.sin(Math.PI * t) * 0.12; });
+      sleep(d * 1000 * 0.9).then(() => puff(v.position.x, 0, v.position.z, 6, 1));
+      return d;
+    }
+    case 'out': {
+      if (v.userData.num) { v.remove(v.userData.num); v.userData.num = null; }
+      const [dx, dy] = DIRS[mv.d];
+      const fx = W(mv.fx), fz = W(mv.fy); const ex = W(mv.tx) - dx * 0.45, ez = W(mv.ty) - dy * 0.45;
+      const slide = 0.08 + Math.hypot(ex - fx, ez - fz) * 0.06, fly = 0.6;
+      const lx = ex + dx * 0.95, lz = ez + dy * 1.9;
+      const spin = (rng() < 0.5 ? -1 : 1);
+      tween(slide, (t) => { v.position.set(lerp(fx, ex, t), 0, lerp(fz, ez, t)); });
+      sleep(slide * 1000).then(() => {
+        SFX.whoosh();
+        tween(fly, (t) => {
+          v.position.set(lerp(ex, lx, t), 1.1 * Math.sin(Math.PI * Math.min(1, t * 1.25)) * (t < 0.8 ? 1 : 1) + lerp(0, -0.7, t * t), lerp(ez, lz, t));
+          body.rotation.x = (dy ? dy : 0) * t * 1.57; body.rotation.z = (dx ? -dx : spin * 0.3) * t * 1.57;
+        });
+        sleep(fly * 1000).then(() => { SFX.land(); puff(lx, -0.7, lz, 10, 1.8); shakeAmt = Math.max(shakeAmt, 0.18); });
+      });
+      return slide + fly * 0.75;
+    }
+  }
+  return 0;
+}
+
+async function animate(G) {
+  for (const g of G) {
+    let dur = 0.1;
+    for (const mv of g.moves) dur = Math.max(dur, animMove(mv));
+    if (g.sfx && SFX[g.sfx]) SFX[g.sfx]();
+    if (g.shake) shakeAmt = Math.max(shakeAmt, g.shake);
+    if (g.note === 'wobble') showKima('', T.wobble, 1.0);
+    if (g.kim && g.kim.length) {
+      const hasOut = g.moves.some((m) => m.k === 'out');
+      const k = g.kim[g.kim.length - 1];
+      boutKims.push(...g.kim);
+      const isNew = g.kim.some((q) => !save.z.includes(q));
+      g.kim.forEach((q) => { if (!save.z.includes(q)) save.z.push(q); });
+      showKima(kimJ(k) + '！', kimE(k) + (isNew ? ' — ' + T.newKim : ''), 1.3);
+      if (isNew) SFX.newk();
+      if (hasOut) sleep(250).then(() => cheer(1));
+    }
+    await sleep(dur * 1000 + 40);
+  }
+}
+
+async function playerAct(d) {
+  if (busy || mode !== 'play') return;
+  const snap = snapshot();
+  const G = []; S.outsThisTurn = 0; S.lost = null;
+  if (!doPlayer(S, d, G)) { SFX.bump(); const v = vmap[0]; tween(0.2, (t) => { v.userData.body.rotation.z = Math.sin(t * Math.PI * 3) * 0.1 * (1 - t); }); return; }
+  busy = true; lastSnap = snap; turnCount++; clearIntents(); preview.visible = false; hint.style.opacity = '0';
+  for (const e of foes(S)) { const v = vmap[e.id]; if (v.userData.num) v.userData.num.visible = false; }
+  updateHud();
+  await animate(G);
+  if (!S.lost && !allOut(S)) {
+    turnInfo.textContent = T.enemyTurn;
+    await sleep(120);
+    let n = 0;
+    const order = foes(S).filter((e) => !e.out);
+    for (const e of order) {
+      if (S.lost || allOut(S)) break;
+      if (e.out) continue;
+      n++;
+      const G2 = [];
+      const v = vmap[e.id]; const nm = v.userData.num; if (nm) { nm.visible = true; tween(0.25, (t) => nm.scale.setScalar(0.36 * (1 + Math.sin(Math.PI * t) * 0.6))); }
+      actFoe(S, e, G2);
+      await animate(G2);
+      if (v.userData.num) v.userData.num.visible = false;
+      await sleep(60);
+    }
+  }
+  for (const e of S.ents) e.stun = false;
+  if (S.outsThisTurn >= 2) {
+    boutKims.push('futari');
+    const isNew = !save.z.includes('futari'); if (isNew) save.z.push('futari');
+    showKima(kimJ('futari') + '！', T.two + (isNew ? ' — ' + T.newKim : ''), 1.3); cheer(1.6); if (isNew) SFX.newk();
+    await sleep(700);
+  }
+  if (S.lost) return lose();
+  if (allOut(S)) return win();
+  if (turnCount >= RANKS[bout].lim) { S.lost = 'time'; return lose(); }
+  plan(S); showIntents();
+  busy = false; turnInfo.textContent = T.yourTurn; updateHud();
+}
+
+async function win() {
+  mode = 'result'; turnInfo.textContent = ''; wins++; persist();
+  SFX.taiko(); setTimeout(() => SFX.taiko(), 180); cheer(2);
+  const v = vmap[0]; tween(0.6, (t) => { v.userData.body.position.y = Math.abs(Math.sin(t * Math.PI * 2)) * 0.25; });
+  v.rotation.y = 0;
+  signal('end', { score: wins });
+  await sleep(900);
+  const final = bout === 7;
+  if (final) { save.yusho++; }
+  save.best = Math.max(save.best, final ? 8 : bout + 1); persist();
+  const uniq = [...new Set(boutKims)];
+  ov.style.display = 'flex';
+  if (final) {
+    ov.innerHTML = `<h1>${losses ? T.yusho : T.zensho}</h1><p class="big">${T.record(wins, losses)}</p>${zukanHtml()}<div class="tap">${T.again}</div>`;
+    mode = 'final';
+  } else {
+    ov.innerHTML = `<h2>${T.win}</h2><p class="big">${rankName(bout)} — ${T.turns(turnCount)}</p><p>${uniq.map(kimJ).join('・')}</p><p style="margin-top:10px">→ ${rankName(bout + 1)}</p><div class="tap">${T.next}</div>`;
+    advance = true;
+  }
+  ovReadyAt = gtime + 0.7; updateHud();
+}
+
+async function lose() {
+  mode = 'result'; turnInfo.textContent = ''; losses++; persist();
+  SFX.lose(); cheer(0.7);
+  signal('end', { score: wins });
+  await sleep(900);
+  ov.style.display = 'flex';
+  if (losses >= 3) {
+    ov.innerHTML = `<h2>${T.over}</h2><p class="big">${T.reached(rankName(bout))}</p><p>${T.record(wins, losses)}</p>${zukanHtml()}<div class="tap">${T.again}</div>`;
+    mode = 'final';
+  } else {
+    ov.innerHTML = `<h2>${T.lose}</h2><p class="big">${T.lostBy[S.lost] || T.lostBy.push}</p><p>${'○'.repeat(wins)}${'●'.repeat(losses)}　${T.loss(losses)}</p><p>${T.retry}</p><div class="tap">${T.again}</div>`;
+  }
+  ovReadyAt = gtime + 0.7; updateHud();
+}
+
+// ---------- input ----------
+const ray = new THREE.Raycaster(); const ndc = new THREE.Vector2();
+function cellAt(cx, cy) {
+  const r = canvas.getBoundingClientRect(); if (!r.width || !r.height) return null;
+  ndc.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
+  ray.setFromCamera(ndc, camera);
+  const o = ray.ray.origin, dv = ray.ray.direction; if (Math.abs(dv.y) < 1e-6) return null;
+  const t = (0.0 - o.y) / dv.y; if (t < 0) return null;
+  return [Math.round(o.x + dv.x * t + 3), Math.round(o.z + dv.z * t + 3)];
+}
+let down = null;
+function swipeDir(dx, dy) { return Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0); }
+function setPreview(d) {
+  if (d == null || busy || mode !== 'play') { preview.visible = false; return; }
+  const p = S.ents[0];
+  const nx = p.x + (d < 0 ? 0 : DIRS[d][0]), ny = p.y + (d < 0 ? 0 : DIRS[d][1]);
+  if (!inRing(nx, ny)) { preview.visible = false; return; }
+  const sim = simulate(d);
+  preview.material.color.setHex(sim.won ? 0xffd54a : sim.lost ? 0xff3322 : 0x55ff88);
+  preview.position.x = W(nx); preview.position.z = W(ny); preview.visible = true;
+}
+function tapDir(cx, cy) {
+  const c = cellAt(cx, cy); if (!c) return null; const p = S.ents[0];
+  const dx = c[0] - p.x, dy = c[1] - p.y;
+  if (dx === 0 && dy === 0) return -1;
+  if (Math.abs(dx) + Math.abs(dy) === 1) return dx === 1 ? 1 : dx === -1 ? 3 : dy === 1 ? 2 : 0;
+  return 'far';
+}
+canvas.addEventListener('pointerdown', (e) => {
+  initAudio();
+  if (mode !== 'play') return;
+  down = { x: e.clientX, y: e.clientY, id: e.pointerId, dir: null };
+  const td = tapDir(e.clientX, e.clientY); if (td !== null && td !== 'far') { down.dir = td; setPreview(td); }
+});
+canvas.addEventListener('pointermove', (e) => {
+  if (!down || e.pointerId !== down.id) return;
+  const dx = e.clientX - down.x, dy = e.clientY - down.y;
+  if (Math.hypot(dx, dy) > 18) { const d = swipeDir(dx, dy); if (d !== down.dir) { down.dir = d; down.swiped = true; setPreview(d); } }
+});
+function endPointer(e, cancel) {
+  if (!down || e.pointerId !== down.id) return;
+  const dd = down; down = null; preview.visible = false;
+  if (cancel) return;
+  const dx = e.clientX - dd.x, dy = e.clientY - dd.y;
+  if (Math.hypot(dx, dy) > 18) { playerAct(swipeDir(dx, dy)); return; }
+  const td = tapDir(e.clientX, e.clientY);
+  if (td === null) return;
+  if (td === 'far') { // tap farther away: step toward it
+    const c = cellAt(e.clientX, e.clientY); const p = S.ents[0];
+    const ddx = c[0] - p.x, ddy = c[1] - p.y;
+    playerAct(Math.abs(ddx) >= Math.abs(ddy) ? (ddx > 0 ? 1 : 3) : (ddy > 0 ? 2 : 0));
+    return;
+  }
+  playerAct(td);
+}
+canvas.addEventListener('pointerup', (e) => endPointer(e, false));
+canvas.addEventListener('pointercancel', (e) => endPointer(e, true));
+ov.addEventListener('pointerdown', () => {
+  initAudio();
+  if (gtime < ovReadyAt) return;
+  if (mode === 'title') startBasho();
+  else if (mode === 'result') { if (advance) { bout++; advance = false; } startBout(); }
+  else if (mode === 'final') showTitle();
+});
+matta.addEventListener('pointerdown', (e) => {
+  e.stopPropagation(); initAudio();
+  if (matta.disabled || busy || !lastSnap || mattaLeft <= 0 || mode !== 'play') return;
+  mattaLeft--; restoreSnap(lastSnap); lastSnap = null; clack(); showKima(LANG === 'ja' ? '待った！' : 'Matta!', '', 0.8); updateHud();
+});
+
+// ---------- resize & loop ----------
+function resize() {
+  const w = Math.max(1, innerWidth), h = Math.max(1, innerHeight);
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  const vf = camera.fov * Math.PI / 180;
+  const hf = 2 * Math.atan(Math.tan(vf / 2) * camera.aspect);
+  const halfW = 4.25;
+  let dist = halfW / Math.tan(hf / 2) + 2.2;
+  dist = Math.max(dist, 11);
+  const el = 56 * Math.PI / 180;
+  camBase.set(camTarget.x, camTarget.y + Math.sin(el) * dist, camTarget.z + Math.cos(el) * dist);
+  camera.position.copy(camBase); camera.lookAt(camTarget);
+  camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize); resize();
+
+let last = performance.now();
+function loop(now) {
+  requestAnimationFrame(loop);
+  const dt = Math.min(0.05, Math.max(0, (now - last) / 1000)); last = now;
+  gtime += dt;
+  for (let i = tweens.length - 1; i >= 0; i--) { const tw = tweens[i]; const t = Math.min(1, (gtime - tw.s) / tw.dur); try { tw.fn(t); } catch (err) { tweens.splice(i, 1); continue; } if (t >= 1) tweens.splice(i, 1); }
+  for (let i = timers.length - 1; i >= 0; i--) if (timers[i].at <= gtime) { const r = timers[i].r; timers.splice(i, 1); r(); }
+  for (const p of dust) if (p.life > 0) { p.life -= dt * 1.6; p.v.y -= 3 * dt; p.m.position.addScaledVector(p.v, dt); p.m.material.opacity = Math.max(0, p.life) * 0.8; if (p.life <= 0) p.m.visible = false; }
+  // idle breathing / staggered wobble / danger ring
+  if (S) for (const e of S.ents) {
+    const v = vmap[e.id]; if (!v || e.out) continue;
+    const b = v.userData.body;
+    if (!tweens.length) {
+      const k = 1 + Math.sin(gtime * 3 + e.id) * 0.025; b.scale.set(1, k, 1);
+      if (e.stg === 1) b.rotation.z = Math.sin(gtime * 9) * 0.12;
+    }
+    if (e.t === 'p') {
+      const ring = v.userData.ring;
+      if (dangerOn && mode === 'play' && !busy) { ring.material.color.setHex(0xff3322); ring.material.opacity = 0.6 + Math.sin(gtime * 10) * 0.35; }
+      else { ring.material.color.setHex(0xffd54a); ring.material.opacity = 0.9; }
+    }
+  }
+  if (kimaTimer > 0) { kimaTimer -= dt; if (kimaTimer <= 0) $('kima').style.opacity = '0'; }
+  if (hintTimer > 0) { hintTimer -= dt; if (hintTimer <= 0) hint.style.opacity = '0'; }
+  if (mode === 'title') { const a = gtime * 0.15; camera.position.set(camTarget.x + Math.sin(a) * 2, camBase.y, camBase.z - (1 - Math.cos(a)) * 0.6); camera.lookAt(camTarget); }
+  else {
+    shakeAmt *= Math.pow(0.02, dt);
+    camera.position.set(camBase.x + (Math.random() - 0.5) * shakeAmt, camBase.y + (Math.random() - 0.5) * shakeAmt, camBase.z);
+    camera.lookAt(camTarget);
+  }
+  renderer.render(scene, camera);
+}
+showTitle();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
