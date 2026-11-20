@@ -1,0 +1,874 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-11-20T03:41:10.033Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "wait": 3000
+        }
+      ],
+      "desc": "tap(0.50,0.50) 120ms → wait 3000ms",
+      "note": "タイトルをタップ。やま1、山の上に落雷で火がついた。風は下向き、家は下に2軒",
+      "noteEn": "Tapped the title. Hill 1: lightning lit a fire at the top. Wind blows down, two houses below",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": [
+        {
+          "path": [
+            [
+              0,
+              0.5
+            ],
+            [
+              0.5,
+              0.49
+            ],
+            [
+              1,
+              0.5
+            ]
+          ],
+          "hold": 1800
+        },
+        {
+          "wait": 1500
+        }
+      ],
+      "desc": "path(0.00,0.50→0.50,0.49→1.00,0.50) 1800ms → wait 1500ms",
+      "note": "火のゆくてを横一本になぞると、草が刈れて茶色い線になった。体力が半分ほど減る",
+      "noteEn": "Swiped a line across ahead of the fire: the grass is cut into a brown line. About half my stamina is gone",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "tap": [
+            0.9,
+            0.955
+          ]
+        },
+        {
+          "wait": 7000
+        }
+      ],
+      "desc": "tap(0.90,0.95) 120ms → wait 7000ms",
+      "note": "早送り。火が線まで来て、そこで止まっている",
+      "noteEn": "Fast-forward. The fire reaches the line and stops there",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "wait": 9000
+        }
+      ],
+      "desc": "wait 9000ms",
+      "note": "燃えつきた。2軒とも無事で星3つ",
+      "noteEn": "It burned out. Both houses safe, three stars",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "u": 1,
+            "b": [
+              250
+            ]
+          }
+        },
+        {
+          "agf": "end",
+          "score": 250
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "wait": 2500
+        }
+      ],
+      "desc": "tap(0.50,0.50) 120ms → wait 2500ms",
+      "note": "やま2。3か所に落雷。道が一本あり、ヒントは「道のすぐ上を長押し」",
+      "noteEn": "Hill 2. Three strikes. There is a road, and the hint says to long-press just above it",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "u": 1,
+            "b": [
+              250
+            ]
+          }
+        },
+        {
+          "agf": "end",
+          "score": 250
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "tap": [
+            0.15,
+            0.63
+          ],
+          "hold": 700
+        },
+        {
+          "tap": [
+            0.38,
+            0.63
+          ],
+          "hold": 700
+        },
+        {
+          "tap": [
+            0.62,
+            0.63
+          ],
+          "hold": 700
+        },
+        {
+          "tap": [
+            0.85,
+            0.63
+          ],
+          "hold": 700
+        },
+        {
+          "wait": 3000
+        }
+      ],
+      "desc": "tap(0.15,0.63) 700ms → tap(0.38,0.63) 700ms → tap(0.62,0.63) 700ms → tap(0.85,0.63) 700ms → wait 3000ms",
+      "note": "道の上4か所を長押し。輪がたまって「むかえ火！」、小さな火が横へ広がっていく",
+      "noteEn": "Long-pressed four spots above the road. The ring fills, Backfire!, and small fires spread sideways",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "u": 1,
+            "b": [
+              250
+            ]
+          }
+        },
+        {
+          "agf": "end",
+          "score": 250
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "wait": 5000
+        }
+      ],
+      "desc": "wait 5000ms",
+      "note": "上から大きな火が迫る。むかえ火の焼け跡が帯になってきた",
+      "noteEn": "The big fire comes down. My backfires have burned a black band",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "u": 1,
+            "b": [
+              250
+            ]
+          }
+        },
+        {
+          "agf": "end",
+          "score": 250
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": [
+        {
+          "tap": [
+            0.9,
+            0.955
+          ]
+        },
+        {
+          "wait": 8000
+        }
+      ],
+      "desc": "tap(0.90,0.95) 120ms → wait 8000ms",
+      "note": "早送り。主火は焼け跡で燃えるものがなくなり、道をこえられない。3軒無事",
+      "noteEn": "Fast-forward. The main fire runs out of fuel at the burned band and cannot cross the road. All three safe",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "u": 1,
+            "b": [
+              250
+            ]
+          }
+        },
+        {
+          "agf": "end",
+          "score": 250
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "u": 2,
+            "b": [
+              250,
+              330
+            ]
+          }
+        },
+        {
+          "agf": "end",
+          "score": 330
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "wait": 2000
+        }
+      ],
+      "desc": "tap(0.50,0.50) 120ms → wait 2000ms",
+      "note": "やま3。火は左上、家は下に2軒と右に2軒。予報では風が東へ変わる",
+      "noteEn": "Hill 3. Fire at top-left, two houses below and two on the right. The forecast says the wind will turn east",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "u": 1,
+            "b": [
+              250
+            ]
+          }
+        },
+        {
+          "agf": "end",
+          "score": 250
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "u": 2,
+            "b": [
+              250,
+              330
+            ]
+          }
+        },
+        {
+          "agf": "end",
+          "score": 330
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "action": [
+        {
+          "path": [
+            [
+              0.455,
+              0.09
+            ],
+            [
+              0.455,
+              0.7
+            ]
+          ],
+          "hold": 1500
+        },
+        {
+          "tap": [
+            0.42,
+            0.16
+          ],
+          "hold": 700
+        },
+        {
+          "tap": [
+            0.42,
+            0.32
+          ],
+          "hold": 700
+        },
+        {
+          "tap": [
+            0.42,
+            0.48
+          ],
+          "hold": 700
+        },
+        {
+          "wait": 1500
+        }
+      ],
+      "desc": "path(0.46,0.09→0.46,0.70) 1500ms → tap(0.42,0.16) 700ms → tap(0.42,0.32) 700ms → tap(0.42,0.48) 700ms → wait 1500ms",
+      "note": "右の家を守るため縦に線を刈り、線の左側（火の側）3か所にむかえ火",
+      "noteEn": "Cut a vertical line to shield the right houses, then lit three backfires on its left (fire) side",
+      "image": "ai-play/step-10.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "u": 1,
+            "b": [
+              250
+            ]
+          }
+        },
+        {
+          "agf": "end",
+          "score": 250
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "u": 2,
+            "b": [
+              250,
+              330
+            ]
+          }
+        },
+        {
+          "agf": "end",
+          "score": 330
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "action": [
+        {
+          "path": [
+            [
+              0.455,
+              0.7
+            ],
+            [
+              0,
+              0.7
+            ]
+          ],
+          "hold": 900
+        },
+        {
+          "tap": [
+            0.2,
+            0.675
+          ],
+          "hold": 700
+        },
+        {
+          "wait": 4000
+        }
+      ],
+      "desc": "path(0.46,0.70→0.00,0.70) 900ms → tap(0.20,0.68) 700ms → wait 4000ms",
+      "note": "下の家のために横にも線を刈り、その上にむかえ火。体力がぎりぎり",
+      "noteEn": "Cut a horizontal line for the lower houses and lit a backfire above it. Stamina is nearly gone",
+      "image": "ai-play/step-11.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "u": 1,
+            "b": [
+              250
+            ]
+          }
+        },
+        {
+          "agf": "end",
+          "score": 250
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "u": 2,
+            "b": [
+              250,
+              330
+            ]
+          }
+        },
+        {
+          "agf": "end",
+          "score": 330
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 12,
+      "action": [
+        {
+          "tap": [
+            0.9,
+            0.955
+          ]
+        },
+        {
+          "wait": 7000
+        }
+      ],
+      "desc": "tap(0.90,0.95) 120ms → wait 7000ms",
+      "note": "早送り。風が東へ変わった",
+      "noteEn": "Fast-forward. The wind turned east",
+      "image": "ai-play/step-12.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "u": 1,
+            "b": [
+              250
+            ]
+          }
+        },
+        {
+          "agf": "end",
+          "score": 250
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "u": 2,
+            "b": [
+              250,
+              330
+            ]
+          }
+        },
+        {
+          "agf": "end",
+          "score": 330
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 13,
+      "action": [
+        {
+          "path": [
+            [
+              1,
+              0.7
+            ],
+            [
+              0.5,
+              0.7
+            ]
+          ],
+          "hold": 500
+        },
+        {
+          "path": [
+            [
+              1,
+              0.685
+            ],
+            [
+              0.55,
+              0.685
+            ]
+          ],
+          "hold": 400
+        },
+        {
+          "wait": 5000
+        }
+      ],
+      "desc": "path(1.00,0.70→0.50,0.70) 500ms → path(1.00,0.69→0.55,0.69) 400ms → wait 5000ms",
+      "note": "下の2軒は燃えた。あわてて右下の家の下を刈ったが、縦の線の下の端を火が回りこんで間に合わず、右下も燃えた。残り1軒に赤い輪",
+      "noteEn": "Both lower houses burned. I hurriedly cut under the lower-right house, but the fire slipped round the bottom end of my vertical line and that house burned too. A red ring on the last one",
+      "image": "ai-play/step-13.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "u": 1,
+            "b": [
+              250
+            ]
+          }
+        },
+        {
+          "agf": "end",
+          "score": 250
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "u": 2,
+            "b": [
+              250,
+              330
+            ]
+          }
+        },
+        {
+          "agf": "end",
+          "score": 330
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 14,
+      "action": [
+        {
+          "wait": 12000
+        }
+      ],
+      "desc": "wait 12000ms",
+      "note": "最後の1軒にも火が届いた。線を下の端まで引くべきだった",
+      "noteEn": "The fire reached the last house too. I should have run the line all the way to the bottom",
+      "image": "ai-play/step-14.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "u": 1,
+            "b": [
+              250
+            ]
+          }
+        },
+        {
+          "agf": "end",
+          "score": 250
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "u": 2,
+            "b": [
+              250,
+              330
+            ]
+          }
+        },
+        {
+          "agf": "end",
+          "score": 330
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 26
+        }
+      ]
+    },
+    {
+      "step": 15,
+      "action": [
+        {
+          "wait": 8000
+        }
+      ],
+      "desc": "wait 8000ms",
+      "note": "「里が燃えた…」0/4。風が変わったあとの回りこみを読めなかった。もう一度やれば線の引き方を変えたい",
+      "noteEn": "The village burned, 0/4. I failed to read how the fire would wrap round after the wind turned. Next time I would draw the line differently",
+      "image": "ai-play/step-15.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "load"
+        },
+        {
+          "agf": "loaded",
+          "data": null
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "u": 1,
+            "b": [
+              250
+            ]
+          }
+        },
+        {
+          "agf": "end",
+          "score": 250
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "save",
+          "data": {
+            "u": 2,
+            "b": [
+              250,
+              330
+            ]
+          }
+        },
+        {
+          "agf": "end",
+          "score": 330
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 26
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}

@@ -1,0 +1,870 @@
+{
+  "id": "2026-11-20-claude-2",
+  "status": "published",
+  "title": "むかえ火の里",
+  "genre": "ストラテジー",
+  "concept": "山火事は消せない。できるのは、草を刈って道をたつことと、先に自分で燃やしておく「むかえ火」だけ。風に乗って勢いづいた火は火の粉を飛ばして細い線をこえるが、風上へはう火は飛ばさない。風の予報を読み、どこを刈り、どこを先に焼くかが核。",
+  "howToPlay": "なぞると草を刈って火の道をたてる。長押しでむかえ火をつけ、火が来る前に先に燃やしておく。風の向きと予報を見て、家を守る。",
+  "libraryDecision": "ライブラリは使わない。火の広がりは44×64マスの自作シミュレーションで、低解像度の地面を拡大してにじませ、炎は加算合成の光で重ねれば十分に火らしく見え、なめらかに動くため。",
+  "soundDecision": "BGMは付けず、燃えているマスの数で大きくなる火のはぜる音と風の音を鳴らす。火の勢いが耳でも分かり、迫る緊張になるため。刈る音、落雷、むかえ火、家が燃える音、クリアの音も付けた。",
+  "improvements": [
+    {
+      "found": "最初の山から細い線を火の粉がこえ、なぜ負けたのか分からない。煙が濃くて火・焼け跡・燃えた家の見分けがつかない。体力切れで線が途切れても気づけない。",
+      "changed": "火の粉に尾を付けて大きくし、飛び火した所に輪と「火の粉がこえた！」を出した。煙を薄く、焼け跡を明るくし、燃えた家に赤い×を付けた。体力切れは指のそばに表示。待つ間は早送りボタンが光る。",
+      "foundEn": "Embers jumped a thin line even on the first hill and I could not tell why I lost. Thick smoke hid fire, ash and burned houses. I did not notice my line breaking when stamina ran out.",
+      "changedEn": "Embers are bigger with a trail, and a spot fire shows a ring and An ember jumped! Thinner smoke, lighter ash, a red X on burned houses. Out of stamina now appears next to the finger. The fast-forward button pulses while you wait."
+    },
+    {
+      "found": "横一本の線が体力100で引ききれず、最初の山で理不尽に負ける。やま3が急に難しく、作戦を立てても1軒しか残らない。守りきっても手応えがなく、ただ火が消えるだけ。",
+      "changed": "刈るコストを下げ、一筆で横断できるようにした。最初の山は火の粉なしにして「線で止まる」を確実に体験できるようにした。やま3以降は必要な軒数・火の粉・体力回復をゆるめ、ヒントを具体的にした。家が危機を脱すると「守った！」と音と火花が出る。",
+      "foundEn": "One line across cost more than my 100 stamina, so the first hill was lost unfairly. Hill 3 was suddenly too hard: even with a plan only one house survived. Saving a house had no payoff; the fire just went out.",
+      "changedEn": "Cutting is cheaper so one stroke crosses the hill. The first hill has no embers, so you reliably see a line stop the fire. From Hill 3 the required houses, embers and stamina regen are gentler and the hint is concrete. A house that escapes danger now shows Safe! with a chime and sparks."
+    },
+    {
+      "found": "同じ操作でも遊ぶたびに火の広がりが大きく変わり、自己プレイの記録が食い違った。",
+      "changed": "火のシミュレーション専用の乱数を分け、同じ山・同じ操作なら同じように燃えるようにした（やり直しのたびに少し変わる）。",
+      "foundEn": "The same inputs gave very different fires on each replay, so my self-play record contradicted itself.",
+      "changedEn": "Gave the fire simulation its own random stream so the same hill and inputs burn the same way (it still varies between retries)."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "ストラテジー",
+      "en": "Strategy",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "山火事から里を守るリアルタイム戦略。火は消せず、草を刈る線と、先に燃やす「むかえ火」で止める。上から見た2Dの山に、光る炎と飛ぶ火の粉、風の筋を重ねる。",
+        "ideaEn": "A real-time strategy about saving a village from wildfire. You cannot put fire out: only cut lines and light backfires. A top-down 2D hill with glowing flames, flying embers and wind streaks.",
+        "fromDraw": true
+      },
+      {
+        "idea": "花火玉に星を並べて詰め、打ち上げると並べたとおりに夜空で開く、目標のない遊び場。2Dに光のにじみを重ねて見せる。",
+        "ideaEn": "A goal-free toy: arrange stars inside a firework shell and launch it to see your pattern bloom in the night sky, drawn in 2D with glow.",
+        "fromDraw": false
+      },
+      {
+        "idea": "3Dの谷を飛ぶ紙ひこうき。指で傾け、上昇気流を見つけて乗り継ぎ、遠くまで飛ぶ。奥行きのある地形を three.js で見せる。",
+        "ideaEn": "A paper plane gliding through a 3D valley: tilt with your finger, find thermals and ride them far. Terrain depth shown with three.js.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "other",
+    "input": [
+      "draw",
+      "hold"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Backfire Village",
+      "concept": "You cannot put a wildfire out. You can only cut grass to break its path, or light a backfire and burn the fuel first. A fire running with the wind throws embers over thin lines; a fire creeping upwind does not. Reading the wind forecast and choosing where to cut and where to burn is the core.",
+      "howToPlay": "Swipe to cut grass and break the fire's path. Long-press to light a backfire and burn the ground before the fire arrives. Watch the wind and its forecast to save the houses.",
+      "libraryDecision": "No library. The fire is a hand-written 44x64 cell simulation; a low-resolution ground scaled up softly with additive flame glows already looks like fire and runs smoothly.",
+      "soundDecision": "No BGM. A crackling fire that grows louder with the number of burning cells, plus wind, so you can hear the fire's strength as tension. Cutting, lightning, backfire, a house catching fire and clear jingles also have sounds."
+    }
+  },
+  "createdAt": "2026-11-20T12:07:12+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Fable 5.2",
+      "vendor": "Anthropic",
+      "model": "claude-fable-5-2",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-20T12:07:12+09:00",
+    "metricsFrom": "2026-11-20T03:06:00.192Z",
+    "transcript": "3b098ca8-d0a6-49c4-abe8-26dc93b95a36.jsonl",
+    "validationRuns": 5,
+    "finishedAt": "2026-11-20T12:56:05+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-20T12:56:04+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "39.8KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=172",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=421",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=152",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=316",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 40738,
+    "lines": 458
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 14
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Fable 5.2",
+      "vendor": "Anthropic",
+      "model": "claude-fable-5-2"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "やま3から急に難しくなり、線の端を火が回りこむ・風が変わると横腹が先頭になる、といった理屈を自分で負けて学ぶしかない。火が届くまで待つ時間も長い。",
+    "comment": "やま2で、道の上につけた小さなむかえ火が横に広がって黒い帯になり、上から来た大きな火がそこで燃えるものを失って止まった場面は、理屈が目で分かって気持ちよかった。やま3は縦の線で右上を守れたのに、線の下の端を回りこまれて全焼し、「次は線を端まで引く」とやり直したくなった。ただ火を待つ時間が長く、早送りを知らないと退屈。数分は普通に遊べるが、人に勧めるほどではない。",
+    "similar": [
+      {
+        "title": "Wildfire (Cat Daddy Games, 2004)",
+        "url": "https://www.mobygames.com/game/43424/wildfire/",
+        "similarity": "中",
+        "note": "山火事を相手に、防火帯やむかえ火と風の変化を扱う点が同じ。あちらは消防隊や予算を指揮するPC向けの本格シミュレーションで、本作は指でなぞる・長押しの2操作だけに絞った。",
+        "note_en": "Also about fighting wildfire with firebreaks, backburns and shifting wind. That one is a full PC simulation commanding crews and budgets; this one is reduced to two touch gestures, swipe and long-press."
+      },
+      {
+        "title": "Wildfire Swap",
+        "url": "https://store.steampowered.com/app/1216030/Wildfire_Swap",
+        "similarity": "低",
+        "note": "家と炎のあいだに防火帯を作って守るという目的が同じ。あちらはタイルを入れ替えるターン制パズルで、本作は風と火の粉のあるリアルタイム。",
+        "note_en": "Shares the goal of making a firebreak between houses and flames. That is a turn-based tile-swapping puzzle; this is real-time with wind and embers."
+      }
+    ],
+    "research": "ウェブ検索を2回行い、山火事・防火帯・むかえ火を扱うゲームを調べた。むかえ火そのものは現実の消火戦術がルーツ。",
+    "i18n": {
+      "en": {
+        "worst": "From Hill 3 it gets hard quickly, and you can only learn by losing that fire wraps round the end of a line and that a flank becomes the head when the wind turns. There is also a lot of waiting for the fire to arrive.",
+        "comment": "On Hill 2 my small backfires above the road spread sideways into a black band, and the big fire coming down ran out of fuel and stopped there: the logic was visible and satisfying. On Hill 3 my vertical line saved the upper right, but the fire slipped round its bottom end and everything burned, which made me want to retry and run the line to the edge. But there is a lot of waiting for the fire, dull if you miss the fast-forward button. Playable for a few minutes, not something I would recommend to friends.",
+        "research": "Two web searches for games about wildfire, firebreaks and backburning. The backfire itself comes from real firefighting practice."
+      }
+    },
+    "method": "スマホ縦画面で 15 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 15 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 3000ms",
+        "note": "タイトルをタップ。やま1、山の上に落雷で火がついた。風は下向き、家は下に2軒",
+        "noteEn": "Tapped the title. Hill 1: lightning lit a fire at the top. Wind blows down, two houses below",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "path(0.00,0.50→0.50,0.49→1.00,0.50) 1800ms → wait 1500ms",
+        "note": "火のゆくてを横一本になぞると、草が刈れて茶色い線になった。体力が半分ほど減る",
+        "noteEn": "Swiped a line across ahead of the fire: the grass is cut into a brown line. About half my stamina is gone",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.90,0.95) 120ms → wait 7000ms",
+        "note": "早送り。火が線まで来て、そこで止まっている",
+        "noteEn": "Fast-forward. The fire reaches the line and stops there",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 9000ms",
+        "note": "燃えつきた。2軒とも無事で星3つ",
+        "noteEn": "It burned out. Both houses safe, three stars",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 1,
+              "b": [
+                250
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 250
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.50,0.50) 120ms → wait 2500ms",
+        "note": "やま2。3か所に落雷。道が一本あり、ヒントは「道のすぐ上を長押し」",
+        "noteEn": "Hill 2. Three strikes. There is a road, and the hint says to long-press just above it",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 1,
+              "b": [
+                250
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 250
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.15,0.63) 700ms → tap(0.38,0.63) 700ms → tap(0.62,0.63) 700ms → tap(0.85,0.63) 700ms → wait 3000ms",
+        "note": "道の上4か所を長押し。輪がたまって「むかえ火！」、小さな火が横へ広がっていく",
+        "noteEn": "Long-pressed four spots above the road. The ring fills, Backfire!, and small fires spread sideways",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 1,
+              "b": [
+                250
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 250
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 5000ms",
+        "note": "上から大きな火が迫る。むかえ火の焼け跡が帯になってきた",
+        "noteEn": "The big fire comes down. My backfires have burned a black band",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 1,
+              "b": [
+                250
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 250
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.90,0.95) 120ms → wait 8000ms",
+        "note": "早送り。主火は焼け跡で燃えるものがなくなり、道をこえられない。3軒無事",
+        "noteEn": "Fast-forward. The main fire runs out of fuel at the burned band and cannot cross the road. All three safe",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 1,
+              "b": [
+                250
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 250
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 2,
+              "b": [
+                250,
+                330
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 330
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.50,0.50) 120ms → wait 2000ms",
+        "note": "やま3。火は左上、家は下に2軒と右に2軒。予報では風が東へ変わる",
+        "noteEn": "Hill 3. Fire at top-left, two houses below and two on the right. The forecast says the wind will turn east",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 1,
+              "b": [
+                250
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 250
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 2,
+              "b": [
+                250,
+                330
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 330
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "path(0.46,0.09→0.46,0.70) 1500ms → tap(0.42,0.16) 700ms → tap(0.42,0.32) 700ms → tap(0.42,0.48) 700ms → wait 1500ms",
+        "note": "右の家を守るため縦に線を刈り、線の左側（火の側）3か所にむかえ火",
+        "noteEn": "Cut a vertical line to shield the right houses, then lit three backfires on its left (fire) side",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 1,
+              "b": [
+                250
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 250
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 2,
+              "b": [
+                250,
+                330
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 330
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "path(0.46,0.70→0.00,0.70) 900ms → tap(0.20,0.68) 700ms → wait 4000ms",
+        "note": "下の家のために横にも線を刈り、その上にむかえ火。体力がぎりぎり",
+        "noteEn": "Cut a horizontal line for the lower houses and lit a backfire above it. Stamina is nearly gone",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 1,
+              "b": [
+                250
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 250
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 2,
+              "b": [
+                250,
+                330
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 330
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.90,0.95) 120ms → wait 7000ms",
+        "note": "早送り。風が東へ変わった",
+        "noteEn": "Fast-forward. The wind turned east",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 1,
+              "b": [
+                250
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 250
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 2,
+              "b": [
+                250,
+                330
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 330
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "path(1.00,0.70→0.50,0.70) 500ms → path(1.00,0.69→0.55,0.69) 400ms → wait 5000ms",
+        "note": "下の2軒は燃えた。あわてて右下の家の下を刈ったが、縦の線の下の端を火が回りこんで間に合わず、右下も燃えた。残り1軒に赤い輪",
+        "noteEn": "Both lower houses burned. I hurriedly cut under the lower-right house, but the fire slipped round the bottom end of my vertical line and that house burned too. A red ring on the last one",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 1,
+              "b": [
+                250
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 250
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 2,
+              "b": [
+                250,
+                330
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 330
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "wait 12000ms",
+        "note": "最後の1軒にも火が届いた。線を下の端まで引くべきだった",
+        "noteEn": "The fire reached the last house too. I should have run the line all the way to the bottom",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 1,
+              "b": [
+                250
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 250
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 2,
+              "b": [
+                250,
+                330
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 330
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 26
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "wait 8000ms",
+        "note": "「里が燃えた…」0/4。風が変わったあとの回りこみを読めなかった。もう一度やれば線の引き方を変えたい",
+        "noteEn": "The village burned, 0/4. I failed to read how the fire would wrap round after the wind turned. Next time I would draw the line differently",
+        "image": "ai-play/step-15.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 1,
+              "b": [
+                250
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 250
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "u": 2,
+              "b": [
+                250,
+                330
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 330
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 26
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-20T12:56:05+09:00"
+  },
+  "publishedAt": "2026-11-20T12:56:05+09:00",
+  "metrics": {
+    "model": "claude-fable-5-2",
+    "effort": "medium",
+    "thinkingTokens": 33344,
+    "outputTokens": 47233,
+    "contextTokens": 6839492,
+    "turns": 34,
+    "toolCalls": 67,
+    "webSearches": 0,
+    "minutes": 50.1,
+    "from": "2026-11-20T03:06:00.192Z",
+    "to": "2026-11-20T03:56:05.524Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-20T12:56:05+09:00",
+    "validationRuns": 5,
+    "codeKB": 39.8
+  }
+}
