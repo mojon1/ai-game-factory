@@ -1,0 +1,438 @@
+{
+  "id": "2026-11-20-gpt-2",
+  "status": "published",
+  "title": "流れを読む渡し舟",
+  "genre": "アクション",
+  "concept": "船を向けた方向と実際に進む方向が川の流れでずれる。金の港へ真っすぐ向けるだけでは流されるので、上流を向いてから舵を戻す。流れの強い帯と岩の位置を見ながら、三つの川の渡り方を探す。",
+  "howToPlay": "画面下の舵を左右に動かすと出航します。離しても船は同じ向きへ進むので、流れと岩を見て舵を切り、金の港へ着けてください。",
+  "libraryDecision": "上から川全体を見渡す2Dを選ぶ。3Dでは岩と港への横ずれを比べにくくなる。流速を場所から計算するだけで核を表せるため、物理や描画ライブラリは使わない。",
+  "soundDecision": "出航と着岸に短い音、失敗には低い音を添える。流れを視覚で読む遊びを邪魔しないようBGMや連続エンジン音は入れない。",
+  "improvements": [
+    {
+      "found": "船の向きと実際の移動を航跡で比べられない／矢印が速すぎ、数値の流速も読みづらい／船首が桟橋へ触れた後も進み、着岸の判定位置が分かりにくい。",
+      "changed": "直近の航跡を残し、川の矢印を流速と対応する速さへ修正。HUDは弱・中・強の流れ表示に変え、船首が港に触れる位置で着岸するようにした。",
+      "foundEn": "There was no trail to compare heading and motion; current arrows moved too fast and numbers were opaque; the bow touched the dock before landing registered.",
+      "changedEn": "Added a recent trail, tied arrow movement to current speed, replaced raw numbers with three strengths, and moved landing detection to the bow's arrival."
+    },
+    {
+      "found": "着岸後の暗幕が航跡を隠し、どの舵が効いたか見返せない／岩へ近づいても安全な余白の目安がない／衝突時の助言が流れへの対処だけで、失敗原因に合っていない。",
+      "changed": "結果を下端の札へ移して船・航跡・停止位置の輪を残す。近い岩には注意の点線を出し、衝突・岸・港外れごとに助言を変えた。",
+      "foundEn": "The result overlay hid the trail; nearby rocks gave no clearance cue; collision advice only discussed current rather than the actual failure.",
+      "changedEn": "A footer result preserves boat and trail with an endpoint ring. Nearby rocks gain a dashed caution outline, and advice now differs for rock, bank and missed-port failures."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "クイズ",
+      "en": "Quiz",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "短く見せた川の矢印から、どの岸へ舟が流されるか答えるクイズ。2Dの図で条件を比較し、3Dは視点による誤解を生むため使わない。",
+        "ideaEn": "A quiz predicting a boat landing from current arrows shown briefly. Flat diagrams expose conditions without perspective ambiguity.",
+        "fromDraw": true
+      },
+      {
+        "idea": "実際に舵を切り、流れで横ずれする小舟を港へ着ける。俯瞰2Dで流れ・岩・港を同時に見せ、角度を変えた結果を軌跡として読む。",
+        "ideaEn": "Steer a drifting ferry into ports. Top-down 2D shows currents, rocks and landing zones together so heading changes can be read directly.",
+        "fromDraw": false
+      },
+      {
+        "idea": "二本のひもを交互に引いて、つった皿の果物を運ぶ。3Dの傾きと転がりで左右の力の釣り合いを見せる。",
+        "ideaEn": "Pull two ropes to carry fruit on a suspended tray, using 3D tilt and rolling to show balance.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 1
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "other",
+    "input": [
+      "drag",
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Ferry Against the Flow",
+      "concept": "The current separates the heading from the actual route. Point upstream before returning the rudder toward the port, reading strong-flow bands and rocks across three rivers.",
+      "howToPlay": "Touch or drag the rudder below to launch and steer. The boat keeps moving after release. Read current arrows and avoid rocks to reach the gold port.",
+      "libraryDecision": "A top-down 2D view makes drift relative to rocks and ports clear. Local flow equations express the core without a physics or rendering library; depth would obscure lateral comparison.",
+      "soundDecision": "Brief launch and landing notes, and a low failure note, provide feedback. No continuous engine or music distracts from reading the river."
+    }
+  },
+  "createdAt": "2026-11-20T12:14:54+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "gpt-6.1-sol",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-20T12:14:54+09:00",
+    "metricsFrom": "2026-11-20T03:12:48.419Z",
+    "transcript": null,
+    "validationRuns": 3,
+    "finishedAt": "2026-11-20T12:24:31+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-20T12:20:37+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "9.3KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=59",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=65",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=47",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=78",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 9518,
+    "lines": 30
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "gpt-6.1-sol",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 2,
+    "works": "ok",
+    "worst": "三コースが短く固定で、通れる舵の順を覚えると再挑戦の変化がなくなる。",
+    "comment": "二つ目では岩の左を通り、上へ抜けるまで右折を待つと着岸できた。三つ目では左・中央・左と舵を戻し、流れを利用して二つの岩を避ける場面があった。航跡で理由は読めるが、全体が短く、数分の遊びを支える幅が足りないため★2。",
+    "similar": [
+      {
+        "title": "Relative Motion — PhysSandbox",
+        "url": "https://physandbox.com/mechanics/relative-motion",
+        "similarity": "中",
+        "note": "舟の水に対する速度と川の流速を合成して横ずれを読む原理が同じ。こちらは計測用のパラメータ操作ではなく、場所で変わる流れ・岩・狭い港を三コースで操作する遊び。",
+        "note_en": "Both combine boat velocity relative to water with the current to explain drift. This game instead uses real-time steering through three fixed courses with spatially varying currents, rocks and narrow ports."
+      }
+    ],
+    "research": "川渡りと速度合成をウェブ検索し、PhysSandboxのRelative Motionシミュレーターの提供元説明を確認した。",
+    "i18n": {
+      "en": {
+        "worst": "The three short courses are fixed; once a working rudder sequence is learned, retries offer little variation.",
+        "comment": "In the second river, waiting until above the rock before turning right reached the port. In the third, left–center–left steering used the current to avoid two rocks. Trails made the route readable, but the brief fixed sequence lacks enough breadth for several minutes of play, so I rate it two stars.",
+        "research": "Searched river crossing and velocity addition, then consulted the provider's description of PhysSandbox's Relative Motion simulator."
+      }
+    },
+    "method": "スマホ縦画面で 9 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 9 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "完成版では結果の下に航跡が見えるか確認し、三つの川を渡る。",
+        "noteEn": "I replay all three rivers, checking that result cards leave the routes visible.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.50,0.88) 120ms → tap(0.20,0.88) 120ms → tap(0.14,0.88) 120ms → tap(0.20,0.88) 120ms",
+        "note": "成功した一つ目の航路を再現する。最初に右へ流されてから上流へ戻した曲線が見返せる。",
+        "noteEn": "I replay the first successful route, preserving its curve from initial downstream drift back upstream.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 800ms → tap(0.50,0.50) 120ms",
+        "note": "着岸位置の緑の輪と航跡が暗幕なしで読める。右へ曲がって着ける二つ目へ進む。",
+        "noteEn": "The green landing ring and trail remain readable. I continue to the right-turn landing.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.50,0.88) 120ms → tap(0.38,0.88) 120ms → wait 950ms → tap(0.87,0.88) 120ms",
+        "note": "二つ目は中央へ進み、左へ傾けて岩を越え、最後に右へ曲がる既知の航路を再現する。",
+        "noteEn": "I replay the known second route: head north, lean upstream past the rock, then turn right late.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 800ms → tap(0.50,0.50) 120ms",
+        "note": "最後は中央の岩を左へよけてから、上の岩を右へ回る道を考える。",
+        "noteEn": "For the final river, I plan to pass left of the central rock, then right of the upper rock.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.32,0.88) 120ms",
+        "note": "出航直後は左寄りの舵。中央の岩へ押し込まれる前に、左側へ余白を作る。",
+        "noteEn": "I launch with a leftward heading, creating room beside the central rock before reaching it.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.50,0.88) 120ms",
+        "note": "中央の岩の左に出た。上の岩へ寄りすぎないよう舵を中央へ戻し、右向きに変わる流れを利用する。",
+        "noteEn": "Now left of the central rock, I center the rudder and use the upper rightward current to avoid the next rock.",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 500ms",
+        "note": "左の岩は船のすぐ横。ここで左へ切ると岩へ戻るので、上へ抜けるまで少し待つ。",
+        "noteEn": "The upper rock is close on the left. Turning left now would return toward it, so I wait until above it.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.10,0.88) 120ms",
+        "note": "岩を越えたので、強い流れへ逆らって左へ切る。狭い港の中央へ戻せるか確かめる。",
+        "noteEn": "Now above the rock, I steer sharply upstream left to return toward the narrow port.",
+        "image": "ai-play/step-09.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-20T12:24:31+09:00"
+  },
+  "publishedAt": "2026-11-20T12:24:31+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 6462,
+    "outputTokens": 8938,
+    "contextTokens": 6908757,
+    "turns": 31,
+    "toolCalls": 31,
+    "webSearches": null,
+    "minutes": 11.8,
+    "from": "2026-11-20T03:12:48.419Z",
+    "to": "2026-11-20T03:24:33.896Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-20T12:24:34+09:00",
+    "validationRuns": 3,
+    "codeKB": 9.3,
+    "evidence": "metrics-evidence.json"
+  }
+}

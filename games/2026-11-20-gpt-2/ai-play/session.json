@@ -1,0 +1,317 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-11-20T03:20:40.132Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.5
+        ],
+        "wait": 100
+      },
+      "desc": "tap(0.50,0.50) 120ms",
+      "note": "完成版では結果の下に航跡が見えるか確認し、三つの川を渡る。",
+      "noteEn": "I replay all three rivers, checking that result cards leave the routes visible.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.875
+          ],
+          "wait": 1000
+        },
+        {
+          "tap": [
+            0.2,
+            0.875
+          ],
+          "wait": 2300
+        },
+        {
+          "tap": [
+            0.14,
+            0.875
+          ],
+          "wait": 1000
+        },
+        {
+          "tap": [
+            0.2,
+            0.875
+          ],
+          "wait": 1800
+        }
+      ],
+      "desc": "tap(0.50,0.88) 120ms → tap(0.20,0.88) 120ms → tap(0.14,0.88) 120ms → tap(0.20,0.88) 120ms",
+      "note": "成功した一つ目の航路を再現する。最初に右へ流されてから上流へ戻した曲線が見返せる。",
+      "noteEn": "I replay the first successful route, preserving its curve from initial downstream drift back upstream.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": [
+        {
+          "wait": 800
+        },
+        {
+          "tap": [
+            0.5,
+            0.5
+          ],
+          "wait": 100
+        }
+      ],
+      "desc": "wait 800ms → tap(0.50,0.50) 120ms",
+      "note": "着岸位置の緑の輪と航跡が暗幕なしで読める。右へ曲がって着ける二つ目へ進む。",
+      "noteEn": "The green landing ring and trail remain readable. I continue to the right-turn landing.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "tap": [
+            0.5,
+            0.875
+          ],
+          "wait": 1200
+        },
+        {
+          "tap": [
+            0.38,
+            0.875
+          ],
+          "wait": 1900
+        },
+        {
+          "wait": 950
+        },
+        {
+          "tap": [
+            0.87,
+            0.875
+          ],
+          "wait": 1100
+        }
+      ],
+      "desc": "tap(0.50,0.88) 120ms → tap(0.38,0.88) 120ms → wait 950ms → tap(0.87,0.88) 120ms",
+      "note": "二つ目は中央へ進み、左へ傾けて岩を越え、最後に右へ曲がる既知の航路を再現する。",
+      "noteEn": "I replay the known second route: head north, lean upstream past the rock, then turn right late.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": [
+        {
+          "wait": 800
+        },
+        {
+          "tap": [
+            0.5,
+            0.5
+          ],
+          "wait": 100
+        }
+      ],
+      "desc": "wait 800ms → tap(0.50,0.50) 120ms",
+      "note": "最後は中央の岩を左へよけてから、上の岩を右へ回る道を考える。",
+      "noteEn": "For the final river, I plan to pass left of the central rock, then right of the upper rock.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": {
+        "tap": [
+          0.32,
+          0.875
+        ],
+        "wait": 1750
+      },
+      "desc": "tap(0.32,0.88) 120ms",
+      "note": "出航直後は左寄りの舵。中央の岩へ押し込まれる前に、左側へ余白を作る。",
+      "noteEn": "I launch with a leftward heading, creating room beside the central rock before reaching it.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": {
+        "tap": [
+          0.5,
+          0.875
+        ],
+        "wait": 1550
+      },
+      "desc": "tap(0.50,0.88) 120ms",
+      "note": "中央の岩の左に出た。上の岩へ寄りすぎないよう舵を中央へ戻し、右向きに変わる流れを利用する。",
+      "noteEn": "Now left of the central rock, I center the rudder and use the upper rightward current to avoid the next rock.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": {
+        "wait": 500
+      },
+      "desc": "wait 500ms",
+      "note": "左の岩は船のすぐ横。ここで左へ切ると岩へ戻るので、上へ抜けるまで少し待つ。",
+      "noteEn": "The upper rock is close on the left. Turning left now would return toward it, so I wait until above it.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": {
+        "tap": [
+          0.1,
+          0.875
+        ],
+        "wait": 1100
+      },
+      "desc": "tap(0.10,0.88) 120ms",
+      "note": "岩を越えたので、強い流れへ逆らって左へ切る。狭い港の中央へ戻せるか確かめる。",
+      "noteEn": "Now above the rock, I steer sharply upstream left to return toward the narrow port.",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}

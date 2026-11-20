@@ -1,0 +1,381 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-11-20T03:09:25.676Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.5
+        ],
+        "wait": 100
+      },
+      "desc": "tap(0.50,0.50) 120ms",
+      "note": "戻すボタンを含め、完成版を最初から確かめる。",
+      "noteEn": "I start the revised version with Undo.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": [
+        {
+          "tap": [
+            0.16,
+            0.22
+          ]
+        },
+        {
+          "tap": [
+            0.38,
+            0.22
+          ]
+        },
+        {
+          "tap": [
+            0.61,
+            0.22
+          ]
+        },
+        {
+          "tap": [
+            0.84,
+            0.22
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.89
+          ],
+          "wait": 1000
+        }
+      ],
+      "desc": "tap(0.16,0.22) 120ms → tap(0.38,0.22) 120ms → tap(0.61,0.22) 120ms → tap(0.84,0.22) 120ms → tap(0.50,0.89) 120ms",
+      "note": "解いた一問目はネコ、イヌ、トリ、ウサギの順。自動選択で並べ、完成した席順が残ることを確かめる。",
+      "noteEn": "I replay the solved Cat–Dog–Bird–Rabbit order with automatic selection and check that the completed row stays visible.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": {
+        "tap": [
+          0.5,
+          0.5
+        ],
+        "wait": 100
+      },
+      "desc": "tap(0.50,0.50) 120ms",
+      "note": "二問目の否定条件を読む。イヌの左にネコ、トリはウサギともネコとも隣り合わない。",
+      "noteEn": "I read the second riddle: Cat just left of Dog; Bird is next to neither Rabbit nor Cat.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": {
+        "tap": [
+          0.16,
+          0.22
+        ],
+        "wait": 100
+      },
+      "desc": "tap(0.16,0.22) 120ms",
+      "note": "ネコを左端へ仮置きする。トリはイヌとしか隣り合えないので、右端に寄せる必要がありそう。",
+      "noteEn": "I tentatively place Cat leftmost. Bird can only neighbor Dog, suggesting Bird belongs at the right edge.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": {
+        "tap": [
+          0.5,
+          0.045
+        ],
+        "wait": 100
+      },
+      "desc": "tap(0.50,0.04) 120ms",
+      "note": "ネコが左端だと右端のトリへイヌが届かない。戻すで空席とネコ選択に戻るか試す。",
+      "noteEn": "Cat leftmost would keep Dog away from Bird at the right edge. I undo to recover the empty row and Cat selection.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": {
+        "tap": [
+          0.38,
+          0.22
+        ],
+        "wait": 100
+      },
+      "desc": "tap(0.38,0.22) 120ms",
+      "note": "ネコを二番目へ。右にイヌ、その隣にトリを置く並びなら否定条件を両立できる。",
+      "noteEn": "I place Cat second; Dog then Bird on its right should satisfy both negative clues.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": [
+        {
+          "tap": [
+            0.61,
+            0.22
+          ]
+        },
+        {
+          "tap": [
+            0.84,
+            0.22
+          ]
+        },
+        {
+          "tap": [
+            0.16,
+            0.22
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.89
+          ],
+          "wait": 1000
+        }
+      ],
+      "desc": "tap(0.61,0.22) 120ms → tap(0.84,0.22) 120ms → tap(0.16,0.22) 120ms → tap(0.50,0.89) 120ms",
+      "note": "推理したウサギ、ネコ、イヌ、トリの並びを完成させて確かめる。",
+      "noteEn": "I complete and check the deduced Rabbit–Cat–Dog–Bird order.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": {
+        "tap": [
+          0.5,
+          0.5
+        ],
+        "wait": 100
+      },
+      "desc": "tap(0.50,0.50) 120ms",
+      "note": "次から五席になる。キツネとウサギは端に座らず、ネコの右がキツネ、ネコの隣にトリという条件を読む。",
+      "noteEn": "Five seats begin. Fox and Rabbit avoid the ends, Fox is just right of Cat, and Bird neighbors Cat.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": {
+        "tap": [
+          0.32,
+          0.22
+        ],
+        "wait": 100
+      },
+      "desc": "tap(0.32,0.22) 120ms",
+      "note": "トリ・ネコ・キツネの三人組を左へ寄せないと、端に座れないウサギの場所が残らない。ネコは二番目。",
+      "noteEn": "The Bird–Cat–Fox chain must begin leftward to leave Rabbit an interior seat. Cat belongs second.",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "action": {
+        "tap": [
+          0.86,
+          0.22
+        ],
+        "wait": 100
+      },
+      "desc": "tap(0.86,0.22) 120ms",
+      "note": "イヌには条件が直接ない。残る右端へ座らせ、手がかりに名前がなくても位置が決まるか考える。",
+      "noteEn": "Dog has no direct clue. I reserve the remaining right edge, testing how an unnamed guest can still be determined.",
+      "image": "ai-play/step-10.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "action": [
+        {
+          "tap": [
+            0.14,
+            0.22
+          ]
+        },
+        {
+          "tap": [
+            0.68,
+            0.22
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.22
+          ]
+        },
+        {
+          "tap": [
+            0.5,
+            0.89
+          ],
+          "wait": 1000
+        }
+      ],
+      "desc": "tap(0.14,0.22) 120ms → tap(0.68,0.22) 120ms → tap(0.50,0.22) 120ms → tap(0.50,0.89) 120ms",
+      "note": "トリを一番目、ウサギを四番目、キツネを三番目へ。四条件が全部緑になる並びを確認する。",
+      "noteEn": "I place Bird first, Rabbit fourth and Fox third, then check the arrangement satisfying all four clues.",
+      "image": "ai-play/step-11.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}
