@@ -1,0 +1,548 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-11-21T03:17:49.125Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.5
+        ],
+        "wait": 100
+      },
+      "desc": "tap(0.50,0.50) 120ms",
+      "note": "列番号と戻すを確認して、完成版を始める。",
+      "noteEn": "I start the final version with numbered columns and Undo.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": [
+        {
+          "tap": [
+            0.17,
+            0.65
+          ],
+          "wait": 100
+        },
+        {
+          "tap": [
+            0.17,
+            0.65
+          ],
+          "wait": 100
+        },
+        {
+          "tap": [
+            0.17,
+            0.65
+          ],
+          "wait": 100
+        },
+        {
+          "tap": [
+            0.39,
+            0.65
+          ],
+          "wait": 100
+        }
+      ],
+      "desc": "tap(0.17,0.65) 120ms → tap(0.17,0.65) 120ms → tap(0.17,0.65) 120ms → tap(0.39,0.65) 120ms",
+      "note": "既に確かめた6・3・4の一列と、隣の2の仕込みを再現する。",
+      "noteEn": "I replay the known setup: 6–3–4 in column one and 2 in column two.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": {
+        "tap": [
+          0.17,
+          0.65
+        ],
+        "wait": 100
+      },
+      "desc": "tap(0.17,0.65) 120ms",
+      "note": "7を一列目へ仮置きする。満杯の赤枠が付くか、戻すで比較できるかを見る。",
+      "noteEn": "I trial 7 in column one, checking the red full-column border before comparing with Undo.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": {
+        "tap": [
+          0.5,
+          0.045
+        ],
+        "wait": 100
+      },
+      "desc": "tap(0.50,0.04) 120ms",
+      "note": "戻すを押す。7が現在の数字へ戻り、残り枚数も32へ戻るか確認する。",
+      "noteEn": "I undo, checking that 7 returns as the current tile and remaining count returns to 32.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": {
+        "tap": [
+          0.39,
+          0.65
+        ],
+        "hold": 400,
+        "wait": 100
+      },
+      "desc": "tap(0.39,0.65) 400ms",
+      "note": "二列目へ7を落とす。まず3と7が光るかを見る。",
+      "noteEn": "I drop 7 into column two and inspect the first highlighted pair, 3 and 7.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": {
+        "wait": 300
+      },
+      "desc": "wait 300ms",
+      "note": "3と7が消えた後、4が下がって6と重なる二段目を確かめる。",
+      "noteEn": "I wait for 3 and 7 to clear, then inspect 4 falling onto 6.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "action": {
+        "wait": 500
+      },
+      "desc": "wait 500ms",
+      "note": "10点から二組目の20点が加わり、合計30点になる。消えた順番は以前より分かりやすい。",
+      "noteEn": "The second pair adds 20 to the first 10, totaling 30. The clear sequence is now readable.",
+      "image": "ai-play/step-07.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "action": [
+        {
+          "tap": [
+            0.17,
+            0.65
+          ],
+          "wait": 100
+        },
+        {
+          "tap": [
+            0.61,
+            0.65
+          ],
+          "wait": 100
+        },
+        {
+          "tap": [
+            0.83,
+            0.65
+          ],
+          "wait": 100
+        }
+      ],
+      "desc": "tap(0.17,0.65) 120ms → tap(0.61,0.65) 120ms → tap(0.83,0.65) 120ms",
+      "note": "6を一列目、続く1を三・四列目に分ける。次の数字で9が来る時の消し場所を残す。",
+      "noteEn": "I put 6 in column one and split the two 1s between columns three and four, keeping options for a later 9.",
+      "image": "ai-play/step-08.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "action": [
+        {
+          "tap": [
+            0.39,
+            0.65
+          ],
+          "wait": 100
+        },
+        {
+          "tap": [
+            0.17,
+            0.65
+          ],
+          "wait": 100
+        },
+        {
+          "tap": [
+            0.83,
+            0.65
+          ],
+          "wait": 900
+        }
+      ],
+      "desc": "tap(0.39,0.65) 120ms → tap(0.17,0.65) 120ms → tap(0.83,0.65) 120ms",
+      "note": "7と6を左側に残し、9は右端の1と消す。すぐ消す手と、後の3や4を待つ手を分ける。",
+      "noteEn": "I keep 7 and 6 on the left, using 9 to clear the rightmost 1 while leaving options for later 3s and 4s.",
+      "image": "ai-play/step-09.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 10,
+      "action": [
+        {
+          "tap": [
+            0.83,
+            0.65
+          ],
+          "wait": 100
+        },
+        {
+          "tap": [
+            0.39,
+            0.65
+          ],
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.83,
+            0.65
+          ],
+          "wait": 900
+        }
+      ],
+      "desc": "tap(0.83,0.65) 120ms → tap(0.39,0.65) 120ms → tap(0.83,0.65) 120ms",
+      "note": "2を空き列に置き、3は7と、8は置いた2と消す。先に見える二枚のおかげで、空き列を使う理由が持てる。",
+      "noteEn": "I reserve an empty column for 2, clear 7 with 3, then clear the reserved 2 with 8. The two-tile preview gives a reason to use empty space.",
+      "image": "ai-play/step-10.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 11,
+      "action": [
+        {
+          "tap": [
+            0.39,
+            0.65
+          ],
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.17,
+            0.65
+          ],
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.39,
+            0.65
+          ],
+          "wait": 100
+        }
+      ],
+      "desc": "tap(0.39,0.65) 120ms → tap(0.17,0.65) 120ms → tap(0.39,0.65) 120ms",
+      "note": "8で二列目の2を消し、4で一列目の上の6を消す。次の3を空いた二列目へ残しておく。",
+      "noteEn": "I clear 2 with 8, clear the upper 6 with 4, and leave the next 3 in the newly opened second column.",
+      "image": "ai-play/step-11.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 12,
+      "action": [
+        {
+          "tap": [
+            0.83,
+            0.65
+          ],
+          "wait": 100
+        },
+        {
+          "tap": [
+            0.61,
+            0.65
+          ],
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.39,
+            0.65
+          ],
+          "wait": 900
+        }
+      ],
+      "desc": "tap(0.83,0.65) 120ms → tap(0.61,0.65) 120ms → tap(0.39,0.65) 120ms",
+      "note": "2を右端に残して、9と7は対応する1と3へ。棚が空いていくが、連鎖を狙わず一組ずつ消すだけでも進めやすい。",
+      "noteEn": "I save 2 on the right and clear the matching 1 and 3 with 9 and 7. The shelf opens easily even without pursuing chains.",
+      "image": "ai-play/step-12.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 13,
+      "action": [
+        {
+          "tap": [
+            0.39,
+            0.65
+          ],
+          "wait": 100
+        },
+        {
+          "tap": [
+            0.61,
+            0.65
+          ],
+          "wait": 100
+        },
+        {
+          "tap": [
+            0.17,
+            0.65
+          ],
+          "wait": 900
+        }
+      ],
+      "desc": "tap(0.39,0.65) 120ms → tap(0.61,0.65) 120ms → tap(0.17,0.65) 120ms",
+      "note": "続く6を別々の列へ置き、4は古い6と消す。満杯を避ける余裕はかなりある。",
+      "noteEn": "I distribute the two 6s and clear the older 6 with 4. There is ample room to avoid filling the shelf.",
+      "image": "ai-play/step-13.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 14,
+      "action": [
+        {
+          "tap": [
+            0.17,
+            0.65
+          ],
+          "wait": 100
+        },
+        {
+          "tap": [
+            0.39,
+            0.65
+          ],
+          "wait": 100
+        },
+        {
+          "tap": [
+            0.83,
+            0.65
+          ],
+          "wait": 100
+        }
+      ],
+      "desc": "tap(0.17,0.65) 120ms → tap(0.39,0.65) 120ms → tap(0.83,0.65) 120ms",
+      "note": "1が二枚続くので別の段へ置く。7は2の上に残し、3が来たら空けるつもりで進める。",
+      "noteEn": "I place the two 1s on different levels and keep 7 above 2, reserving a possible clear when 3 arrives.",
+      "image": "ai-play/step-14.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 15,
+      "action": [
+        {
+          "tap": [
+            0.61,
+            0.65
+          ],
+          "wait": 100
+        },
+        {
+          "tap": [
+            0.17,
+            0.65
+          ],
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.83,
+            0.65
+          ],
+          "wait": 900
+        }
+      ],
+      "desc": "tap(0.61,0.65) 120ms → tap(0.17,0.65) 120ms → tap(0.83,0.65) 120ms",
+      "note": "8を一時保管し、9で左の1を、3で右の7を消す。保管の必要はあるが、単発消去だけでも棚はかなり空く。",
+      "noteEn": "I store 8, clear the left 1 with 9 and the right 7 with 3. Storage matters, but single-pair clears still leave plenty of room.",
+      "image": "ai-play/step-15.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 16,
+      "action": [
+        {
+          "tap": [
+            0.83,
+            0.65
+          ],
+          "wait": 100
+        },
+        {
+          "tap": [
+            0.83,
+            0.65
+          ],
+          "wait": 100
+        },
+        {
+          "tap": [
+            0.17,
+            0.65
+          ],
+          "wait": 900
+        }
+      ],
+      "desc": "tap(0.83,0.65) 120ms → tap(0.83,0.65) 120ms → tap(0.17,0.65) 120ms",
+      "note": "7と5を右へ保管し、4を空いた左の底へ。横から6を消し、その上の1を下へ落とす。",
+      "noteEn": "I store 7 and 5 on the right, then put 4 at the empty left base to clear 6 sideways and lower the 1 above it.",
+      "image": "ai-play/step-16.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 17,
+      "action": [
+        {
+          "tap": [
+            0.61,
+            0.65
+          ],
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.39,
+            0.65
+          ],
+          "wait": 900
+        },
+        {
+          "tap": [
+            0.61,
+            0.65
+          ],
+          "wait": 900
+        }
+      ],
+      "desc": "tap(0.61,0.65) 120ms → tap(0.39,0.65) 120ms → tap(0.61,0.65) 120ms",
+      "note": "2で8、9で1を消す。3は右の7と同じ段へ置き、上にあった5を落としてみる。",
+      "noteEn": "I clear 8 with 2 and 1 with 9, then put 3 alongside the right-hand 7 to make its 5 fall.",
+      "image": "ai-play/step-17.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 18,
+      "action": {
+        "tap": [
+          0.83,
+          0.65
+        ],
+        "wait": 1000
+      },
+      "desc": "tap(0.83,0.65) 120ms",
+      "note": "最後の5を、落ちた5と合わせる。36枚を置き切った結果とベストの表示まで見る。",
+      "noteEn": "I pair the final 5 with the fallen 5 and inspect the 36-tile result and best score.",
+      "image": "ai-play/step-18.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end",
+          "score": 180
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}
