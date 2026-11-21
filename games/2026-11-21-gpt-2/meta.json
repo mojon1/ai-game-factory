@@ -1,0 +1,460 @@
+{
+  "id": "2026-11-21-gpt-2",
+  "status": "published",
+  "title": "十を待つ落とし棚",
+  "genre": "数字・計算",
+  "concept": "四列の棚へ数字を落とし、隣の二枚を足して十にする。今の一組を消すだけでなく、上の数字が落ちた後の組を仕込む。次の二枚を見て、空ける列と残す数字を選ぶ。",
+  "howToPlay": "列を押して選び、離すと数字が落ちます。上下左右の二枚で10になると消え、落ちた後も10なら連鎖します。36枚か棚が埋まるまで遊びます。",
+  "libraryDecision": "平面の数字と上下左右の接続を同時に読むためHTMLとCSSを使う。3Dの厚みは隣接を隠す。物理よりマス単位で確実に落ちることが計算の読みを支えるため、ライブラリは使わない。",
+  "soundDecision": "置く時の低い短音と、連鎖が長いほど上がる短音で手応えを付ける。次の手を考える静けさを残すためBGMは入れない。",
+  "improvements": [
+    {
+      "found": "二組が一瞬で消え、どの数字が落ちて連鎖したか読めない／置く前に候補の組を確かめられない／30点の内訳がなく、連鎖を狙う価値が分かりにくい。",
+      "changed": "消える二枚を順に光らせてから落とす演出を追加。押している間は最初の消去組と合計点を予告し、1組目10点・2組目20点と増える配点を明記した。",
+      "foundEn": "Both pairs vanished instantly; candidate clears could not be checked before release; the 30-point chain had no explained breakdown.",
+      "changedEn": "Pairs now highlight sequentially before falling. Holding previews the first clear and total points, and the increasing 10/20-point chain scoring is explicit."
+    },
+    {
+      "found": "試し置きの失敗を戻せず、連鎖を試す気持ちが弱くなる／列の番号がなく、落下先を追う手がかりが少ない／満杯の警告が指を離した後にしか出ない。",
+      "changed": "直前の配置・得点・残り枚数を戻すUndoを追加。各列へ番号を振り、満杯の列は赤枠にして押している間から警告するようにした。",
+      "foundEn": "Irreversible trial moves discouraged experimenting; unlabeled columns were hard to track; full-column warnings appeared only after release.",
+      "changedEn": "Added Undo for the last placement, score and remaining count, numbered the columns, and marked full columns red with warnings during selection."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "数字・計算",
+      "en": "Number game",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "数字を四列へ落とし、隣の二枚が十なら消す。2Dの棚で落下後の組を読ませ、3Dは奥行きが隣接を隠すため使わない。",
+        "ideaEn": "Drop numbers into four columns; neighboring pairs totaling ten disappear. A flat shelf keeps post-fall pairs readable.",
+        "fromDraw": true
+      },
+      {
+        "idea": "魚の群れの前へ餌を置き、向きの連鎖で湖の輪を作る。俯瞰2Dで群れの反応を見渡し、3Dの水面反射は使わない。",
+        "ideaEn": "Place food ahead of a fish shoal and shape a circle through turning cascades, viewed from above for readable group reactions.",
+        "fromDraw": false
+      },
+      {
+        "idea": "両端の重さが違う回転棒を投げ、狭い輪へ通す。3Dの回転軸と重心で、離す瞬間を読む。",
+        "ideaEn": "Throw an unevenly weighted spinning rod through a narrow ring, using 3D rotation and center of mass to time release.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "other",
+    "input": [
+      "tap",
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Ten on the Falling Shelf",
+      "concept": "Drop numbers into four columns and form adjacent pairs totaling ten. Prepare pairs that only meet after upper tiles fall, reading two upcoming numbers to decide what to keep and where to leave space.",
+      "howToPlay": "Hold a column and release to drop. Vertical and horizontal pairs totaling ten disappear; new pairs after falling form chains. Play until 36 tiles or a full shelf.",
+      "libraryDecision": "Flat HTML and CSS keep numeric adjacency visible. Discrete gravity supports calculation better than physical motion; depth would obscure neighbors, so no library is used.",
+      "soundDecision": "A low placement note and rising chain notes reward decisions. No background music interrupts planning."
+    }
+  },
+  "createdAt": "2026-11-21T12:13:27+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "gpt-6.1-sol",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-21T12:13:27+09:00",
+    "metricsFrom": "2026-11-21T03:11:17.020Z",
+    "transcript": null,
+    "validationRuns": 3,
+    "finishedAt": "2026-11-21T12:24:00+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-21T12:17:46+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "9.5KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 9752,
+    "lines": 25
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "gpt-6.1-sol",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 2,
+    "works": "ok",
+    "worst": "単発の消去だけでも36枚まで棚に余裕があり、連鎖を仕込む必要性と緊張が薄い。",
+    "comment": "6・3・4を一列に積み、隣へ2・7を落として3＋7、落下後の6＋4と二組の連鎖を作れた。予告・戻す・順番の発光で仕組みは読める。最後まで180点で遊べたが、後半は補数を一組ずつ消す手が中心になり、★2とした。",
+    "similar": [
+      {
+        "title": "Number Match (Easybrain)",
+        "url": "https://easybrain.com/numbermatch",
+        "similarity": "中",
+        "note": "二枚の合計10を探して数字を消す核が共通する。こちらは同数消し・斜め・行またぎを使わず、四列への落下と消去後の重力連鎖、増える連鎖配点を中心にする。",
+        "note_en": "Both clear numeric pairs totaling ten. This version omits equal-number, diagonal and row-wrap matches, centering four-column placement, gravity chains and increasing chain scores."
+      }
+    ],
+    "research": "Number Matchの規則をウェブ検索し、提供元Easybrainの公式説明で合計10・同数・接続範囲を確認した。",
+    "i18n": {
+      "en": {
+        "worst": "Single-pair clears leave ample shelf space through 36 tiles, so preparing chains lacks pressure and necessity.",
+        "comment": "Stacking 6–3–4 beside 2–7 produced a 3+7 clear, then 6+4 after falling. Preview, Undo and sequential highlights made it readable. I completed the round at 180 points, but later play mostly cleared individual complements, so I rate it two stars.",
+        "research": "Searched Number Match rules and consulted Easybrain's official explanation of ten-sum pairs, equal-number pairs and allowed connections."
+      }
+    },
+    "method": "スマホ縦画面で 18 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 18 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "列番号と戻すを確認して、完成版を始める。",
+        "noteEn": "I start the final version with numbered columns and Undo.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.17,0.65) 120ms → tap(0.17,0.65) 120ms → tap(0.17,0.65) 120ms → tap(0.39,0.65) 120ms",
+        "note": "既に確かめた6・3・4の一列と、隣の2の仕込みを再現する。",
+        "noteEn": "I replay the known setup: 6–3–4 in column one and 2 in column two.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.17,0.65) 120ms",
+        "note": "7を一列目へ仮置きする。満杯の赤枠が付くか、戻すで比較できるかを見る。",
+        "noteEn": "I trial 7 in column one, checking the red full-column border before comparing with Undo.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.50,0.04) 120ms",
+        "note": "戻すを押す。7が現在の数字へ戻り、残り枚数も32へ戻るか確認する。",
+        "noteEn": "I undo, checking that 7 returns as the current tile and remaining count returns to 32.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.39,0.65) 400ms",
+        "note": "二列目へ7を落とす。まず3と7が光るかを見る。",
+        "noteEn": "I drop 7 into column two and inspect the first highlighted pair, 3 and 7.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 300ms",
+        "note": "3と7が消えた後、4が下がって6と重なる二段目を確かめる。",
+        "noteEn": "I wait for 3 and 7 to clear, then inspect 4 falling onto 6.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 500ms",
+        "note": "10点から二組目の20点が加わり、合計30点になる。消えた順番は以前より分かりやすい。",
+        "noteEn": "The second pair adds 20 to the first 10, totaling 30. The clear sequence is now readable.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.17,0.65) 120ms → tap(0.61,0.65) 120ms → tap(0.83,0.65) 120ms",
+        "note": "6を一列目、続く1を三・四列目に分ける。次の数字で9が来る時の消し場所を残す。",
+        "noteEn": "I put 6 in column one and split the two 1s between columns three and four, keeping options for a later 9.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.39,0.65) 120ms → tap(0.17,0.65) 120ms → tap(0.83,0.65) 120ms",
+        "note": "7と6を左側に残し、9は右端の1と消す。すぐ消す手と、後の3や4を待つ手を分ける。",
+        "noteEn": "I keep 7 and 6 on the left, using 9 to clear the rightmost 1 while leaving options for later 3s and 4s.",
+        "image": "ai-play/step-09.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.83,0.65) 120ms → tap(0.39,0.65) 120ms → tap(0.83,0.65) 120ms",
+        "note": "2を空き列に置き、3は7と、8は置いた2と消す。先に見える二枚のおかげで、空き列を使う理由が持てる。",
+        "noteEn": "I reserve an empty column for 2, clear 7 with 3, then clear the reserved 2 with 8. The two-tile preview gives a reason to use empty space.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.39,0.65) 120ms → tap(0.17,0.65) 120ms → tap(0.39,0.65) 120ms",
+        "note": "8で二列目の2を消し、4で一列目の上の6を消す。次の3を空いた二列目へ残しておく。",
+        "noteEn": "I clear 2 with 8, clear the upper 6 with 4, and leave the next 3 in the newly opened second column.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.83,0.65) 120ms → tap(0.61,0.65) 120ms → tap(0.39,0.65) 120ms",
+        "note": "2を右端に残して、9と7は対応する1と3へ。棚が空いていくが、連鎖を狙わず一組ずつ消すだけでも進めやすい。",
+        "noteEn": "I save 2 on the right and clear the matching 1 and 3 with 9 and 7. The shelf opens easily even without pursuing chains.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "tap(0.39,0.65) 120ms → tap(0.61,0.65) 120ms → tap(0.17,0.65) 120ms",
+        "note": "続く6を別々の列へ置き、4は古い6と消す。満杯を避ける余裕はかなりある。",
+        "noteEn": "I distribute the two 6s and clear the older 6 with 4. There is ample room to avoid filling the shelf.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "tap(0.17,0.65) 120ms → tap(0.39,0.65) 120ms → tap(0.83,0.65) 120ms",
+        "note": "1が二枚続くので別の段へ置く。7は2の上に残し、3が来たら空けるつもりで進める。",
+        "noteEn": "I place the two 1s on different levels and keep 7 above 2, reserving a possible clear when 3 arrives.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "tap(0.61,0.65) 120ms → tap(0.17,0.65) 120ms → tap(0.83,0.65) 120ms",
+        "note": "8を一時保管し、9で左の1を、3で右の7を消す。保管の必要はあるが、単発消去だけでも棚はかなり空く。",
+        "noteEn": "I store 8, clear the left 1 with 9 and the right 7 with 3. Storage matters, but single-pair clears still leave plenty of room.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "tap(0.83,0.65) 120ms → tap(0.83,0.65) 120ms → tap(0.17,0.65) 120ms",
+        "note": "7と5を右へ保管し、4を空いた左の底へ。横から6を消し、その上の1を下へ落とす。",
+        "noteEn": "I store 7 and 5 on the right, then put 4 at the empty left base to clear 6 sideways and lower the 1 above it.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 17,
+        "action": "tap(0.61,0.65) 120ms → tap(0.39,0.65) 120ms → tap(0.61,0.65) 120ms",
+        "note": "2で8、9で1を消す。3は右の7と同じ段へ置き、上にあった5を落としてみる。",
+        "noteEn": "I clear 8 with 2 and 1 with 9, then put 3 alongside the right-hand 7 to make its 5 fall.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 18,
+        "action": "tap(0.83,0.65) 120ms",
+        "note": "最後の5を、落ちた5と合わせる。36枚を置き切った結果とベストの表示まで見る。",
+        "noteEn": "I pair the final 5 with the fallen 5 and inspect the 36-tile result and best score.",
+        "image": "ai-play/step-18.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 180
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-21T12:24:00+09:00"
+  },
+  "publishedAt": "2026-11-21T12:24:00+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 8275,
+    "outputTokens": 9829,
+    "contextTokens": 12010388,
+    "turns": 35,
+    "toolCalls": 35,
+    "webSearches": null,
+    "minutes": 12.8,
+    "from": "2026-11-21T03:11:17.020Z",
+    "to": "2026-11-21T03:24:03.208Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-21T12:24:03+09:00",
+    "validationRuns": 3,
+    "codeKB": 9.5,
+    "evidence": "metrics-evidence.json"
+  }
+}

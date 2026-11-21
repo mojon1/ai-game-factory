@@ -1,0 +1,338 @@
+{
+  "id": "2026-11-21-gpt-1",
+  "status": "published",
+  "title": "傾く星の小箱",
+  "genre": "物理おもちゃ",
+  "concept": "小箱の傾きで玉を転がし、穴の縁を避けて三つの星を集める。動かしたい方向へ押し続けるだけでなく、手を離して減速する余白を作る。立体の縁と玉の重さから、次に止める場所を読む。",
+  "howToPlay": "下のパッドをなぞると箱が傾き、玉が転がります。指を離して減速しながら、穴に落ちず三つの星を集めてください。",
+  "libraryDecision": "three.jsとcannon-esを使う。立体の縁と穴の奥行きを見せ、物理の回転と壁の反発で早めに減速する判断を強める構成にした。影の効果は加えず、低負荷の小さな盤だけを描く。",
+  "soundDecision": "星を取るほど高くなる短音を鳴らし、操作を続ける達成感を添える。静かに玉を止める間合いを残すためBGMは入れない。",
+  "improvements": [
+    {
+      "found": "奥の玉が小さく、床との位置が読みにくい／取った星が消えるだけで通った場所を忘れる／指を離すと箱は即座に水平になり、玉がまだ動く余韻を読みづらい。",
+      "changed": "玉を少し大きくして足元の輪を追加。集めた星を緑の低い印として残し、水平へ戻る見た目をなめらかにした。離した後は減速中と停止を表示する。",
+      "foundEn": "The far marble was small; vanished stars erased route landmarks; immediate leveling hid the fact that the marble was still coasting.",
+      "changedEn": "Enlarged the marble and added a ground ring, retained low green star markers, smoothed visual leveling, and labeled coasting versus a settled level board."
+    },
+    {
+      "found": "成功すると箱と集めた場所が暗幕で隠れる／パッドに方向の印がなく、奥と手前を迷う／回る八面体は星というより四角い石に見え、目標の形が文言と合わない。",
+      "changed": "結果を下端へ移して小箱を残し、パッドへ四方向の矢印を追加。目標を厚みのある五角の星形に替え、取得後は床の近くに小さな緑の星を残す。",
+      "foundEn": "The success overlay hid the box and collected landmarks; the pad lacked direction cues; octahedra looked like square stones rather than stars.",
+      "changedEn": "Moved results to a footer, added four directional pad arrows, and replaced targets with thin five-point stars that remain as small green floor markers."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "ワンボタン",
+      "en": "One-button",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "ボタンを押すたび磁力が反転する小さな電車で、同じ極の駅に止まる。2Dの線路で引力と反発を直接見せ、3Dの奥行きは使わない。",
+        "ideaEn": "Reverse a magnetic train with one button to stop at stations. A flat rail makes attraction and repulsion readable.",
+        "fromDraw": true
+      },
+      {
+        "idea": "小箱を傾け、穴の周りを転がる玉で星を集める。3Dの縁と球の転がりを操作の手がかりにする。",
+        "ideaEn": "Tilt a small box to roll a marble around holes and collect stars. Three-dimensional rims and rolling provide control cues.",
+        "fromDraw": false
+      },
+      {
+        "idea": "一枚の布を引きながら、上の積み木を落とさず運ぶ。3Dの傾きと摩擦で、引く速さによる崩れ方を遊ぶ。",
+        "ideaEn": "Pull a cloth carrying blocks without dropping them, using 3D tilt and friction to explore how pulling speed changes collapse.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 1
+  },
+  "structure": {
+    "goal": "complete",
+    "ending": "other",
+    "input": [
+      "drag",
+      "hold"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Tilting Star Box",
+      "concept": "Tilt a box to roll a marble around holes and collect three stars. Releasing early creates braking room; rims and rolling weight help read where to slow down next.",
+      "howToPlay": "Drag the pad below to tilt the box. Release to slow the marble and collect three stars without falling into holes.",
+      "libraryDecision": "Three.js and cannon-es show depth, rolling and wall rebounds to strengthen early braking decisions. Only a small board is rendered; no costly shadow effects.",
+      "soundDecision": "Brief rising notes reward each collected star. No background music interrupts the timing of slowing the marble."
+    }
+  },
+  "createdAt": "2026-11-21T12:00:16+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "gpt-6.1-sol",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-21T12:00:16+09:00",
+    "metricsFrom": "2026-11-21T02:57:48.100Z",
+    "transcript": null,
+    "validationRuns": 3,
+    "finishedAt": "2026-11-21T12:11:11+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-21T12:04:55+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "11.0KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=1",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=80",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=1",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=76",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 11273,
+    "lines": 26
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js"
+    },
+    {
+      "name": "cannon-es",
+      "version": "0.20.0",
+      "file": "cannon-es-0.20.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "gpt-6.1-sol",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 2,
+    "works": "ok",
+    "worst": "壁沿いに大回りすると穴を避けやすく、遠回りする手間に対して経路選びの緊張が薄い。",
+    "comment": "左の星で指を離して止め、穴の外側を通って奥の星へ回り、最後は下向きの短い傾きで三つ目を取れた。輪と取得済みの印で位置は読みやすくなったが、自由な最短経路より壁沿いを選ぶだけになりやすく★2。",
+    "similar": [
+      {
+        "title": "BRIO Labyrinth Game",
+        "url": "https://www.ravensburger.us/en-US/brio/products/games/labyrinth-game-63402000",
+        "similarity": "高",
+        "note": "二方向へ盤を傾け、穴を避けて玉を転がす核は同じ。こちらは二つのつまみを一つのパッドへ置き換え、決まった道ではなく三つの星を好きな順で集める。",
+        "note_en": "The core of tilting a board in two axes to roll a marble around holes is the same. A single pad replaces two knobs, and three stars can be collected in any order rather than following a marked route."
+      }
+    ],
+    "research": "BRIOの穴付き傾斜迷路をウェブ検索し、メーカーの商品説明と板の違いを確認した。",
+    "i18n": {
+      "en": {
+        "worst": "Following the outer walls avoids holes easily, leaving little route tension relative to the effort of a long detour.",
+        "comment": "I released to slow at the left star, followed the outside of a hole to the back star, then used a short downward tilt for the last one. The ring and collected markers improved reading, but following walls often replaces more interesting route choices, so I rate it two stars.",
+        "research": "Searched BRIO's tilting labyrinth and checked the manufacturer's description and interchangeable boards."
+      }
+    },
+    "method": "スマホ縦画面で 6 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 6 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "五角の星とパッドの方向を見て、完成版で同じ箱を渡り直す。",
+        "noteEn": "I inspect the five-point stars and pad directions before replaying the revised box.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.22,0.82) 1200ms → tap(0.28,0.82) 350ms",
+        "note": "左の星を取り直す。緑の星が残り、玉の輪も床で見分けられる。",
+        "noteEn": "I collect the left star again, inspecting the green marker and the marble's ground ring.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.50,0.81) 1500ms → tap(0.50,0.81) 700ms",
+        "note": "穴の左側を回る同じ道を進む。壁沿いに余白があることを輪で確かめる。",
+        "noteEn": "I replay the route left of the hole, using the ring to judge clearance along the wall.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.78,0.85) 1700ms",
+        "note": "奥へ回ってから右へ。星形の目標は床の印と色でも区別できる。",
+        "noteEn": "I turn right after reaching the back; gold targets and green floor stars are distinct.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.75,0.90) 1100ms",
+        "note": "右下の残る星へ。中央の穴を横切るより、奥から回る方が余白がある。",
+        "noteEn": "I approach the last star down-right; coming from the back leaves more clearance than crossing the central hole.",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.50,0.89) 550ms",
+        "note": "最後は下向きの短い傾き。完成した箱が結果の札の上に残るか確認する。",
+        "noteEn": "I use the final short downward tilt and check that the completed box remains above the result card.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-21T12:11:11+09:00"
+  },
+  "publishedAt": "2026-11-21T12:11:11+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 8598,
+    "outputTokens": 10417,
+    "contextTokens": 8636318,
+    "turns": 28,
+    "toolCalls": 28,
+    "webSearches": null,
+    "minutes": 13.4,
+    "from": "2026-11-21T02:57:48.100Z",
+    "to": "2026-11-21T03:11:14.243Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-21T12:11:14+09:00",
+    "validationRuns": 3,
+    "codeKB": 11,
+    "evidence": "metrics-evidence.json"
+  }
+}
