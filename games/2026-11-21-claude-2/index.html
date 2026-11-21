@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>チリン！ドミノ倒し</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; margin: 0; height: 100%; overflow: hidden; background: #3a2a22; font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif; }
+#c { display: block; position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; height: 100dvh; }
+#hud { position: fixed; left: 0; right: 0; top: 0; height: 52px; display: flex; justify-content: space-between; align-items: center; padding: 0 12px; color: #fff4e0; pointer-events: none; text-shadow: 0 1px 3px rgba(0,0,0,.6); box-sizing: border-box; }
+#hud .l { font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55%; }
+#hud .l small { display: block; font-size: 12px; font-weight: 400; opacity: .85; }
+#hud .r { text-align: right; font-size: 15px; font-weight: 700; white-space: nowrap; }
+#hud .r small { display: block; font-size: 12px; font-weight: 400; opacity: .85; }
+#hud .r.warn { color: #ff8a7a; }
+#bar { position: fixed; left: 0; right: 0; bottom: 0; height: 92px; display: flex; justify-content: space-between; align-items: center; padding: 0 14px 6px; box-sizing: border-box; pointer-events: none; }
+.btn { pointer-events: auto; border: none; border-radius: 30px; height: 60px; font: 700 18px system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif; color: #3a2a22; background: #fff4e0; box-shadow: 0 4px 0 #b89a78, 0 6px 12px rgba(0,0,0,.35); padding: 0 20px; min-width: 60px; }
+.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #b89a78; }
+.btn.go { background: #ffcc33; box-shadow: 0 4px 0 #c08a10, 0 6px 12px rgba(0,0,0,.35); min-width: 150px; font-size: 20px; }
+.btn[disabled] { opacity: .35; }
+#hint { position: fixed; left: 10px; right: 10px; bottom: 100px; text-align: center; color: #fff; font-size: 15px; font-weight: 700; text-shadow: 0 1px 4px rgba(0,0,0,.9); pointer-events: none; transition: opacity .5s; }
+#msg { position: fixed; left: 0; right: 0; top: 38%; text-align: center; color: #fff; font-size: 26px; font-weight: 800; text-shadow: 0 2px 6px rgba(0,0,0,.8); pointer-events: none; opacity: 0; transition: opacity .3s; padding: 0 12px; }
+.ov { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #fff4e0; background: rgba(40,26,18,.72); padding: 20px; box-sizing: border-box; }
+.ov h1 { font-size: 40px; margin: 0 0 6px; line-height: 1.15; color: #ffd94a; text-shadow: 0 3px 0 #8a4b10, 0 6px 14px rgba(0,0,0,.5); }
+.ov h2 { font-size: 28px; margin: 0 0 8px; color: #ffd94a; text-shadow: 0 2px 0 #8a4b10; }
+.ov p { margin: 4px 0; font-size: 15px; line-height: 1.5; }
+.ov .stars { font-size: 44px; letter-spacing: 6px; color: #ffd94a; margin: 6px 0; text-shadow: 0 2px 0 #8a4b10; }
+.ov .stars .off { color: rgba(255,244,224,.25); text-shadow: none; }
+.ov .tap { margin-top: 22px; font-size: 18px; font-weight: 700; animation: blink 1.2s infinite; }
+.ov .sub { font-size: 13px; opacity: .8; }
+@keyframes blink { 50% { opacity: .35; } }
+.hide { display: none !important; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud"><div class="l" id="hl"></div><div class="r" id="hr"></div></div>
+<div id="bar"><button class="btn" id="undo">↶</button><button class="btn go" id="go"></button></div>
+<div id="hint"></div>
+<div id="msg"></div>
+<div class="ov" id="title">
+  <h1 id="tt"></h1>
+  <p id="th1"></p><p id="th2"></p><p id="th3"></p>
+  <p class="sub" id="tprog"></p>
+  <div class="tap" id="ttap"></div>
+</div>
+<div class="ov hide" id="result">
+  <h2 id="rh"></h2>
+  <div class="stars" id="rs"></div>
+  <p id="r1"></p><p class="sub" id="r2"></p>
+  <div class="tap" id="rtap"></div>
+</div>
+<script src="../../lib/three-0.186.1.min.js"></script>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const TXT = {
+  ja: {
+    title: 'チリン！ドミノ倒し', how1: '指でなぞると、なぞった道にドミノが並ぶ', how2: '▶で緑のドミノを倒して、ベルを全部鳴らそう',
+    how3: '少ないドミノで鳴らすほど★が増える', tap: 'タップでスタート', cont: 'つづき: ステージ ', stage: 'ステージ',
+    domino: 'ドミノ', goal: '★3は', within: '個以内', go: '▶ たおす', clear: 'チリーン！クリア', used: '使ったドミノ',
+    target: '★3の目標', next: 'タップで次へ', allClear: '全ステージクリア！', total: 'あつめた★', again: 'タップでもう一度',
+    broke: 'ここでとぎれた…', fix: '直してもう一度！', empty: 'ドミノがもうない！', sharp: '曲がりが急すぎる！',
+    pieces: '個', tries: 'ためした回数', ring: 'チリン！', undo: '↶ もどす',
+  },
+  en: {
+    title: 'Chime Dominoes', how1: 'Trace a path with your finger to line up dominoes', how2: 'Press ▶ to tip the green one and ring every bell',
+    how3: 'Fewer dominoes = more stars', tap: 'Tap to start', cont: 'Continue: Stage ', stage: 'Stage',
+    domino: 'Dominoes', goal: '★3:', within: ' or less', go: '▶ Topple', clear: 'Ding! Clear', used: 'Dominoes used',
+    target: '★3 target', next: 'Tap to continue', allClear: 'All stages clear!', total: 'Stars', again: 'Tap to play again',
+    broke: 'The chain broke here…', fix: 'Fix it and try again!', empty: 'Out of dominoes!', sharp: 'Too sharp a turn!',
+    pieces: '', tries: 'Tries', ring: 'Ding!', undo: '↶ Undo',
+  }
+};
+const L = TXT[LANG] || TXT.en;
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const $ = (id) => document.getElementById(id);
+
+// ---------- stages ----------
+// board: x in [-4.5,4.5], z in [-7,7] (negative z = far / top of screen)
+// rect = [x0, z0, x1, z1]
+const STAGES = [
+  { ja: 'まっすぐ', en: 'Straight', start: [0, 5.6, 0, -1], bells: [[0, -4]], max: 26, par: 16,
+    hja: '緑のドミノから上へなぞって、▶ で倒そう', hen: 'Trace up from the green domino, then press ▶' },
+  { ja: 'まわりみち', en: 'Detour', start: [-3, 5.6, 0, -1], walls: [[-4.6, 0.3, 0.6, 1.0]], bells: [[-3, -4.6]], max: 34, par: 24,
+    hja: '壁をよけて回りこもう。急な曲がりは倒れない', hen: 'Go around the wall. Sharp turns won\'t topple' },
+  { ja: 'ふたまた', en: 'Fork', start: [0, 5.6, 0, -1], walls: [[-0.5, -7, 0.5, -2.2]], bells: [[-3, -5], [3, -5]], max: 44, par: 32,
+    hja: '並んだドミノの上からなぞると枝分かれできる', hen: 'Start a trace on a domino to branch off' },
+  { ja: 'ころがる玉', en: 'Rolling ball', start: [-2.2, 5.6, 0, -1], puddles: [[-4.6, -1.2, 4.6, 1.0]], balls: [[1.5, 2.0]], bells: [[1.5, -5]], max: 18, par: 11,
+    hja: '水にはドミノを置けない。玉は倒れた向きに転がる', hen: 'No dominoes in water. The ball rolls where it\'s hit' },
+  { ja: 'ジグザグ', en: 'Zigzag', start: [3.4, 5.8, 0, -1], walls: [[-4.6, 2.4, 2.0, 3.0], [-2.0, -1.4, 4.6, -0.8]], bells: [[-3.2, -5]], max: 44, par: 30,
+    hja: 'ドミノの数に気をつけて', hen: 'Watch your domino count' },
+  { ja: '水の向こう', en: 'Across the water', start: [0, 5.8, 0, -1], puddles: [[-4.6, -1.0, 4.6, 1.4]], balls: [[0, 2.8]], bells: [[-3.4, -5.6], [3.4, -5.6]], max: 34, par: 22,
+    hja: '水の向こうにも並べておける', hen: 'You can place dominoes across the water too' },
+  { ja: 'ふたつの玉', en: 'Two balls', start: [0, 6, 0, -1], puddles: [[-4.6, -2.4, 4.6, -0.2]], balls: [[-2.6, 1.6], [2.6, 1.6]], walls: [[-0.4, -7, 0.4, -2.6]], bells: [[-2.6, -5.4], [2.6, -5.4]], max: 26, par: 17,
+    hja: '左右の玉を、まっすぐ上へ', hen: 'Send both balls straight up' },
+  { ja: 'チリン三つ', en: 'Three bells', start: [0, 6.1, 0, -1], walls: [[-2.2, 3.0, 2.2, 3.6]], puddles: [[-4.6, -3.6, -1.6, 0.2]], balls: [[-3, 1.4]],
+    bells: [[-3, -5.6], [0.2, -5.6], [3.4, -5.6]], max: 56, par: 42, hja: 'ここまで来たら、あとは工夫！', hen: 'Time to get creative!' },
+];
+
+// ---------- save ----------
+let save = { stage: 0, stars: [] };
+addEventListener('message', (e) => {
+  if (e.data && e.data.agf === 'loaded' && e.data.data && typeof e.data.data === 'object') {
+    const d = e.data.data; save.stage = clamp(d.stage | 0, 0, STAGES.length - 1);
+    save.stars = Array.isArray(d.stars) ? d.stars.map((v) => clamp(v | 0, 0, 3)) : [];
+    showTitle();
+  }
+});
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+const persist = () => { try { parent.postMessage({ agf: 'save', data: save }, '*'); } catch (e) {} };
+
+// ---------- audio ----------
+let AC = null, master = null;
+function initAudio() {
+  try {
+    if (!AC) { AC = new (window.AudioContext || window.webkitAudioContext)(); master = AC.createGain(); master.gain.value = 0.55; master.connect(AC.destination); }
+    if (AC.state !== 'running') AC.resume();
+  } catch (e) { AC = null; }
+}
+const PENTA = [0, 2, 4, 7, 9];
+function noteHz(i) { const o = Math.floor(i / 5), n = PENTA[((i % 5) + 5) % 5] + 12 * o; return 392 * Math.pow(2, n / 12); }
+function tone(freq, dur, type, vol, when = 0, attack = 0.004) {
+  if (!AC) return;
+  try {
+    const t = AC.currentTime + when, o = AC.createOscillator(), g = AC.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + attack); g.gain.exponentialRampToValueAtTime(0.0008, t + dur);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.02);
+  } catch (e) {}
+}
+let noiseBuf = null;
+function click(vol = 0.25, hp = 1800) {
+  if (!AC) return;
+  try {
+    if (!noiseBuf) { noiseBuf = AC.createBuffer(1, AC.sampleRate * 0.05, AC.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 3); }
+    const s = AC.createBufferSource(), f = AC.createBiquadFilter(), g = AC.createGain();
+    s.buffer = noiseBuf; f.type = 'highpass'; f.frequency.value = hp; g.gain.value = vol;
+    s.connect(f); f.connect(g); g.connect(master); s.start();
+  } catch (e) {}
+}
+function sfxDomino(i) { click(0.22, 2200); tone(noteHz(i), 0.18, 'triangle', 0.12); }
+function sfxPlace(n) { tone(900 + (n % 6) * 40, 0.05, 'sine', 0.05); }
+function sfxBell(k) {
+  const base = [1046.5, 1318.5, 1568][k % 3];
+  [[1, 0.22, 2.2], [2.76, 0.08, 1.2], [5.4, 0.04, 0.6], [0.5, 0.06, 1.6]].forEach(([m, v, d]) => tone(base * m, d, 'sine', v, 0, 0.002));
+}
+function sfxBall() { tone(110, 0.25, 'sine', 0.18); click(0.15, 400); }
+function sfxClear() { [0, 4, 7, 12, 16].forEach((n, i) => tone(784 * Math.pow(2, n / 12), 0.5, 'triangle', 0.12, i * 0.09)); }
+function sfxFail() { tone(330, 0.25, 'triangle', 0.1); tone(247, 0.4, 'triangle', 0.1, 0.18); }
+function sfxBad() { tone(180, 0.12, 'square', 0.05); }
+
+// ---------- three.js ----------
+const cv = $('c');
+const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x3a2a22);
+const camera = new THREE.PerspectiveCamera(38, 0.5625, 0.5, 120);
+scene.add(new THREE.HemisphereLight(0xfff4e6, 0x6a4a3a, 1.5));
+const sun = new THREE.DirectionalLight(0xffffff, 2.2);
+sun.position.set(-5, 14, 6); sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024);
+Object.assign(sun.shadow.camera, { left: -8, right: 8, top: 10, bottom: -10, near: 1, far: 40 });
+sun.shadow.bias = -0.0008;
+scene.add(sun);
+
+// table
+function woodTex() {
+  const c = document.createElement('canvas'); c.width = 256; c.height = 512; const g = c.getContext('2d');
+  g.fillStyle = '#e2bf8e'; g.fillRect(0, 0, 256, 512);
+  for (let p = 0; p < 4; p++) { g.fillStyle = p % 2 ? 'rgba(160,110,60,0.10)' : 'rgba(255,240,210,0.10)'; g.fillRect(p * 64, 0, 64, 512); g.fillStyle = 'rgba(90,55,25,0.25)'; g.fillRect(p * 64, 0, 1.5, 512); }
+  for (let i = 0; i < 90; i++) { g.strokeStyle = `rgba(120,75,35,${0.04 + Math.random() * 0.07})`; g.lineWidth = 1 + Math.random() * 2; const x = Math.random() * 256; g.beginPath(); g.moveTo(x, 0); for (let y = 0; y <= 512; y += 32) g.lineTo(x + Math.sin(y * 0.02 + i) * 6, y); g.stroke(); }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const table = new THREE.Mesh(new THREE.PlaneGeometry(9.2, 14.2), new THREE.MeshStandardMaterial({ map: woodTex(), roughness: 0.85 }));
+table.rotation.x = -Math.PI / 2; table.receiveShadow = true; scene.add(table);
+const frameMat = new THREE.MeshStandardMaterial({ color: 0x7a4a2a, roughness: 0.7 });
+for (const [w, d, x, z] of [[9.8, 0.3, 0, -7.25], [9.8, 0.3, 0, 7.25], [0.3, 14.8, -4.75, 0], [0.3, 14.8, 4.75, 0]]) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, 0.3, d), frameMat); m.position.set(x, 0.15, z); m.castShadow = m.receiveShadow = true; scene.add(m);
+}
+const under = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.MeshStandardMaterial({ color: 0x4a3428, roughness: 1 }));
+under.rotation.x = -Math.PI / 2; under.position.y = -0.02; under.receiveShadow = true; scene.add(under);
+
+const levelGroup = new THREE.Group(); scene.add(levelGroup);
+const dominoGroup = new THREE.Group(); scene.add(dominoGroup);
+const fxGroup = new THREE.Group(); scene.add(fxGroup);
+
+// ---------- constants ----------
+const DH = 1.0, DW = 0.5, DT = 0.13, SP = 0.55, MIN_D = 0.34, LAT = 0.5, MAX_TURN = 50 * Math.PI / 180;
+const BELL_R = 0.42, BALL_R = 0.32, BX = 4.5, BZ = 7;
+const domGeo = new THREE.BoxGeometry(DW, DH, DT);
+const pipGeo = new THREE.CircleGeometry(0.055, 12);
+const pipMat = new THREE.MeshBasicMaterial({ color: 0x2a1a14 });
+
+// ---------- state ----------
+let stageIdx = 0, stage = null, mode = 'title'; // title | edit | run | result
+let dominos = [], strokes = [], bells = [], balls = [], walls = [], puddles = [];
+let allRungT = 0, startDom = null, tries = 0, runTimer = 0, quietT = 0, chainCount = 0, markers = [];
+let stroke = null;
+
+function makeDominoMesh(color, isStart) {
+  const pivot = new THREE.Group();
+  const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.45, emissive: 0x000000 });
+  const m = new THREE.Mesh(domGeo, mat); m.position.set(0, DH / 2, -DT / 2); m.castShadow = true; m.receiveShadow = true;
+  pivot.add(m);
+  // pips on the front face
+  for (const [px, py] of isStart ? [[0, 0.75], [0, 0.25]] : [[-0.12, 0.78], [0.12, 0.62], [0, 0.25]]) {
+    const p = new THREE.Mesh(pipGeo, pipMat); p.position.set(px, py, DT / 2 + 0.002 - DT / 2); pivot.add(p);
+    const q = p.clone(); q.position.z = -DT - 0.002; q.rotation.y = Math.PI; pivot.add(q);
+  }
+  const line = new THREE.Mesh(new THREE.BoxGeometry(DW * 0.9, 0.025, DT + 0.01), pipMat); line.position.set(0, 0.5, -DT / 2); pivot.add(line);
+  dominoGroup.add(pivot);
+  return { pivot, mat };
+}
+function addDomino(x, z, fx, fz, color, strokeId, isStart) {
+  const { pivot, mat } = makeDominoMesh(color, isStart);
+  const d = { x, z, fx, fz, color, strokeId, isStart, pivot, mat, state: 'stand', th: 0, w: 0, dx: fx, dz: fz, leanOn: null, endReason: null, warn: false, born: performance.now() };
+  setPose(d); dominos.push(d); return d;
+}
+function setPose(d) {
+  d.pivot.rotation.order = 'YXZ';
+  d.pivot.rotation.y = Math.atan2(d.dx, d.dz);
+  d.pivot.rotation.x = d.th;
+  d.pivot.position.set(d.x + d.dx * DT / 2, 0, d.z + d.dz * DT / 2);
+}
+function removeDomino(d) { dominoGroup.remove(d.pivot); d.mat.dispose(); }
+
+function bellMesh() {
+  const g = new THREE.Group();
+  const pts = []; for (let i = 0; i <= 12; i++) { const t = i / 12; pts.push(new THREE.Vector2(0.08 + 0.32 * Math.pow(t, 1.6) + (t > 0.9 ? (t - 0.9) * 0.6 : 0), 0.95 - t * 0.75)); }
+  const mat = new THREE.MeshStandardMaterial({ color: 0xf2c230, metalness: 0.55, roughness: 0.28, emissive: 0x000000, side: THREE.DoubleSide });
+  const body = new THREE.Mesh(new THREE.LatheGeometry(pts, 24), mat); body.castShadow = true;
+  const top = new THREE.Mesh(new THREE.SphereGeometry(0.1, 12, 8), mat); top.position.y = 0.98;
+  const sw = new THREE.Group(); sw.add(body, top); sw.position.y = 0.05; g.add(sw);
+  const clap = new THREE.Mesh(new THREE.SphereGeometry(0.07, 10, 8), new THREE.MeshStandardMaterial({ color: 0x8a5a10 })); clap.position.y = 0.2; sw.add(clap);
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.46, 0.5, 0.08, 24), new THREE.MeshStandardMaterial({ color: 0x9a2a2a, roughness: 0.6 })); base.position.y = 0.04; base.receiveShadow = true; g.add(base);
+  const ring = new THREE.Mesh(new THREE.RingGeometry(0.55, 0.68, 32), new THREE.MeshBasicMaterial({ color: 0xffe066, transparent: true, opacity: 0 }));
+  ring.rotation.x = -Math.PI / 2; ring.position.y = 0.02; g.add(ring);
+  return { g, sw, mat, ring };
+}
+
+function loadStage(i) {
+  stageIdx = i; stage = STAGES[i];
+  for (const d of dominos) removeDomino(d);
+  dominos = []; strokes = []; markers.forEach((m) => fxGroup.remove(m)); markers = [];
+  levelGroup.clear(); bells = []; balls = []; walls = []; puddles = [];
+  for (const r of stage.walls || []) {
+    const [x0, z0, x1, z1] = r; const w = x1 - x0, dd = z1 - z0;
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, 0.9, dd), new THREE.MeshStandardMaterial({ color: 0xa8683c, roughness: 0.75 }));
+    m.position.set((x0 + x1) / 2, 0.45, (z0 + z1) / 2); m.castShadow = m.receiveShadow = true; levelGroup.add(m);
+    const cap = new THREE.Mesh(new THREE.BoxGeometry(w, 0.06, dd), new THREE.MeshStandardMaterial({ color: 0xc88a5a, roughness: 0.6 }));
+    cap.position.set((x0 + x1) / 2, 0.92, (z0 + z1) / 2); levelGroup.add(cap);
+    walls.push(r);
+  }
+  for (const r of stage.puddles || []) {
+    const [x0, z0, x1, z1] = r;
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(x1 - x0, z1 - z0), new THREE.MeshStandardMaterial({ color: 0x4aa8e0, roughness: 0.15, metalness: 0.1, transparent: true, opacity: 0.85 }));
+    m.rotation.x = -Math.PI / 2; m.position.set((x0 + x1) / 2, 0.012, (z0 + z1) / 2); m.receiveShadow = true; levelGroup.add(m);
+    for (let k = 0; k < 6; k++) {
+      const wv = new THREE.Mesh(new THREE.RingGeometry(0.2, 0.24, 24), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.4 }));
+      wv.rotation.x = -Math.PI / 2; wv.position.set(x0 + 0.5 + Math.random() * (x1 - x0 - 1), 0.02, z0 + 0.3 + Math.random() * (z1 - z0 - 0.6));
+      wv.userData.ph = Math.random() * 3; levelGroup.add(wv); puddles.wave = (puddles.wave || []).concat(wv);
+    }
+    puddles.push(r);
+  }
+  (stage.bells || []).forEach(([x, z], k) => { const b = bellMesh(); b.g.position.set(x, 0, z); levelGroup.add(b.g); bells.push({ x, z, k, ...b, rung: false, t: 0 }); });
+  for (const [x, z] of stage.balls || []) {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(BALL_R, 24, 16), new THREE.MeshStandardMaterial({ color: 0xe8413a, roughness: 0.25, metalness: 0.1 }));
+    m.castShadow = true; m.position.set(x, BALL_R, z); levelGroup.add(m);
+    const stripe = new THREE.Mesh(new THREE.TorusGeometry(BALL_R * 1.001, 0.04, 6, 24), new THREE.MeshStandardMaterial({ color: 0xffffff })); m.add(stripe);
+    balls.push({ x0: x, z0: z, x, z, vx: 0, vz: 0, m, moving: false });
+  }
+  const [sx, sz, fx, fz] = stage.start;
+  startDom = addDomino(sx, sz, fx, fz, 0x3cc85a, -1, true);
+  // arrow showing the push direction
+  const arrow = new THREE.Mesh(new THREE.ConeGeometry(0.22, 0.45, 3), new THREE.MeshBasicMaterial({ color: 0x3cc85a }));
+  arrow.rotation.order = 'YXZ'; arrow.rotation.y = Math.atan2(fx, fz); arrow.rotation.x = Math.PI / 2;
+  arrow.position.set(sx + fx * 0.5, 0.05, sz + fz * 0.5); arrow.userData.arrow = true; levelGroup.add(arrow); stage.arrow = arrow;
+  tries = 0; mode = 'edit';
+  updateHud(); fitCamera();
+  showHint(LANG === 'ja' ? stage.hja : stage.hen, 5);
+  signal('start');
+}
+
+function resetRun() {
+  for (const d of dominos) { d.state = 'stand'; d.th = 0; d.w = 0; d.dx = d.fx; d.dz = d.fz; d.leanOn = null; d.endReason = null; d.kickedBall = false; d.sideHit = false; setPose(d); d.mat.emissive.setHex(d.warn ? 0x661100 : 0); }
+  for (const b of bells) { b.rung = false; b.t = 0; b.mat.emissive.setHex(0); b.sw.rotation.set(0, 0, 0); b.ring.material.opacity = 0; }
+  for (const b of balls) { b.x = b.x0; b.z = b.z0; b.vx = b.vz = 0; b.moving = false; b.kicked = false; b.m.position.set(b.x, BALL_R, b.z); b.m.rotation.set(0, 0, 0); }
+}
+function clearMarkers() { markers.forEach((m) => fxGroup.remove(m)); markers = []; }
+
+// aim guide: where each ball will roll when the domino in front of it falls
+const guideMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.7, depthTest: false });
+const guideGeo = new THREE.CircleGeometry(0.07, 8);
+let guides = [];
+function updateGuides() {
+  for (const g of guides) fxGroup.remove(g); guides = [];
+  if (mode !== 'edit') return;
+  for (const b of balls) {
+    for (const d of dominos) {
+      const rx = b.x0 - d.x, rz = b.z0 - d.z, sg = Math.sign(rx * d.fx + rz * d.fz) || 1, dx = d.fx * sg, dz = d.fz * sg;
+      const a = rx * dx + rz * dz, bb = Math.abs(rx * dz - rz * dx);
+      if (a > 0 && bb < BALL_R + DW * 0.4 && a - BALL_R <= DH + DT) {
+        for (let k = 1; k <= 14; k++) {
+          const m = new THREE.Mesh(guideGeo, guideMat); m.rotation.x = -Math.PI / 2; m.renderOrder = 4;
+          m.position.set(b.x0 + dx * k * 0.45, 0.04, b.z0 + dz * k * 0.45);
+          if (Math.abs(m.position.x) > BX || Math.abs(m.position.z) > BZ) break;
+          fxGroup.add(m); guides.push(m);
+        }
+        break;
+      }
+    }
+  }
+}
+// ---------- HUD ----------
+const placedCount = () => dominos.length - 1;
+function updateHud() {
+  $('hl').innerHTML = `${L.stage} ${stageIdx + 1}/${STAGES.length}<small>${LANG === 'ja' ? stage.ja : stage.en}</small>`;
+  const left = stage.max - placedCount();
+  const hr = $('hr');
+  hr.innerHTML = `${L.domino} ${placedCount()}/${stage.max}<small>${L.goal} ${stage.par}${L.within}</small>`;
+  hr.classList.toggle('warn', left <= 0);
+  $('undo').disabled = mode !== 'edit' || strokes.length === 0;
+  $('go').disabled = mode !== 'edit';
+  updateGuides();
+}
+let hintT = 0;
+function showHint(s, sec) { const h = $('hint'); h.textContent = s; h.style.opacity = 1; hintT = sec; }
+let msgT = 0;
+function showMsg(s, sec) { const m = $('msg'); m.textContent = s; m.style.opacity = 1; msgT = sec; }
+
+// ---------- camera fit ----------
+let VW = 360, VH = 640, camBase = null, camCur = { x: 0, z: 0, k: 1 };
+function fitCamera() {
+  VW = Math.max(1, innerWidth); VH = Math.max(1, innerHeight);
+  renderer.setSize(VW, VH, false);
+  camera.aspect = VW / VH;
+  const el = 62 * Math.PI / 180;
+  const topPx = 56, botPx = 98;
+  const yMax = 1 - 2 * topPx / VH, yMin = -1 + 2 * botPx / VH, xLim = 1 - 2 * 6 / VW;
+  const pts = [];
+  for (const x of [-4.9, 4.9]) for (const z of [-7.4, 7.4]) for (const y of [0, 0.6]) pts.push(new THREE.Vector3(x, y, z));
+  let best = null;
+  for (let fovI = 0; fovI < 1; fovI++) {
+    for (let D = 10; D < 60; D += 0.25) {
+      let ok = false;
+      for (let tz = -3; tz <= 3; tz += 0.1) {
+        camera.position.set(0, Math.sin(el) * D, tz + Math.cos(el) * D); camera.lookAt(0, 0, tz); camera.updateMatrixWorld(); camera.updateProjectionMatrix();
+        let a = 9, b = -9, c = 0;
+        for (const p of pts) { const q = p.clone().project(camera); a = Math.min(a, q.y); b = Math.max(b, q.y); c = Math.max(c, Math.abs(q.x)); }
+        if (a >= yMin && b <= yMax && c <= xLim) { best = { D, tz }; ok = true; break; }
+      }
+      if (ok) break;
+    }
+  }
+  if (!best) best = { D: 30, tz: 0 };
+  camBase = { D: best.D, tz: best.tz, el };
+  camera.position.set(0, Math.sin(el) * best.D, best.tz + Math.cos(el) * best.D); camera.lookAt(0, 0, best.tz);
+  camera.updateProjectionMatrix(); camera.updateMatrixWorld();
+}
+addEventListener('resize', () => { fitCamera(); });
+
+// ---------- geometry helpers ----------
+const inRect = (x, z, r, m = 0) => x > r[0] - m && x < r[2] + m && z > r[1] - m && z < r[3] + m;
+function canPlace(x, z, minD = MIN_D) {
+  if (Math.abs(x) > BX - 0.3 || Math.abs(z) > BZ - 0.3) return false;
+  for (const r of walls) if (inRect(x, z, r, 0.3)) return false;
+  for (const r of puddles) if (inRect(x, z, r, 0.15)) return false;
+  for (const b of bells) if (Math.hypot(x - b.x, z - b.z) < 0.75) return false;
+  for (const b of balls) if (Math.hypot(x - b.x0, z - b.z0) < 0.6) return false;
+  for (const d of dominos) if (Math.hypot(x - d.x, z - d.z) < minD) return false;
+  return true;
+}
+
+// ---------- input ----------
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), hitV = new THREE.Vector3();
+function groundAt(cx, cy) {
+  if (camBase) { camCur.x = camCur.z = 0; camCur.k = 1; const D = camBase.D; camera.position.set(0, Math.sin(camBase.el) * D, camBase.tz + Math.cos(camBase.el) * D); camera.lookAt(0, 0, camBase.tz); camera.updateMatrixWorld(); }
+  ndc.set(cx / VW * 2 - 1, -(cy / VH) * 2 + 1); ray.setFromCamera(ndc, camera);
+  return ray.ray.intersectPlane(plane, hitV) ? { x: hitV.x, z: hitV.z } : null;
+}
+function beginStroke(p) {
+  let ax = p.x, az = p.z, snapped = null, bd = 0.7;
+  for (const d of dominos) { const dd = Math.hypot(d.x - p.x, d.z - p.z); if (dd < bd) { bd = dd; snapped = d; } }
+  if (snapped) { ax = snapped.x; az = snapped.z; }
+  stroke = { id: strokes.length, ax, az, list: [], prev: snapped };
+}
+function strokeTo(p) {
+  let guard = 0;
+  while (guard++ < 40) {
+    const vx = p.x - stroke.ax, vz = p.z - stroke.az, len = Math.hypot(vx, vz);
+    if (len < SP) break;
+    const fx = vx / len, fz = vz / len, qx = stroke.ax + fx * SP, qz = stroke.az + fz * SP;
+    stroke.ax = qx; stroke.az = qz;
+    if (placedCount() >= stage.max) { if (!warnedEmpty) { warnedEmpty = true; showMsg(L.empty, 1.2); sfxBad(); } continue; }
+    // the first domino of a branch may sit closer to its neighbours
+    if (!canPlace(qx, qz, stroke.prev && !stroke.list.length ? 0.26 : MIN_D)) continue;
+    const n = dominos.length;
+    const col = new THREE.Color().setHSL((0.02 + placedCount() * 0.045) % 1, 0.62, 0.62);
+    const d = addDomino(qx, qz, fx, fz, col, stroke.id, false);
+    const pr = stroke.list.length ? stroke.list[stroke.list.length - 1] : stroke.prev;
+    if (pr) { const dot = Math.abs(pr.fx * fx + pr.fz * fz); if (dot < Math.cos(MAX_TURN)) { d.warn = true; d.mat.emissive.setHex(0x661100); showMsg(L.sharp, 1); } }
+    stroke.list.push(d); sfxPlace(n); updateHud();
+  }
+}
+let activePointer = null, warnedEmpty = false;
+cv.addEventListener('pointerdown', (e) => {
+  initAudio();
+  if (mode !== 'edit' || activePointer !== null) return;
+  const p = groundAt(e.clientX, e.clientY); if (!p) return;
+  activePointer = e.pointerId; try { cv.setPointerCapture(e.pointerId); } catch (er) {}
+  clearMarkers(); hintT = Math.min(hintT, 0.6);
+  beginStroke(p);
+  warnedEmpty = false;
+});
+cv.addEventListener('pointermove', (e) => {
+  if (e.pointerId !== activePointer || !stroke) return;
+  const p = groundAt(e.clientX, e.clientY); if (!p) return;
+  strokeTo(p);
+});
+function endStroke(e) {
+  if (e.pointerId !== activePointer) return;
+  activePointer = null;
+  if (stroke && stroke.list.length) strokes.push(stroke.list);
+  stroke = null; updateHud();
+}
+cv.addEventListener('pointerup', endStroke);
+cv.addEventListener('pointercancel', endStroke);
+
+$('undo').addEventListener('pointerdown', (e) => {
+  e.stopPropagation(); initAudio();
+  if (mode !== 'edit' || !strokes.length) return;
+  const s = strokes.pop(); for (const d of s) { removeDomino(d); dominos.splice(dominos.indexOf(d), 1); }
+  clearMarkers(); tone(500, 0.08, 'sine', 0.08); updateHud();
+});
+$('go').addEventListener('pointerdown', (e) => {
+  e.stopPropagation(); initAudio();
+  if (mode !== 'edit') return;
+  clearMarkers(); resetRun();
+  mode = 'run'; tries++; chainCount = 0; allRungT = 0; runTimer = 0; quietT = 0; hintT = Math.min(hintT, 0.5);
+  topple(startDom, startDom.fx, startDom.fz, 2.4);
+  updateHud();
+});
+$('go').textContent = L.go; $('undo').textContent = L.undo;
+
+// ---------- simulation ----------
+function topple(d, dx, dz, w) {
+  if (d.state !== 'stand') return;
+  d.state = 'fall'; d.dx = dx; d.dz = dz; d.w = w; d.th = 0.001;
+  sfxDomino(chainCount++);
+}
+function fallDirFor(d, dx, dz) {
+  const dot = dx * d.fx + dz * d.fz;
+  if (Math.abs(dot) < Math.cos(52 * Math.PI / 180)) return null; // hit on the side: won't topple
+  return dot > 0 ? [d.fx, d.fz] : [-d.fx, -d.fz];
+}
+function ringBell(b) {
+  if (b.rung) return; b.rung = true; b.t = 0; b.mat.emissive.setHex(0x664400); sfxBell(bells.filter((x) => x.rung).length - 1);
+  burst(b.x, 1.0, b.z, 0xffe066, 14);
+}
+function contacts(d, reach) {
+  // returns what this falling/leaning domino touched: null | 'dom' | 'side' | 'bell' | 'wall'
+  let hit = null;
+  for (const o of dominos) {
+    if (o === d || o.state !== 'stand') continue;
+    const rx = o.x - d.x, rz = o.z - d.z, a = rx * d.dx + rz * d.dz, b = Math.abs(rx * d.dz - rz * d.dx);
+    if (a > 0.02 && b < LAT && a <= reach) {
+      const fd = fallDirFor(o, d.dx, d.dz);
+      if (fd) { topple(o, fd[0], fd[1], Math.max(1.4, d.w * 0.55)); if (!hit || hit === 'side') { hit = 'dom'; d.leanOn = o; } }
+      else if (!hit) { hit = 'side'; o.sideHit = true; }
+    }
+  }
+  for (const b of bells) {
+    const rx = b.x - d.x, rz = b.z - d.z, a = rx * d.dx + rz * d.dz, bb = Math.abs(rx * d.dz - rz * d.dx);
+    if (a > 0 && bb < BELL_R + DW * 0.6 && a - BELL_R * 0.85 <= reach) { ringBell(b); if (!hit) hit = 'bell'; }
+  }
+  for (const b of balls) {
+    if (b.moving || b.kicked) continue;
+    const rx = b.x - d.x, rz = b.z - d.z, a = rx * d.dx + rz * d.dz, bb = Math.abs(rx * d.dz - rz * d.dx);
+    if (a > 0 && bb < BALL_R + DW * 0.4 && a - BALL_R <= reach) { const sp = 3.2 + Math.min(d.w, 8) * 0.5; b.vx = d.dx * sp; b.vz = d.dz * sp; b.moving = true; b.kicked = true; sfxBall(); d.kickedBall = true; }
+  }
+  if (!hit) {
+    const tx = d.x + d.dx * reach, tz = d.z + d.dz * reach;
+    for (const r of walls) if (inRect(tx, tz, r, 0.02)) { hit = 'wall'; break; }
+  }
+  return hit;
+}
+function stepDomino(d, dt) {
+  if (d.state === 'lean') {
+    // follow the domino we lean on, and keep pushing anything newly in reach (branches)
+    const o = d.leanOn; if (o) { const tgt = d.leanBase + (o.th / 1.5) * (1.45 - d.leanBase); if (tgt > d.th) d.th = Math.min(tgt, 1.45); }
+    contacts(d, DH * Math.sin(Math.min(d.th, Math.PI / 2)) + DT * Math.cos(d.th));
+    setPose(d); return;
+  }
+  if (d.state !== 'fall') return;
+  d.w += (26 * Math.sin(d.th) + 3) * dt; d.th += d.w * dt;
+  const reach = DH * Math.sin(Math.min(d.th, Math.PI / 2)) + DT * Math.cos(d.th);
+  const hit = contacts(d, reach);
+  if (hit) { d.state = 'lean'; d.leanBase = d.th; d.endReason = hit === 'dom' ? null : hit; if (hit !== 'dom') d.leanOn = null; }
+  if (d.state === 'fall' && d.th >= 1.5) { d.th = 1.5; d.state = 'down'; click(0.08, 1200); d.endReason = d.kickedBall ? 'ball' : 'floor'; }
+  setPose(d);
+}
+function stepBall(b, dt) {
+  if (!b.moving) return;
+  const sub = 4; let stopped = false;
+  for (let s = 0; s < sub && !stopped; s++) {
+    const h = dt / sub; b.x += b.vx * h; b.z += b.vz * h;
+    const fr = Math.exp(-0.35 * h); b.vx *= fr; b.vz *= fr;
+    // board edges
+    if (b.x < -BX + BALL_R) { b.x = -BX + BALL_R; b.vx = Math.abs(b.vx) * 0.7; bump(); }
+    if (b.x > BX - BALL_R) { b.x = BX - BALL_R; b.vx = -Math.abs(b.vx) * 0.7; bump(); }
+    if (b.z < -BZ + BALL_R) { b.z = -BZ + BALL_R; b.vz = Math.abs(b.vz) * 0.7; bump(); }
+    if (b.z > BZ - BALL_R) { b.z = BZ - BALL_R; b.vz = -Math.abs(b.vz) * 0.7; bump(); }
+    for (const r of walls) {
+      const cx = clamp(b.x, r[0], r[2]), cz = clamp(b.z, r[1], r[3]); const dx = b.x - cx, dz = b.z - cz, dd = Math.hypot(dx, dz);
+      if (dd < BALL_R && dd > 1e-6) { const nx = dx / dd, nz = dz / dd; b.x = cx + nx * BALL_R; b.z = cz + nz * BALL_R; const vn = b.vx * nx + b.vz * nz; if (vn < 0) { b.vx -= 1.7 * vn * nx; b.vz -= 1.7 * vn * nz; bump(); } }
+    }
+    for (const bl of bells) {
+      const dx = b.x - bl.x, dz = b.z - bl.z, dd = Math.hypot(dx, dz);
+      if (dd < BALL_R + BELL_R) { ringBell(bl); const nx = dx / dd, nz = dz / dd; b.x = bl.x + nx * (BALL_R + BELL_R); b.z = bl.z + nz * (BALL_R + BELL_R); const vn = b.vx * nx + b.vz * nz; if (vn < 0) { b.vx -= 1.6 * vn * nx; b.vz -= 1.6 * vn * nz; } }
+    }
+    const spd = Math.hypot(b.vx, b.vz);
+    for (const d of dominos) {
+      if (d.state !== 'stand' || spd < 0.05) continue;
+      const dx = d.x - b.x, dz = d.z - b.z, dd = Math.hypot(dx, dz);
+      if (dd < BALL_R + 0.22) {
+        const fd = fallDirFor(d, b.vx / spd, b.vz / spd);
+        if (fd) { topple(d, fd[0], fd[1], 2.0); b.vx *= 0.75; b.vz *= 0.75; }
+        else { const nx = -dx / dd, nz = -dz / dd, vn = b.vx * nx + b.vz * nz; if (vn < 0) { b.vx -= 1.6 * vn * nx; b.vz -= 1.6 * vn * nz; } }
+      }
+    }
+    if (Math.hypot(b.vx, b.vz) < 0.25) { b.moving = false; b.vx = b.vz = 0; stopped = true; }
+  }
+  const spd = Math.hypot(b.vx, b.vz);
+  b.m.position.set(b.x, BALL_R, b.z);
+  if (spd > 0) { const ax = new THREE.Vector3(b.vz, 0, -b.vx).normalize(); b.m.rotateOnWorldAxis(ax, spd * dt / BALL_R); }
+  for (const r of puddles) if (inRect(b.x, b.z, r) && Math.random() < spd * dt * 2) burst(b.x, 0.1, b.z, 0xbfe8ff, 2);
+}
+let lastBump = 0;
+function bump() { const t = performance.now(); if (t - lastBump > 80) { lastBump = t; click(0.12, 600); } }
+
+// particles
+const parts = [];
+const partGeo = new THREE.SphereGeometry(0.06, 6, 4);
+function burst(x, y, z, color, n) {
+  const mat = new THREE.MeshBasicMaterial({ color, transparent: true });
+  for (let i = 0; i < n; i++) {
+    const m = new THREE.Mesh(partGeo, mat); m.position.set(x, y, z); fxGroup.add(m);
+    const a = Math.random() * Math.PI * 2, s = 1 + Math.random() * 2.5;
+    parts.push({ m, vx: Math.cos(a) * s, vy: 2 + Math.random() * 3, vz: Math.sin(a) * s, t: 0.9 + Math.random() * 0.4, mat });
+  }
+}
+function markerAt(x, z) {
+  const m = new THREE.Mesh(new THREE.RingGeometry(0.45, 0.62, 28), new THREE.MeshBasicMaterial({ color: 0xff3a2a, transparent: true, opacity: 0.9, depthTest: false }));
+  m.rotation.x = -Math.PI / 2; m.position.set(x, 0.05, z); m.renderOrder = 5; fxGroup.add(m); markers.push(m);
+}
+
+function finishRun() {
+  const ok = bells.every((b) => b.rung);
+  if (ok) {
+    mode = 'result';
+    const used = placedCount();
+    const st = used <= stage.par ? 3 : used <= stage.par + Math.ceil(stage.par * 0.3) ? 2 : 1;
+    const prev = save.stars[stageIdx] | 0;
+    save.stars[stageIdx] = Math.max(prev, st);
+    const nextIdx = stageIdx + 1;
+    save.stage = nextIdx >= STAGES.length ? 0 : Math.max(save.stage, nextIdx);
+    if (nextIdx >= STAGES.length) save.stage = 0;
+    persist();
+    const total = save.stars.reduce((a, b) => a + (b | 0), 0);
+    signal('end', { score: total });
+    sfxClear();
+    for (const b of bells) { burst(b.x, 1.2, b.z, 0xff6a8a, 10); burst(b.x, 1.2, b.z, 0x6ad0ff, 10); burst(b.x, 1.2, b.z, 0xffe066, 10); }
+    later(0.7, () => showResult(st, used, nextIdx >= STAGES.length, total));
+  } else {
+    sfxFail();
+    let n = 0;
+    for (const d of dominos) if ((d.state === 'down' && d.endReason === 'floor') || d.endReason === 'side' || d.endReason === 'wall') { markerAt(d.x + d.dx * 0.6, d.z + d.dz * 0.6); n++; }
+    if (!n) for (const d of dominos) if (d.state === 'stand' && d.isStart) markerAt(d.x, d.z);
+    showMsg(L.broke, 1.6);
+    mode = 'fail';
+    later(1.5, () => { if (mode === 'fail') { resetRun(); mode = 'edit'; showHint(L.fix, 3); updateHud(); } });
+  }
+}
+
+let resultReadyAt = 0, resultNext = 0, gameTime = 0;
+const timers = [];
+function later(sec, fn) { timers.push({ t: gameTime + sec, fn }); }
+function showResult(st, used, last, total) {
+  $('rh').textContent = L.clear;
+  $('rs').innerHTML = [0, 1, 2].map((i) => i < st ? '★' : '<span class="off">★</span>').join('');
+  $('r1').textContent = `${L.used}: ${used}${L.pieces}　（${L.target}: ${stage.par}${L.pieces}）`;
+  $('r2').textContent = last ? `${L.allClear}　${L.total} ${total}/${STAGES.length * 3}` : `${L.tries}: ${tries}　${L.total} ${total}/${STAGES.length * 3}`;
+  $('rtap').textContent = last ? L.again : L.next;
+  $('result').classList.remove('hide');
+  resultReadyAt = gameTime + 0.7; resultNext = last ? 0 : stageIdx + 1;
+}
+$('result').addEventListener('pointerdown', (e) => {
+  e.stopPropagation(); initAudio();
+  if (gameTime < resultReadyAt) return;
+  $('result').classList.add('hide'); loadStage(resultNext);
+});
+
+// ---------- title ----------
+function showTitle() {
+  if (mode !== 'title') return;
+  $('tt').textContent = L.title; $('th1').textContent = L.how1; $('th2').textContent = L.how2; $('th3').textContent = L.how3; $('ttap').textContent = L.tap;
+  const total = save.stars.reduce((a, b) => a + (b | 0), 0);
+  $('tprog').textContent = save.stage > 0 ? `${L.cont}${save.stage + 1}　★${total}` : '';
+}
+$('title').addEventListener('pointerdown', (e) => {
+  e.stopPropagation(); initAudio();
+  $('title').classList.add('hide'); loadStage(save.stage);
+});
+
+// demo scene behind the title
+function titleScene() {
+  stage = STAGES[0];
+  loadStageVisualOnly();
+}
+function loadStageVisualOnly() {
+  levelGroup.clear();
+  const b = bellMesh(); b.g.position.set(0, 0, -4); levelGroup.add(b.g);
+  for (let i = 0; i < 22; i++) {
+    const t = i / 21, x = Math.sin(t * Math.PI * 2) * 2.6, z = 5.5 - t * 9;
+    const x2 = Math.sin((t + 0.01) * Math.PI * 2) * 2.6, z2 = 5.5 - (t + 0.01) * 9; const l = Math.hypot(x2 - x, z2 - z);
+    addDomino(x, z, (x2 - x) / l, (z2 - z) / l, new THREE.Color().setHSL((0.02 + i * 0.045) % 1, 0.62, 0.62), 0, i === 0);
+  }
+}
+titleScene(); showTitle();
+
+// ---------- loop ----------
+let last = performance.now();
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(0.05, Math.max(0, (now - last) / 1000)); last = now; gameTime += dt;
+  for (let i = timers.length - 1; i >= 0; i--) if (gameTime >= timers[i].t) { const f = timers[i].fn; timers.splice(i, 1); f(); }
+  if (mode === 'run') {
+    runTimer += dt;
+    for (const d of dominos) stepDomino(d, dt);
+    for (const b of balls) stepBall(b, dt);
+    const busy = dominos.some((d) => d.state === 'fall') || balls.some((b) => b.moving);
+    quietT = busy ? 0 : quietT + dt;
+    if (bells.every((b) => b.rung)) { allRungT += dt; if (allRungT > 0.9 || quietT > 0.3) finishRun(); }
+    else if (quietT > 0.9) finishRun();
+  }
+  // placement pop-in
+  for (const d of dominos) {
+    const age = (now - d.born) / 1000;
+    if (age < 0.25) { const s = 0.4 + 0.6 * Math.sin(age / 0.25 * Math.PI / 2) + Math.sin(age / 0.25 * Math.PI) * 0.15; d.pivot.scale.set(s, s, s); } else if (d.pivot.scale.x !== 1) d.pivot.scale.set(1, 1, 1);
+  }
+  for (const b of bells) {
+    if (b.rung) { b.t += dt; b.sw.rotation.z = Math.sin(b.t * 18) * 0.35 * Math.exp(-b.t * 1.5); b.ring.material.opacity = Math.max(0, 0.9 - b.t * 0.4); const s = 1 + b.t * 0.8; b.ring.scale.set(s, s, s); }
+  }
+  if (puddles.wave) for (const w of puddles.wave) { const ph = (now / 1000 * 0.5 + w.userData.ph) % 1; const s = 0.5 + ph * 2.5; w.scale.set(s, s, s); w.material.opacity = 0.35 * (1 - ph); }
+  if (stage && stage.arrow) { stage.arrow.visible = mode !== 'title' && startDom && startDom.state === 'stand'; stage.arrow.position.y = 0.05 + Math.abs(Math.sin(now / 300)) * 0.1; }
+  for (let i = parts.length - 1; i >= 0; i--) {
+    const p = parts[i]; p.t -= dt; p.vy -= 9 * dt; p.m.position.x += p.vx * dt; p.m.position.y = Math.max(0.03, p.m.position.y + p.vy * dt); p.m.position.z += p.vz * dt;
+    p.mat.opacity = clamp(p.t, 0, 1);
+    if (p.t <= 0) { fxGroup.remove(p.m); parts.splice(i, 1); }
+  }
+  for (const m of markers) m.material.opacity = 0.55 + 0.4 * Math.sin(now / 120);
+  if (hintT > 0) { hintT -= dt; if (hintT <= 0) $('hint').style.opacity = 0; }
+  if (msgT > 0) { msgT -= dt; $('msg').style.opacity = 1; if (msgT <= 0) $('msg').style.opacity = 0; }
+  // camera gently follows the front of the chain while it runs
+  if (camBase) {
+    let tx = 0, tz = 0, tk = 1;
+    if (mode === 'run') {
+      let n = 0, sx = 0, sz = 0;
+      for (const d of dominos) if (d.state === 'fall') { sx += d.x; sz += d.z; n++; }
+      for (const b of balls) if (b.moving) { sx += b.x * 2; sz += b.z * 2; n += 2; }
+      if (n) { tx = sx / n * 0.3; tz = (sz / n - camBase.tz) * 0.3; tk = 0.84; } else { tx = camCur.x; tz = camCur.z; tk = camCur.k; }
+    }
+    const a = 1 - Math.exp(-dt * 2.5);
+    camCur.x += (tx - camCur.x) * a; camCur.z += (tz - camCur.z) * a; camCur.k += (tk - camCur.k) * a;
+    const D = camBase.D * camCur.k, cz = camBase.tz + camCur.z;
+    camera.position.set(camCur.x, Math.sin(camBase.el) * D, cz + Math.cos(camBase.el) * D); camera.lookAt(camCur.x, 0, cz);
+  }
+  renderer.render(scene, camera);
+}
+fitCamera();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

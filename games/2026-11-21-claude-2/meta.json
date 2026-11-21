@@ -1,0 +1,1297 @@
+{
+  "id": "2026-11-21-claude-2",
+  "status": "published",
+  "title": "チリン！ドミノ倒し",
+  "genre": "パズル",
+  "concept": "指でなぞった道にドミノが並び、倒すと音階を上りながら連鎖してベルを鳴らす。急な曲がりでは止まり、途中から枝分かれでき、玉に当てれば水の向こうへ転がる。少ない数で全部のベルに届く道を描く、作って倒して直す試行錯誤と、連鎖を見守る気持ちよさが核。",
+  "howToPlay": "緑のドミノから指でなぞってドミノを並べ、▶で倒してベルを全部鳴らす。並んだドミノの上からなぞると枝分かれできる。",
+  "libraryDecision": "three.js を使う。ドミノが奥へ向かって倒れていく連鎖は立体で見るのが一番気持ちよく、影と傾きで「どこまで届くか」が読めるため。倒れ方は物理演算ライブラリではなく自前の簡単な計算にし、曲がり角や枝分かれで結果が毎回同じになるようにした（試行錯誤のパズルに必要）。",
+  "soundDecision": "BGMは付けず、ドミノが1枚倒れるごとに「カチ」と五音音階を1音ずつ上る音を鳴らし、連鎖そのものが曲になるようにした。ベルは倍音を重ねたチリンという音で、届いた瞬間のごほうびにした。",
+  "improvements": [
+    {
+      "found": "①途中から枝分かれさせても片方しか倒れない ②クリアしてから結果が出るまで、玉が止まるのを待って間延びする ③「↶」だけのボタンが何をするか分からず、ベルのすぐ横で外れるのが理不尽に感じる",
+      "changed": "倒れたドミノがもたれた後も押し続けるようにして枝分かれを成立させた。ベルが全部鳴ったら0.9秒で結果へ。ボタンを「↶ もどす」にし、ベルの当たり幅を少し広げ、各面の★3目標を実際に解いて決め直した。",
+      "foundEn": "1) Branches only toppled one side 2) After the last bell, the result waited for the ball to stop 3) A bare '↶' button was unclear and near-misses beside the bell felt unfair",
+      "changedEn": "Leaning dominoes keep pushing so forks work. Result appears 0.9 s after all bells ring. Labeled the button 'Undo', widened the bell hit area, and re-tuned every 3-star target by actually solving each stage."
+    },
+    {
+      "found": "①盤面全体を固定カメラで見るので、連鎖が小さく迫力がない ②全部のベルが鳴っても喜びが薄い ③倒している間、目がどこを追えばいいか迷う",
+      "changed": "倒している間はカメラが連鎖の先頭や転がる玉を少し寄って追うようにし、クリアの瞬間に各ベルから色とりどりの紙吹雪を出した。",
+      "foundEn": "1) The fixed overview camera made the cascade small 2) Ringing every bell felt underwhelming 3) Hard to know where to look while it topples",
+      "changedEn": "The camera now zooms in slightly and follows the chain front or rolling ball, and confetti bursts from every bell on clear."
+    },
+    {
+      "found": "①玉がどの向きに転がるか倒すまで分からず、外れても直し方が分からない ②玉の面だけ運まかせの当てずっぽうになる ③何度も倒し直すのが作業になる",
+      "changed": "玉の前にドミノを置くと、玉が転がる道すじが白い点線で見えるようにした。点線をベルに合わせるように線を引き直す、狙いのパズルになった。",
+      "foundEn": "1) You couldn't tell where the ball would roll until toppling 2) Ball stages became guesswork 3) Re-toppling repeatedly felt like a chore",
+      "changedEn": "A dotted line now shows the ball's path once a domino stands in front of it, so you aim by redrawing until the line meets the bell."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "RPG",
+      "en": "RPG",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "数字の塔RPG: 勇者より小さい数の敵を倒して吸収し強くなり、分かれ道を選んでボスへ。",
+        "ideaEn": "Number-tower RPG: absorb enemies weaker than the hero, pick forks, reach the boss.",
+        "fromDraw": true
+      },
+      {
+        "idea": "なぞってドミノ倒し(3D): なぞった道にドミノが並び、倒してベルを鳴らす。枝分かれ・玉・限られた数。",
+        "ideaEn": "Draw-a-domino-run (3D): trace paths, topple them to ring bells, with forks, balls and a limited count.",
+        "fromDraw": false
+      },
+      {
+        "idea": "雨粒の池: タップで雨粒を落とすと波紋が音になり、鯉が寄ってくる終わりのない遊び場。",
+        "ideaEn": "Rain pond: tap to drop raindrops whose ripples make notes and draw koi; an endless toy.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 1
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "draw",
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Chime Dominoes",
+      "concept": "Trace a path and dominoes line up along it; topple them and the chain climbs a scale to ring the bells. Sharp turns stop it, you can fork from the middle, and a ball carries the chain across water. Draw a run that reaches every bell with as few pieces as possible: build, topple, fix, and enjoy watching the cascade.",
+      "howToPlay": "Trace from the green domino to place dominoes, press ▶ to topple and ring every bell. Start a trace on a domino to branch.",
+      "libraryDecision": "Uses three.js: a cascade falling away from you reads best in 3D, and shadows and tilt show how far each piece reaches. Toppling uses my own simple deterministic model instead of a physics library, so curves and forks behave the same every try, which a trial-and-error puzzle needs.",
+      "soundDecision": "No BGM. Each falling domino clicks and plays the next note of a pentatonic scale, so the chain itself becomes the melody; bells ring with layered harmonics as the reward."
+    }
+  },
+  "createdAt": "2026-11-21T12:07:21+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-21T12:07:21+09:00",
+    "metricsFrom": "2026-11-21T03:06:07.759Z",
+    "transcript": "abdfd092-14dd-46ab-a397-7249b464063b.jsonl",
+    "validationRuns": 5,
+    "finishedAt": "2026-11-21T12:57:37+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-21T12:57:37+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "41.1KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=248",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=131",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=222",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=90",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 42120,
+    "lines": 691
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "線を引くのは指の感覚まかせなので、ベルや玉の手前で狙いがずれて『惜しい』外れ方をすることが多く、細かく直すには「もどす」で一筆ごと消すしかない。8面で終わり、後半は長い線を引く作業感もある。",
+    "comment": "3面で幹のとちゅうからなぞると連鎖が左右に分かれて同時に走り、両方のベルがチリンと鳴った瞬間がいちばん気持ちよかった。倒れるごとに音階が上がるので見守る時間も楽しい。4面では点線で玉の行き先が見え、線を引き直して真上に合わせるとまっすぐ水を渡ってベルに当たった。少ない数で★3を狙う工夫もある。ただし狙いずれのやり直しが続くと少し面倒。",
+    "similar": [
+      {
+        "title": "Domino Line!",
+        "url": "https://apps.apple.com/us/app/domino-line/id1490200358",
+        "similarity": "高",
+        "note": "指でなぞった方向にドミノを並べ、障害物をよけてゴールまで倒す点が同じ。こちらは枝分かれ・玉・ベル複数と、少ない数で★を狙う点が違う。",
+        "note_en": "Same core of dragging to lay dominoes around obstacles to a goal. This adds forks, balls, multiple bells and a fewest-pieces star target."
+      },
+      {
+        "title": "Dominos Draw!",
+        "url": "https://apps.apple.com/au/app/dominos-draw/id1472739353",
+        "similarity": "高",
+        "note": "道を描いてドミノを倒す遊びは同じ。こちらは急な曲がりで止まる・倒れる音が音階になる・玉の行き先が点線で見える点が違う。",
+        "note_en": "Same draw-a-path-and-topple idea. Differs in sharp turns breaking the chain, a musical scale per domino, and the dotted ball-aim line."
+      }
+    ],
+    "research": "WebSearchで「domino puzzle game draw line to place dominoes mobile」を1回検索し、App Storeの説明文から近い作品を2つ選んだ。",
+    "i18n": {
+      "en": {
+        "worst": "Drawing is by feel, so you often miss just beside a bell or ball, and the only fix is undoing whole strokes. Only 8 stages, and the later ones feel like long tracing work.",
+        "comment": "In stage 3, branching from the middle of the trunk made the chain split and race both ways, and both bells dinged - the best moment. Notes climb with every domino, so watching is fun. In stage 4 the dotted line showed the ball's path; redrawing to aim straight up sent it across the water into the bell. Chasing 3 stars with fewer pieces adds depth, though repeated near-miss redraws get a little tedious.",
+        "research": "One WebSearch for 'domino puzzle game draw line to place dominoes mobile'; picked two close titles from App Store descriptions."
+      }
+    },
+    "method": "スマホ縦画面で 20 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 20 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "タイトルをタップ",
+        "noteEn": "Tap the title",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "path(0.50,0.64→0.50,0.45→0.50,0.25) 700ms",
+        "note": "緑のドミノからベルまでまっすぐなぞる。並ぶたびにコツコツ鳴る",
+        "noteEn": "Trace straight to the bell; each domino ticks as it appears",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.75,0.92) 120ms → wait 1600ms",
+        "note": "たおす。カメラが先頭を少し追い、音階が上がっていく",
+        "noteEn": "Topple; the camera follows the front and the notes climb",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 3000ms",
+        "note": "チリーン！★3でクリア",
+        "noteEn": "Ding! Cleared with 3 stars",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "stars": [
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 500ms → tap(0.50,0.50) 120ms → wait 300ms",
+        "note": "次へ",
+        "noteEn": "Next",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "stars": [
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "path(0.22,0.64→0.22,0.59→0.62,0.45→0.62,0.39→0.26,0.25) 1200ms",
+        "note": "壁の右を斜めに回る近道。曲がり角はゆるやかに",
+        "noteEn": "Diagonal shortcut around the wall, keeping turns gentle",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "stars": [
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.75,0.92) 120ms → wait 5000ms",
+        "note": "24個で★3",
+        "noteEn": "3 stars with 24",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "stars": [
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 2,
+              "stars": [
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 800ms → tap(0.50,0.50) 120ms → wait 300ms",
+        "note": "次へ",
+        "noteEn": "Next",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "stars": [
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 2,
+              "stars": [
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "path(0.50,0.64→0.50,0.37) 600ms",
+        "note": "ふたまた: まず幹",
+        "noteEn": "Fork: trunk first",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "stars": [
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 2,
+              "stars": [
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "path(0.50,0.44→0.40,0.39→0.28,0.33→0.26,0.22) 800ms",
+        "note": "幹のとちゅうから左へ枝分かれ",
+        "noteEn": "Branch left from the trunk",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "stars": [
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 2,
+              "stars": [
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "path(0.50,0.37→0.58,0.33→0.71,0.29→0.74,0.22) 800ms",
+        "note": "幹の先から右へ",
+        "noteEn": "Right branch from the trunk end",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "stars": [
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 2,
+              "stars": [
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.75,0.92) 120ms → wait 2300ms",
+        "note": "2本に分かれて同時に走る。ここが一番気持ちいい",
+        "noteEn": "It splits and races both ways at once - the best moment",
+        "image": "ai-play/step-12.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "stars": [
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 2,
+              "stars": [
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "wait 3000ms",
+        "note": "両方のベルが鳴った。31個で★3",
+        "noteEn": "Both bells rang; 3 stars with 31",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "stars": [
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 2,
+              "stars": [
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 3,
+              "stars": [
+                3,
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 9
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "wait 800ms → tap(0.50,0.50) 120ms → wait 300ms",
+        "note": "次へ",
+        "noteEn": "Next",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "stars": [
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 2,
+              "stars": [
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 3,
+              "stars": [
+                3,
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 9
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "path(0.29,0.64→0.32,0.61→0.39,0.59→0.53,0.58→0.60,0.57→0.64,0.54→0.63,0.50) 900ms",
+        "note": "ころがる玉: 右へ回って玉の真下からまっすぐ当てる",
+        "noteEn": "Rolling ball: curve right and hit the ball straight from below",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "stars": [
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 2,
+              "stars": [
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 3,
+              "stars": [
+                3,
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 9
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "wait 300ms",
+        "note": "玉の前にドミノを置くと、転がる向きが点線で見える。右上へそれている",
+        "noteEn": "With a domino in front of the ball, a dotted line shows its path; it veers up-right",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "stars": [
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 2,
+              "stars": [
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 3,
+              "stars": [
+                3,
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 9
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 17,
+        "action": "tap(0.20,0.92) 120ms",
+        "note": "もどすで今の線を消す",
+        "noteEn": "Undo the stroke",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "stars": [
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 2,
+              "stars": [
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 3,
+              "stars": [
+                3,
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 9
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 18,
+        "action": "path(0.29,0.64→0.32,0.61→0.43,0.60→0.56,0.60→0.62,0.58→0.64,0.55→0.63,0.50) 900ms",
+        "note": "早めに上へ向けて引き直す。点線がベルに向いた",
+        "noteEn": "Redraw, turning upward earlier; the dotted line now points at the bell",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "stars": [
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 2,
+              "stars": [
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 3,
+              "stars": [
+                3,
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 9
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 19,
+        "action": "tap(0.75,0.92) 120ms → wait 3000ms",
+        "note": "玉が水をこえてまっすぐベルへ",
+        "noteEn": "The ball crosses the water straight to the bell",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "stars": [
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 2,
+              "stars": [
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 3,
+              "stars": [
+                3,
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 9
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 20,
+        "action": "wait 2500ms",
+        "note": "チリーン！10個で★3",
+        "noteEn": "Ding! 3 stars with 10",
+        "image": "ai-play/step-20.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "stars": [
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 3
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 2,
+              "stars": [
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 6
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 3,
+              "stars": [
+                3,
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 9
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 4,
+              "stars": [
+                3,
+                3,
+                3,
+                3
+              ]
+            }
+          },
+          {
+            "agf": "end",
+            "score": 12
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-21T12:57:37+09:00"
+  },
+  "publishedAt": "2026-11-21T12:57:37+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 29323,
+    "outputTokens": 50935,
+    "contextTokens": 14917603,
+    "turns": 73,
+    "toolCalls": 80,
+    "webSearches": 0,
+    "minutes": 51.6,
+    "from": "2026-11-21T03:06:07.759Z",
+    "to": "2026-11-21T03:57:41.151Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-21T12:57:41+09:00",
+    "validationRuns": 5,
+    "codeKB": 41.1
+  }
+}
