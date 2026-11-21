@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>せーの！大なわ</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; margin: 0; height: 100%; overflow: hidden; background: #9fd8f5; }
+canvas { display: block; width: 100vw; height: 100vh; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const TXT = {
+  ja: {
+    title: 'せーの！大なわ', how1: 'なわが足もとに来る直前にタップでジャンプ',
+    how2: 'つづけて跳ぶと友だちが入ってくる', how3: '跳ぶたびに歌がすすむ。昼休みは80秒',
+    tap: 'タップでスタート', score: 'スコア', best: 'ベスト', left: 'のこり', streak: 'れんぞく',
+    hint: 'なわが足もとに来る直前にタップ！', hold: 'ため…', fast: 'はやまわし！', slow: 'ゆ〜っくり',
+    sway: 'おおなみ こなみ', go: 'まわすよー！', seno: 'せーの！', caught: 'ひっかかった〜', last: 'ラスト10びょう！',
+    perfect: 'ぴったり！', song: 'うたいきった！', join: 'いれて〜！', result: '昼休み おわり',
+    maxStreak: '最高れんぞく', maxPeople: '最大', newBest: 'ベスト更新！', again: 'タップでもう一度',
+    times: '回', people: '人', together: 'みんなで', far: 'はしの子は少しおくれて跳ぶ', early: 'はやい！', late: 'おそい！'
+  },
+  en: {
+    title: 'Ready, Go! Big Rope', how1: 'Tap just before the rope reaches your feet',
+    how2: 'Keep jumping and friends join in', how3: 'Every jump plays the next note. Recess: 80 s',
+    tap: 'Tap to start', score: 'Score', best: 'Best', left: 'Left', streak: 'in a row',
+    hint: 'Tap just before the rope hits your feet!', hold: 'Hold it…', fast: 'Speed up!', slow: 'Sloooow',
+    sway: 'Big waves, small waves', go: 'Here it comes!', seno: 'Ready, go!', caught: 'Caught!', last: 'Last 10 seconds!',
+    perfect: 'Perfect!', song: 'Song complete!', join: 'Let me in!', result: 'Recess is over',
+    maxStreak: 'Best streak', maxPeople: 'Max', newBest: 'New best!', again: 'Tap to play again',
+    times: '', people: '', together: 'Together', far: 'Kids at the ends jump a bit later', early: 'Too early!', late: 'Too late!'
+  }
+};
+const L = TXT[LANG] || TXT.en;
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const perf = () => performance.now() / 1000;
+
+// ---------- save ----------
+let best = 0, bestStreak = 0;
+addEventListener('message', (e) => {
+  if (e.data && e.data.agf === 'loaded' && e.data.data) {
+    best = e.data.data.best | 0; bestStreak = e.data.data.bestStreak | 0;
+  }
+});
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+
+// ---------- canvas ----------
+const cv = document.getElementById('c');
+const cx = cv.getContext('2d');
+let W = 360, H = 640, DPR = 1, S = 1, gy = 448, axisY = 376, R = 74, xL = 30, xR = 330, CX = 180;
+function resize() {
+  W = Math.max(1, innerWidth); H = Math.max(1, innerHeight);
+  DPR = Math.min(2, devicePixelRatio || 1);
+  cv.width = Math.max(1, Math.round(W * DPR)); cv.height = Math.max(1, Math.round(H * DPR));
+  S = Math.max(0.3, Math.min(W / 360, H / 640));
+  gy = H * 0.72; CX = W / 2;
+  xL = CX - 158 * S; xR = CX + 158 * S;
+  axisY = gy - 70 * S; R = 70 * S;
+}
+addEventListener('resize', resize);
+resize();
+
+// ---------- audio ----------
+let AC = null, master = null, noiseBuf = null;
+function initAudio() {
+  if (AC) { if (AC.state !== 'running') AC.resume().catch(() => {}); return; }
+  try {
+    AC = new (window.AudioContext || window.webkitAudioContext)();
+    master = AC.createGain(); master.gain.value = 0.55; master.connect(AC.destination);
+    const n = AC.sampleRate | 0;
+    noiseBuf = AC.createBuffer(1, n, AC.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+    AC.resume().catch(() => {});
+  } catch (e) { AC = null; }
+}
+const at = (tg) => AC.currentTime + Math.max(0, tg - perf());
+const mf = (m) => 440 * Math.pow(2, (m - 69) / 12);
+function tone(f, t, dur, vol, type, f2) {
+  if (!AC) return;
+  try {
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(f, t);
+    if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.006);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.03);
+  } catch (e) {}
+}
+function noise(t, dur, vol, ftype, f0, f1, q, pk) {
+  if (!AC) return;
+  try {
+    const s = AC.createBufferSource(); s.buffer = noiseBuf;
+    const fl = AC.createBiquadFilter(); fl.type = ftype; fl.frequency.setValueAtTime(f0, t);
+    if (f1) fl.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    fl.Q.value = q || 1;
+    const g = AC.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + Math.max(0.003, dur * (pk == null ? 0.7 : pk)));
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(fl); fl.connect(g); g.connect(master);
+    s.start(t, Math.random() * 0.5); s.stop(t + dur + 0.03);
+  } catch (e) {}
+}
+function marimba(m, t, vol) {
+  const f = mf(m);
+  tone(f, t, 0.42, vol, 'sine');
+  tone(f * 2, t, 0.16, vol * 0.22, 'triangle');
+  tone(f * 4, t, 0.05, vol * 0.18, 'sine');
+}
+// original pentatonic tune: one note per successful jump
+const MEL = [67, 64, 67, 69, 67, 64, 62, 64, 67, 67, 69, 72, 69, 67, 64, 67, 69, 72, 74, 72, 69, 67, 64, 62, 64, 67, 69, 67, 64, 62, 60, 60];
+const BASS = [48, 45, 53, 48, 50, 45, 48, 48];
+const SCALE = [0, 2, 4, 5, 7, 9, 11];
+function third(m) {
+  let oct = Math.floor(m / 12), idx = SCALE.indexOf(m % 12);
+  if (idx < 0) return m - 3;
+  idx -= 2; if (idx < 0) { idx += 7; oct--; }
+  return oct * 12 + SCALE[idx];
+}
+
+function playNote(count, perfect) {
+  const m = MEL[melIdx];
+  if (AC) {
+    const t = AC.currentTime + 0.005;
+    marimba(m, t, 0.17);
+    if (count >= 2 && melIdx % 2 === 0) tone(mf(BASS[melIdx >> 2]), t, 0.34, 0.13, 'sine');
+    if (count >= 5) marimba(third(m), t, 0.08);
+    if (count >= 8 || perfect) tone(mf(m + 12), t, 0.25, perfect ? 0.06 : 0.04, 'sine');
+  }
+  melIdx++;
+}
+
+// ---------- game state ----------
+const LIMIT = 80, M = 0.065, MAXK = 9, SP = 28, KS = 1.4;
+const SHIRTS = ['#4fc3f7', '#81c784', '#ffb74d', '#ba68c8', '#f06292', '#4db6ac', '#7986cb', '#fff176', '#a1887f', '#90a4ae'];
+const HAIRS = ['#3b2a20', '#5a3b25', '#1f1f2e', '#7a4a2a', '#2b2b2b'];
+let state = 'title', now = perf(), playStart = 0, seg = null, queue = [], cool = 0, swayDir = 1, plain = 0, lastEv = '';
+let jumpers = [], score = 0, streak = 0, maxStreak = 0, sinceJoin = 0, melIdx = 0, maxPeople = 1;
+let caughtAt = 0, endAt = 0, leftDone = false, lastTen = false, newBest = false, streakPop = 0, shake = 0;
+let parts = [], pops = [], th = Math.PI, passFlash = -9, passT = -9;
+
+function makeYou() {
+  return { you: true, side: 0, rank: 0, ox: 0, delay: 0, jit: 0, tj: -9, T: 0.4, pend: null, Tp: 0.4, state: 'in', color: '#e53935', hair: '#3b2a20', caught: false };
+}
+jumpers = [makeYou()];
+
+function startGame() {
+  state = 'play'; now = perf(); playStart = now;
+  score = 0; streak = 0; maxStreak = 0; sinceJoin = 0; melIdx = 0; maxPeople = 1;
+  newBest = false; lastTen = false; leftDone = false; shake = 0;
+  jumpers = [makeYou()]; parts = []; pops = [];
+  queue = []; cool = 0; swayDir = -1; plain = 0; lastEv = '';
+  seg = { type: 'sway', t0: now, D: 1.3, label: 'seno', dir: 1 };
+  queue.push({ type: 'sway', D: 0.95 }, { type: 'sway', D: 0.95 }, { type: 'sway', D: 0.95 }, { type: 'rot', D: 1.05, label: 'go' });
+  schedulePass(seg);
+  signal('start');
+}
+
+function elapsed() { return now - playStart; }
+function genSegs() {
+  const e = elapsed(), d = clamp(e / LIMIT, 0, 1);
+  let I = 0.9 - 0.36 * d;
+  if (e > LIMIT - 10) I *= 0.94;
+  if (cool > 0) { cool--; queue.push({ type: 'rot', D: I }); return; }
+  const types = [];
+  if (e > 6) types.push('hold', 'slow');
+  if (e > 11) types.push('fast', 'fast');
+  if (e > 20) types.push('sway');
+  const pool = types.filter((t) => t !== lastEv);
+  if (!pool.length || (plain < 4 && Math.random() > 0.2 + 0.15 * d)) { plain++; queue.push({ type: 'rot', D: I }); return; }
+  const ev = pool[Math.random() * pool.length | 0];
+  lastEv = ev;
+  if (ev === 'hold') { queue.push({ type: 'hold', D: I * 2.0, label: 'hold' }); cool = 2; }
+  else if (ev === 'fast') {
+    const n = 3 + (Math.random() * 2 | 0), D = Math.max(0.42, I * 0.72);
+    for (let i = 0; i < n; i++) queue.push({ type: 'rot', D, label: i ? null : 'fast' });
+    cool = 2;
+  }
+  else if (ev === 'slow') { queue.push({ type: 'rot', D: I * 1.55, label: 'slow' }); cool = 2; }
+  else {
+    for (let i = 0; i < 4; i++) queue.push({ type: 'sway', D: 0.8, label: i ? null : 'sway' });
+    queue.push({ type: 'rot', D: I * 1.1, label: 'go' }); cool = 1;
+  }
+  plain = 0;
+}
+function advanceSeg(pt) {
+  seg = queue.shift();
+  seg.t0 = pt;
+  if (seg.type === 'sway') { seg.dir = swayDir; swayDir = -swayDir; }
+  while (queue.length < 3) genSegs();
+  schedulePass(seg);
+}
+function schedulePass(sg) {
+  if (!AC) return;
+  const pt = sg.t0 + sg.D, ta = at(pt);
+  const soft = sg.type === 'sway';
+  noise(Math.max(AC.currentTime, ta - 0.24), 0.27, soft ? 0.05 : 0.09, 'bandpass', 300, 1500, 1.3, 0.86);
+  noise(ta, 0.08, soft ? 0.12 : 0.24, 'lowpass', 2000, 500, 0.7, 0.04);
+  tone(soft ? 120 : 92, ta, 0.09, soft ? 0.08 : 0.16, 'sine', 60);
+}
+
+function airTime(D) { return clamp(D * 0.8, 0.3, 0.46); }
+function applyPending(t) {
+  for (const j of jumpers) {
+    if (j.pend != null && j.pend <= t && t >= j.tj + j.T) {
+      j.tj = Math.max(j.pend, j.tj + j.T); j.T = j.Tp; j.pend = null;
+    }
+  }
+}
+function onTap() {
+  initAudio();
+  const tt = perf();
+  if (state === 'title') { startGame(); return; }
+  if (state === 'end') { if (tt - endAt > 1.75) startGame(); return; }
+  if (state !== 'play') return;
+  const you = jumpers[0], land = you.tj + you.T;
+  let base;
+  if (tt >= land) base = tt; else if (land - tt < 0.1) base = land; else return;
+  const T = airTime(seg.D);
+  for (const j of jumpers) { if (j.state === 'leaving') continue; j.pend = base + j.delay * T; j.Tp = T; }
+  applyPending(tt);
+}
+addEventListener('pointerdown', (e) => { e.preventDefault(); onTap(); }, { passive: false });
+
+function sideCount(s) { return jumpers.filter((j) => j.side === s && j.state !== 'leaving').length; }
+function rerank() {
+  for (const s of [-1, 1]) {
+    const arr = jumpers.filter((j) => j.side === s && j.state !== 'leaving').sort((a, b) => a.rank - b.rank);
+    arr.forEach((j, i) => { j.rank = i + 1; j.delay = 0.06 * j.rank + j.jit; });
+  }
+}
+function spawnKid(D) {
+  const l = sideCount(-1), r = sideCount(1);
+  const side = l < r ? -1 : r < l ? 1 : (Math.random() < 0.5 ? -1 : 1);
+  const rank = sideCount(side) + 1;
+  const used = jumpers.map((j) => j.color);
+  const free = SHIRTS.filter((c) => !used.includes(c));
+  const color = free.length ? free[Math.random() * free.length | 0] : SHIRTS[Math.random() * SHIRTS.length | 0];
+  const start = side * (W / 2 / S + 30), target = side * rank * SP;
+  const jit = Math.random() * 0.012;
+  jumpers.push({
+    side, rank, ox: start, delay: 0.06 * rank + jit, jit, tj: -9, T: 0.4, pend: null, Tp: 0.4,
+    state: 'entering', color, hair: HAIRS[Math.random() * HAIRS.length | 0], caught: false,
+    speed: Math.abs(start - target) / Math.max(0.2, D * 0.5)
+  });
+  addPop(L.join, CX + side * (W / 2 - 62 * S), gy - 128 * S, '#ffffff', 15);
+  if (AC) { const t = AC.currentTime; tone(784, t, 0.1, 0.05, 'triangle'); tone(988, t + 0.09, 0.14, 0.05, 'triangle'); }
+}
+
+function judge(pt) {
+  applyPending(pt);
+  const failed = []; let count = 0;
+  for (const j of jumpers) {
+    if (j.state === 'leaving') continue;
+    if (j.state === 'entering') { j.state = 'in'; continue; }
+    count++;
+    const dt = pt - j.tj;
+    if (!(dt >= M && dt <= j.T - M)) failed.push(j);
+  }
+  if (failed.length) { doCatch(failed, pt); return false; }
+  const you = jumpers[0];
+  const perfect = Math.abs(pt - (you.tj + you.T / 2)) < 0.06;
+  streak++; sinceJoin++; streakPop = now;
+  if (streak > maxStreak) maxStreak = streak;
+  if (count > maxPeople) maxPeople = count;
+  let pts = count * (perfect ? 2 : 1);
+  playNote(count, perfect);
+  if (melIdx >= MEL.length) {
+    melIdx = 0; pts += 10 * count;
+    addPop(L.song + ' +' + (10 * count), CX, gy - 235 * S, '#ffeb3b', 22);
+    for (let i = 0; i < 40; i++) parts.push({ x: CX + (Math.random() - 0.5) * W * 0.8, y: gy - 200 * S - Math.random() * 60 * S, vx: (Math.random() - 0.5) * 80 * S, vy: -Math.random() * 120 * S, g: 260 * S, life: 1.6, max: 1.6, col: SHIRTS[i % SHIRTS.length], r: 3 * S, sq: true });
+    if (AC) { const t = AC.currentTime + 0.12; [72, 76, 79, 84].forEach((m, i) => marimba(m, t + i * 0.07, 0.1)); }
+  }
+  score += pts;
+  addPop('+' + pts, CX + 64 * S, gy - 206 * S, perfect ? '#ffeb3b' : '#ffffff', 16);
+  if (perfect) {
+    addPop(L.perfect, CX - 70 * S, gy - 206 * S, '#ffeb3b', 17); passFlash = now;
+    for (let i = 0; i < 8; i++) { const a = Math.random() * 6.28; parts.push({ x: CX, y: gy - 40 * S, vx: Math.cos(a) * 90 * S, vy: Math.sin(a) * 90 * S, g: 0, life: 0.45, max: 0.45, col: '#fff59d', r: 2.2 * S }); }
+  }
+  passT = now;
+  const singers = jumpers.filter((j) => j.state === 'in');
+  for (let i = 0; i < Math.min(3, 1 + (count >> 2)); i++) {
+    const j = singers[Math.random() * singers.length | 0];
+    if (j) parts.push({ x: CX + j.ox * S + (Math.random() - 0.5) * 10 * S, y: gy - 90 * S, vx: (Math.random() - 0.5) * 30 * S, vy: -55 * S, g: 0, life: 1.1, max: 1.1, col: ['#ffffff', '#fff59d', '#ffccbc'][i % 3], r: 13 * S, note: Math.random() < 0.5 ? '♪' : '♫' });
+  }
+  for (let i = 0; i < 7; i++) {
+    parts.push({ x: CX + (Math.random() - 0.5) * 260 * S, y: gy, vx: (Math.random() - 0.5) * 40 * S, vy: -20 * S - Math.random() * 25 * S, g: 40 * S, life: 0.5, max: 0.5, col: 'rgba(200,160,110,0.6)', r: 5 * S, dust: true });
+  }
+  const live = jumpers.filter((j) => j.state !== 'leaving').length;
+  if (sinceJoin >= 4 && live < MAXK && elapsed() < LIMIT - 2) { spawnKid(queue[0] ? queue[0].D : 0.8); sinceJoin = 0; }
+  return true;
+}
+function doCatch(failed, pt) {
+  state = 'caught'; caughtAt = now; leftDone = false; shake = 0.35;
+  streak = 0; sinceJoin = 0; melIdx = 0;
+  const you = jumpers[0];
+  const youFailed = failed.includes(you);
+  const shown = {};
+  for (const f of failed.slice().sort((a, b) => b.rank - a.rank)) {
+    f.caught = true; if (!f.you) f.toLeave = true;
+    const dt = pt - f.tj, early = dt > f.T - M && dt < 2;
+    if (shown[f.side]) continue; shown[f.side] = 1;
+    addPop(early ? L.early : L.late, CX + f.ox * S, gy - 112 * S - (f.you ? 0 : 14 * S), early ? '#80d8ff' : '#ffab91', 14);
+  }
+  const others = jumpers.filter((j) => !j.you && j.state !== 'leaving').sort((a, b) => b.rank - a.rank);
+  if (youFailed) for (let i = 0; i < Math.ceil(others.length / 2); i++) others[i].toLeave = true;
+  // at most half of the group gives up; the outermost leave first
+  const cap = Math.ceil(others.length / 2);
+  let n = 0;
+  for (const j of others) { if (j.toLeave) { if (n < cap) n++; else j.toLeave = false; } }
+  addPop(L.caught, CX, gy - 150 * S, '#ff8a80', 22);
+  if (AC) {
+    const t = AC.currentTime;
+    noise(t, 0.12, 0.3, 'bandpass', 1400, 600, 1, 0.05);
+    tone(520, t + 0.03, 0.4, 0.1, 'triangle', 170);
+  }
+}
+function finish() {
+  state = 'end'; endAt = now;
+  if (score > best) { best = score; newBest = score > 0; }
+  if (maxStreak > bestStreak) bestStreak = maxStreak;
+  try { parent.postMessage({ agf: 'save', data: { best, bestStreak } }, '*'); } catch (e) {}
+  signal('end', { score });
+  if (AC) {
+    const t = AC.currentTime + 0.05;
+    [64, 60, 62, 55, 55, 62, 64, 60].forEach((m, i) => { const f = mf(m); tone(f, t + i * 0.5, 1.4, 0.11, 'sine'); tone(f * 2.76, t + i * 0.5, 0.5, 0.025, 'sine'); });
+  }
+}
+function addPop(text, x, y, col, size) { pops.push({ text, x, y, col, size, life: 1.0, max: 1.0 }); }
+
+// ---------- update ----------
+function update(dt) {
+  if (state === 'play') {
+    const e = elapsed();
+    if (e >= LIMIT) finish();
+    else {
+      let guard = 0;
+      while (state === 'play' && now >= seg.t0 + seg.D && guard++ < 8) {
+        const pt = seg.t0 + seg.D;
+        if (!judge(pt)) break;
+        advanceSeg(pt);
+      }
+      if (!lastTen && e >= LIMIT - 10) { lastTen = true; addPop(L.last, CX, gy - 260 * S, '#ffffff', 20); }
+    }
+  } else if (state === 'caught') {
+    if (elapsed() >= LIMIT) finish();
+    else {
+      if (!leftDone && now - caughtAt > 0.9) {
+        leftDone = true;
+        for (const j of jumpers) if (j.toLeave) { j.state = 'leaving'; j.toLeave = false; }
+        rerank();
+      }
+      if (now - caughtAt > 1.6) {
+        for (const j of jumpers) j.caught = false;
+        state = 'play'; queue = []; cool = 1;
+        seg = { type: 'rot', t0: now, D: 1.15, label: 'seno' };
+        while (queue.length < 3) genSegs();
+        schedulePass(seg);
+      }
+    }
+  }
+  applyPending(now);
+  for (let i = jumpers.length - 1; i >= 0; i--) {
+    const j = jumpers[i];
+    if (j.state === 'leaving') {
+      j.ox += (j.side || 1) * 150 * dt;
+      if (Math.abs(j.ox) * S > W / 2 + 40 * S) jumpers.splice(i, 1);
+    } else {
+      const target = j.side * j.rank * SP;
+      const sp = Math.max(j.state === 'entering' ? (j.speed || 200) : 120, 60) * dt;
+      const d = target - j.ox;
+      j.ox += Math.abs(d) < sp ? d : Math.sign(d) * sp;
+    }
+  }
+  for (let i = parts.length - 1; i >= 0; i--) {
+    const p = parts[i]; p.life -= dt;
+    if (p.life <= 0) { parts.splice(i, 1); continue; }
+    p.vy += p.g * dt; p.x += p.vx * dt; p.y += p.vy * dt;
+  }
+  for (let i = pops.length - 1; i >= 0; i--) { const p = pops[i]; p.life -= dt; p.y -= 26 * S * dt; if (p.life <= 0) pops.splice(i, 1); }
+  if (shake > 0) shake = Math.max(0, shake - dt);
+}
+
+// ---------- rope ----------
+function ropeTheta() {
+  if (state === 'title') return Math.PI + 0.85 * Math.sin(now * 2.4);
+  if (state !== 'play') return Math.PI;
+  const s = clamp((now - seg.t0) / seg.D, 0, 1);
+  if (seg.type === 'sway') return Math.PI + seg.dir * 0.95 * Math.sin(Math.PI * s);
+  if (seg.type === 'hold') {
+    let f;
+    if (s < 0.3) { const q = s / 0.3; f = 0.5 * (1 - (1 - q) * (1 - q)); }
+    else if (s < 0.7) f = 0.5 + 0.01 * Math.sin((s - 0.3) * 40);
+    else { const q = (s - 0.7) / 0.3; f = 0.5 + 0.5 * q * q; }
+    return Math.PI + 2 * Math.PI * f;
+  }
+  return Math.PI + 2 * Math.PI * (s + 0.05 * Math.sin(2 * Math.PI * s));
+}
+function ropeXY(u, t) {
+  const x = xL + (xR - xL) * u;
+  const k = Math.abs(2 * u - 1), k2 = k * k;
+  const a = R * (1 - k2 * k2 * k2) + 7 * S;
+  let y = axisY - a * Math.cos(t);
+  const z = a * Math.sin(t);
+  y += z * 0.22;
+  const g = gy + z * 0.22;
+  if (y > g) y = g;
+  return [x, y];
+}
+function drawRope(t) {
+  const front = Math.sin(t);
+  cx.beginPath();
+  for (let i = 0; i <= 40; i++) { const [x, y] = ropeXY(i / 40, t); if (i) cx.lineTo(x, y); else cx.moveTo(x, y); }
+  cx.lineCap = 'round'; cx.lineJoin = 'round';
+  cx.strokeStyle = 'rgba(90,60,30,0.9)'; cx.lineWidth = (5.2 + 1.4 * front) * S; cx.stroke();
+  cx.strokeStyle = '#fff3c9'; cx.lineWidth = (2.8 + 1.0 * front) * S; cx.stroke();
+}
+
+function drawRopeShadow(t) {
+  const near = clamp((-Math.cos(t) + 0.2) / 1.2, 0, 1);
+  cx.beginPath();
+  for (let i = 0; i <= 30; i++) {
+    const u = i / 30, x = xL + (xR - xL) * u, k = Math.abs(2 * u - 1), k2 = k * k;
+    const a = R * (1 - k2 * k2 * k2) + 7 * S;
+    const y = gy + a * Math.sin(t) * 0.22 + 2 * S;
+    if (i) cx.lineTo(x, y); else cx.moveTo(x, y);
+  }
+  cx.strokeStyle = `rgba(80,50,20,${0.08 + 0.22 * near})`; cx.lineWidth = (3 + 3 * (1 - near)) * S; cx.lineCap = 'round'; cx.stroke();
+  const f = 1 - (now - Math.max(passT, passFlash)) / 0.18;
+  if (f > 0) {
+    cx.strokeStyle = now - passFlash < 0.2 ? `rgba(255,241,118,${f})` : `rgba(255,255,255,${f * 0.7})`;
+    cx.lineWidth = 7 * S * f + 2 * S;
+    cx.beginPath(); cx.moveTo(xL + 30 * S, gy + 1 * S); cx.lineTo(xR - 30 * S, gy + 1 * S); cx.stroke();
+  }
+}
+// ---------- drawing ----------
+function rr(x, y, w, h, r) { cx.beginPath(); cx.moveTo(x + r, y); cx.arcTo(x + w, y, x + w, y + h, r); cx.arcTo(x + w, y + h, x, y + h, r); cx.arcTo(x, y + h, x, y, r); cx.arcTo(x, y, x + w, y, r); cx.closePath(); }
+function drawBG() {
+  const hz = gy - 100 * S;
+  let g = cx.createLinearGradient(0, 0, 0, hz);
+  g.addColorStop(0, '#7cc8f2'); g.addColorStop(1, '#d9f1ff');
+  cx.fillStyle = g; cx.fillRect(0, 0, W, hz + 1);
+  // clouds
+  cx.fillStyle = 'rgba(255,255,255,0.85)';
+  for (let i = 0; i < 3; i++) {
+    const x = ((i * 157 + now * 6) % (W + 160 * S)) - 80 * S, y = hz - 230 * S + i * 28 * S;
+    cx.beginPath(); cx.ellipse(x, y, 34 * S, 11 * S, 0, 0, 7); cx.ellipse(x + 22 * S, y - 7 * S, 22 * S, 11 * S, 0, 0, 7); cx.fill();
+  }
+  // school
+  const bx = W * 0.06, bw = W * 0.88, by = hz - 140 * S, bh = 140 * S;
+  cx.fillStyle = '#f5e8d2'; cx.fillRect(bx, by, bw, bh);
+  cx.fillStyle = '#e2cfae'; cx.fillRect(bx, by, bw, 8 * S);
+  cx.fillStyle = '#d7c19a'; cx.fillRect(bx, by + bh - 6 * S, bw, 6 * S);
+  const cols = Math.max(4, Math.floor(bw / (34 * S)));
+  for (let r = 0; r < 2; r++) for (let c = 0; c < cols; c++) {
+    const wx = bx + (c + 0.5) * bw / cols - 11 * S, wy = by + 46 * S + r * 44 * S;
+    if (Math.abs(wx + 11 * S - CX) < 26 * S && r === 0) continue;
+    cx.fillStyle = '#9ccbe0'; cx.fillRect(wx, wy, 22 * S, 26 * S);
+    cx.fillStyle = 'rgba(255,255,255,0.5)'; cx.fillRect(wx + 2 * S, wy + 2 * S, 6 * S, 22 * S);
+  }
+  // clock = recess timer
+  const ccy = by + 30 * S, cr = 17 * S;
+  cx.fillStyle = '#ffffff'; cx.beginPath(); cx.arc(CX, ccy, cr, 0, 7); cx.fill();
+  cx.strokeStyle = '#8d6e63'; cx.lineWidth = 3 * S; cx.stroke();
+  let frac = 0;
+  if (state === 'play' || state === 'caught') frac = clamp(elapsed() / LIMIT, 0, 1);
+  else if (state === 'end') frac = 1;
+  if (frac < 1) {
+    cx.fillStyle = 'rgba(239,83,80,0.35)'; cx.beginPath(); cx.moveTo(CX, ccy);
+    cx.arc(CX, ccy, cr - 2 * S, -Math.PI / 2 + frac * Math.PI * 2, Math.PI * 1.5); cx.closePath(); cx.fill();
+  }
+  const ha = -Math.PI / 2 + frac * Math.PI * 2;
+  cx.strokeStyle = '#4e342e'; cx.lineWidth = 2.4 * S; cx.beginPath(); cx.moveTo(CX, ccy); cx.lineTo(CX + Math.cos(ha) * (cr - 4 * S), ccy + Math.sin(ha) * (cr - 4 * S)); cx.stroke();
+  // bushes + fence
+  cx.fillStyle = '#7cb342';
+  for (let x = -10 * S; x < W + 20 * S; x += 26 * S) { cx.beginPath(); cx.arc(x, hz + 2 * S, 16 * S, Math.PI, 0); cx.fill(); }
+  // ground
+  g = cx.createLinearGradient(0, hz, 0, H);
+  g.addColorStop(0, '#e8cc95'); g.addColorStop(1, '#d4ad6c');
+  cx.fillStyle = g; cx.fillRect(0, hz, W, H - hz);
+  cx.strokeStyle = 'rgba(255,255,255,0.55)'; cx.lineWidth = 2.5 * S;
+  cx.beginPath(); cx.ellipse(CX, gy + 40 * S, W * 0.62, 26 * S, 0, Math.PI * 0.05, Math.PI * 0.95); cx.stroke();
+}
+
+function drawPerson(x, h, p) {
+  // shadow
+  const sw = 12 * S * p.sc * (1 - Math.min(0.55, h / (60 * S)));
+  cx.fillStyle = 'rgba(70,45,20,0.25)'; cx.beginPath(); cx.ellipse(x, gy + 1 * S, sw, 3.5 * S * p.sc, 0, 0, 7); cx.fill();
+  cx.save();
+  cx.translate(x, gy - h);
+  if (p.tilt) cx.rotate(p.tilt);
+  const k = S * p.sc; cx.scale(k, k * (p.squash || 1));
+  cx.lineCap = 'round'; cx.lineJoin = 'round';
+  // legs
+  cx.strokeStyle = '#5d4a3a'; cx.lineWidth = 4.5;
+  cx.beginPath();
+  let fl, fr;
+  if (p.legs === 'tuck') { cx.moveTo(-3.5, -15); cx.lineTo(-7, -8); cx.lineTo(-3.5, -4); cx.moveTo(3.5, -15); cx.lineTo(7, -8); cx.lineTo(3.5, -4); fl = [-3.5, -4]; fr = [3.5, -4]; }
+  else if (p.legs === 'run') { const a = Math.sin(p.ph) * 0.6; fl = [-2 + Math.sin(a) * 14, -15 + Math.cos(a) * 14]; fr = [2 - Math.sin(a) * 14, -15 + Math.cos(a) * 14]; cx.moveTo(-2, -15); cx.lineTo(fl[0], fl[1]); cx.moveTo(2, -15); cx.lineTo(fr[0], fr[1]); }
+  else { cx.moveTo(-3.5, -15); cx.lineTo(-3.5, -1.5); cx.moveTo(3.5, -15); cx.lineTo(3.5, -1.5); fl = [-3.5, -1.5]; fr = [3.5, -1.5]; }
+  cx.stroke();
+  cx.fillStyle = '#3f3f5c';
+  cx.beginPath(); cx.ellipse(fl[0] - 0.5, fl[1] + 0.5, 3.4, 2.2, 0, 0, 7); cx.ellipse(fr[0] + 0.5, fr[1] + 0.5, 3.4, 2.2, 0, 0, 7); cx.fill();
+  // shorts
+  cx.fillStyle = '#37474f'; rr(-7.5, -18, 15, 6, 2.5); cx.fill();
+  // torso
+  cx.fillStyle = p.color; rr(-8, -36, 16, 21, 6); cx.fill();
+  // arms
+  cx.strokeStyle = p.color; cx.lineWidth = 4;
+  const hands = [];
+  cx.beginPath();
+  if (p.hand) {
+    cx.moveTo(-6 * p.dirx, -31); cx.lineTo(p.hand[0], p.hand[1]); hands.push(p.hand);
+    cx.moveTo(6 * p.dirx, -31); cx.lineTo(9 * p.dirx, -20); hands.push([9 * p.dirx, -20]);
+  } else if (p.arms === 'up') { cx.moveTo(-6, -31); cx.lineTo(-13, -42); cx.moveTo(6, -31); cx.lineTo(13, -42); hands.push([-13, -42], [13, -42]); }
+  else if (p.arms === 'wave') { const a = Math.sin(p.ph) * 4; cx.moveTo(-6, -31); cx.lineTo(-11, -21 + a); cx.moveTo(6, -31); cx.lineTo(11, -21 - a); hands.push([-11, -21 + a], [11, -21 - a]); }
+  else { cx.moveTo(-6, -31); cx.lineTo(-10, -20); cx.moveTo(6, -31); cx.lineTo(10, -20); hands.push([-10, -20], [10, -20]); }
+  cx.stroke();
+  cx.fillStyle = '#ffd7b0';
+  for (const hd of hands) { cx.beginPath(); cx.arc(hd[0], hd[1], 2.4, 0, 7); cx.fill(); }
+  // head
+  const hy = -46;
+  cx.fillStyle = '#ffdcb8'; cx.beginPath(); cx.arc(0, hy, 10, 0, 7); cx.fill();
+  if (p.cap) {
+    cx.fillStyle = '#d32f2f'; cx.beginPath(); cx.arc(0, hy - 1, 10.6, Math.PI, 0); cx.fill();
+    cx.beginPath(); cx.ellipse(0, hy - 1, 12.5, 3, 0, 0, 7); cx.fill();
+    cx.fillStyle = '#fff'; cx.beginPath(); cx.arc(0, hy - 6, 2.2, 0, 7); cx.fill();
+  } else {
+    cx.fillStyle = p.hair; cx.beginPath(); cx.arc(0, hy - 0.5, 10.6, Math.PI * 0.95, Math.PI * 2.05); cx.fill();
+    cx.beginPath(); cx.ellipse(-4, hy - 6, 6, 3.5, -0.3, 0, 7); cx.ellipse(4, hy - 6.5, 6, 3.2, 0.3, 0, 7); cx.fill();
+  }
+  // face
+  cx.fillStyle = '#3a2a20'; cx.strokeStyle = '#3a2a20'; cx.lineWidth = 1.4;
+  if (p.face === 'x') {
+    cx.beginPath();
+    for (const ex of [-3.8, 3.8]) { cx.moveTo(ex - 1.8, hy - 1.8); cx.lineTo(ex + 1.8, hy + 1.8); cx.moveTo(ex + 1.8, hy - 1.8); cx.lineTo(ex - 1.8, hy + 1.8); }
+    cx.moveTo(-3, hy + 5.5); cx.quadraticCurveTo(-1.5, hy + 4, 0, hy + 5.5); cx.quadraticCurveTo(1.5, hy + 7, 3, hy + 5.5); cx.stroke();
+  } else {
+    cx.beginPath(); cx.arc(-3.8, hy, 1.5, 0, 7); cx.arc(3.8, hy, 1.5, 0, 7); cx.fill();
+    cx.beginPath();
+    if (p.face === 'o') { cx.arc(0, hy + 5, 1.8, 0, 7); cx.stroke(); }
+    else if (p.face === 'grin') { cx.arc(0, hy + 2.5, 4.2, 0.15 * Math.PI, 0.85 * Math.PI); cx.stroke(); }
+    else { cx.arc(0, hy + 3, 3, 0.2 * Math.PI, 0.8 * Math.PI); cx.stroke(); }
+  }
+  cx.fillStyle = 'rgba(255,120,120,0.35)'; cx.beginPath(); cx.arc(-6.5, hy + 3, 2, 0, 7); cx.arc(6.5, hy + 3, 2, 0, 7); cx.fill();
+  cx.restore();
+}
+function jumpH(j) {
+  const dt = now - j.tj;
+  if (dt < 0 || dt > j.T) return 0;
+  const hm = 36 * S * Math.pow(j.T / 0.46, 1.2);
+  return hm * 4 * (dt / j.T) * (1 - dt / j.T);
+}
+function drawJumper(j) {
+  const x = CX + j.ox * S;
+  let h = jumpH(j), legs = 'stand', arms = 'down', face = 'smile', squash = 1, tilt = 0;
+  if (state === 'title' && j.you) {
+    const u = ((now * 2.4 / Math.PI + 0.5) % 1) - 0.5;
+    if (Math.abs(u) < 0.17) h = 34 * S * (1 - (u / 0.17) * (u / 0.17));
+  }
+  if (h > 2 * S) { legs = 'tuck'; arms = 'up'; }
+  else { const ld = now - (j.tj + j.T); if (ld >= 0 && ld < 0.1) squash = 0.88 + ld * 1.2; }
+  if (j.state === 'entering' || j.state === 'leaving') { legs = 'run'; arms = 'wave'; h = Math.abs(Math.sin(now * 16)) * 2 * S; }
+  if (state === 'caught') {
+    if (j.caught) { face = 'x'; tilt = (j.side || (j.ox >= 0 ? 1 : -1)) * Math.min(0.5, (now - caughtAt) * 2.5); }
+    else face = 'o';
+  }
+  if (j.state === 'leaving') face = 'smile';
+  drawPerson(x, h, { sc: KS, color: j.color, hair: j.hair, cap: !!j.you, legs, arms, face, squash, tilt, ph: now * 16 });
+}
+function drawTurner(side) {
+  const x = side < 0 ? xL + 1 * S : xR - 1 * S;
+  const sc = 1.55;
+  const [hx, hy] = ropeXY(side < 0 ? 0 : 1, th);
+  const hand = [(hx - x) / (S * sc), (hy - gy) / (S * sc)];
+  let face = 'smile';
+  if (state === 'play' && seg && seg.type === 'hold') face = 'grin';
+  if (state === 'caught') face = 'o';
+  drawPerson(x, 0, { sc, color: side < 0 ? '#5c6bc0' : '#26a69a', hair: side < 0 ? '#2b2b2b' : '#5a3b25', legs: 'stand', face, hand, dirx: -side });
+}
+function bubbleKey() {
+  if (state !== 'play' || !seg) return null;
+  if (queue[0] && queue[0].label && queue[0].label !== 'go') return queue[0].label;
+  if (seg.label) return seg.label;
+  if (queue[0] && queue[0].label === 'go') return 'go';
+  return null;
+}
+function drawBubble() {
+  const key = bubbleKey(); if (!key) return;
+  const text = L[key];
+  const fs = 15 * S;
+  cx.font = `800 ${fs}px ${FONT}`;
+  const tw = Math.min(cx.measureText(text).width, W - 40 * S);
+  const bw = tw + 22 * S, bh = 30 * S;
+  const ax = xL + 1 * S, ay = gy - 100 * S;
+  const bx = clamp(ax - 12 * S, 8 * S, W - bw - 8 * S), by = ay - 48 * S;
+  cx.fillStyle = key === 'hold' ? '#fff59d' : key === 'fast' ? '#ffccbc' : '#ffffff';
+  rr(bx, by, bw, bh, 12 * S); cx.fill();
+  cx.beginPath(); cx.moveTo(ax + 2 * S, by + bh - 1); cx.lineTo(ax + 14 * S, by + bh - 1); cx.lineTo(ax + 4 * S, by + bh + 12 * S); cx.closePath(); cx.fill();
+  cx.strokeStyle = 'rgba(80,50,30,0.5)'; cx.lineWidth = 1.5 * S; rr(bx, by, bw, bh, 12 * S); cx.stroke();
+  cx.fillStyle = '#4e342e'; cx.textAlign = 'center'; cx.textBaseline = 'middle';
+  cx.fillText(text, bx + bw / 2, by + bh / 2 + 1 * S, W - 40 * S);
+}
+function txt(str, x, y, size, col, align, weight, outline) {
+  cx.font = `${weight || 800} ${size}px ${FONT}`;
+  cx.textAlign = align || 'center'; cx.textBaseline = 'middle';
+  let w = cx.measureText(str).width, maxW = W - 24 * S;
+  if (w > maxW) { size *= maxW / w; cx.font = `${weight || 800} ${size}px ${FONT}`; }
+  if (outline) { cx.lineJoin = 'round'; cx.strokeStyle = outline; cx.lineWidth = Math.max(3, size * 0.22); cx.strokeText(str, x, y); }
+  cx.fillStyle = col; cx.fillText(str, x, y);
+}
+function drawHUD() {
+  const rem = state === 'end' ? 0 : clamp(LIMIT - elapsed(), 0, LIMIT);
+  txt(L.score, 14 * S, 18 * S, 13 * S, '#1a3a52', 'left', 700);
+  txt(String(score), 14 * S, 42 * S, 26 * S, '#ffffff', 'left', 900, '#1a3a52');
+  const m = Math.floor(Math.ceil(rem) / 60), s = Math.ceil(rem) % 60;
+  txt(`${L.left} ${m}:${String(s).padStart(2, '0')}`, W - 14 * S, 22 * S, 18 * S, rem <= 10 ? '#ffeb3b' : '#ffffff', 'right', 900, '#1a3a52');
+  txt(`${L.best} ${best}`, W - 14 * S, 46 * S, 13 * S, '#1a3a52', 'right', 700);
+  // song progress
+  const n = MEL.length, sp = Math.min(8 * S, (W - 60 * S) / n), x0 = CX - sp * (n - 1) / 2, y = 68 * S;
+  txt('♪', x0 - 14 * S, y, 13 * S, '#1a3a52', 'center', 800);
+  for (let i = 0; i < n; i++) {
+    cx.fillStyle = i < melIdx ? (i % 4 === 0 ? '#ffeb3b' : '#ffffff') : 'rgba(26,58,82,0.25)';
+    cx.beginPath(); cx.arc(x0 + i * sp, y, (i % 4 === 0 ? 2.8 : 2.2) * S, 0, 7); cx.fill();
+  }
+  // streak
+  if (streak > 0) {
+    const k = 1 + Math.max(0, 0.25 - (now - streakPop)) * 1.6;
+    txt(String(streak), CX, gy - 204 * S, 46 * S * k, '#ffffff', 'center', 900, '#e65100');
+    txt(L.streak, CX, gy - 172 * S, 13 * S, '#ffffff', 'center', 800, '#e65100');
+  }
+  const live = jumpers.filter((j) => j.state === 'in').length;
+  if (live > 1 && state !== 'end') txt(`${L.together} ${live}${L.people}  ×${live}`, CX, gy + 34 * S, 15 * S, '#5d4037', 'center', 800, 'rgba(255,255,255,0.7)');
+}
+function draw() {
+  cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  if (shake > 0) cx.translate((Math.random() - 0.5) * 8 * S * shake, (Math.random() - 0.5) * 8 * S * shake);
+  drawBG();
+  th = ropeTheta();
+  const front = Math.sin(th) > 0;
+  drawRopeShadow(th);
+  if (!front) drawRope(th);
+  const order = jumpers.slice().sort((a, b) => Math.abs(b.ox) - Math.abs(a.ox));
+  for (const j of order) drawJumper(j);
+  if (front) drawRope(th);
+  drawTurner(-1); drawTurner(1);
+  for (const p of parts) {
+    const a = clamp(p.life / p.max, 0, 1);
+    cx.globalAlpha = a; cx.fillStyle = p.col;
+    if (p.note) { cx.font = `900 ${p.r}px ${FONT}`; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.strokeStyle = 'rgba(120,70,30,0.6)'; cx.lineWidth = 3 * S; cx.strokeText(p.note, p.x, p.y); cx.fillText(p.note, p.x, p.y); }
+    else if (p.sq) cx.fillRect(p.x - p.r, p.y - p.r, p.r * 2, p.r * 1.4);
+    else { cx.beginPath(); cx.arc(p.x, p.y, p.r * (p.dust ? (1.6 - a) : 1), 0, 7); cx.fill(); }
+  }
+  cx.globalAlpha = 1;
+  for (const p of pops) {
+    cx.globalAlpha = clamp(p.life / 0.35, 0, 1);
+    txt(p.text, p.x, p.y, p.size * S, p.col, 'center', 900, 'rgba(60,30,10,0.75)');
+  }
+  cx.globalAlpha = 1;
+  if (state !== 'title') { drawHUD(); drawBubble(); }
+  if (state === 'play' && elapsed() < 6) {
+    cx.globalAlpha = clamp(6 - elapsed(), 0, 1);
+    txt(L.hint, CX, H - 46 * S, 15 * S, '#ffffff', 'center', 800, '#6d4c41');
+    cx.globalAlpha = 1;
+  }
+  if (state === 'title') drawTitle();
+  if (state === 'end') drawEnd();
+}
+function drawTitle() {
+  const top = 70 * S;
+  cx.fillStyle = 'rgba(255,255,255,0.82)';
+  rr(18 * S, top, W - 36 * S, 190 * S, 20 * S); cx.fill();
+  txt(L.title, CX, top + 44 * S, 38 * S, '#e65100', 'center', 900, '#ffffff');
+  txt(L.how1, CX, top + 92 * S, 14.5 * S, '#4e342e', 'center', 700);
+  txt(L.how2, CX, top + 118 * S, 14.5 * S, '#4e342e', 'center', 700);
+  txt(L.how3, CX, top + 144 * S, 14.5 * S, '#4e342e', 'center', 700);
+  if (best > 0) txt(`${L.best} ${best}`, CX, top + 172 * S, 13 * S, '#8d6e63', 'center', 700);
+  const a = 0.6 + 0.4 * Math.sin(now * 4);
+  cx.globalAlpha = a;
+  txt(L.tap, CX, H - 60 * S, 22 * S, '#ffffff', 'center', 900, '#e65100');
+  cx.globalAlpha = 1;
+}
+function drawEnd() {
+  const t = now - endAt;
+  if (t < 0.9) return;
+  cx.fillStyle = 'rgba(20,25,45,0.55)'; cx.fillRect(0, 0, W, H);
+  const pw = Math.min(W - 32 * S, 320 * S), ph = 290 * S, px = CX - pw / 2, py = H * 0.5 - ph / 2 - 20 * S;
+  cx.fillStyle = '#fffaf0'; rr(px, py, pw, ph, 22 * S); cx.fill();
+  txt(L.result, CX, py + 36 * S, 20 * S, '#6d4c41', 'center', 800);
+  txt(L.score, CX, py + 72 * S, 14 * S, '#8d6e63', 'center', 700);
+  txt(String(score), CX, py + 118 * S, 60 * S, '#e65100', 'center', 900);
+  if (newBest) txt(L.newBest, CX, py + 166 * S, 20 * S, '#d84315', 'center', 900);
+  else txt(`${L.best} ${best}`, CX, py + 166 * S, 16 * S, '#6d4c41', 'center', 700);
+  txt(`${L.maxStreak} ${maxStreak}${L.times}  /  ${L.maxPeople} ${maxPeople}${L.people}`, CX, py + 204 * S, 15 * S, '#4e342e', 'center', 700);
+  txt(L.far, CX, py + 236 * S, 12.5 * S, '#8d6e63', 'center', 600);
+  if (t > 1.75) {
+    cx.globalAlpha = 0.6 + 0.4 * Math.sin(now * 4);
+    txt(L.again, CX, py + ph + 40 * S, 20 * S, '#ffffff', 'center', 900, '#e65100');
+    cx.globalAlpha = 1;
+  }
+}
+
+// ---------- loop ----------
+let lastTs = 0;
+function frame(ts) {
+  requestAnimationFrame(frame);
+  now = ts / 1000;
+  const dt = lastTs ? Math.min(0.05, Math.max(0, now - lastTs)) : 0.016;
+  lastTs = now;
+  if (!W || !H) return;
+  update(dt);
+  draw();
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

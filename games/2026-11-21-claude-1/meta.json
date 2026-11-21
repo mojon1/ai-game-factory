@@ -1,0 +1,820 @@
+{
+  "id": "2026-11-21-claude-1",
+  "status": "published",
+  "title": "せーの！大なわ",
+  "genre": "リズム",
+  "concept": "大なわとびのリズムを、譜面ではなく回るなわそのものから読む。続けて跳ぶほど友だちが入って列が伸び、跳ぶたびに歌が1音ずつ進む。ただし端の子ほど少しおくれて跳ぶので、人数が増えるほどタイミングの幅がせまくなる。",
+  "howToPlay": "なわが足もとに来る直前に画面をタップしてジャンプ。「ため…」「はやまわし！」などの掛け声と、なわの動きを見て合わせる。昼休みは80秒。",
+  "libraryDecision": "使わない。2Dの横からの画面で、なわを前後に回る曲線として描けば奥行きもタイミングも十分読み取れるので、3Dや物理演算を足しても面白さは増えないと判断した。",
+  "soundDecision": "BGMは流さず、なわの風切り音と地面をたたく音そのものを拍にした。成功するたびに自作の5音音階の歌が1音進み、人数が増えるとベース・ハモリ・高音が重なっていくので、続けるほど合唱になっていく気持ちよさを狙った。",
+  "improvements": [
+    {
+      "found": "人物となわが小さく画面の上半分が空いていて跳んだ手応えが薄い／なわが足もとに来る瞬間が読み取りにくい／「ぴったり」と点数の文字が重なる",
+      "changed": "人物を1.4倍に、なわを長く大きくした。地面になわの影を描き、近づくほど濃くし、通過の瞬間に地面を光らせた。文字の位置を左右に分けた。",
+      "foundEn": "Kids and rope were small with an empty upper screen, so jumps felt weak / hard to read when the rope reaches the feet / 'Perfect' and score texts overlapped",
+      "changedEn": "Scaled kids 1.4x and enlarged the rope; drew the rope's shadow on the ground that darkens as it nears, plus a ground flash on each pass; split the texts left and right."
+    },
+    {
+      "found": "判定がゆるく適当でも続き緊張感がない／端の子がおくれて跳ぶ仕組みが見えず、なぜ失敗したか分からない／最初の20秒ほどなわが一定で単調",
+      "changed": "判定をきびしくし、端の子の遅れを跳ぶ時間に比例させて人数が増えるほど幅がせまくなるようにした。失敗した子の上に「はやい！」「おそい！」を出す。掛け声の変化を6秒ごろから必ず出すようにした。",
+      "foundEn": "Timing was so lenient that sloppy taps kept going / the end kids' delay was invisible so failures were unexplained / the rope stayed constant for about 20 s",
+      "changedEn": "Tightened timing and made the end kids' delay proportional to jump time so bigger groups need tighter taps; show 'Too early!/Too late!' over caught kids; guaranteed rope variations from about 6 s."
+    },
+    {
+      "found": "変化が「ため」ばかり続いて単調／1回のミスで全員抜けて立て直す気が起きない／歌が進む実感が画面から薄い",
+      "changed": "変化の種類を前回と同じにしない選び方に変えた（ため・ゆっくり・はやまわし・おおなみ）。ミスで抜けるのは最大で半分までにした。跳ぶたびに子どもから音符が浮かび、32回で歌いきると紙吹雪とボーナス。",
+      "foundEn": "Variations repeated 'Hold it' over and over / one miss emptied the whole line, killing motivation / the song progressing wasn't felt on screen",
+      "changedEn": "Variation picks now avoid repeating the last type (hold, slow, speed up, big waves); at most half the group leaves on a miss; notes float up from the kids on each jump, and finishing the 32-note song gives confetti and a bonus."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "リズム",
+      "en": "Rhythm",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "大なわとびのリズムゲーム。回るなわを見てタップで跳び、続けると友だちが入ってくる。跳ぶたびに歌が進み、端の子は少しおくれて跳ぶ。",
+        "ideaEn": "A big-rope rhythm game: read the turning rope, tap to jump, friends join as you keep going; each jump plays the next note and kids at the ends jump slightly later.",
+        "fromDraw": true
+      },
+      {
+        "idea": "夕立ちが来る前に洗濯物をドラッグで取りこむ。雲の動きを読み、乾き具合と雨の近さを比べる時間切れのゲーム。",
+        "ideaEn": "Drag the laundry indoors before the shower arrives, weighing how dry each piece is against the approaching clouds.",
+        "fromDraw": false
+      },
+      {
+        "idea": "3Dの校舎の廊下を紙飛行機で飛ぶ。ストーブの上昇気流や開いた窓の風を使って遠くまで滑空する。",
+        "ideaEn": "Glide a paper plane through a 3D school corridor, riding heater updrafts and window drafts to fly as far as possible.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "time",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Ready, Go! Big Rope",
+      "concept": "Big-rope jumping where the rhythm is read from the turning rope itself, not a note chart. Keep jumping and friends join the line, and every jump plays the next note of a song. But kids at the ends jump slightly later, so the bigger the group, the tighter your timing must be.",
+      "howToPlay": "Tap just before the rope reaches your feet to jump. Watch the rope and the turners' calls like 'Hold it…' and 'Speed up!'. Recess lasts 80 seconds.",
+      "libraryDecision": "No libraries. A 2D side view with the rope drawn as a curve swinging in front and behind already shows depth and timing clearly, so 3D or physics would not add fun.",
+      "soundDecision": "No BGM: the rope's whoosh and its slap on the ground are the beat. Each success plays the next note of an original pentatonic song, and as the group grows bass, harmony and a high voice join in, so a long streak turns into a choir."
+    }
+  },
+  "createdAt": "2026-11-21T09:12:36+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-21T09:12:36+09:00",
+    "metricsFrom": "2026-11-21T00:06:10.219Z",
+    "transcript": "a35175f0-7605-46a1-8ed6-7a3e357e91a9.jsonl",
+    "validationRuns": 10,
+    "finishedAt": "2026-11-21T10:03:24+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-21T10:03:07+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "35.0KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=202",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=195",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=177",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=228",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 35838,
+    "lines": 729
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0.5,
+    "idleStarts": 2
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "タイミングの手がかりがなわの見た目と音だけで、慣れるまでは早すぎ・遅すぎの区別がつきにくい。80秒の中で変化は4種類だけなので、2〜3回遊ぶと展開が読めてくる。",
+    "comment": "列が9人までのび、全員が波のように少しずつずれて跳ぶ絵がかわいく、32回目で歌いきって紙吹雪が出た場面は気持ちよかった。端の子が遅れて引っかかり「おそい！」と出て抜けていくので、人数を増やすほど早めに跳ぶという工夫が生まれる。一方、時間停止の自己プレイではリズムを体で取れないため、ゲーム内のなわの通過時刻を読み取ってタップ時刻を計算して遊んだ（音も聞けていない）。実機での手触りは未確認なので★3とした。",
+    "similar": [
+      {
+        "title": "Jump together (itch.io)",
+        "url": "https://hpcergar.itch.io/jump-together",
+        "similarity": "中",
+        "note": "友だちと大なわを跳ぶリズムゲームという題材が近い。こちらは1人用で、続けるほど友だちが増え、端の子の遅れで判定がせまくなる点と、跳ぶたびに歌が進む点が違う。",
+        "note_en": "Close theme: a rhythm game of jumping rope with friends. Mine is single-player, adds friends as you keep going, narrows timing via the end kids delay, and advances a song each jump."
+      },
+      {
+        "title": "Jumpy Rope (itch.io)",
+        "url": "https://betodev.itch.io/jumpy-rope",
+        "similarity": "低",
+        "note": "なわとびをタイミングで跳ぶスマホ向けの小品。こちらは大なわで、なわの動きの変化（ため・はやまわし）を読むことと人数の列が中心。",
+        "note_en": "A small mobile jump-rope timing game. Mine is a long rope, centered on reading rope variations (hold, speed up) and a growing line of kids."
+      }
+    ],
+    "research": "WebSearch で jump rope rhythm game mobile group を検索し、大なわ・なわとびのタイミングゲームを確認した。",
+    "i18n": {
+      "en": {
+        "worst": "The only timing cues are the rope's look and sound, so early vs. late is hard to tell until you get used to it. With just four variations in 80 seconds, the flow becomes predictable after 2-3 plays.",
+        "comment": "The line grows to nine kids who jump in a slight ripple, which looks charming, and finishing the song on the 32nd jump with confetti felt great. End kids get caught when you are late ('Too late!') and leave, so you learn to jump earlier as the group grows. However, in the time-frozen self-play I could not feel the rhythm, so I read the rope's pass times from the game state and computed tap times (and could not hear the sound). The real-device feel is unverified, so 3 stars.",
+        "research": "Searched the web for jump rope rhythm/timing games on mobile and with groups."
+      }
+    },
+    "method": "スマホ縦画面で 30 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 30 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "タイトルからスタート。「せーの！」でなわが揺れはじめる",
+        "noteEn": "Start; the rope begins to sway on 'Ready, go!'",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "wait 800ms → tap(0.50,0.60) 120ms → wait 830ms → tap(0.50,0.60) 120ms → wait 830ms → tap(0.50,0.60) 120ms → wait 830ms → tap(0.50,0.60) 120ms → wait 930ms → tap(0.50,0.60) 120ms",
+        "note": "なわの影が足もとに重なる直前にタップ。4回続くごとに友だちが「いれて〜」と入ってくる",
+        "noteEn": "Tap just before the rope's shadow meets the feet; every 4 jumps a friend runs in",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 755ms → tap(0.50,0.60) 120ms → wait 766ms → tap(0.50,0.60) 120ms → wait 761ms → tap(0.50,0.60) 120ms",
+        "note": "なわの影が足もとに重なる直前にタップ。4回続くごとに友だちが「いれて〜」と入ってくる",
+        "noteEn": "Tap just before the rope's shadow meets the feet; every 4 jumps a friend runs in",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 757ms → tap(0.50,0.60) 120ms → wait 1232ms → tap(0.50,0.60) 120ms → wait 749ms → tap(0.50,0.60) 120ms",
+        "note": "なわの影が足もとに重なる直前にタップ。4回続くごとに友だちが「いれて〜」と入ってくる",
+        "noteEn": "Tap just before the rope's shadow meets the feet; every 4 jumps a friend runs in",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 744ms → tap(0.50,0.60) 120ms → wait 741ms → tap(0.50,0.60) 120ms → wait 735ms → tap(0.50,0.60) 120ms",
+        "note": "なわの影が足もとに重なる直前にタップ。4回続くごとに友だちが「いれて〜」と入ってくる",
+        "noteEn": "Tap just before the rope's shadow meets the feet; every 4 jumps a friend runs in",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 716ms → tap(0.50,0.60) 120ms → wait 727ms → tap(0.50,0.60) 120ms → wait 487ms → tap(0.50,0.60) 120ms → wait 487ms → tap(0.50,0.60) 120ms → wait 487ms → tap(0.50,0.60) 120ms",
+        "note": "なわの影が足もとに重なる直前にタップ。4回続くごとに友だちが「いれて〜」と入ってくる",
+        "noteEn": "Tap just before the rope's shadow meets the feet; every 4 jumps a friend runs in",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 710ms → tap(0.50,0.60) 120ms → wait 709ms → tap(0.50,0.60) 120ms → wait 706ms → tap(0.50,0.60) 120ms",
+        "note": "なわの影が足もとに重なる直前にタップ。4回続くごとに友だちが「いれて〜」と入ってくる",
+        "noteEn": "Tap just before the rope's shadow meets the feet; every 4 jumps a friend runs in",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 691ms → tap(0.50,0.60) 120ms → wait 699ms → tap(0.50,0.60) 120ms → wait 1144ms → tap(0.50,0.60) 120ms",
+        "note": "なわの影が足もとに重なる直前にタップ。4回続くごとに友だちが「いれて〜」と入ってくる",
+        "noteEn": "Tap just before the rope's shadow meets the feet; every 4 jumps a friend runs in",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 693ms → tap(0.50,0.60) 120ms → wait 688ms → tap(0.50,0.60) 120ms → wait 680ms → tap(0.50,0.60) 120ms → wait 680ms → tap(0.50,0.60) 120ms → wait 680ms → tap(0.50,0.60) 120ms",
+        "note": "「ゆ〜っくり」の声。なわが遅くなるのを見て待ってから跳ぶ。32回で歌が1曲終わる",
+        "noteEn": "'Sloooow' — wait for the slower rope; 32 jumps finish the song",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 665ms → tap(0.50,0.60) 120ms → wait 765ms → tap(0.50,0.60) 120ms → wait 664ms → tap(0.50,0.60) 120ms",
+        "note": "「ゆ〜っくり」の声。なわが遅くなるのを見て待ってから跳ぶ。32回で歌が1曲終わる",
+        "noteEn": "'Sloooow' — wait for the slower rope; 32 jumps finish the song",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "wait 80ms → tap(0.50,0.60) 120ms → wait 661ms → tap(0.50,0.60) 120ms → wait 657ms → tap(0.50,0.60) 120ms → wait 400ms",
+        "note": "人数が増えて気がゆるみ、おくれて跳ぶ。はしの子が引っかかって抜けてしまった",
+        "noteEn": "Got careless with a big group and jumped late; the kids at the ends got caught and left",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "wait 81ms → tap(0.50,0.60) 120ms → wait 650ms → tap(0.50,0.60) 120ms",
+        "note": "半分の友だちは残ってくれた。「せーの！」で再開、また人数を増やす",
+        "noteEn": "Half the friends stayed; restart on 'Ready, go!' and grow the line again",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "wait 313ms → tap(0.50,0.60) 120ms → wait 639ms → tap(0.50,0.60) 120ms → wait 439ms → tap(0.50,0.60) 120ms → wait 427ms → tap(0.50,0.60) 120ms → wait 427ms → tap(0.50,0.60) 120ms → wait 427ms → tap(0.50,0.60) 120ms",
+        "note": "はやまわし・ため・おおなみ、掛け声を見て合わせる。端の子ほどおくれて跳ぶので、少し早めがちょうどいい",
+        "noteEn": "Follow the calls (speed up, hold, big waves). The end kids jump later, so slightly early is just right",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "wait 601ms → tap(0.50,0.60) 120ms → wait 626ms → tap(0.50,0.60) 120ms → wait 623ms → tap(0.50,0.60) 120ms",
+        "note": "はやまわし・ため・おおなみ、掛け声を見て合わせる。端の子ほどおくれて跳ぶので、少し早めがちょうどいい",
+        "noteEn": "Follow the calls (speed up, hold, big waves). The end kids jump later, so slightly early is just right",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "wait 620ms → tap(0.50,0.60) 120ms → wait 617ms → tap(0.50,0.60) 120ms → wait 614ms → tap(0.50,0.60) 120ms",
+        "note": "はやまわし・ため・おおなみ、掛け声を見て合わせる。端の子ほどおくれて跳ぶので、少し早めがちょうどいい",
+        "noteEn": "Follow the calls (speed up, hold, big waves). The end kids jump later, so slightly early is just right",
+        "image": "ai-play/step-15.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "wait 1341ms → tap(0.50,0.60) 120ms → wait 607ms → tap(0.50,0.60) 120ms → wait 604ms → tap(0.50,0.60) 120ms",
+        "note": "はやまわし・ため・おおなみ、掛け声を見て合わせる。端の子ほどおくれて跳ぶので、少し早めがちょうどいい",
+        "noteEn": "Follow the calls (speed up, hold, big waves). The end kids jump later, so slightly early is just right",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 17,
+        "action": "wait 588ms → tap(0.50,0.60) 120ms → wait 594ms → tap(0.50,0.60) 120ms → wait 591ms → tap(0.50,0.60) 120ms",
+        "note": "はやまわし・ため・おおなみ、掛け声を見て合わせる。端の子ほどおくれて跳ぶので、少し早めがちょうどいい",
+        "noteEn": "Follow the calls (speed up, hold, big waves). The end kids jump later, so slightly early is just right",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 18,
+        "action": "wait 586ms → tap(0.50,0.60) 120ms → wait 972ms → tap(0.50,0.60) 120ms → wait 581ms → tap(0.50,0.60) 120ms",
+        "note": "はやまわし・ため・おおなみ、掛け声を見て合わせる。端の子ほどおくれて跳ぶので、少し早めがちょうどいい",
+        "noteEn": "Follow the calls (speed up, hold, big waves). The end kids jump later, so slightly early is just right",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 19,
+        "action": "wait 577ms → tap(0.50,0.60) 120ms → wait 575ms → tap(0.50,0.60) 120ms → wait 680ms → tap(0.50,0.60) 120ms → wait 680ms → tap(0.50,0.60) 120ms → wait 680ms → tap(0.50,0.60) 120ms → wait 680ms → tap(0.50,0.60) 120ms",
+        "note": "はやまわし・ため・おおなみ、掛け声を見て合わせる。端の子ほどおくれて跳ぶので、少し早めがちょうどいい",
+        "noteEn": "Follow the calls (speed up, hold, big waves). The end kids jump later, so slightly early is just right",
+        "image": "ai-play/step-19.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 20,
+        "action": "wait 639ms → tap(0.50,0.60) 120ms → wait 553ms → tap(0.50,0.60) 120ms → wait 918ms → tap(0.50,0.60) 120ms",
+        "note": "はやまわし・ため・おおなみ、掛け声を見て合わせる。端の子ほどおくれて跳ぶので、少し早めがちょうどいい",
+        "noteEn": "Follow the calls (speed up, hold, big waves). The end kids jump later, so slightly early is just right",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 21,
+        "action": "wait 545ms → tap(0.50,0.60) 120ms → wait 543ms → tap(0.50,0.60) 120ms → wait 539ms → tap(0.50,0.60) 120ms",
+        "note": "はやまわし・ため・おおなみ、掛け声を見て合わせる。端の子ほどおくれて跳ぶので、少し早めがちょうどいい",
+        "noteEn": "Follow the calls (speed up, hold, big waves). The end kids jump later, so slightly early is just right",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 22,
+        "action": "wait 535ms → tap(0.50,0.60) 120ms → wait 532ms → tap(0.50,0.60) 120ms → wait 1178ms → tap(0.50,0.60) 120ms",
+        "note": "9人全員で跳ぶ。ラスト10秒はなわが速くなる",
+        "noteEn": "All nine jump together; the rope speeds up for the last 10 seconds",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 23,
+        "action": "wait 525ms → tap(0.50,0.60) 120ms → wait 523ms → tap(0.50,0.60) 120ms → wait 398ms → tap(0.50,0.60) 120ms → wait 341ms → tap(0.50,0.60) 120ms → wait 341ms → tap(0.50,0.60) 120ms",
+        "note": "9人全員で跳ぶ。ラスト10秒はなわが速くなる",
+        "noteEn": "All nine jump together; the rope speeds up for the last 10 seconds",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 24,
+        "action": "wait 451ms → tap(0.50,0.60) 120ms → wait 506ms → tap(0.50,0.60) 120ms → wait 1128ms → tap(0.50,0.60) 120ms",
+        "note": "9人全員で跳ぶ。ラスト10秒はなわが速くなる",
+        "noteEn": "All nine jump together; the rope speeds up for the last 10 seconds",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 25,
+        "action": "wait 503ms → tap(0.50,0.60) 120ms → wait 499ms → tap(0.50,0.60) 120ms → wait 835ms → tap(0.50,0.60) 120ms",
+        "note": "9人全員で跳ぶ。ラスト10秒はなわが速くなる",
+        "noteEn": "All nine jump together; the rope speeds up for the last 10 seconds",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 26,
+        "action": "wait 491ms → tap(0.50,0.60) 120ms → wait 488ms → tap(0.50,0.60) 120ms → wait 485ms → tap(0.50,0.60) 120ms",
+        "note": "ラスト10びょう。速くなったなわを全員で跳び切る",
+        "noteEn": "Last 10 seconds: the whole line keeps jumping the faster rope",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 27,
+        "action": "wait 384ms → tap(0.50,0.60) 120ms → wait 313ms → tap(0.50,0.60) 120ms → wait 313ms → tap(0.50,0.60) 120ms",
+        "note": "ラスト10びょう。速くなったなわを全員で跳び切る",
+        "noteEn": "Last 10 seconds: the whole line keeps jumping the faster rope",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 28,
+        "action": "wait 401ms → tap(0.50,0.60) 120ms → wait 471ms → tap(0.50,0.60) 120ms → wait 1058ms → tap(0.50,0.60) 120ms",
+        "note": "ラスト10びょう。速いなわを最後まで跳ぶ",
+        "noteEn": "Last 10 seconds: keep jumping the fast rope",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 29,
+        "action": "wait 466ms → tap(0.50,0.60) 120ms → wait 442ms → tap(0.50,0.60) 120ms → wait 428ms → tap(0.50,0.60) 120ms",
+        "note": "ラスト10びょう。速いなわを最後まで跳ぶ",
+        "noteEn": "Last 10 seconds: keep jumping the fast rope",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 30,
+        "action": "wait 9000ms",
+        "note": "最後は手を止めてチャイムを待つ。結果にスコア・最高れんぞく・最大人数が出る",
+        "noteEn": "Stop at the very end and wait for the bell; the result shows score, best streak and max group",
+        "image": "ai-play/step-30.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 1434,
+              "bestStreak": 59
+            }
+          },
+          {
+            "agf": "end",
+            "score": 1434
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-21T10:03:24+09:00"
+  },
+  "publishedAt": "2026-11-21T10:03:24+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 49303,
+    "outputTokens": 47293,
+    "contextTokens": 14566710,
+    "turns": 66,
+    "toolCalls": 76,
+    "webSearches": 0,
+    "minutes": 57.2,
+    "from": "2026-11-21T00:06:10.219Z",
+    "to": "2026-11-21T01:03:24.214Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-21T10:03:24+09:00",
+    "validationRuns": 10,
+    "codeKB": 35
+  }
+}
