@@ -1,0 +1,760 @@
+{
+  "id": "2026-11-22-claude-2",
+  "status": "published",
+  "title": "かおいろババぬき",
+  "genre": "カードゲーム",
+  "concept": "ババぬきの「相手の顔色を読む」を指の手触りにした。札に指をのせると相手の表情が変わり、正直なたぬき、ババでニヤリとするうそつきのきつね、顔に出ないかわりに札を握って離さないおにと、相手ごとのくせを見抜いて読み方を変えるのが核。",
+  "howToPlay": "相手の札に指をのせて顔色を見て、下へ引いて取る。ババを持ったら自分の札をタップで出っぱらせて相手をさそう。",
+  "libraryDecision": "使わない。面白さの核は相手の表情の細かな変化と札の重さの手触りで、表情はパーツの数値を少しずつ動かすだけで描け、物理演算や3Dで強まる部分がないため、Canvas 2D で自作した。",
+  "soundDecision": "BGMは付けず、札をすべる音・ペアがそろう和音・ババを引いた「ドロン」と相手の笑い声などの効果音だけにした。顔色を読む静かな間を邪魔しないためで、名前のある3人はババに触れると小さく「ごくり」「ふふ」と鳴り、おにのババは引くとギシギシきしむ音も手がかりになる。",
+  "improvements": [
+    {
+      "found": "①ババを持っていない時の相手の番がただ待つだけで間延びする ②きつねの口があごの端にあって、ニヤリ顔が読みにくい ③勝敗が決まっても相手の残りの札が伏せたままで、上の表示はもう次の相手の名前になっている",
+      "changed": "ババを持っていない時は相手の手が1回で素早く引くようにした。きつねの鼻と口を上げ、口の曲がりを大きくした。決着時に残った札を表に返し、表示は次へ進むまで今の相手のままにした。ばけくらべは連勝するほど顔色が微妙になり、待ってくれる時間も短くなるようにした（覚えたら終わり、を防ぐ）",
+      "foundEn": "(1) When I don't hold the Joker, their turn is pure waiting (2) The fox's mouth sat at the chin, so the smug grin was hard to read (3) After the match the leftover cards stayed face down, and the HUD already showed the next opponent",
+      "changedEn": "When nothing is at stake their paw draws quickly in one pass. Raised the fox's nose and mouth and exaggerated the mouth curve. Leftover cards flip face up at the end and the HUD keeps the current opponent until you move on. In Shapeshifter mode, tells get subtler and patience shorter as your streak grows, so learning the rule isn't the end."
+    },
+    {
+      "found": "①相手が札を切り直さないので、一度ババの位置が分かれば二度と顔を見なくてよい ②顔を読んでいる最中のまばたきが「目を細めた＝安心」の顔と見分けにくい ③おにの「手に出る」くせは引いてみても普通の札との違いが小さく、気づきにくい。ヒントの帯が引いた札と重なる",
+      "changed": "自分が引く番の前に毎回相手が札を切り直す（動きと音つき）ようにして、毎回読む必要を作った。顔を読まれている間はまばたきしないようにした。おにのババは引くとほとんど動かず、札の上におにのツメが掛かり、歯を食いしばってギシギシ鳴るようにした。ヒントの帯は札の下に描くようにした",
+      "foundEn": "(1) They never reshuffled, so once you found the Joker you never had to read their face again (2) A blink while being read looked like the narrowed-eye \"relaxed\" face (3) The oni's \"in the hands\" tell barely differed from a normal card; the hint banner overlapped the pulled card",
+      "changedEn": "They now reshuffle (with motion and sound) before each of your draws, so every draw needs a fresh read. No blinking while being read. The oni's Joker barely budges when pulled: its claws grip the card top, it grits its teeth and the card creaks. The hint banner now sits beneath the cards."
+    },
+    {
+      "found": "①相手が札を切り直している最中に指をのせると、番が来ても反応せず「平気な顔＝安全」と誤解する ②決着の画面が相手の手を覆い、最後に残ったババがほとんど見えない ③勝った瞬間の相手の顔（がーん）も帯に隠れる",
+      "changed": "自分の番が始まった時に指がすでに相手の札にのっていれば、そのまま顔色の読み取りを始めるようにした。結果の帯を画面の下へ移し、相手の顔と表になったババが見えるまま勝ち負けを出すようにした",
+      "foundEn": "(1) Resting a finger on a card during their reshuffle gave no reaction even after your turn began, which looked like a safe \"calm face\" (2) The result banner covered their hand, hiding the Joker left at the end (3) Their stunned face at the moment you win was hidden too",
+      "changedEn": "If a finger is already on their cards when your turn starts, reading begins immediately. The result banner moved to the lower part of the screen so their face and the revealed Joker stay visible."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "カードゲーム",
+      "en": "Card game",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "ババぬき：相手の札に指をのせると表情が変わる。相手ごとに違う「くせ」（正直・うそつき・手に出る）を見抜いてババを避け、ババを持ったら札を出っぱらせて相手をさそう。",
+        "ideaEn": "Old Maid where resting a finger on a card changes the opponent's face. Learn each opponent's tell (honest, liar, in-the-hands) to dodge the Joker, and bait them with a raised card when you hold it.",
+        "fromDraw": true
+      },
+      {
+        "idea": "雨の庭の遊び場：指でなぞると雨どいや葉に水の道ができ、落ちる滴が音を鳴らす。目標も終わりもない、音の庭づくり。",
+        "ideaEn": "A rain-garden playground: trace gutters and leaves to route falling drops that ring out notes. No goal, no end — just building a sound garden.",
+        "fromDraw": false
+      },
+      {
+        "idea": "3Dのだるまさんがころんだ：鬼がふり向く直前の気配を音と影で読み、指を離して止まる。奥行きのある公園を少しずつ近づく。",
+        "ideaEn": "A 3D red-light-green-light: read the sound and shadow just before the watcher turns, lift your finger to freeze, and creep closer across a deep park.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "drag",
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Tell-Tale Old Maid",
+      "concept": "Old Maid's \"read their face\" made into a touch. Rest a finger on a card and the opponent's expression shifts: the honest tanuki, the lying fox who grins at the Joker, and the poker-faced oni who instead grips the card and won't let go. Spotting each one's tell and changing how you read is the core.",
+      "howToPlay": "Rest a finger on their cards to read the face, then pull one down to take it. Holding the Joker? Tap your cards to raise one and tempt them.",
+      "libraryDecision": "None. The fun is in small changes of expression and the weight of a card under your finger; faces are just a few numbers eased smoothly, and neither physics nor 3D would strengthen that, so it's hand-drawn Canvas 2D.",
+      "soundDecision": "No music — only effects: card slides, a chord when a pair matches, a puff and a laugh when you draw the Joker. That keeps the quiet tension of reading a face. The three named opponents give a tiny gulp or giggle on the Joker, and the oni's Joker creaks as you pull, so sound is a clue too."
+    }
+  },
+  "createdAt": "2026-11-22T12:06:49+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-22T12:06:49+09:00",
+    "metricsFrom": "2026-11-22T03:05:43.646Z",
+    "transcript": "8669ff75-8974-4472-bc7f-b64d02032b63.jsonl",
+    "validationRuns": 8,
+    "finishedAt": "2026-11-22T12:41:48+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-22T12:42:04+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "45.1KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=182",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=239",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=163",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=200",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 46230,
+    "lines": 892
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "相手ごとのくせは一度見抜くと読み方が決まり、名前のある3人はそれぞれ1〜2戦で単純作業になる。ばけくらべで連勝するほど顔色が微妙になるが、長く遊べるほどの深さかは分からない",
+    "comment": "札に指をすべらせると、たぬきが急に目を見開いて冷や汗をかく瞬間がはっきり面白い。わざとババを引いて『ふふふ』と笑われ、ババを出っぱらせたら、たぬきがまんまと引いてがーんとなる流れは、ババぬきらしいやり取りになっていた。きつねで裏をかかれ、おにの札がツメでがっちり握られて動かない手応えも、相手ごとの発見がある。一方で、くせが分かった後は答えが見えすぎる。",
+    "similar": [
+      {
+        "title": "Joker Face（WarioWare のプチゲーム）",
+        "url": "https://www.mariowiki.com/Joker_Face",
+        "similarity": "高",
+        "note": "相手の表情の手がかりでババを避けて札を引く点が同じ。こちらは指をのせて顔色を探る操作、相手ごとに違うくせ（うそつき・手に出る）、自分がババを持った時の守りまで含む1対1のババぬき全体である点が違う",
+        "note_en": "Same core: pick a card while reading the opponent's face to avoid the Joker. This game adds probing with a resting finger, opponent-specific tells (liar, in-the-hands) and the defensive half of a full one-on-one Old Maid."
+      },
+      {
+        "title": "Tail Tell Hearts",
+        "url": "https://dezhango.itch.io/tail-tell-hearts",
+        "similarity": "中",
+        "note": "猫の相手の顔やしっぽの表情から手を読む点が似ている。あちらはポーカー寄り、こちらはババぬきで、指をのせた札ごとに反応が変わる",
+        "note_en": "Similar in reading a cat opponent's face and tail. That one is poker-like; here it is Old Maid and the reaction changes per card under your finger."
+      }
+    ],
+    "research": "WebSearch で「old maid video game read opponent facial expression joker」を検索し、顔色でババを避ける既存作を確認した",
+    "i18n": {
+      "en": {
+        "worst": "Once you crack an opponent's tell the reading is fixed, so each named opponent becomes routine within a match or two. Shapeshifter mode makes tells subtler with your streak, but I'm not sure it has lasting depth.",
+        "comment": "Sliding a finger along their cards until the tanuki suddenly goes wide-eyed and sweaty is genuinely fun. Drawing the Joker on purpose, getting laughed at, then raising it so the tanuki falls for it and gasps felt like real Old Maid back-and-forth. The fox's reversal and the oni's claws gripping an immovable card give each opponent a discovery. But once you know the tell, the answer is too visible.",
+        "research": "Searched the web for Old Maid games about reading the opponent's facial expression to avoid the Joker."
+      }
+    },
+    "method": "スマホ縦画面で 26 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 26 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 600ms → tap(0.50,0.50) 120ms → wait 2000ms",
+        "note": "たぬき戦。6枚の札のどれかがババ",
+        "noteEn": "Vs Tanuki. One of its six cards is the Joker",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.12,0.47) 550ms",
+        "note": "札に指をのせて顔色を見る",
+        "noteEn": "Rest a finger on a card and read the face",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.27,0.47) 550ms",
+        "note": "札に指をのせて顔色を見る",
+        "noteEn": "Rest a finger on a card and read the face",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.42,0.47) 550ms",
+        "note": "札に指をのせて顔色を見る",
+        "noteEn": "Rest a finger on a card and read the face",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.58,0.47) 550ms",
+        "note": "札に指をのせて顔色を見る",
+        "noteEn": "Rest a finger on a card and read the face",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.73,0.47) 550ms",
+        "note": "札に指をのせて顔色を見る",
+        "noteEn": "Rest a finger on a card and read the face",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.88,0.47) 550ms",
+        "note": "札に指をのせて顔色を見る",
+        "noteEn": "Rest a finger on a card and read the face",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "path(0.88,0.47→0.88,0.50→0.88,0.82) 450ms → wait 1200ms",
+        "note": "冷や汗の札をわざと引いてみる→ババ。たぬきが笑う",
+        "noteEn": "Deliberately took the sweating card -> Joker. The tanuki laughs",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 300ms → tap(0.58,0.90) 120ms → wait 1200ms",
+        "note": "たぬきは出っぱった札に手がのびる。ババを出っぱらせてさそう",
+        "noteEn": "The tanuki reaches for a raised card, so I raise the Joker as bait",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 2600ms",
+        "note": "たぬきがババを引いた！",
+        "noteEn": "The tanuki took the Joker!",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.12,0.47) 550ms",
+        "note": "札に指をのせて顔色を見る",
+        "noteEn": "Rest a finger on a card and read the face",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.27,0.47) 550ms",
+        "note": "札に指をのせて顔色を見る",
+        "noteEn": "Rest a finger on a card and read the face",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "tap(0.42,0.47) 550ms",
+        "note": "札に指をのせて顔色を見る",
+        "noteEn": "Rest a finger on a card and read the face",
+        "image": "ai-play/step-13.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "tap(0.58,0.47) 550ms",
+        "note": "札に指をのせて顔色を見る",
+        "noteEn": "Rest a finger on a card and read the face",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "tap(0.73,0.47) 550ms",
+        "note": "札に指をのせて顔色を見る",
+        "noteEn": "Rest a finger on a card and read the face",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "tap(0.88,0.47) 550ms",
+        "note": "札に指をのせて顔色を見る",
+        "noteEn": "Rest a finger on a card and read the face",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 17,
+        "action": "path(0.88,0.47→0.88,0.50→0.88,0.82) 450ms → wait 3500ms",
+        "note": "どれも落ち着いた顔。確かめそびれた左端を避け、右端を引く",
+        "noteEn": "All calm faces; avoid the unchecked left end and take the right end",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 18,
+        "action": "tap(0.26,0.47) 550ms",
+        "note": "札に指をのせて顔色を見る",
+        "noteEn": "Rest a finger on a card and read the face",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 19,
+        "action": "tap(0.42,0.47) 550ms",
+        "note": "札に指をのせて顔色を見る",
+        "noteEn": "Rest a finger on a card and read the face",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 20,
+        "action": "tap(0.58,0.47) 550ms",
+        "note": "札に指をのせて顔色を見る",
+        "noteEn": "Rest a finger on a card and read the face",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 21,
+        "action": "tap(0.74,0.47) 550ms",
+        "note": "札に指をのせて顔色を見る",
+        "noteEn": "Rest a finger on a card and read the face",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 22,
+        "action": "path(0.74,0.47→0.74,0.50→0.74,0.82) 450ms → wait 3500ms",
+        "note": "左端で冷や汗。右端を引く",
+        "noteEn": "Sweat on the left end; take the right end",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 23,
+        "action": "tap(0.42,0.47) 550ms",
+        "note": "札に指をのせて顔色を見る",
+        "noteEn": "Rest a finger on a card and read the face",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 24,
+        "action": "tap(0.58,0.47) 550ms",
+        "note": "札に指をのせて顔色を見る",
+        "noteEn": "Rest a finger on a card and read the face",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 25,
+        "action": "path(0.58,0.47→0.58,0.50→0.58,0.82) 450ms → wait 2600ms",
+        "note": "にっこり顔の右を引いて、勝ち！たぬきの手にババが残る",
+        "noteEn": "Took the smiling right card and won; the Joker stays with the tanuki",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "best": 0
+            }
+          }
+        ]
+      },
+      {
+        "step": 26,
+        "action": "wait 400ms",
+        "note": "結果画面。たぬきの手に残ったババが表になる",
+        "noteEn": "Result: the Joker left in the tanuki's hand is revealed",
+        "image": "ai-play/step-26.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "best": 0
+            }
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-22T12:41:48+09:00"
+  },
+  "publishedAt": "2026-11-22T12:41:48+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 23552,
+    "outputTokens": 57770,
+    "contextTokens": 21783563,
+    "turns": 104,
+    "toolCalls": 113,
+    "webSearches": 0,
+    "minutes": 36.3,
+    "from": "2026-11-22T03:05:43.646Z",
+    "to": "2026-11-22T03:42:04.204Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-22T12:42:04+09:00",
+    "validationRuns": 8,
+    "codeKB": 45.1
+  }
+}

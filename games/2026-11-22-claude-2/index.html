@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>かおいろババぬき</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #1d3b2c; }
+canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const JA = LANG === 'ja';
+document.documentElement.lang = JA ? 'ja' : 'en';
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+
+const T = {
+  ja: {
+    title: 'かおいろババぬき', sub: '相手の顔色を、指で読む。',
+    how1: '相手の札に指をのせると、顔色が変わる', how2: '下へ引けば、その札を取る',
+    how3: 'ババ（ジョーカー）を最後に持っていたら負け',
+    start: 'タップでスタート', cont: (n) => `つづき：${n} から`,
+    names: ['たぬき', 'きつね', 'おに', 'ばけだぬき'],
+    hint: [
+      ['うそがつけない。顔をよく見て。', '出っぱった札に、つい手がのびる。'],
+      ['ばかす名人。顔を信じすぎるな。', '出っぱった札は、罠だと思っている。'],
+      ['顔には出ない。手に出る。', '出っぱった札は、半分くらい疑う。'],
+      ['正体不明。どのくせを持っている？', '取り方のくせも、わからない。'],
+    ],
+    vs: 'しょうぶ', tapGo: 'タップではじめる',
+    hintPlay: '相手の札に指をのせて、顔色を見よう',
+    hintPull: '決めたら、そのまま下へ引く',
+    hintDef: '札をタップで出っぱらせて、相手をさそおう',
+    hurry: 'はやく！', myTurn: 'あなたが引く番', oppTurn: '相手が引く番…',
+    win: 'かち！', lose: 'まけ…', loseSub: 'ババが手もとに残った',
+    next: (n) => `つぎの相手：${n}`, retry: 'もう一回しょうぶ',
+    allClear: '3人ぬき 達成！', bakeNext: 'つぎは「ばけくらべ」…何連勝できる？',
+    streak: (n) => `連勝 ${n}`, best: (n) => `ベスト ${n}`, bestUp: 'ベスト更新！',
+    tapNext: 'タップで次へ', tapAgain: 'タップでもう一度',
+    reveal: (k) => `正体：${k}`,
+    kinds: ['正直者', 'うそつき', '顔に出ない'],
+    jokersDrawn: (n) => `ババを引いた回数 ${n}`,
+    lines: {
+      gotJoker: ['しめしめ', 'ふふふ', 'それそれ！'],
+      lostJoker: ['あっ…', 'ぎくっ', 'しまった'],
+      take: ['これだ', 'どれにしようかな', 'えいっ'],
+    },
+  },
+  en: {
+    title: 'Tell-Tale Old Maid', sub: 'Read their face with your finger.',
+    how1: 'Rest a finger on their card — watch their face', how2: 'Pull it down to take it',
+    how3: 'Whoever is left holding the Joker loses',
+    start: 'Tap to start', cont: (n) => `Continue: vs ${n}`,
+    names: ['Tanuki', 'Fox', 'Oni', 'Shapeshifter'],
+    hint: [
+      ['Can\'t lie. Watch the face.', 'Can\'t resist a card that sticks out.'],
+      ['A trickster. Don\'t trust the face.', 'Thinks a card that sticks out is a trap.'],
+      ['Not in the face. In the hands.', 'Half suspects a card that sticks out.'],
+      ['Unknown. Which tell does it have?', 'Its drawing habit is a mystery too.'],
+    ],
+    vs: 'vs', tapGo: 'Tap to begin',
+    hintPlay: 'Rest a finger on their cards and watch the face',
+    hintPull: 'Decided? Pull it straight down',
+    hintDef: 'Tap a card to make it stick out — tempt them',
+    hurry: 'Hurry!', myTurn: 'Your draw', oppTurn: 'Their draw…',
+    win: 'You win!', lose: 'You lose…', loseSub: 'You were left with the Joker',
+    next: (n) => `Next: ${n}`, retry: 'Rematch',
+    allClear: 'All three beaten!', bakeNext: 'Next: Shapeshifter mode — how many in a row?',
+    streak: (n) => `Streak ${n}`, best: (n) => `Best ${n}`, bestUp: 'New best!',
+    tapNext: 'Tap to continue', tapAgain: 'Tap to play again',
+    reveal: (k) => `It was: ${k}`,
+    kinds: ['Honest', 'Liar', 'Poker face'],
+    jokersDrawn: (n) => `Jokers drawn: ${n}`,
+    lines: {
+      gotJoker: ['Hehe', 'Gotcha', 'Ha ha!'],
+      lostJoker: ['Uh oh…', 'Eek', 'Oops'],
+      take: ['This one', 'Hmm…', 'There!'],
+    },
+  },
+}[JA ? 'ja' : 'en'];
+
+// ---------- canvas ----------
+const cv = document.getElementById('c');
+const g = cv.getContext('2d');
+let W = 360, H = 640, DPR = 1;
+function resize() {
+  DPR = Math.min(2, devicePixelRatio || 1);
+  W = Math.max(1, innerWidth || 360); H = Math.max(1, innerHeight || 640);
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+  layout();
+}
+addEventListener('resize', resize);
+
+// ---------- audio ----------
+let AC = null, master = null;
+function audioInit() {
+  try {
+    if (!AC) { AC = new (window.AudioContext || window.webkitAudioContext)(); master = AC.createGain(); master.gain.value = 0.5; master.connect(AC.destination); }
+    if (AC.state !== 'running') AC.resume();
+  } catch (e) { AC = null; }
+}
+function tone(f, d, type = 'sine', v = 0.2, f2 = null, delay = 0) {
+  if (!AC) return;
+  try {
+    const t = AC.currentTime + delay, o = AC.createOscillator(), gn = AC.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d);
+    gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(v, t + 0.012); gn.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(gn); gn.connect(master); o.start(t); o.stop(t + d + 0.02);
+  } catch (e) {}
+}
+let noiseBuf = null;
+function noise(d, fq, v = 0.15, q = 1, delay = 0) {
+  if (!AC) return;
+  try {
+    if (!noiseBuf) { noiseBuf = AC.createBuffer(1, AC.sampleRate, AC.sampleRate); const a = noiseBuf.getChannelData(0); for (let i = 0; i < a.length; i++) a[i] = crand() * 2 - 1; }
+    const t = AC.currentTime + delay, s = AC.createBufferSource(), f = AC.createBiquadFilter(), gn = AC.createGain();
+    s.buffer = noiseBuf; f.type = 'bandpass'; f.frequency.value = fq; f.Q.value = q;
+    gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(v, t + 0.01); gn.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    s.connect(f); f.connect(gn); gn.connect(master); s.start(t); s.stop(t + d + 0.02);
+  } catch (e) {}
+}
+const NOTE = (n) => 440 * Math.pow(2, (n - 69) / 12);
+const SCALE = [60, 62, 64, 67, 69, 72, 74, 76, 79, 81, 84, 86, 88];
+const sfx = {
+  touch() { noise(0.05, 3000, 0.05, 2); },
+  slide() { noise(0.08, 2200, 0.07, 1.5); },
+  pull() { noise(0.12, 1500, 0.1, 1); },
+  pair(r) { const n = SCALE[r % SCALE.length]; tone(NOTE(n), 0.25, 'triangle', 0.16); tone(NOTE(n + 7), 0.35, 'triangle', 0.12, null, 0.08); },
+  joker() { tone(220, 0.5, 'sawtooth', 0.08, 70); noise(0.4, 400, 0.12, 0.7); tone(330, 0.15, 'square', 0.05, 160, 0.05); },
+  laugh() { for (let i = 0; i < 4; i++) tone(700 - i * 40, 0.07, 'square', 0.04, 600 - i * 40, i * 0.09); },
+  dismay() { tone(500, 0.35, 'triangle', 0.1, 260); },
+  gulp() { tone(420, 0.09, 'sine', 0.09, 210); },
+  hehe() { tone(880, 0.05, 'sine', 0.05, 1000); tone(880, 0.05, 'sine', 0.05, 1000, 0.09); },
+  creak() { tone(70, 0.18, 'sawtooth', 0.05, 55); },
+  tick() { tone(1200, 0.03, 'square', 0.03); },
+  raise() { tone(660, 0.06, 'triangle', 0.08, 880); },
+  shuffle() { for (let i = 0; i < 5; i++) noise(0.04, 2500, 0.06, 2, i * 0.07); },
+  win() { [72, 76, 79, 84].forEach((n, i) => tone(NOTE(n), 0.3, 'triangle', 0.14, null, i * 0.1)); },
+  lose() { [67, 63, 60, 55].forEach((n, i) => tone(NOTE(n), 0.35, 'triangle', 0.12, null, i * 0.14)); },
+  hurry() { tone(600, 0.08, 'square', 0.06); tone(600, 0.08, 'square', 0.06, null, 0.12); },
+};
+
+// ---------- opponents ----------
+// tell: 0 honest face, 1 liar face, 2 heavy hands.  take: 0 takes raised, 1 avoids raised, 2 half
+const OPP = [
+  { col: '#a07450', dark: '#5b3b26', light: '#e9d3b4', kind: 'tanuki', tell: 0, take: 0, patience: 11 },
+  { col: '#e88a3a', dark: '#8f4612', light: '#fff4e4', kind: 'fox', tell: 1, take: 1, patience: 9 },
+  { col: '#d2463a', dark: '#6e1611', light: '#f6b9a6', kind: 'oni', tell: 2, take: 2, patience: 8 },
+  { col: '#7b6aa8', dark: '#3a2f5c', light: '#ddd3f0', kind: 'bake', tell: 0, take: 0, patience: 8 },
+];
+
+// ---------- state ----------
+let mode = 'title';          // title | intro | play | result
+let stage = 0;               // 0..2 named, 3 = shapeshifter
+let streak = 0, bestStreak = 0, jokersDrawn = 0;
+let opp = OPP[0];
+let me = [], op = [];        // hands (card objects)
+let flying = [];             // cards flying to discard
+let pile = 0;                // discarded pair count
+let turn = 'me';             // me | opp | busy | over
+let timers = [];
+let patience = 1;
+let touch = null;            // {pid, idx, x, y, locked, heavy}
+let face = { eye: 1, px: 0, py: 0, brow: 0, mouth: 0.2, open: 0, sweat: 0, blush: 0, shake: 0, grit: 0 };
+let faceT = Object.assign({}, face);
+let blink = 0, blinkT = 2;
+let bubble = null;           // {text, t}
+let hint = null;             // {text, t}
+let hintsShown = {};
+let paw = null;              // opponent's drawing hand
+let resultAt = 0, result = null;
+let now = 0;
+let shakeScreen = 0;
+let cardNoise = new Map();
+let raisedId = null;
+let lastCreak = 0, lastTouchIdx = -1, lastSoundIdx = -1;
+let wobble = 0;
+let saved = null;
+
+function later(t, fn) { timers.push({ t: now + t, fn }); }
+let cseed = 12345;
+const crand = () => { cseed = (cseed * 16807) % 2147483647; return cseed / 2147483647; };   // cosmetic only
+const pick = (a) => a[Math.floor(Math.random() * a.length)];
+const lerp = (a, b, k) => a + (b - a) * k;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+// ---------- layout ----------
+let L = {};
+function layout() {
+  const cw = Math.min(W / 6.4, 66, H / 10);
+  L.cw = cw; L.ch = cw * 1.42;
+  L.faceX = W / 2; L.faceY = Math.max(130, H * 0.215);
+  L.faceR = Math.min(W * 0.25, H * 0.12);
+  L.opY = L.faceY + L.faceR * 1.25 + L.ch * 0.55 + 18;
+  L.meY = H - L.ch * 0.62 - Math.max(18, H * 0.04);
+  L.midY = (L.opY + L.ch * 0.5 + L.meY - L.ch * 0.5) / 2;
+  L.pileX = W * 0.82; L.pileY = L.midY;
+}
+function fanX(n, i) {
+  const s = Math.min(L.cw * 1.02, (W - 28 - L.cw) / Math.max(1, n - 1));
+  return W / 2 + (i - (n - 1) / 2) * s;
+}
+function fanSpacing(n) { return Math.min(L.cw * 1.02, (W - 28 - L.cw) / Math.max(1, n - 1)); }
+
+// ---------- deck ----------
+const SUITS = ['♠', '♥', '♦', '♣'];
+let cid = 0;
+function mk(rank, suit) { return { id: ++cid, rank, suit, x: W / 2, y: L.midY, r: 0, lift: 0, faceUp: false }; }
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+function setupMatch() {
+  timers = []; flying = []; pile = 0; touch = null; paw = null; raisedId = null; bubble = null;
+  opp = Object.assign({}, OPP[Math.min(stage, 3)]);
+  opp.str = 1;
+  if (stage >= 3) {
+    opp.tell = Math.floor(Math.random() * 3); opp.take = Math.floor(Math.random() * 3);
+    // the longer the streak, the subtler the tells and the shorter the patience
+    opp.str = clamp(1 - streak * 0.11, 0.45, 1);
+    opp.patience = 8 - Math.min(3, streak * 0.4);
+  }
+  const n = stage === 0 ? 5 : 6;
+  const ranks = shuffle([...Array(13).keys()]).slice(0, n);
+  me = ranks.map((r) => mk(r, Math.floor(Math.random() * 4)));
+  op = ranks.map((r) => mk(r, Math.floor(Math.random() * 4)));
+  const jok = mk(-1, 0);
+  const jokerMine = stage === 0 ? false : Math.random() < 0.4;
+  if (jokerMine) me.push(jok); else op.push(jok);
+  shuffle(me); shuffle(op);
+  me.forEach((c, i) => { c.x = W / 2; c.y = L.midY; c.faceUp = true; c.delay = i * 0.06; });
+  op.forEach((c, i) => { c.x = W / 2; c.y = L.midY; c.delay = i * 0.06 + 0.03; });
+  // per-card noise for tells (fixed for the match so a card "feels" consistent)
+  cardNoise = new Map();
+  for (const c of [...me, ...op]) cardNoise.set(c.id, Math.random());
+  patience = 1; turn = 'busy';
+  later(0.9, () => startMyTurn());
+  signal('start');
+}
+
+function startMyTurn(noShuffle) {
+  if (checkEnd()) return;
+  // they re-shuffle before every draw, so the Joker has to be read anew each time
+  if (!noShuffle && op.length > 1 && op.some((c) => c.rank === -1)) {
+    turn = 'busy'; shuffleOpp(3);
+    later(0.5, () => startMyTurn(true));
+    return;
+  }
+  turn = 'me'; patience = 1;
+  // a finger already resting on their cards starts reading right away
+  for (const [pid, f] of fingers) {
+    const i = opIndexAt(f.x, f.y);
+    if (i >= 0 && !touch) { touch = { pid, idx: i, x: f.x, y: f.y, pull: 0, locked: false }; lastSoundIdx = -1; onTouchCard(i); }
+  }
+  if (!hintsShown.play) { hintsShown.play = 1; showHint(T.hintPlay, 4); }
+}
+
+function showHint(text, d) { hint = { text, t: d }; }
+function say(text, d = 1.4) { bubble = { text, t: d }; }
+
+function checkEnd() {
+  if (turn === 'over') return true;
+  if (me.length === 0 || op.length === 0) {
+    const won = me.length === 0;
+    turn = 'over'; touch = null; paw = null;
+    later(0.6, () => endMatch(won));
+    return true;
+  }
+  return false;
+}
+
+function endMatch(won) {
+  mode = 'result'; resultAt = now;
+  const r = { won, stage, kind: opp.tell, best: false };
+  if (stage >= 3) {
+    if (won) { streak++; if (streak > bestStreak) { bestStreak = streak; r.best = true; } }
+    r.streak = streak;
+    if (!won) streak = 0;
+    signal('end', { score: r.streak });
+  } else {
+    signal('end', { score: won ? stage + 1 : stage });
+  }
+  r.jokers = jokersDrawn;
+  r.nextStage = won && stage < 3 ? stage + 1 : stage;
+  result = r;
+  for (const c of op) c.faceUp = true;   // show what they were holding
+  if (won) { sfx.win(); setFace('dismay', 99); } else { sfx.lose(); setFace('gloat', 99); }
+  save(r.nextStage);
+}
+
+function save(st = stage) { try { parent.postMessage({ agf: 'save', data: { stage: st, best: bestStreak } }, '*'); } catch (e) {} }
+addEventListener('message', (e) => {
+  if (e.data && e.data.agf === 'loaded' && e.data.data && mode === 'title') {
+    saved = e.data.data; stage = clamp(saved.stage | 0, 0, 3); bestStreak = saved.best | 0;
+  }
+});
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+
+// ---------- expressions ----------
+const EXPR = {
+  neutral: { eye: 1, brow: 0, mouth: 0.15, open: 0, sweat: 0, blush: 0, shake: 0, grit: 0 },
+  calm:    { eye: 0.55, brow: 0.15, mouth: 0.7, open: 0, sweat: 0, blush: 0.5, shake: 0, grit: 0 },
+  nervous: { eye: 1.4, brow: -0.9, mouth: -0.55, open: 0.25, sweat: 1, blush: 0, shake: 0.7, grit: 0 },
+  smug:    { eye: 0.35, brow: 0.7, mouth: 0.95, open: 0.1, sweat: 0, blush: 0.2, shake: 0, grit: 0 },
+  worried: { eye: 1.15, brow: -0.6, mouth: -0.35, open: 0, sweat: 0.45, blush: 0, shake: 0.15, grit: 0 },
+  strain:  { eye: 0.7, brow: 1, mouth: -0.2, open: 0.3, sweat: 0.6, blush: 0.4, shake: 0.5, grit: 1 },
+  dismay:  { eye: 1.3, brow: -1, mouth: -0.9, open: 0.7, sweat: 0.8, blush: 0, shake: 0.3, grit: 0 },
+  gloat:   { eye: 0.3, brow: 0.6, mouth: 1, open: 0.8, sweat: 0, blush: 0.6, shake: 0, grit: 0 },
+  think:   { eye: 0.9, brow: 0.3, mouth: 0, open: 0, sweat: 0, blush: 0, shake: 0, grit: 0 },
+};
+let faceHold = 0;
+function setFace(name, hold = 1.2) { Object.assign(faceT, EXPR[name]); faceHold = hold; }
+function mixFace(a, b, t) { const A = EXPR[a], B = EXPR[b]; for (const k in A) faceT[k] = lerp(A[k], B[k], t); }
+
+function updateFaceTarget() {
+  if (faceHold > 0) return;
+  if (turn === 'me' && touch && touch.idx >= 0 && op[touch.idx]) {
+    const c = op[touch.idx];
+    const nz = cardNoise.get(c.id) || 0.5;
+    const isJ = c.rank === -1;
+    const s = opp.str;
+    const jt = lerp(0.45, 0.88 + nz * 0.12, s), st = nz * nz * lerp(0.5, 0.38, s);
+    if (opp.tell === 0) {           // honest
+      mixFace('calm', 'nervous', isJ ? jt : st);
+    } else if (opp.tell === 1) {    // liar: grins at the joker, frets over safe cards
+      mixFace('worried', 'smug', isJ ? jt : st);
+    } else {                        // poker face: random small moods, strain when pulling joker
+      const moods = ['calm', 'worried', 'think', 'neutral'];
+      Object.assign(faceT, EXPR[moods[Math.floor(nz * 4)]]);
+      if (isJ && touch.pull > 14) mixFace(moods[Math.floor(nz * 4)], 'strain', clamp(touch.pull / 70, 0, 1));
+    }
+    faceT.px = clamp((c.x - L.faceX) / (W * 0.35), -1, 1); faceT.py = 1;
+  } else if (turn === 'opp' && paw) {
+    Object.assign(faceT, EXPR.think);
+    faceT.px = clamp((paw.x - L.faceX) / (W * 0.35), -1, 1); faceT.py = 1;
+  } else {
+    Object.assign(faceT, EXPR.neutral);
+    faceT.px = Math.sin(now * 0.7) * 0.3; faceT.py = 0.3;
+  }
+}
+
+// ---------- my draw ----------
+function heavyFor(c) { return opp.tell === 2 && c.rank === -1; }
+function takeFromOpp(idx) {
+  const c = op[idx]; if (!c) return;
+  touch = null; turn = 'busy';
+  op.splice(idx, 1);
+  c.faceUp = true; c.lift = 0;
+  sfx.pull();
+  if (c.rank === -1) {
+    jokersDrawn++;
+    const pos = Math.floor(Math.random() * (me.length + 1));
+    me.splice(pos, 0, c);
+    later(0.25, () => { sfx.joker(); shakeScreen = 0.35; });
+    later(0.55, () => { sfx.laugh(); setFace('gloat', 1.4); say(pick(T.lines.gotJoker)); });
+    later(1.4, () => { if (!hintsShown.def) { hintsShown.def = 1; showHint(T.hintDef, 4.5); } startOppTurn(); });
+  } else {
+    me.push(c);
+    const m = me.find((x) => x !== c && x.rank === c.rank);
+    later(0.45, () => discardPair(me, c, m));
+    later(1.05, () => { if (!checkEnd()) startOppTurn(); });
+  }
+}
+function discardPair(hand, a, b) {
+  for (const c of [a, b]) {
+    if (!c) continue;
+    const i = hand.indexOf(c); if (i >= 0) hand.splice(i, 1);
+    if (c.id === raisedId) raisedId = null;
+    c.faceUp = true;
+    flying.push({ c, sx: c.x, sy: c.y, sr: c.r, t: 0, tx: L.pileX + (crand() - 0.5) * 10, ty: L.pileY + (crand() - 0.5) * 8, tr: (crand() - 0.5) * 0.6 });
+  }
+  sfx.pair(a.rank);
+  later(0.35, () => { pile++; });
+}
+
+// ---------- opponent draw ----------
+function startOppTurn() {
+  if (checkEnd()) return;
+  turn = 'opp';
+  const n = me.length;
+  const plan = [];
+  // nothing at stake when I don't hold the Joker: keep it brisk
+  const stakes = me.some((c) => c.rank === -1);
+  const k = stakes ? 2 + Math.floor(Math.random() * 3) : 1;
+  for (let i = 0; i < k; i++) plan.push(Math.floor(Math.random() * n));
+  paw = { plan, stakes, step: 0, t: 0, x: W / 2, y: -60, tx: W / 2, ty: L.meY - L.ch * 1.0, state: 'hover', hold: stakes ? 0.6 + Math.random() * 0.4 : 0.3, grab: null };
+}
+function oppChoose() {
+  const n = me.length;
+  const ri = me.findIndex((c) => c.id === raisedId);
+  if (ri < 0 || n === 1) return Math.floor(Math.random() * n);
+  const others = [...Array(n).keys()].filter((i) => i !== ri);
+  const r = Math.random();
+  if (opp.take === 0) return r < 0.85 ? ri : pick(others);
+  if (opp.take === 1) return r < 0.9 ? pick(others) : ri;
+  return r < 0.5 ? ri : pick(others);
+}
+function updatePaw(dt) {
+  if (!paw) return;
+  const p = paw;
+  p.t += dt;
+  if (p.state === 'hover') {
+    const idx = Math.min(p.plan[p.step], me.length - 1);
+    p.tx = me[idx] ? me[idx].x : W / 2; p.ty = L.meY - L.ch * 0.95;
+    if (p.t > p.hold) {
+      p.t = 0; p.step++;
+      p.hold = 0.45 + Math.random() * 0.45;
+      if (p.step >= p.plan.length) { p.state = 'final'; p.target = oppChoose(); p.hold = p.stakes ? 0.55 : 0.25; if (Math.random() < 0.4) say(pick(T.lines.take), 1); }
+      else sfx.touch();
+    }
+  } else if (p.state === 'final') {
+    const c = me[p.target];
+    if (!c) { p.target = Math.floor(Math.random() * me.length); return; }
+    p.tx = c.x; p.ty = L.meY - L.ch * 0.6;
+    // fox and oni re-think if the raise changes at the last moment
+    if (p.t > p.hold) {
+      p.state = 'grab'; p.t = 0;
+      const i = me.indexOf(c);
+      me.splice(i, 1); if (c.id === raisedId) raisedId = null;
+      p.grab = c; c.faceUp = false; sfx.pull();
+    }
+  } else if (p.state === 'grab') {
+    p.tx = W / 2; p.ty = -80;
+    const c = p.grab;
+    c.x = p.x; c.y = p.y + L.ch * 0.35; c.r = 0;
+    if (p.t > 0.45) {
+      p.state = 'done';
+      const pos = Math.floor(Math.random() * (op.length + 1));
+      op.splice(pos, 0, c);
+      c.x = W / 2; c.y = -L.ch;
+      if (c.rank === -1) {
+        sfx.dismay(); setFace('dismay', 1.3); say(pick(T.lines.lostJoker));
+        later(1.3, () => { paw = null; startMyTurn(); });
+      } else {
+        const m = op.find((x) => x !== c && x.rank === c.rank);
+        c.faceUp = true;
+        later(0.4, () => discardPair(op, c, m));
+        later(1.0, () => { paw = null; if (!checkEnd()) startMyTurn(); });
+      }
+    }
+  }
+  const k = 1 - Math.exp(-dt * (p.state === 'grab' ? 9 : 7));
+  p.x = lerp(p.x, p.tx, k); p.y = lerp(p.y, p.ty, k);
+}
+function shuffleOpp(times) {
+  for (let i = 0; i < times; i++) later(i * 0.13, () => { shuffle(op); sfx.slide(); });
+}
+
+// ---------- input ----------
+const fingers = new Map();
+function opIndexAt(x, y) {
+  if (!op.length) return -1;
+  if (y < L.opY - L.ch * 0.75 || y > L.opY + L.ch * 2.4) return -1;
+  let best = -1, bd = 1e9;
+  for (let i = 0; i < op.length; i++) { const d = Math.abs(fanX(op.length, i) - x); if (d < bd) { bd = d; best = i; } }
+  return bd < Math.max(L.cw * 0.75, fanSpacing(op.length) * 0.6) ? best : -1;
+}
+function meIndexAt(x, y) {
+  if (y < L.meY - L.ch * 0.9 || y > L.meY + L.ch * 0.8) return -1;
+  const n = me.length; if (!n) return -1;
+  const s = fanSpacing(n);
+  let best = -1, bd = 1e9;
+  for (let i = 0; i < n; i++) { const d = Math.abs(fanX(n, i) - x); if (d < bd) { bd = d; best = i; } }
+  return bd < Math.max(L.cw * 0.6, s * 0.55) ? best : -1;
+}
+cv.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  audioInit();
+  const x = e.clientX, y = e.clientY;
+  fingers.set(e.pointerId, { x, y });
+  if (mode === 'title') { mode = 'intro'; resultAt = now; sfx.raise(); return; }
+  if (mode === 'intro') { if (now - resultAt > 0.4) { mode = 'play'; setupMatch(); sfx.shuffle(); } return; }
+  if (mode === 'result') {
+    if (now - resultAt > 0.7) { stage = result.nextStage; faceHold = 0; mode = 'intro'; resultAt = now; sfx.raise(); }
+    return;
+  }
+  if (mode !== 'play') return;
+  if (turn === 'me' && !touch) {
+    const i = opIndexAt(x, y);
+    if (i >= 0) { touch = { pid: e.pointerId, idx: i, x, y, pull: 0, locked: false }; lastTouchIdx = i; faceHold = 0; sfx.touch(); onTouchCard(i); return; }
+  }
+  // raise/lower my cards (any time I'm not drawing)
+  const mi = meIndexAt(x, y);
+  if (mi >= 0 && turn !== 'over') {
+    const c = me[mi];
+    raisedId = raisedId === c.id ? null : c.id;
+    sfx.raise();
+  }
+});
+function onTouchCard(i) {
+  const c = op[i]; if (!c) return;
+  if (i === lastSoundIdx) return;
+  lastSoundIdx = i;
+  if (c.rank === -1 && stage < 3) {
+    if (opp.tell === 0) later(0.18, () => { if (touch && op[touch.idx] === c) sfx.gulp(); });
+    else if (opp.tell === 1) later(0.18, () => { if (touch && op[touch.idx] === c) sfx.hehe(); });
+  }
+}
+cv.addEventListener('pointermove', (e) => {
+  const f = fingers.get(e.pointerId); if (f) { f.x = e.clientX; f.y = e.clientY; }
+  if (!touch || touch.pid !== e.pointerId || turn !== 'me') return;
+  touch.x = e.clientX; touch.y = e.clientY;
+  const baseY = L.opY;
+  touch.pull = Math.max(0, touch.y - baseY - L.ch * 0.15);
+  if (touch.pull < 26) {
+    touch.locked = false;
+    const i = opIndexAt(touch.x, clamp(touch.y, L.opY - L.ch * 0.5, L.opY + L.ch * 0.5));
+    if (i >= 0 && i !== touch.idx) { touch.idx = i; sfx.slide(); onTouchCard(i); }
+  } else touch.locked = true;
+});
+function release(e) {
+  fingers.delete(e.pointerId);
+  if (!touch || touch.pid !== e.pointerId) return;
+  const c = op[touch.idx];
+  if (turn === 'me' && c) {
+    const off = cardPullOffset(c, touch.pull);
+    if (off > L.ch * 0.8) { takeFromOpp(touch.idx); lastSoundIdx = -1; return; }
+    if (touch.pull < 10 && !hintsShown.pull) { hintsShown.pull = 1; showHint(T.hintPull, 3.5); }
+    faceHold = 0.7;   // the reaction lingers a moment after the finger leaves
+  }
+  touch = null; lastSoundIdx = -1;
+}
+cv.addEventListener('pointerup', release);
+cv.addEventListener('pointercancel', release);
+function cardPullOffset(c, pull) { return heavyFor(c) ? pull * lerp(0.75, 0.36, opp.str) : pull * 0.95; }
+
+// ---------- update ----------
+function update(dt) {
+  now += dt;
+  for (let i = timers.length - 1; i >= 0; i--) if (timers[i].t <= now) { const t = timers[i]; timers.splice(i, 1); t.fn(); }
+  if (faceHold > 0) faceHold -= dt;
+  updateFaceTarget();
+  const fk = 1 - Math.exp(-dt * 7);
+  for (const k in faceT) face[k] = lerp(face[k], faceT[k], fk);
+  blinkT -= dt; if (blinkT < 0) { if (!touch) blink = 0.14; blinkT = 2 + crand() * 3; }   // no blinking while being read
+  if (blink > 0) blink -= dt;
+  if (bubble) { bubble.t -= dt; if (bubble.t <= 0) bubble = null; }
+  if (hint) { hint.t -= dt; if (hint.t <= 0) hint = null; }
+  if (shakeScreen > 0) shakeScreen -= dt;
+
+  if (mode === 'play') {
+    if (turn === 'me') {
+      const rate = (touch ? 1 : 0.6) / opp.patience;
+      const before = patience;
+      patience -= dt * rate;
+      if (patience < 0.3 && Math.floor(before * 20) !== Math.floor(patience * 20)) sfx.tick();
+      if (patience <= 0) {
+        patience = 0; say(T.hurry, 1); sfx.hurry();
+        const idx = touch && op[touch.idx] ? touch.idx : Math.floor(Math.random() * op.length);
+        takeFromOpp(idx);
+      }
+      if (touch && op[touch.idx] && heavyFor(op[touch.idx]) && touch.pull > 14 && now - lastCreak > 0.25) { lastCreak = now; sfx.creak(); }
+    }
+    updatePaw(dt);
+    // card motion
+    const n = me.length, m = op.length;
+    const k = 1 - Math.exp(-dt * 11);
+    op.forEach((c, i) => {
+      if (c.delay > 0) { c.delay -= dt; return; }
+      let tx = fanX(m, i), ty = L.opY + Math.pow((i - (m - 1) / 2) / Math.max(1, m), 2) * 18, tr = -(i - (m - 1) / 2) * 0.05;
+      let lift = 0;
+      if (touch && touch.idx === i && turn === 'me') {
+        const off = cardPullOffset(c, touch.pull);
+        lift = 10 + off; tr *= 0.3;
+        if (heavyFor(c) && touch.pull > 14) tx += Math.sin(now * 60) * 1.5;
+        tx = lerp(tx, touch.x, clamp(off / (L.ch * 2), 0, 0.5));
+      }
+      c.lift = lerp(c.lift, lift, 1 - Math.exp(-dt * 18));
+      c.x = lerp(c.x, tx, k); c.y = lerp(c.y, ty + c.lift, k * 1.4 > 1 ? 1 : k * 1.4); c.r = lerp(c.r, tr, k);
+    });
+    me.forEach((c, i) => {
+      if (c.delay > 0) { c.delay -= dt; return; }
+      const tx = fanX(n, i), ty = L.meY + Math.pow((i - (n - 1) / 2) / Math.max(1, n), 2) * 18 - (c.id === raisedId ? L.ch * 0.28 : 0), tr = (i - (n - 1) / 2) * 0.05;
+      c.x = lerp(c.x, tx, k); c.y = lerp(c.y, ty, k); c.r = lerp(c.r, tr, k);
+    });
+    for (let i = flying.length - 1; i >= 0; i--) {
+      const f = flying[i]; f.t += dt / 0.4;
+      if (f.t >= 1) { flying.splice(i, 1); continue; }
+    }
+  }
+}
+
+// ---------- draw helpers ----------
+function rr(x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+function fitText(text, x, y, maxW, size, weight = '700', color = '#fff', align = 'center') {
+  let s = size; g.font = `${weight} ${s}px ${FONT}`;
+  while (g.measureText(text).width > maxW && s > 12) { s -= 1; g.font = `${weight} ${s}px ${FONT}`; }
+  g.fillStyle = color; g.textAlign = align; g.textBaseline = 'middle'; g.fillText(text, x, y);
+}
+const RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+function drawCard(c, x, y, r, up, glow = 0) {
+  const w = L.cw, h = L.ch;
+  g.save(); g.translate(x, y); g.rotate(r);
+  g.shadowColor = 'rgba(0,0,0,0.35)'; g.shadowBlur = 6; g.shadowOffsetY = 3;
+  rr(-w / 2, -h / 2, w, h, w * 0.12);
+  g.fillStyle = up ? '#fbf8f0' : '#24407a'; g.fill();
+  g.shadowColor = 'transparent';
+  if (glow > 0) { g.lineWidth = 3; g.strokeStyle = `rgba(255,230,120,${glow})`; g.stroke(); }
+  if (!up) {
+    g.save(); rr(-w / 2 + 4, -h / 2 + 4, w - 8, h - 8, w * 0.08); g.clip();
+    g.strokeStyle = 'rgba(255,255,255,0.18)'; g.lineWidth = 1.5;
+    for (let i = -6; i < 8; i++) { g.beginPath(); g.moveTo(-w, i * 10); g.lineTo(w, i * 10 + w); g.stroke(); g.beginPath(); g.moveTo(-w, i * 10 + w); g.lineTo(w, i * 10); g.stroke(); }
+    g.restore();
+    rr(-w / 2 + 4, -h / 2 + 4, w - 8, h - 8, w * 0.08); g.strokeStyle = '#e8c96a'; g.lineWidth = 1.5; g.stroke();
+    g.fillStyle = '#e8c96a'; g.beginPath(); g.arc(0, 0, w * 0.13, 0, 7); g.fill();
+  } else if (c.rank === -1) {
+    // joker: a grinning jester
+    g.fillStyle = '#7d2fb0'; g.beginPath(); g.moveTo(-w * 0.32, -h * 0.05); g.lineTo(-w * 0.38, -h * 0.34); g.lineTo(-w * 0.1, -h * 0.12); g.lineTo(0, -h * 0.38); g.lineTo(w * 0.1, -h * 0.12); g.lineTo(w * 0.38, -h * 0.34); g.lineTo(w * 0.32, -h * 0.05); g.closePath(); g.fill();
+    g.fillStyle = '#f2c43d'; for (const [px, py] of [[-w * 0.38, -h * 0.34], [0, -h * 0.38], [w * 0.38, -h * 0.34]]) { g.beginPath(); g.arc(px, py, w * 0.06, 0, 7); g.fill(); }
+    g.fillStyle = '#fff'; g.beginPath(); g.arc(0, h * 0.07, w * 0.27, 0, 7); g.fill(); g.strokeStyle = '#333'; g.lineWidth = 1.2; g.stroke();
+    g.fillStyle = '#222'; g.beginPath(); g.arc(-w * 0.1, h * 0.03, w * 0.035, 0, 7); g.arc(w * 0.1, h * 0.03, w * 0.035, 0, 7); g.fill();
+    g.strokeStyle = '#c0262d'; g.lineWidth = 2; g.beginPath(); g.arc(0, h * 0.08, w * 0.14, 0.2, Math.PI - 0.2); g.stroke();
+    g.fillStyle = '#e0457b'; g.beginPath(); g.arc(0, h * 0.08, w * 0.035, 0, 7); g.fill();
+    g.fillStyle = '#7d2fb0'; g.font = `800 ${Math.round(w * 0.2)}px ${FONT}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('JOKER', 0, h * 0.38);
+  } else {
+    const red = c.suit === 1 || c.suit === 2;
+    g.fillStyle = red ? '#c8283a' : '#1f2430';
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = `800 ${Math.round(w * 0.42)}px ${FONT}`; g.fillText(RANKS[c.rank], 0, -h * 0.13);
+    g.font = `${Math.round(w * 0.38)}px ${FONT}`; g.fillText(SUITS[c.suit], 0, h * 0.24);
+    g.font = `700 ${Math.round(w * 0.2)}px ${FONT}`; g.fillText(RANKS[c.rank], -w * 0.3, -h * 0.38);
+  }
+  g.restore();
+}
+
+function drawFace(o, cx, cy, R, alpha = 1) {
+  const f = face;
+  const sh = f.shake * Math.sin(now * 47) * R * 0.03;
+  g.save(); g.globalAlpha = alpha; g.translate(cx + sh, cy);
+  const kind = o.kind;
+  // ears / horns
+  g.fillStyle = o.col;
+  if (kind === 'tanuki' || kind === 'bake') {
+    for (const s of [-1, 1]) { g.beginPath(); g.arc(s * R * 0.72, -R * 0.72, R * 0.3, 0, 7); g.fill(); g.fillStyle = o.dark; g.beginPath(); g.arc(s * R * 0.72, -R * 0.72, R * 0.16, 0, 7); g.fill(); g.fillStyle = o.col; }
+  } else if (kind === 'fox') {
+    for (const s of [-1, 1]) {
+      g.beginPath(); g.moveTo(s * R * 0.25, -R * 0.8); g.lineTo(s * R * 0.95, -R * 1.35); g.lineTo(s * R * 0.92, -R * 0.35); g.closePath(); g.fill();
+      g.fillStyle = o.dark; g.beginPath(); g.moveTo(s * R * 0.45, -R * 0.78); g.lineTo(s * R * 0.88, -R * 1.18); g.lineTo(s * R * 0.84, -R * 0.55); g.closePath(); g.fill(); g.fillStyle = o.col;
+    }
+  } else if (kind === 'oni') {
+    g.fillStyle = '#f3e6c4';
+    for (const s of [-1, 1]) { g.beginPath(); g.moveTo(s * R * 0.3, -R * 0.82); g.quadraticCurveTo(s * R * 0.5, -R * 1.45, s * R * 0.62, -R * 1.5); g.lineTo(s * R * 0.62, -R * 0.7); g.closePath(); g.fill(); }
+    g.fillStyle = '#2a1a18'; g.beginPath(); for (let i = -4; i <= 4; i++) { g.moveTo(i * R * 0.2 - R * 0.14, -R * 0.75); g.lineTo(i * R * 0.2, -R * 1.08); g.lineTo(i * R * 0.2 + R * 0.14, -R * 0.75); } g.fill();
+  }
+  // head
+  g.fillStyle = o.col;
+  g.beginPath();
+  if (kind === 'fox') { g.moveTo(-R, -R * 0.35); g.quadraticCurveTo(-R, -R, 0, -R * 0.95); g.quadraticCurveTo(R, -R, R, -R * 0.35); g.quadraticCurveTo(R * 0.9, R * 0.5, 0, R * 0.95); g.quadraticCurveTo(-R * 0.9, R * 0.5, -R, -R * 0.35); }
+  else g.ellipse(0, 0, R, R * 0.93, 0, 0, 7);
+  g.fill();
+  if (kind === 'oni') { g.fillStyle = '#2a1a18'; g.beginPath(); g.ellipse(0, -R * 0.78, R * 0.85, R * 0.25, 0, Math.PI, 0); g.fill(); }
+  // muzzle / cheeks
+  g.fillStyle = o.light;
+  if (kind === 'tanuki' || kind === 'bake') { g.beginPath(); g.ellipse(0, R * 0.38, R * 0.55, R * 0.42, 0, 0, 7); g.fill(); }
+  if (kind === 'fox') { g.beginPath(); g.moveTo(-R * 0.95, -R * 0.1); g.quadraticCurveTo(-R * 0.3, R * 0.1, 0, R * 0.95); g.quadraticCurveTo(R * 0.3, R * 0.1, R * 0.95, -R * 0.1); g.quadraticCurveTo(R * 0.6, R * 0.6, 0, R * 0.95); g.quadraticCurveTo(-R * 0.6, R * 0.6, -R * 0.95, -R * 0.1); g.fill(); }
+  // eye patches
+  if (kind === 'tanuki' || kind === 'bake') { g.fillStyle = o.dark; for (const s of [-1, 1]) { g.beginPath(); g.ellipse(s * R * 0.38, -R * 0.08, R * 0.3, R * 0.24, s * -0.4, 0, 7); g.fill(); } }
+  if (kind === 'bake') { // leaf
+    g.fillStyle = '#5fae4a'; g.beginPath(); g.ellipse(0, -R * 0.98, R * 0.34, R * 0.16, -0.3, 0, 7); g.fill(); g.strokeStyle = '#2f6b25'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(-R * 0.28, -R * 0.9); g.lineTo(R * 0.3, -R * 1.06); g.stroke();
+  }
+  // blush
+  if (f.blush > 0.05) { g.fillStyle = `rgba(255,110,130,${f.blush * 0.55})`; for (const s of [-1, 1]) { g.beginPath(); g.ellipse(s * R * 0.62, R * 0.25, R * 0.17, R * 0.1, 0, 0, 7); g.fill(); } }
+  // eyes
+  const eo = Math.max(0.06, f.eye * (blink > 0 ? 0.08 : 1));
+  for (const s of [-1, 1]) {
+    const ex = s * R * 0.36, ey = -R * 0.08;
+    const ew = R * 0.17, eh = R * 0.17 * eo;
+    g.fillStyle = '#fff'; g.beginPath(); g.ellipse(ex, ey, ew, Math.max(1, eh), 0, 0, 7); g.fill();
+    if (eh > 2) {
+      g.save(); g.beginPath(); g.ellipse(ex, ey, ew, eh, 0, 0, 7); g.clip();
+      const pr = R * (f.eye > 1.2 ? 0.065 : 0.09);
+      g.fillStyle = kind === 'fox' ? '#5a2a00' : '#1b1b1b'; g.beginPath(); g.arc(ex + f.px * ew * 0.45, ey + f.py * eh * 0.35, pr, 0, 7); g.fill();
+      g.fillStyle = '#fff'; g.beginPath(); g.arc(ex + f.px * ew * 0.45 - pr * 0.35, ey + f.py * eh * 0.35 - pr * 0.35, pr * 0.3, 0, 7); g.fill();
+      g.restore();
+    }
+    // brow
+    g.strokeStyle = kind === 'oni' ? '#2a1a18' : o.dark; g.lineWidth = R * 0.07; g.lineCap = 'round';
+    const by = ey - R * 0.27 - (f.eye - 1) * R * 0.08;
+    g.beginPath(); g.moveTo(ex - s * R * 0.14, by + f.brow * R * 0.08); g.lineTo(ex + s * R * 0.14, by - f.brow * R * 0.08); g.stroke();
+  }
+  // nose
+  g.fillStyle = '#2b1c16'; g.beginPath(); g.ellipse(0, R * (kind === 'fox' ? 0.42 : 0.2), R * 0.1, R * 0.07, 0, 0, 7); g.fill();
+  // mouth
+  const my = R * (kind === 'fox' ? 0.6 : 0.5), mw = R * (kind === 'fox' ? 0.26 : 0.3);
+  g.strokeStyle = '#2b1c16'; g.lineWidth = R * 0.05;
+  if (f.grit > 0.3) {
+    g.fillStyle = '#fff'; rr(-mw, my - R * 0.06, mw * 2, R * 0.13, R * 0.04); g.fill(); g.stroke();
+    g.beginPath(); for (let i = -2; i <= 2; i++) { g.moveTo(i * mw * 0.35, my - R * 0.06); g.lineTo(i * mw * 0.35, my + R * 0.07); } g.stroke();
+  } else {
+    const curve = f.mouth * R * 0.2;
+    const wav = f.mouth < -0.3 ? Math.sin(now * 20) * R * 0.015 * f.shake * 3 : 0;
+    g.beginPath(); g.moveTo(-mw, my - curve * 0.3);
+    g.quadraticCurveTo(0, my + curve + wav, mw, my - curve * 0.3);
+    if (f.open > 0.08) { g.quadraticCurveTo(0, my + curve + f.open * R * 0.32, -mw, my - curve * 0.3); g.fillStyle = '#5a1d22'; g.fill(); }
+    g.stroke();
+  }
+  if (kind === 'oni') { g.fillStyle = '#fff'; for (const s of [-1, 1]) { g.beginPath(); g.moveTo(s * R * 0.2, my); g.lineTo(s * R * 0.26, my - R * 0.16); g.lineTo(s * R * 0.31, my); g.fill(); } }
+  // sweat
+  if (f.sweat > 0.08) {
+    const sy = -R * 0.5 + ((now * 0.7) % 1) * R * 0.5 * f.sweat;
+    g.fillStyle = `rgba(120,200,255,${Math.min(1, f.sweat)})`;
+    for (const s of [1, -1]) { if (s < 0 && f.sweat < 0.7) continue; g.beginPath(); g.moveTo(s * R * 0.95, sy - R * 0.14); g.quadraticCurveTo(s * R * 1.06, sy + R * 0.02, s * R * 0.95, sy + R * 0.06); g.quadraticCurveTo(s * R * 0.84, sy + R * 0.02, s * R * 0.95, sy - R * 0.14); g.fill(); }
+  }
+  if (kind === 'bake' && mode === 'play') { g.fillStyle = 'rgba(255,255,255,0.85)'; g.font = `800 ${Math.round(R * 0.32)}px ${FONT}`; g.textAlign = 'center'; g.fillText('?', R * 0.85, R * 0.65); }
+  g.restore();
+}
+
+function drawPaw(p) {
+  const o = opp; const R = L.cw * 0.42;
+  g.save(); g.translate(p.x, p.y);
+  g.fillStyle = o.col; g.strokeStyle = o.dark; g.lineWidth = 2;
+  g.beginPath(); g.rect(-R * 0.55, -R * 3.2, R * 1.1, R * 3.0); g.fill();
+  g.beginPath(); g.ellipse(0, 0, R * 0.8, R * 0.7, 0, 0, 7); g.fill(); g.stroke();
+  for (let i = -1.5; i <= 1.5; i++) { g.beginPath(); g.ellipse(i * R * 0.42, R * 0.6, R * 0.2, R * 0.28, 0, 0, 7); g.fill(); g.stroke(); }
+  if (o.kind === 'oni') { g.fillStyle = '#f3e6c4'; for (let i = -1.5; i <= 1.5; i++) { g.beginPath(); g.moveTo(i * R * 0.42 - 3, R * 0.8); g.lineTo(i * R * 0.42, R * 1.05); g.lineTo(i * R * 0.42 + 3, R * 0.8); g.fill(); } }
+  g.restore();
+}
+
+function drawBubble(text, x, y) {
+  g.font = `700 16px ${FONT}`;
+  const w = Math.min(W - 24, g.measureText(text).width + 24), h = 34;
+  const bx = clamp(x - w / 2, 12, W - 12 - w);
+  g.fillStyle = '#fff'; rr(bx, y - h / 2, w, h, 14); g.fill();
+  g.beginPath(); g.moveTo(x - 8, y + h / 2 - 1); g.lineTo(x - 18, y + h / 2 + 10); g.lineTo(x + 4, y + h / 2 - 1); g.fill();
+  fitText(text, bx + w / 2, y, w - 16, 16, '700', '#222');
+}
+
+// ---------- render ----------
+function drawTable() {
+  const grd = g.createRadialGradient(W / 2, H * 0.55, 10, W / 2, H * 0.55, Math.max(W, H) * 0.8);
+  grd.addColorStop(0, '#2f6b4b'); grd.addColorStop(1, '#14301f');
+  g.fillStyle = grd; g.fillRect(0, 0, W, H);
+  // wooden edge behind opponent
+  g.fillStyle = 'rgba(0,0,0,0.18)'; g.fillRect(0, 0, W, L.faceY + L.faceR * 1.05);
+}
+
+function render() {
+  g.setTransform(DPR, 0, 0, DPR, 0, 0);
+  const ss = shakeScreen > 0 ? shakeScreen * 10 : 0;
+  g.translate((crand() - 0.5) * ss, (crand() - 0.5) * ss);
+  drawTable();
+  if (mode === 'title') return drawTitle();
+  if (mode === 'intro') return drawIntro();
+  drawPlay();
+  if (mode === 'result') drawResult();
+}
+
+function drawHUD() {
+  const left = stage >= 3 ? T.streak(streak) : `${Math.min(stage, 2) + 1}/3 ${T.names[Math.min(stage, 3)]}`;
+  fitText(left, 14, 22, W * 0.5, 17, '800', '#fff', 'left');
+  const right = stage >= 3 ? T.best(bestStreak) : T.jokersDrawn(jokersDrawn);
+  fitText(right, W - 14, 22, W * 0.45, 14, '600', 'rgba(255,255,255,0.8)', 'right');
+}
+
+function drawPlay() {
+  const showStage = result && mode === 'result' ? result.stage : stage;
+  const o = mode === 'result' ? opp : opp;
+  drawHUD();
+  drawFace(o, L.faceX, L.faceY, L.faceR);
+  // patience bar
+  if (turn === 'me' && mode === 'play') {
+    const bw = Math.min(W * 0.5, 200), bx = W / 2 - bw / 2, by = L.faceY + L.faceR * 1.05;
+    g.fillStyle = 'rgba(0,0,0,0.35)'; rr(bx, by, bw, 8, 4); g.fill();
+    g.fillStyle = patience < 0.3 ? '#ff6a5a' : '#ffd35a'; rr(bx, by, Math.max(4, bw * patience), 8, 4); g.fill();
+  }
+  // pile
+  if (pile > 0) {
+    for (let i = 0; i < Math.min(pile, 8); i++) {
+      g.save(); g.translate(L.pileX, L.pileY - i * 2); g.rotate((i % 3 - 1) * 0.12);
+      g.fillStyle = '#ece6d6'; g.strokeStyle = 'rgba(0,0,0,0.25)'; g.lineWidth = 1; rr(-L.cw * 0.4, -L.ch * 0.4, L.cw * 0.8, L.ch * 0.8, 5); g.fill(); g.stroke(); g.restore();
+    }
+    fitText(`×${pile}`, L.pileX, L.pileY + L.ch * 0.55, 60, 14, '700', 'rgba(255,255,255,0.75)');
+  }
+  if (hint && mode === 'play') {
+    const a = Math.min(1, hint.t * 2);
+    g.globalAlpha = a;
+    g.fillStyle = 'rgba(0,0,0,0.55)'; rr(12, L.midY - 22, W - 24, 34, 10); g.fill();
+    fitText(hint.text, W / 2, L.midY - 5, W - 40, 15, '700', '#fff');
+    g.globalAlpha = 1;
+  }
+  if (mode === 'play' && (turn === 'me' || turn === 'opp')) {
+    fitText(turn === 'me' ? T.myTurn : T.oppTurn, W * 0.4, L.midY + 34, W * 0.6, 15, '700', 'rgba(255,255,255,0.7)');
+  }
+  // opponent hand
+  const touchedIdx = touch && turn === 'me' ? touch.idx : -1;
+  op.forEach((c, i) => { if (i !== touchedIdx) drawCard(c, c.x, c.y, c.r, c.faceUp && c.rank !== -1 ? true : c.faceUp); });
+  // my hand
+  me.forEach((c) => drawCard(c, c.x, c.y, c.r, true, c.id === raisedId ? 0.9 : 0));
+  // flying pairs
+  for (const f of flying) {
+    const e = 1 - Math.pow(1 - f.t, 3);
+    drawCard(f.c, lerp(f.sx, f.tx, e), lerp(f.sy, f.ty, e) - Math.sin(f.t * Math.PI) * 30, lerp(f.sr, f.tr, e), true);
+  }
+  // touched card on top
+  if (touchedIdx >= 0 && op[touchedIdx]) {
+    const c = op[touchedIdx]; drawCard(c, c.x, c.y, c.r, false, 0.7);
+    if (heavyFor(c) && touch.pull > 10) {   // the oni's fingers won't let go
+      const k = clamp(touch.pull / 60, 0, 1), top = c.y - L.ch * 0.5;
+      g.save(); g.globalAlpha = 0.4 + k * 0.6;
+      g.fillStyle = opp.col; g.strokeStyle = opp.dark; g.lineWidth = 2;
+      for (let i = -1; i <= 1; i++) { g.beginPath(); g.ellipse(c.x + i * L.cw * 0.26, top + 4, L.cw * 0.11, L.cw * 0.2, 0, 0, 7); g.fill(); g.stroke(); }
+      g.fillStyle = '#f3e6c4';
+      for (let i = -1; i <= 1; i++) { g.beginPath(); g.moveTo(c.x + i * L.cw * 0.26 - 3, top + 12); g.lineTo(c.x + i * L.cw * 0.26, top + 20); g.lineTo(c.x + i * L.cw * 0.26 + 3, top + 12); g.fill(); }
+      g.restore();
+    }
+  }
+  if (paw) { if (paw.grab) drawCard(paw.grab, paw.grab.x, paw.grab.y, 0, false); drawPaw(paw); }
+  if (bubble) drawBubble(bubble.text, L.faceX + L.faceR * 0.9, L.faceY - L.faceR * 1.05);
+}
+
+function drawTitle() {
+  const R = Math.min(W * 0.18, H * 0.09);
+  const fakeOpp = OPP[Math.floor(now / 2.4) % 3];
+  face.eye = 1; Object.assign(faceT, EXPR[['calm', 'smug', 'nervous'][Math.floor(now / 2.4) % 3]]);
+  drawFace(fakeOpp, W / 2, H * 0.2, R);
+  // decorative fan
+  const n = 5;
+  for (let i = 0; i < n; i++) {
+    const c = { rank: i === 2 ? -1 : [0, 11, 0, 12, 6][i], suit: i % 4 };
+    drawCard(c, W / 2 + (i - 2) * L.cw * 0.6, H * 0.42 + Math.abs(i - 2) * 6, (i - 2) * 0.13, true);
+  }
+  fitText(T.title, W / 2, H * 0.58, W - 32, 38, '900', '#ffe9a8');
+  fitText(T.sub, W / 2, H * 0.635, W - 32, 17, '700', '#fff');
+  fitText(T.how1, W / 2, H * 0.7, W - 28, 15, '500', 'rgba(255,255,255,0.88)');
+  fitText(T.how2, W / 2, H * 0.74, W - 28, 15, '500', 'rgba(255,255,255,0.88)');
+  fitText(T.how3, W / 2, H * 0.78, W - 28, 15, '500', 'rgba(255,255,255,0.88)');
+  const a = 0.55 + Math.sin(now * 4) * 0.45;
+  fitText(T.start, W / 2, H * 0.87, W - 32, 20, '800', `rgba(255,255,255,${a})`);
+  if (stage > 0) fitText(T.cont(T.names[Math.min(stage, 3)]), W / 2, H * 0.92, W - 32, 14, '600', 'rgba(255,233,168,0.9)');
+}
+
+function drawIntro() {
+  const o = OPP[Math.min(stage, 3)];
+  Object.assign(faceT, EXPR.think); faceHold = 0;
+  drawFace(o, W / 2, H * 0.27, Math.min(W * 0.24, H * 0.12));
+  fitText(T.vs, W / 2, H * 0.45, W - 32, 16, '700', 'rgba(255,255,255,0.7)');
+  fitText(T.names[Math.min(stage, 3)], W / 2, H * 0.51, W - 32, 34, '900', '#ffe9a8');
+  const h = T.hint[Math.min(stage, 3)];
+  g.fillStyle = 'rgba(0,0,0,0.3)'; rr(16, H * 0.57, W - 32, 76, 12); g.fill();
+  fitText(h[0], W / 2, H * 0.57 + 24, W - 48, 16, '700', '#fff');
+  fitText(h[1], W / 2, H * 0.57 + 52, W - 48, 14, '500', 'rgba(255,255,255,0.85)');
+  if (stage >= 3) fitText(T.best(bestStreak) + ' / ' + T.streak(streak), W / 2, H * 0.74, W - 32, 15, '700', 'rgba(255,255,255,0.8)');
+  const a = 0.55 + Math.sin(now * 4) * 0.45;
+  fitText(T.tapGo, W / 2, H * 0.86, W - 32, 20, '800', `rgba(255,255,255,${a})`);
+}
+
+function drawResult() {
+  const r = result; if (!r) return;
+  const a = Math.min(1, (now - resultAt) * 3);
+  g.globalAlpha = a;
+  const oy = H * 0.24; g.fillStyle = 'rgba(8,20,14,0.82)'; g.fillRect(0, H * 0.33 + oy, W, H * 0.4);
+  fitText(r.won ? T.win : T.lose, W / 2, H * 0.4 + oy, W - 32, 44, '900', r.won ? '#ffe36a' : '#ff9a8a');
+  let y = H * 0.47 + oy;
+  if (!r.won) { fitText(T.loseSub, W / 2, y, W - 32, 16, '600', '#fff'); y += 28; }
+  if (r.stage >= 3) {
+    fitText(T.reveal(T.kinds[r.kind]), W / 2, y, W - 32, 16, '700', '#d9ccff'); y += 30;
+    fitText(T.streak(r.streak), W / 2, y, W - 32, 24, '800', '#fff'); y += 30;
+    fitText(r.best ? T.bestUp : T.best(bestStreak), W / 2, y, W - 32, 16, '700', r.best ? '#ffe36a' : 'rgba(255,255,255,0.8)');
+  } else if (r.won) {
+    if (r.stage === 2) { fitText(T.allClear, W / 2, y, W - 32, 20, '800', '#fff'); y += 30; fitText(T.bakeNext, W / 2, y, W - 32, 14, '600', 'rgba(255,255,255,0.85)'); }
+    else fitText(T.next(T.names[r.stage + 1]), W / 2, y, W - 32, 18, '700', '#fff');
+  } else {
+    fitText(T.retry, W / 2, y, W - 32, 18, '700', '#fff');
+  }
+  if (now - resultAt > 0.7) {
+    const b = 0.55 + Math.sin(now * 4) * 0.45;
+    fitText(r.won ? T.tapNext : T.tapAgain, W / 2, H * 0.7 + oy, W - 32, 18, '800', `rgba(255,255,255,${b})`);
+  }
+  g.globalAlpha = 1;
+}
+
+// ---------- loop ----------
+let last = performance.now();
+function frame(t) {
+  const dt = Math.min(0.05, Math.max(0, (t - last) / 1000)); last = t;
+  if (W < 2 || H < 2) resize();
+  update(dt);
+  render();
+  requestAnimationFrame(frame);
+}
+resize();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
