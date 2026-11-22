@@ -1,0 +1,493 @@
+{
+  "id": "2026-11-22-gpt-2",
+  "status": "published",
+  "title": "場所をわすれる鈴",
+  "genre": "記憶",
+  "concept": "光った鈴の形と音の順を覚え、場所が入れ替わった後で同じ歌を返す。指の位置だけで覚える近道を外し、太陽・月・しずく・葉の名前に置き換えて覚える。三音から七音へ少しずつ長くなる五つの歌。",
+  "howToPlay": "光った鈴の順番を覚え、入れ替わった鈴を同じ順にタップします。三回間違えるまでに五つの歌を返してください。",
+  "libraryDecision": "形と位置の入れ替わりを読むため、正面の2Dパネルを使う。3Dの回転や遮蔽は記憶する対象を曖昧にする。四つの短音とCSSの光だけで核を表せるためライブラリは使わない。",
+  "soundDecision": "四つの形へ異なる高さの柔らかい音を割り当て、形の並びを音の歌としても覚えられるようにする。独立したBGMは記憶を邪魔するため付けない。",
+  "improvements": [
+    {
+      "found": "葉がクラブ、しずくがひし形で、名前と形を結びつけにくい／返した形の履歴がなく途中の位置を見失いやすい／最後の正解直後の追加タップが誤答になることを検査で確認した。",
+      "changed": "葉としずくを名前に合う絵へ替え、自分が返した形だけを履歴として残した。最後の正解で直ちに入力を閉じ、区切りまでの連打を誤答にしない。",
+      "foundEn": "Leaf and Drop symbols did not match their names; there was no reply history; a check confirmed that an extra tap immediately after the final correct note caused an error.",
+      "changedEn": "Used matching leaf and drop icons, retained only the player's reply history, and locked input immediately after the last correct note."
+    },
+    {
+      "found": "聞く音の合間に進み具合が0へ戻る／間違えても正しい形が分からず、復習のきっかけがない／誤答も正解と同じ白い光で見分けづらい。",
+      "changed": "聞いた数を音の合間にも維持。誤答時は正しい形の名前を一度示してから同じ歌を再生し、押した形を赤い輪で知らせる。",
+      "foundEn": "Playback progress reset between notes; mistakes did not reveal the expected identity; errors used the same white glow as correct notes.",
+      "changedEn": "Kept playback progress through gaps, briefly named the expected identity before replaying the same melody, and marked the mistaken bell with a red ring."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "カードゲーム",
+      "en": "Card game",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "一度だけ見せた札の並びを、一回の交換で元へ戻すカード遊び。2Dで全ての表を見せ、3Dの裏返しで情報を隠さない。",
+        "ideaEn": "Restore a briefly shown card order with a single swap. Flat cards expose all information without 3D flips.",
+        "fromDraw": true
+      },
+      {
+        "idea": "四つの鈴の形と音を覚え、場所が変わった後で同じ歌を返す。正面2Dの光るパネルで、形と位置を分けて記憶する。",
+        "ideaEn": "Remember four bell identities and notes, then repeat a melody after their locations change. Flat glowing panels separate identity memory from location.",
+        "fromDraw": false
+      },
+      {
+        "idea": "重さの違う回転棒を輪へ投げ入れる。3Dの軸と重心で離す瞬間を読む。",
+        "ideaEn": "Throw an uneven spinning rod through a ring, using 3D axes and center of mass to time release.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 1
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "other",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Bells Forget Their Places",
+      "concept": "Remember bell shapes and notes, then repeat their melody after the locations change. Removing position-only memory encourages naming Sun, Moon, Drop and Leaf across five melodies growing from three to seven notes.",
+      "howToPlay": "Remember the glowing bells, then tap their reshuffled identities in the same order. Return five melodies before three mistakes.",
+      "libraryDecision": "Frontal 2D panels keep identities clear as locations change. Four synthesized notes and CSS glow express the core without 3D occlusion or libraries.",
+      "soundDecision": "Each shape has a distinct soft pitch, allowing the sequence to become a melody. No separate background music competes with memory."
+    }
+  },
+  "createdAt": "2026-11-22T12:07:50+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "gpt-6.1-sol",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-22T12:07:50+09:00",
+    "metricsFrom": "2026-11-22T03:06:03.481Z",
+    "transcript": null,
+    "validationRuns": 3,
+    "finishedAt": "2026-11-22T12:18:25+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-22T12:12:14+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "7.3KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 7522,
+    "lines": 18
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0.3,
+    "idleStarts": 2
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "gpt-6.1-sol",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "五曲とも同じ四つの形を覚える繰り返しで、並び以外の変化が少ない。音だけで追うのも難しく、形の名前に頼りがち。",
+    "comment": "二曲目の太陽・葉・太陽・しずくを名前にして覚え、入れ替わった左下の葉と右上のしずくを探して返す場面に小さな手応えがあった。五曲の英語検査も完走したが、繰り返し遊ぶ動機は弱い。ふつうの短い記憶遊び。",
+    "similar": [
+      {
+        "title": "Simon",
+        "url": "https://instructions.hasbro.com/en-us/instruction/simon-game",
+        "similarity": "高",
+        "note": "四つの光と音を順に覚えて返す核が同じ。こちらは位置を入れ替え、独立した五曲を三音から七音へ増やす。",
+        "note_en": "Same core of remembering four lights and sounds and repeating their order. This game reshuffles locations and uses five independent melodies of three to seven notes."
+      }
+    ],
+    "research": "Hasbro公式のSimon説明書を検索し、光と音の順を同じ順に押して返す遊びを確認した。",
+    "i18n": {
+      "en": {
+        "worst": "All five songs repeat the same four identities with little variation beyond sequence. The pitches alone are hard to follow, encouraging reliance on names.",
+        "comment": "Naming Sun, Leaf, Sun, Drop and finding Leaf at lower left and Drop at upper right after the shuffle gave a small satisfying moment. English QA cleared all five songs, but replay motivation is limited. An ordinary short memory game.",
+        "research": "Searched Hasbro's official Simon instructions and confirmed its core of repeating a sequence of lights and sounds."
+      }
+    },
+    "method": "スマホ縦画面で 16 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 16 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "音の合間の進み具合も保持する完成版で、最初の葉を覚える。",
+        "noteEn": "In the revised version with stable progress, I memorize the first Leaf.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "wait 850ms",
+        "note": "二音目の月。葉、月の順を覚える。",
+        "noteEn": "The second note is Moon; I remember Leaf, Moon.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "wait 850ms",
+        "note": "三音目の太陽。最初の歌は葉、月、太陽。",
+        "noteEn": "The third note is Sun; the first melody is Leaf, Moon, Sun.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 1400ms",
+        "note": "入れ替わった後の位置を読む。葉は右上、月は左上、太陽は左下。",
+        "noteEn": "After the shuffle, Leaf is upper right, Moon upper left, and Sun lower left.",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.72,0.43) 120ms",
+        "note": "葉を返すと、下に自分の返した葉が残る。正解全体は出ないので記憶の遊びは保たれている。",
+        "noteEn": "Replying with Leaf leaves only my answered note below, without revealing the remaining melody.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.28,0.43) 120ms",
+        "note": "月を返し、葉と月の履歴を確認する。",
+        "noteEn": "I reply with Moon and inspect the Leaf–Moon history.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.28,0.64) 120ms",
+        "note": "太陽で三音を終える。次の歌では四音を新しく覚える。",
+        "noteEn": "Sun completes the first melody; the next one will have four new notes.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "二つ目の歌を聞く。最初の形を見る。",
+        "noteEn": "I listen to the first identity of the second melody.",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 850ms",
+        "note": "一音目は太陽。二音目を確かめる。",
+        "noteEn": "The first note is Sun; I inspect the second.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "wait 850ms",
+        "note": "太陽、葉に続く三音目を読む。",
+        "noteEn": "I inspect the third note after Sun and Leaf.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "wait 850ms",
+        "note": "三音目は太陽で同じ形が戻る。最後の四音目を聞く。",
+        "noteEn": "The third note returns to Sun; I listen to the fourth.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "wait 1400ms",
+        "note": "太陽、葉、太陽、しずく。移った位置を見て返す。",
+        "noteEn": "Sun, Leaf, Sun, Drop. I inspect their new locations before replying.",
+        "image": "ai-play/step-12.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "tap(0.72,0.64) 120ms",
+        "note": "太陽を返す。",
+        "noteEn": "Reply Sun.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "tap(0.28,0.64) 120ms",
+        "note": "左下の葉を返す。",
+        "noteEn": "Reply Leaf at lower left.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "tap(0.72,0.64) 120ms",
+        "note": "もう一度太陽。位置より形の順をたどる。",
+        "noteEn": "Sun again; follow identities rather than locations.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "tap(0.72,0.43) 120ms",
+        "note": "最後は右上のしずく。二つ目の歌をミスなく返せた。",
+        "noteEn": "Finish with Drop at upper right; song two cleared without a mistake.",
+        "image": "ai-play/step-16.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-22T12:18:25+09:00"
+  },
+  "publishedAt": "2026-11-22T12:18:25+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 3392,
+    "outputTokens": 13258,
+    "contextTokens": 12885026,
+    "turns": 37,
+    "toolCalls": 36,
+    "webSearches": null,
+    "minutes": 12.4,
+    "from": "2026-11-22T03:06:03.481Z",
+    "to": "2026-11-22T03:18:28.312Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-22T12:18:28+09:00",
+    "validationRuns": 3,
+    "codeKB": 7.3,
+    "evidence": "metrics-evidence.json"
+  }
+}
