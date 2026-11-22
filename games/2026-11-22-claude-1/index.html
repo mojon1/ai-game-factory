@@ -1,0 +1,725 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>ふりむき迷宮</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; }
+html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #050403; color: #f1e6d2;
+  font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif; }
+#wrap { position: fixed; left: 0; top: 0; width: 100vw; height: 100dvh; overflow: hidden; }
+#gl { position: absolute; left: 0; top: 0; display: block; }
+#flash { position: absolute; left: 0; top: 0; right: 0; pointer-events: none; opacity: 0; }
+.edge { position: absolute; pointer-events: none; opacity: 0; }
+#eL { left: 0; top: 0; width: 60px; background: linear-gradient(to right, rgba(255,40,20,.85), rgba(255,40,20,0)); }
+#eR { right: 0; top: 0; width: 60px; background: linear-gradient(to left, rgba(255,40,20,.85), rgba(255,40,20,0)); }
+#eB { left: 0; right: 0; height: 70px; background: linear-gradient(to top, rgba(255,40,20,.85), rgba(255,40,20,0)); }
+#eT { left: 0; right: 0; top: 0; height: 60px; background: linear-gradient(to bottom, rgba(255,40,20,.7), rgba(255,40,20,0)); }
+#hud { position: absolute; left: 0; right: 0; top: 0; display: flex; justify-content: space-between; align-items: flex-start;
+  padding: 10px 12px; pointer-events: none; text-shadow: 0 1px 3px #000, 0 0 6px #000; }
+#floor { font-size: 24px; font-weight: 800; letter-spacing: 1px; }
+#floorSub { font-size: 13px; opacity: .8; margin-top: 2px; }
+#info { font-size: 16px; text-align: right; font-weight: 700; }
+#mini { position: absolute; right: 8px; top: 38px; width: 128px; height: 128px; pointer-events: none; border-radius: 6px; }
+#hint { position: absolute; left: 0; right: 0; text-align: center; font-size: 15px; pointer-events: none; padding: 0 16px;
+  text-shadow: 0 1px 3px #000, 0 0 8px #000; transition: opacity .6s; }
+#pad { position: absolute; left: 0; right: 0; bottom: 0; padding: 8px 10px calc(10px + env(safe-area-inset-bottom));
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; background: linear-gradient(to top, rgba(5,4,3,.95), rgba(5,4,3,.6)); }
+.b { grid-column: span 2; height: 54px; border-radius: 14px; background: rgba(48,40,32,.85); border: 1px solid rgba(255,214,160,.28);
+  color: #f6e8cf; font-size: 24px; display: flex; align-items: center; justify-content: center; line-height: 1; }
+.b.w { grid-column: span 3; font-size: 17px; font-weight: 700; gap: 6px; }
+.b.on { background: rgba(140,104,60,.95); }
+#bStare { border-color: rgba(190,220,255,.45); }
+#ov { position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 24px; background: rgba(5,4,3,.72); }
+#ov.hide { display: none; }
+#ovT { font-size: 40px; font-weight: 900; letter-spacing: 2px; margin-bottom: 14px; text-shadow: 0 0 18px rgba(255,170,90,.45); }
+#ovB { font-size: 16px; line-height: 1.7; opacity: .95; max-width: 340px; }
+#ovS { font-size: 20px; font-weight: 800; margin-top: 10px; color: #ffd890; }
+#ovC { font-size: 17px; margin-top: 26px; opacity: .9; animation: blink 1.6s infinite; }
+@keyframes blink { 50% { opacity: .35; } }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="gl"></canvas>
+  <div id="flash"></div><div class="edge" id="eL"></div><div class="edge" id="eR"></div><div class="edge" id="eB"></div><div class="edge" id="eT"></div>
+  <div id="hud"><div><div id="floor">B1F</div><div id="floorSub"></div></div><div id="info"></div></div>
+  <canvas id="mini"></canvas>
+  <div id="hint"></div>
+  <div id="pad">
+    <div class="b" id="bL"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 6 6v5"/></svg></div>
+    <div class="b" id="bF">▲</div>
+    <div class="b" id="bR"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0-6 6v5"/></svg></div>
+    <div class="b w" id="bU"><span>⟲</span><span id="tU"></span></div>
+    <div class="b w" id="bStare"><span>◉</span><span id="tS"></span></div>
+  </div>
+  <div id="ov"><div id="ovT"></div><div id="ovB"></div><div id="ovS"></div><div id="ovC"></div></div>
+</div>
+<script src="../../lib/three-0.186.1.min.js"></script>
+<script>
+'use strict';
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const TX = {
+  ja: {
+    title: 'ふりむき迷宮',
+    how: '石像は、見られている間は動けない。<br>見つめた分だけ、長く石になる。<br>うしろに気をつけて階段まで逃げよう。',
+    tap: 'タップでスタート', cont: 'タップで次へ', again: 'タップでもう一度', retry: 'タップでこの階をやり直す',
+    fromFloor: (f) => `B${f}F からつづき`,
+    u: 'ふりむく', s: '見つめる',
+    hint: '見つめた分だけ像は石になる。ふりむくにも1手かかる',
+    hintKey: '地図の金色が鍵。鍵がないと階段は開かない',
+    caught: 'つかまった…', caughtB: (n) => `${n}手目でつかまった`,
+    clear: (f) => `B${f}F 突破`, clearB: (n) => `${n}手で階段へ`,
+    win: '地上だ！', winB: (n, c) => `全5階を ${n}手 でぬけた<br>つかまった回数 ${c}`,
+    best: (n) => `ベスト ${n}手`, newBest: 'ベスト更新！',
+    steps: (n) => `${n}手`, keyNeed: '鍵 ✕', keyHave: '鍵 ✓', locked: '鍵がかかっている',
+    floorsLeft: (n) => `地上まで ${n}階`, gotKey: '鍵を手に入れた！ 階段が開いた',
+    squeeze: '石の像はすり抜けられる。でも今度はうしろに…',
+    sight: '見つめるほど石の輪がたまる。石のうちはすり抜けられる',
+  },
+  en: {
+    title: 'Look-Back Maze',
+    how: 'Statues cannot move while you watch them.<br>The longer you stare, the longer they stay stone.<br>Mind your back and reach the stairs.',
+    tap: 'Tap to start', cont: 'Tap to continue', again: 'Tap to play again', retry: 'Tap to retry this floor',
+    fromFloor: (f) => `Continue from B${f}F`,
+    u: 'Turn back', s: 'Stare',
+    hint: 'Stare to turn statues to stone. Turning costs a move too',
+    hintKey: 'Gold on the map is the key. The stairs need it',
+    caught: 'Caught…', caughtB: (n) => `Caught on move ${n}`,
+    clear: (f) => `B${f}F cleared`, clearB: (n) => `Stairs in ${n} moves`,
+    win: 'Daylight!', winB: (n, c) => `All 5 floors in ${n} moves<br>Times caught: ${c}`,
+    best: (n) => `Best ${n} moves`, newBest: 'New best!',
+    steps: (n) => `${n} moves`, keyNeed: 'Key ✕', keyHave: 'Key ✓', locked: 'It is locked',
+    floorsLeft: (n) => `${n} floors to the surface`, gotKey: 'Got the key! The stairs are open',
+    squeeze: 'You can slip past stone statues. But now it is behind you…',
+    sight: 'Staring fills its stone ring. While stone, you can slip past',
+  }
+}[LANG === 'ja' ? 'ja' : 'en'];
+document.documentElement.lang = LANG === 'ja' ? 'ja' : 'en';
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+
+const $ = (id) => document.getElementById(id);
+$('tU').textContent = TX.u; $('tS').textContent = TX.s;
+
+// ---------- save ----------
+let save = { floor: 1, best: 0 };
+addEventListener('message', (e) => {
+  if (e.data && e.data.agf === 'loaded' && e.data.data) {
+    const d = e.data.data;
+    save.floor = Math.max(1, Math.min(5, d.floor | 0 || 1)); save.best = d.best | 0;
+    if (state === 'title') showTitle();
+  }
+});
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+const doSave = () => { try { parent.postMessage({ agf: 'save', data: save }, '*'); } catch (e) {} };
+
+// ---------- rng ----------
+function rng(seed) { let s = seed >>> 0; return () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+
+// ---------- rules ----------
+const DX = [0, 1, 0, -1], DY = [-1, 0, 1, 0];
+const CAM_BACK = 0.3;
+const VIS = 6;           // how far you can see (tiles)
+let STONE_GAIN = 3;    // stone turns gained per move while watched
+let STONE_MAX = 9;
+const FLOORS = [
+  { w: 4, h: 4, st: 1, key: false, loops: 0.2, wake: 5, wakeTick: 60, spd: 0.5 },
+  { w: 5, h: 5, st: 1, key: true, loops: 0.3, wake: 5, wakeTick: 60, spd: 0.5 },
+  { w: 5, h: 5, st: 2, key: true, loops: 0.32, wake: 5, wakeTick: 60, spd: 0.55 },
+  { w: 6, h: 6, st: 2, key: true, loops: 0.24, wake: 7, wakeTick: 60, spd: 0.7 },
+  { w: 6, h: 6, st: 3, key: true, loops: 0.28, wake: 7, wakeTick: 60, spd: 0.75 },
+];
+
+let state = 'title', floorIdx = 0, cfg, map, GW, GH, px, py, pd, exitT, keyT, haveKey, statues = [], seen, steps = 0, totalSteps = 0, caughtCount = 0, floorSeed = 0;
+let squeezed = false, firstSight = false, ovGuard = 0, queued = null, caughtBy = null, runStartFloor = 1;
+
+const isWall = (x, y) => x < 0 || y < 0 || x >= GW || y >= GH || map[y][x] === 1;
+function bfs(sx, sy) {
+  const d = new Int16Array(GW * GH).fill(-1); const q = [sx + sy * GW]; d[q[0]] = 0;
+  for (let i = 0; i < q.length; i++) {
+    const c = q[i], x = c % GW, y = (c / GW) | 0;
+    for (let k = 0; k < 4; k++) { const nx = x + DX[k], ny = y + DY[k]; if (!isWall(nx, ny) && d[nx + ny * GW] < 0) { d[nx + ny * GW] = d[c] + 1; q.push(nx + ny * GW); } }
+  }
+  return d;
+}
+
+function genFloor(c, seed) {
+  const R = rng(seed);
+  GW = c.w * 2 + 1; GH = c.h * 2 + 1;
+  map = Array.from({ length: GH }, () => new Uint8Array(GW).fill(1));
+  const vis = new Uint8Array(c.w * c.h); const stack = [[0, c.h - 1]]; vis[(c.h - 1) * c.w] = 1; map[GH - 2][1] = 0;
+  while (stack.length) {
+    const [cx, cy] = stack[stack.length - 1]; const nb = [];
+    for (let d = 0; d < 4; d++) { const nx = cx + DX[d], ny = cy + DY[d]; if (nx >= 0 && ny >= 0 && nx < c.w && ny < c.h && !vis[ny * c.w + nx]) nb.push([nx, ny]); }
+    if (!nb.length) { stack.pop(); continue; }
+    const [nx, ny] = nb[(R() * nb.length) | 0];
+    map[cy * 2 + 1 + (ny - cy)][cx * 2 + 1 + (nx - cx)] = 0; map[ny * 2 + 1][nx * 2 + 1] = 0; vis[ny * c.w + nx] = 1; stack.push([nx, ny]);
+  }
+  const walls = [];
+  for (let y = 1; y < GH - 1; y++) for (let x = 1; x < GW - 1; x++) if (map[y][x] === 1 && ((x % 2 === 0) !== (y % 2 === 0))) walls.push([x, y]);
+  for (let i = walls.length - 1; i > 0; i--) { const j = (R() * (i + 1)) | 0; [walls[i], walls[j]] = [walls[j], walls[i]]; }
+  const nRemove = Math.round(walls.length * c.loops);
+  for (let i = 0; i < nRemove; i++) map[walls[i][1]][walls[i][0]] = 0;
+  px = 1; py = GH - 2;
+  const dS = bfs(px, py);
+  const cells = [];
+  for (let y = 1; y < GH; y += 2) for (let x = 1; x < GW; x += 2) cells.push({ x, y, s: dS[x + y * GW] });
+  cells.sort((a, b) => b.s - a.s);
+  const ex = cells[(R() * 2) | 0]; exitT = { x: ex.x, y: ex.y };
+  const dE = bfs(exitT.x, exitT.y);
+  keyT = null;
+  if (c.key) {
+    let bestK = null, bv = -1;
+    for (const q of cells) { if (q.x === exitT.x && q.y === exitT.y) continue; const v = Math.min(q.s, dE[q.x + q.y * GW] * 1.2) + R() * 3; if (v > bv) { bv = v; bestK = q; } }
+    keyT = { x: bestK.x, y: bestK.y };
+  }
+  statues = [];
+  const maxS = cells[0].s;
+  const dK = keyT ? bfs(keyT.x, keyT.y) : null;
+  const cand = cells.filter(q => q.s >= Math.max(9, maxS * 0.4) && dE[q.x + q.y * GW] >= 6 && !(dK && dK[q.x + q.y * GW] < 4));
+  for (let i = cand.length - 1; i > 0; i--) { const j = (R() * (i + 1)) | 0; [cand[i], cand[j]] = [cand[j], cand[i]]; }
+  // the first statue sleeps on the way to the first goal, so every floor has a meeting
+  {
+    const tgt = keyT || exitT; const dT = bfs(tgt.x, tgt.y); const path = [];
+    let x = px, y = py;
+    while (!(x === tgt.x && y === tgt.y) && path.length < 400) {
+      for (let k = 0; k < 4; k++) { const nx = x + DX[k], ny = y + DY[k]; if (!isWall(nx, ny) && dT[nx + ny * GW] === dT[x + y * GW] - 1) { x = nx; y = ny; break; } }
+      path.push({ x, y });
+    }
+    const ok = path.filter((q, i) => i >= 5 && i <= path.length - 3);
+    if (ok.length) { const q = ok[Math.min(ok.length - 1, (ok.length * (0.35 + R() * 0.3)) | 0)]; cand.unshift({ x: q.x, y: q.y }); }
+  }
+  for (const q of cand) {
+    if (statues.length >= c.st) break;
+    if (statues.some(s => Math.abs(s.x - q.x) + Math.abs(s.y - q.y) < 6)) continue;
+    statues.push({ x: q.x, y: q.y, stone: 0, mv: 0, awake: false, seen: false, lx: -1, ly: -1, wasVis: false, pose: R() });
+  }
+  // face an open direction
+  pd = 0; for (const d of [0, 1, 2, 3]) if (!isWall(px + DX[d], py + DY[d])) { pd = d; break; }
+  seen = new Uint8Array(GW * GH).fill(1);
+}
+
+function visibleTile(tx, ty, x0 = px, y0 = py, d0 = pd) {
+  const rx = tx - x0, ry = ty - y0;
+  const f = rx * DX[d0] + ry * DY[d0];
+  const l = rx * DX[(d0 + 1) % 4] + ry * DY[(d0 + 1) % 4];
+  if (f < 0.5 || f > VIS) return false;
+  if (Math.abs(l) > (f + CAM_BACK) * tanH + 0.3) return false;
+  // seen if a ray from the eye reaches the statue's centre or either side of its body
+  const ex = x0 - DX[d0] * CAM_BACK, ey = y0 - DY[d0] * CAM_BACK;
+  const h = Math.hypot(tx - ex, ty - ey) || 1, nx = -(ty - ey) / h, ny = (tx - ex) / h;
+  for (const o of [0, 0.2, -0.2]) if (clearRay(ex, ey, tx + nx * o, ty + ny * o, tx, ty)) return true;
+  return false;
+}
+function clearRay(ax, ay, bx, by, tx, ty) {
+  const n = Math.ceil(Math.hypot(bx - ax, by - ay) * 10);
+  for (let i = 1; i < n; i++) {
+    const t = i / n; const sx = Math.round(ax + (bx - ax) * t), sy = Math.round(ay + (by - ay) * t);
+    if ((sx !== tx || sy !== ty) && isWall(sx, sy)) return false;
+  }
+  return true;
+}
+function updateSeen() {
+  seen[px + py * GW] = 1;
+  for (let k = 0; k < 4; k++) { const nx = px + DX[k], ny = py + DY[k]; if (!isWall(nx, ny)) seen[nx + ny * GW] = 1; }
+  for (let y = Math.max(0, py - VIS); y <= Math.min(GH - 1, py + VIS); y++)
+    for (let x = Math.max(0, px - VIS); x <= Math.min(GW - 1, px + VIS); x++)
+      if (!isWall(x, y) && visibleTile(x, y)) seen[x + y * GW] = 1;
+}
+const statueAt = (x, y) => statues.find(s => s.x === x && s.y === y);
+
+// ---------- three ----------
+const canvas = $('gl');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1));
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x050403);
+scene.fog = new THREE.Fog(0x050403, 1.0, VIS + 0.6);
+const camera = new THREE.PerspectiveCamera(70, 1, 0.04, 30);
+camera.rotation.order = 'YXZ';
+const torch = new THREE.PointLight(0xffb070, 3.4, 10, 1.3);
+scene.add(torch);
+scene.add(new THREE.AmbientLight(0x8090b0, 0.22));
+let tanH = 0.5;
+
+function makeTex(draw, size = 128) {
+  const c = document.createElement('canvas'); c.width = c.height = size; const g = c.getContext('2d'); draw(g, size);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t;
+}
+const R0 = rng(7);
+const wallTex = makeTex((g, S) => {
+  g.fillStyle = '#2a241f'; g.fillRect(0, 0, S, S);
+  const rows = 4, bh = S / rows;
+  for (let r = 0; r < rows; r++) {
+    const off = (r % 2) * S / 4;
+    for (let i = -1; i < 3; i++) {
+      const x = i * S / 2 + off; const v = 60 + R0() * 30 | 0;
+      g.fillStyle = `rgb(${v + 14},${v + 4},${v - 8})`; g.fillRect(x + 2, r * bh + 2, S / 2 - 4, bh - 4);
+    }
+  }
+  for (let i = 0; i < 900; i++) { const a = R0() * 0.18; g.fillStyle = R0() < .5 ? `rgba(0,0,0,${a})` : `rgba(255,230,200,${a * .5})`; g.fillRect(R0() * S, R0() * S, 2, 2); }
+});
+const floorTex = makeTex((g, S) => {
+  g.fillStyle = '#211c18'; g.fillRect(0, 0, S, S);
+  for (let i = 0; i < 2; i++) for (let j = 0; j < 2; j++) { const v = 52 + R0() * 18 | 0; g.fillStyle = `rgb(${v + 8},${v},${v - 6})`; g.fillRect(i * S / 2 + 2, j * S / 2 + 2, S / 2 - 4, S / 2 - 4); }
+  for (let i = 0; i < 700; i++) { g.fillStyle = `rgba(0,0,0,${R0() * .25})`; g.fillRect(R0() * S, R0() * S, 2, 2); }
+});
+const ceilTex = makeTex((g, S) => {
+  g.fillStyle = '#17130f'; g.fillRect(0, 0, S, S);
+  for (let i = 0; i < 600; i++) { g.fillStyle = `rgba(${R0() < .5 ? '0,0,0' : '90,80,70'},${R0() * .3})`; g.fillRect(R0() * S, R0() * S, 3, 3); }
+});
+const wallMat = new THREE.MeshStandardMaterial({ map: wallTex, roughness: 0.95, metalness: 0 });
+const floorMat = new THREE.MeshStandardMaterial({ map: floorTex, roughness: 0.9 });
+const ceilMat = new THREE.MeshStandardMaterial({ map: ceilTex, roughness: 1 });
+
+let level = null;
+const boxGeo = new THREE.BoxGeometry(1, 1, 1);
+const STONE_DARK = new THREE.Color(0x34302d), STONE_LIGHT = new THREE.Color(0xd8d0c2);
+
+function makeStatue() {
+  const g = new THREE.Group();
+  const mat = new THREE.MeshStandardMaterial({ color: 0x34302d, roughness: 0.95, metalness: 0.05 });
+  const add = (geo, x, y, z, parent = g) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); parent.add(m); return m; };
+  add(new THREE.CylinderGeometry(0.2, 0.23, 0.06, 14), 0, 0.03, 0);
+  const torso = new THREE.Group(); g.add(torso);
+  add(new THREE.CylinderGeometry(0.1, 0.21, 0.56, 12), 0, 0.34, 0, torso);
+  add(new THREE.SphereGeometry(0.13, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), 0, 0.6, 0, torso);
+  const head = new THREE.Group(); head.position.set(0, 0.73, 0); torso.add(head);
+  add(new THREE.SphereGeometry(0.095, 14, 10), 0, 0, 0, head);
+  const hood = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.16, 12), mat); hood.position.set(0, 0.07, -0.02); head.add(hood);
+  const eyeMat = new THREE.MeshBasicMaterial({ color: 0xff2a14 });
+  for (const sx of [-1, 1]) { const e = new THREE.Mesh(new THREE.SphereGeometry(0.017, 8, 6), eyeMat); e.position.set(sx * 0.036, 0.005, 0.085); head.add(e); }
+  const arms = [];
+  for (const sx of [-1, 1]) {
+    const p = new THREE.Group(); p.position.set(sx * 0.13, 0.58, 0); torso.add(p);
+    const a = new THREE.Mesh(new THREE.BoxGeometry(0.055, 0.32, 0.055), mat); a.position.y = -0.15; p.add(a);
+    const h = new THREE.Mesh(new THREE.SphereGeometry(0.038, 8, 6), mat); h.position.y = -0.32; p.add(h);
+    arms.push(p);
+  }
+  const ringMat = new THREE.MeshBasicMaterial({ color: 0xbfe0ff, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, fog: false });
+  const ring = new THREE.Mesh(new THREE.RingGeometry(0.25, 0.3, 32), ringMat); ring.rotation.x = -Math.PI / 2; ring.position.y = 0.012; g.add(ring);
+  const arcMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9, depthWrite: false, blending: THREE.AdditiveBlending, fog: false });
+  const arc = new THREE.Mesh(new THREE.RingGeometry(0.31, 0.36, 32, 1, 0, Math.PI * 2), arcMat); arc.rotation.x = -Math.PI / 2; arc.position.y = 0.014; g.add(arc);
+  g.userData = { mat, eyeMat, arms, head, torso, ring, ringMat, arc, arcMat, flash: 0, shown: 0, arcStone: -1 };
+  return g;
+}
+function poseStatue(s, near) {
+  const u = s.mesh.userData; const r = Math.random;
+  const reach = near ? 1.3 + r() * 0.5 : 0.2 + r() * 1.4;
+  u.arms[0].rotation.x = -(reach + (r() - .5) * .5); u.arms[1].rotation.x = -(reach + (r() - .5) * .5);
+  u.arms[0].rotation.z = -0.1 - r() * .3; u.arms[1].rotation.z = 0.1 + r() * .3;
+  u.head.rotation.z = (r() - .5) * 0.7; u.head.rotation.x = (r() - .3) * 0.5;
+  u.torso.rotation.z = (r() - .5) * 0.18; u.torso.rotation.x = near ? 0.18 : (r() - .5) * .15;
+}
+function faceStatue(s) { s.mesh.position.set(s.x, 0, s.y); s.mesh.lookAt(px, 0, py); }
+
+function buildLevel() {
+  if (level) { scene.remove(level); level.traverse(o => { if (o.geometry && o.geometry !== boxGeo) o.geometry.dispose(); }); }
+  level = new THREE.Group(); scene.add(level);
+  let n = 0; for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) if (map[y][x]) n++;
+  const inst = new THREE.InstancedMesh(boxGeo, wallMat, n); const m4 = new THREE.Matrix4(); let i = 0;
+  for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) if (map[y][x]) { m4.makeTranslation(x, 0.5, y); inst.setMatrixAt(i++, m4); }
+  level.add(inst);
+  const fGeo = new THREE.PlaneGeometry(GW, GH);
+  const ft = floorTex.clone(); ft.wrapS = ft.wrapT = THREE.RepeatWrapping; ft.repeat.set(GW, GH); ft.needsUpdate = true;
+  const fl = new THREE.Mesh(fGeo, new THREE.MeshStandardMaterial({ map: ft, roughness: 0.9 })); fl.rotation.x = -Math.PI / 2; fl.position.set((GW - 1) / 2, 0, (GH - 1) / 2); level.add(fl);
+  const ct = ceilTex.clone(); ct.wrapS = ct.wrapT = THREE.RepeatWrapping; ct.repeat.set(GW, GH); ct.needsUpdate = true;
+  const cl = new THREE.Mesh(fGeo.clone(), new THREE.MeshStandardMaterial({ map: ct, roughness: 1 })); cl.rotation.x = Math.PI / 2; cl.position.set((GW - 1) / 2, 1, (GH - 1) / 2); level.add(cl);
+  // exit
+  const ex = new THREE.Group(); ex.position.set(exitT.x, 0, exitT.y); level.add(ex);
+  // stairs rising toward the light (they climb along the wall-side of the cell)
+  let up = 0; for (let k = 0; k < 4; k++) if (isWall(exitT.x + DX[k], exitT.y + DY[k])) { up = k; break; }
+  const stairs = new THREE.Group(); stairs.rotation.y = -up * Math.PI / 2; ex.add(stairs);
+  const stMat = new THREE.MeshStandardMaterial({ color: 0xb8aa96, roughness: 0.8, emissive: 0x2a4258 });
+  const exLight = new THREE.PointLight(0x9fd8ff, 1.6, 4.5, 1.4); exLight.position.set(0, 0.85, 0); ex.add(exLight);
+  for (let k = 0; k < 6; k++) { const h = 0.1 + k * 0.16; const st = new THREE.Mesh(new THREE.BoxGeometry(0.62, h, 0.12), stMat); st.position.set(0, h / 2, 0.05 + k * 0.08 - 0.5 + 0.5); st.position.z = -(0.0 + k * 0.08) + 0.05; stairs.add(st); }
+  const sky = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 0.8), new THREE.MeshBasicMaterial({ color: 0xcfe8ff, fog: false })); sky.rotation.x = Math.PI / 2; sky.position.set(0, 0.995, 0); ex.add(sky);
+  const rimMat = new THREE.MeshBasicMaterial({ color: cfg.key ? 0xff5a3a : 0x6cc8ff });
+  for (let k = 0; k < 4; k++) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.03, 0.04), rimMat); b.position.y = 0.016; b.rotation.y = k * Math.PI / 2; b.position.x = Math.sin(k * Math.PI / 2) * 0.38; b.position.z = Math.cos(k * Math.PI / 2) * 0.38; ex.add(b); }
+  const colMat = new THREE.MeshBasicMaterial({ color: cfg.key ? 0xff6040 : 0x6cc8ff, transparent: true, opacity: 0.22, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
+  const col = new THREE.Mesh(new THREE.CylinderGeometry(0.33, 0.36, 1, 20, 1, true), colMat); col.position.y = 0.5; ex.add(col);
+  const gate = new THREE.Group(); ex.add(gate);
+  const barMat = new THREE.MeshStandardMaterial({ color: 0x5a4a40, metalness: 0.6, roughness: 0.5 });
+  for (let k = -2; k <= 2; k++) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.035, 0.74), barMat); b.position.set(k * 0.14, 0.04, 0); gate.add(b); }
+  for (const z of [-0.2, 0.2]) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.74, 0.035, 0.035), barMat); b.position.set(0, 0.06, z); gate.add(b); }
+  gate.visible = !!cfg.key;
+  level.userData.exit = { rimMat, colMat, gate };
+  // key
+  if (keyT) {
+    const kg = new THREE.Group(); kg.position.set(keyT.x, 0.42, keyT.y);
+    const km = new THREE.MeshStandardMaterial({ color: 0xffc640, emissive: 0x8a5a00, metalness: 0.8, roughness: 0.3 });
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.06, 0.018, 8, 18), km); ring.position.y = 0.09; kg.add(ring);
+    const sh = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.16, 0.025), km); kg.add(sh);
+    for (const yy of [-0.06, -0.025]) { const t = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.022, 0.022), km); t.position.set(0.03, yy, 0); kg.add(t); }
+    const glow = new THREE.Mesh(new THREE.SphereGeometry(0.16, 12, 8), new THREE.MeshBasicMaterial({ color: 0xffb030, transparent: true, opacity: 0.18, depthWrite: false, blending: THREE.AdditiveBlending }));
+    kg.add(glow);
+    level.add(kg); level.userData.key = kg;
+  }
+  for (const s of statues) { s.mesh = makeStatue(); level.add(s.mesh); faceStatue(s); poseStatue(s, false); }
+}
+
+// ---------- camera anim ----------
+const yawOf = (d) => -d * Math.PI / 2;
+let cam = { x: 0, z: 0, yaw: 0 }, anim = null, shake = 0, bob = 0;
+const camTX = () => px - DX[pd] * CAM_BACK, camTZ = () => py - DY[pd] * CAM_BACK;
+function setCamNow() { cam.x = camTX(); cam.z = camTZ(); cam.yaw = yawOf(pd); anim = null; }
+function startAnim(type, extra) {
+  anim = { t: 0, dur: type === 'bump' ? 0.16 : 0.17, type, fx: cam.x, fz: cam.z, fy: cam.yaw, tx: camTX(), tz: camTZ(), ty: extra != null ? extra : cam.yaw };
+}
+
+// ---------- audio ----------
+let ac = null, master = null, noiseBuf = null, ambient = null;
+function initAudio() {
+  if (ac) { if (ac.state === 'suspended') ac.resume(); return; }
+  try {
+    ac = new (window.AudioContext || window.webkitAudioContext)();
+    master = ac.createGain(); master.gain.value = 0.7; master.connect(ac.destination);
+    noiseBuf = ac.createBuffer(1, ac.sampleRate, ac.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    // ambient drone
+    const g = ac.createGain(); g.gain.value = 0.045; const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 260; lp.connect(g); g.connect(master);
+    for (const f of [55, 55.6, 82.4]) { const o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f; const og = ac.createGain(); og.gain.value = f > 80 ? 0.3 : 0.6; o.connect(og); og.connect(lp); o.start(); }
+    const lfo = ac.createOscillator(); lfo.frequency.value = 0.07; const lg = ac.createGain(); lg.gain.value = 120; lfo.connect(lg); lg.connect(lp.frequency); lfo.start();
+    ambient = g;
+  } catch (e) { ac = null; }
+}
+function env(g, t, a, peak, dec) { g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + a + dec); }
+function noise(t, dur, type, freq, q, peak, pan = 0, a = 0.005) {
+  if (!ac) return; const s = ac.createBufferSource(); s.buffer = noiseBuf; const f = ac.createBiquadFilter(); f.type = type; f.frequency.value = freq; f.Q.value = q;
+  const g = ac.createGain(); env(g, t, a, peak, dur); const p = ac.createStereoPanner(); p.pan.value = Math.max(-1, Math.min(1, pan));
+  s.connect(f); f.connect(g); g.connect(p); p.connect(master); s.start(t, Math.random() * 0.5); s.stop(t + a + dur + 0.05); return f;
+}
+function tone(t, freq, dur, type, peak, pan = 0, a = 0.005, slide = 0) {
+  if (!ac) return; const o = ac.createOscillator(); o.type = type; o.frequency.setValueAtTime(freq, t); if (slide) o.frequency.exponentialRampToValueAtTime(freq * slide, t + a + dur);
+  const g = ac.createGain(); env(g, t, a, peak, dur); const p = ac.createStereoPanner(); p.pan.value = Math.max(-1, Math.min(1, pan));
+  o.connect(g); g.connect(p); p.connect(master); o.start(t); o.stop(t + a + dur + 0.05);
+}
+const now = () => ac ? ac.currentTime : 0;
+const sfx = {
+  step() { if (!ac) return; const t = now(); noise(t, 0.07, 'bandpass', 900 + Math.random() * 300, 1.2, 0.09); tone(t, 90, 0.06, 'sine', 0.08); },
+  turn() { if (!ac) return; const t = now(); const f = noise(t, 0.14, 'bandpass', 600, 0.8, 0.05, 0, 0.04); f && f.frequency.exponentialRampToValueAtTime(1800, t + 0.16); },
+  bump() { if (!ac) return; const t = now(); tone(t, 70, 0.12, 'sine', 0.25); noise(t, 0.06, 'lowpass', 400, 1, 0.12); },
+  scrape(vol, pan, behind) {
+    if (!ac) return; const t = now() + Math.random() * 0.04;
+    noise(t, 0.28, 'bandpass', behind ? 260 : 420, 2.2, 0.32 * vol, pan, 0.03);
+    noise(t + 0.02, 0.18, 'lowpass', 160, 1, 0.25 * vol, pan, 0.01);
+    tone(t, 48, 0.25, 'sine', 0.35 * vol, pan);
+  },
+  stone(level) { if (!ac) return; const t = now(); const f = 700 + level * 120; tone(t, f, 0.35, 'triangle', 0.09); tone(t + 0.01, f * 2.01, 0.25, 'sine', 0.05); noise(t, 0.08, 'highpass', 5000, 1, 0.05); },
+  sting(vol) { if (!ac) return; const t = now(); for (const f of [61.7, 65.4, 92.5, 138.6]) tone(t, f, 1.1, 'sawtooth', 0.07 * vol, 0, 0.01); noise(t, 0.6, 'lowpass', 500, 1, 0.2 * vol, 0, 0.01); },
+  wake(vol, rp) { if (!ac) return; const t = now(); const pan = rp ? rp.pan : 0; noise(t, 1.0, 'lowpass', 220, 2, 0.45 * vol, pan, 0.15); tone(t, 41, 1.0, 'sawtooth', 0.12 * vol, pan, 0.1, 1.5); tone(t + 0.05, 44, 0.9, 'sawtooth', 0.1 * vol, pan, 0.1, 1.45); },
+  squeeze() { if (!ac) return; const t = now(); noise(t, 0.3, 'bandpass', 1200, 0.7, 0.12, 0, 0.05); tone(t, 220, 0.25, 'sine', 0.06, 0, 0.02, 0.7); },
+  heart(vol) { if (!ac) return; const t = now(); tone(t, 58, 0.12, 'sine', 0.5 * vol); tone(t + 0.16, 52, 0.14, 'sine', 0.38 * vol); },
+  key() { if (!ac) return; const t = now(); [784, 988, 1175, 1568].forEach((f, i) => tone(t + i * 0.07, f, 0.5, 'triangle', 0.12)); },
+  unlock() { if (!ac) return; const t = now() + 0.3; tone(t, 180, 0.2, 'square', 0.06, 0, 0.005, 0.6); noise(t, 0.2, 'bandpass', 2000, 3, 0.1); },
+  locked() { if (!ac) return; const t = now(); tone(t, 140, 0.12, 'square', 0.06); tone(t + 0.13, 120, 0.15, 'square', 0.06); },
+  exit() { if (!ac) return; const t = now(); [523, 659, 784, 1047, 1319].forEach((f, i) => { tone(t + i * 0.09, f, 0.8, 'triangle', 0.1); tone(t + i * 0.09, f / 2, 0.8, 'sine', 0.06); }); },
+  caught() { if (!ac) return; const t = now(); noise(t, 0.9, 'lowpass', 1400, 1, 0.6, 0, 0.005); tone(t, 110, 1.0, 'sawtooth', 0.25, 0, 0.005, 0.4); tone(t, 116, 1.0, 'sawtooth', 0.2, 0, 0.005, 0.38); },
+  drip() { if (!ac) return; const t = now(); tone(t, 1400 + Math.random() * 900, 0.18, 'sine', 0.03, (Math.random() - .5) * 1.4, 0.002, 0.6); },
+};
+
+// ---------- game flow ----------
+function startFloor(newSeed) {
+  cfg = FLOORS[floorIdx];
+  if (newSeed) floorSeed = (Math.random() * 1e9) | 0;
+  genFloor(cfg, floorSeed + floorIdx * 977);
+  haveKey = !cfg.key; steps = 0; caughtBy = null; queued = null;
+  buildLevel(); setCamNow(); updateSeen();
+  for (const s of statues) { s.wasVis = visibleTile(s.x, s.y); }
+  state = 'play'; hideOv();
+  $('floor').textContent = `B${5 - floorIdx}F`;
+  $('floorSub').textContent = TX.floorsLeft(5 - floorIdx);
+  showHint(floorIdx === 1 ? TX.hintKey : (floorIdx === 0 ? TX.hint : ''));
+  updateHud(); drawMini();
+  signal('start');
+}
+let hintTimer = 0;
+function showHint(t) { const h = $('hint'); h.textContent = t; h.style.opacity = t ? 1 : 0; hintTimer = t ? 4.5 : 0; }
+
+function act(a) {
+  if (state !== 'play') return;
+  if (anim) { queued = a; return; }
+  const before = { x: px, y: py, yaw: cam.yaw };
+  if (a === 'f') {
+    const nx = px + DX[pd], ny = py + DY[pd];
+    const st = statueAt(nx, ny);
+    if (isWall(nx, ny) || (st && st.awake && st.stone === 0)) { sfx.bump(); startAnim('bump'); return; }
+    if (exitT.x === nx && exitT.y === ny && !haveKey) { sfx.locked(); showHint(TX.locked); startAnim('bump'); return; }
+    if (st) { st.x = px; st.y = py; sfx.squeeze(); if (!squeezed) { squeezed = true; showHint(TX.squeeze); } }
+    px = nx; py = ny; sfx.step();
+    if (st) faceStatue(st);
+  } else if (a === 'l') { pd = (pd + 3) % 4; sfx.turn(); }
+  else if (a === 'r') { pd = (pd + 1) % 4; sfx.turn(); }
+  else if (a === 'u') { pd = (pd + 2) % 4; sfx.turn(); }
+  steps++;
+  let targetYaw = before.yaw + (a === 'l' ? Math.PI / 2 : a === 'r' ? -Math.PI / 2 : a === 'u' ? Math.PI : 0);
+  startAnim('move', targetYaw);
+  if (keyT && !haveKey && px === keyT.x && py === keyT.y) {
+    haveKey = true; sfx.key(); sfx.unlock(); showHint(TX.gotKey);
+    if (level.userData.key) level.userData.key.visible = false;
+    const e = level.userData.exit; e.gate.visible = false; e.rimMat.color.set(0x6cc8ff); e.colMat.color.set(0x6cc8ff);
+  }
+  if (px === exitT.x && py === exitT.y && haveKey) { state = 'exiting'; anim.exitAfter = true; sfx.exit(); updateHud(); return; }
+  worldTick();
+  updateSeen(); updateHud(); drawMini();
+}
+
+function worldTick() {
+  const dist = bfs(px, py);
+  const order = statues.slice().sort((a, b) => dist[a.x + a.y * GW] - dist[b.x + b.y * GW]);
+  let nearest = 99;
+  for (const s of order) {
+    const vis = visibleTile(s.x, s.y);
+    const dd = dist[s.x + s.y * GW];
+    if (!s.awake && (vis || dd <= cfg.wake || steps >= cfg.wakeTick + statues.indexOf(s) * 10)) {
+      s.awake = true; s.stone = Math.max(s.stone, 3); s.mesh.userData.wake = 1; sfx.wake(Math.max(0.4, 1.2 - dd / 12), relPan(s)); edgeCue(s, 1); if (!vis) { s.wasVis = false; s.stone--; continue; }
+    }
+    if (!s.awake) { s.wasVis = vis; if (vis) { s.seen = true; s.lx = s.x; s.ly = s.y; } continue; }
+    if (vis) {
+      if (!s.wasVis) sfx.sting(Math.max(0.35, 1.2 - dd / 8));
+      if (!firstSight) { firstSight = true; showHint(TX.sight); }
+      const before = s.stone; s.stone = Math.min(STONE_MAX, s.stone + STONE_GAIN);
+      if (s.stone > before) { sfx.stone(s.stone); s.mesh.userData.flash = 1; }
+      s.seen = true; s.lx = s.x; s.ly = s.y; s.wasVis = true;
+      continue;
+    }
+    s.wasVis = false;
+    if (s.stone > 0) { s.stone--; continue; }
+    s.mv += cfg.spd; if (s.mv < 1) continue; s.mv -= 1;
+    const cur = dist[s.x + s.y * GW];
+    const opts = [];
+    for (let k = 0; k < 4; k++) {
+      const nx = s.x + DX[k], ny = s.y + DY[k];
+      if (isWall(nx, ny) || dist[nx + ny * GW] !== cur - 1) continue;
+      if (statues.some(o => o !== s && o.x === nx && o.y === ny)) continue;
+      opts.push([nx, ny]);
+    }
+    if (!opts.length) continue;
+    const [nx, ny] = opts[(Math.random() * opts.length) | 0];
+    s.x = nx; s.y = ny;
+    if (nx === px && ny === py) { caughtBy = s; }
+    faceStatue(s); poseStatue(s, dist[nx + ny * GW] <= 3);
+    // sound: footstep of stone
+    const d2 = Math.max(0, cur - 1);
+    const vol = Math.max(0.1, Math.min(1, 1.15 - d2 / 14));
+    const rp = relPan(s);
+    sfx.scrape(vol, rp.pan, rp.behind);
+    if (d2 <= 10) edgeCue(s, vol);
+    // a statue stepping into view becomes visible immediately (and is caught by the gaze next move)
+    s.wasVis = visibleTile(s.x, s.y);
+    if (s.wasVis) sfx.sting(Math.max(0.35, 1.2 - d2 / 8));
+  }
+  for (const s of statues) if (s.stone === 0) nearest = Math.min(nearest, dist[s.x + s.y * GW]);
+  if (caughtBy) { caught(); return; }
+  if (nearest <= 5) sfx.heart(Math.max(0.3, 1.2 - nearest / 5));
+  if (Math.random() < 0.12) sfx.drip();
+}
+
+function relPan(s) {
+  const rx = s.x - px, ry = s.y - py;
+  const l = rx * DX[(pd + 1) % 4] + ry * DY[(pd + 1) % 4];
+  const f = rx * DX[pd] + ry * DY[pd];
+  const h = Math.hypot(rx, ry) || 1;
+  return { pan: l / h, behind: f < 0, f, l };
+}
+const edgeV = { l: 0, r: 0, b: 0, t: 0 };
+function edgeCue(s, v) {
+  const r = relPan(s); let k;
+  if (Math.abs(r.l) > Math.abs(r.f)) k = r.l > 0 ? 'r' : 'l'; else k = r.f < 0 ? 'b' : 't';
+  edgeV[k] = Math.max(edgeV[k], Math.min(1, 0.35 + v * 0.75));
+}
+function caught() {
+  state = 'caught'; caughtCount++; sfx.caught();
+  // swing the view to the statue
+  const s = caughtBy; const rx = s.x - px, ry = s.y - py;
+  let d = pd; for (let k = 0; k < 4; k++) if (DX[k] === Math.sign(rx) && DY[k] === Math.sign(ry)) d = k;
+  let diff = ((d - pd + 4) % 4); const dy = diff === 1 ? -Math.PI / 2 : diff === 3 ? Math.PI / 2 : diff === 2 ? Math.PI : 0;
+  pd = d; s.x = px; s.y = py;
+  anim = { t: 0, dur: 0.22, type: 'move', fx: cam.x, fz: cam.z, fy: cam.yaw, tx: camTX(), tz: camTZ(), ty: cam.yaw + dy };
+  // place statue right in front of the camera
+  s.mesh.position.set(camTX() + DX[d] * 0.68, -0.02, camTZ() + DY[d] * 0.68); s.mesh.lookAt(camTX(), 0, camTZ()); poseStatue(s, true);
+  s.awake = true;
+  s.stone = 0; flashT = 1;
+  signal('end', { score: floorIdx });
+  setTimeout(() => showOv(TX.caught, TX.caughtB(steps), '', TX.retry), 900);
+}
+
+function floorCleared() {
+  totalSteps += steps;
+  signal('end', { score: floorIdx + 1 });
+  if (floorIdx === 4) {
+    state = 'win';
+    let sub = '';
+    if (runStartFloor === 1) {
+      if (!save.best || totalSteps < save.best) { save.best = totalSteps; sub = TX.newBest; } else sub = TX.best(save.best);
+    }
+    save.floor = 1; doSave();
+    showOv(TX.win, TX.winB(totalSteps, caughtCount), sub, TX.again);
+  } else {
+    state = 'cleared';
+    save.floor = floorIdx + 2; doSave();
+    showOv(TX.clear(5 - floorIdx), TX.clearB(steps), '', TX.cont);
+  }
+}
+
+function showOv(t, b, s, c) { $('ovT').textContent = t; $('ovB').innerHTML = b; $('ovS').textContent = s || ''; $('ovC').textContent = c; $('ov').classList.remove('hide'); ovGuard = performance.now() + 700; }
+function hideOv() { $('ov').classList.add('hide'); }
+function showTitle() {
+  state = 'title';
+  showOv(TX.title, TX.how, save.floor > 1 ? TX.fromFloor(6 - save.floor) : (save.best ? TX.best(save.best) : ''), TX.tap);
+  ovGuard = 0;
+}
+function onOvTap() {
+  if (performance.now() < ovGuard) return;
+  initAudio();
+  if (state === 'title') { floorIdx = save.floor - 1; runStartFloor = save.floor; totalSteps = 0; caughtCount = 0; startFloor(true); }
+  else if (state === 'caught') startFloor(false);
+  else if (state === 'cleared') { floorIdx++; startFloor(true); }
+  else if (state === 'win') { floorIdx = 0; runStartFloor = 1; totalSteps = 0; caughtCount = 0; startFloor(true); }
+}
+
+function updateHud() {
+  const parts = [];
+  if (cfg && cfg.key) parts.push(haveKey ? TX.keyHave : TX.keyNeed);
+  parts.push(TX.steps(steps));
+  $('info').innerHTML = parts.map(t => `<span style="margin-left:12px">${t}</span>`).join('');
+}
+
+// ---------- minimap ----------
+const mini = $('mini'), mg = mini.getContext('2d');
+function drawMini() {
+  if (!map) return;
+  const dpr = Math.min(2, devicePixelRatio || 1); const S = 128, H = S / 2;
+  if (mini.width !== S * dpr) { mini.width = S * dpr; mini.height = S * dpr; }
+  mg.setTransform(dpr, 0, 0, dpr, 0, 0); mg.clearRect(0, 0, S, S);
+  mg.save(); mg.beginPath(); mg.arc(H, H, H - 1, 0, 7); mg.fillStyle = 'rgba(10,8,6,.72)'; mg.fill(); mg.clip();
+  const c = 11; // px per tile, heading-up, centred on the player
+  const yaw = cam.yaw; const fx = -Math.sin(yaw), fz = -Math.cos(yaw);
+  const ppx = cam.x + fx * CAM_BACK, ppz = cam.z + fz * CAM_BACK;
+  mg.translate(H, H + 10); mg.rotate(yaw); mg.translate(-ppx * c, -ppz * c);
+  const T = (x) => (x - .5) * c;
+  mg.fillStyle = '#9a8468';
+  for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) if (seen[x + y * GW] && !map[y][x]) mg.fillRect(T(x) - .3, T(y) - .3, c + .6, c + .6);
+  mg.fillStyle = haveKey ? '#6cc8ff' : '#ff5a3a'; mg.fillRect(T(exitT.x) + c * .1, T(exitT.y) + c * .1, c * .8, c * .8);
+  if (keyT && !haveKey) { mg.fillStyle = '#ffc640'; mg.beginPath(); mg.arc(keyT.x * c, keyT.y * c, c * .42, 0, 7); mg.fill(); }
+  for (const s of statues) {
+    if (!s.seen) continue;
+    if (s.stone > 0 || !s.awake) {
+      mg.fillStyle = s.awake ? '#e8f2ff' : '#b8b0a4'; mg.beginPath(); mg.arc(s.x * c, s.y * c, c * .45, 0, 7); mg.fill();
+      if (s.stone > 0) { mg.strokeStyle = '#9fd0ff'; mg.lineWidth = 2; mg.beginPath(); mg.arc(s.x * c, s.y * c, c * .85, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * s.stone / STONE_MAX); mg.stroke(); }
+    } else {
+      mg.fillStyle = 'rgba(255,60,40,.55)'; mg.beginPath(); mg.arc(s.lx * c, s.ly * c, c * .45, 0, 7); mg.fill();
+    }
+  }
+  mg.restore();
+  // pointers to the stairs / key when off the map window
+  const pointTo = (tx, ty, col) => {
+    const dx = tx - ppx, dz = ty - ppz; const cs = Math.cos(yaw), sn = Math.sin(yaw);
+    const rx = dx * cs - dz * sn, ry = dx * sn + dz * cs; // rotated into screen space
+    const sx = rx * c, sy = ry * c + 10; const r = Math.hypot(sx, sy);
+    if (r < H - 8) return;
+    const k = (H - 7) / r; mg.fillStyle = col; mg.beginPath(); mg.arc(H + sx * k, H + sy * k, 4.5, 0, 7); mg.fill();
+  };
+  pointTo(exitT.x, exitT.y, haveKey ? '#6cc8ff' : '#ff5a3a');
+  if (keyT && !haveKey) pointTo(keyT.x, keyT.y, '#ffc640');
+  // player arrow (always pointing up)
+  mg.fillStyle = '#ffe9a8'; mg.beginPath(); mg.moveTo(H, H + 10 - c * .8); mg.lineTo(H + c * .55, H + 10 + c * .5); mg.lineTo(H - c * .55, H + 10 + c * .5); mg.closePath(); mg.fill();
+  mg.strokeStyle = 'rgba(255,220,170,.35)'; mg.lineWidth = 1.5; mg.beginPath(); mg.arc(H, H, H - 1, 0, 7); mg.stroke();
+}
+
+// ---------- input ----------
+const bind = (id, a) => { const el = $(id); el.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); initAudio(); el.classList.add('on'); act(a); }); for (const t of ['pointerup', 'pointercancel', 'pointerleave']) el.addEventListener(t, () => el.classList.remove('on')); };
+bind('bL', 'l'); bind('bF', 'f'); bind('bR', 'r'); bind('bU', 'u'); bind('bStare', 'w');
+$('ov').addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); onOvTap(); });
+const swipes = new Map();
+canvas.addEventListener('pointerdown', (e) => { initAudio(); swipes.set(e.pointerId, { x: e.clientX, y: e.clientY }); });
+const endSwipe = (e, cancel) => {
+  const s = swipes.get(e.pointerId); swipes.delete(e.pointerId); if (!s || cancel) return;
+  const dx = e.clientX - s.x, dy = e.clientY - s.y;
+  if (Math.max(Math.abs(dx), Math.abs(dy)) < 30) { act('w'); return; }
+  if (Math.abs(dx) > Math.abs(dy)) act(dx > 0 ? 'r' : 'l'); else act(dy < 0 ? 'f' : 'u');
+};
+canvas.addEventListener('pointerup', (e) => endSwipe(e, false));
+canvas.addEventListener('pointercancel', (e) => endSwipe(e, true));
+
+// ---------- resize ----------
+function resize() {
+  const W = innerWidth, H = innerHeight; if (!W || !H) return;
+  const padH = $('pad').offsetHeight || 140;
+  const vh = Math.max(50, H - padH);
+  canvas.style.width = W + 'px'; canvas.style.height = vh + 'px';
+  renderer.setSize(W, vh, false);
+  const aspect = W / vh;
+  const vfov = Math.max(58, Math.min(95, 2 * Math.atan(0.52 / aspect) * 180 / Math.PI));
+  camera.fov = vfov; camera.aspect = aspect; camera.updateProjectionMatrix();
+  tanH = Math.tan(vfov * Math.PI / 360) * aspect;
+  $('hint').style.bottom = (padH + 12) + 'px';
+  $('flash').style.height = vh + 'px';
+  $('eL').style.height = $('eR').style.height = vh + 'px'; $('eB').style.top = (vh - 70) + 'px';
+}
+addEventListener('resize', resize);
+
+// ---------- loop ----------
+let last = performance.now(), flashT = 0, tAll = 0;
+function frame(ts) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000)); last = ts; tAll += dt;
+  if (hintTimer > 0) { hintTimer -= dt; if (hintTimer <= 0) $('hint').style.opacity = 0; }
+  if (anim) {
+    anim.t += dt / anim.dur; const k = Math.min(1, anim.t);
+    if (anim.type === 'bump') {
+      const b = Math.sin(k * Math.PI) * 0.12; cam.x = anim.fx + DX[pd] * b; cam.z = anim.fz + DY[pd] * b; cam.yaw = anim.fy;
+    } else {
+      const e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+      cam.x = anim.fx + (anim.tx - anim.fx) * e; cam.z = anim.fz + (anim.tz - anim.fz) * e; cam.yaw = anim.fy + (anim.ty - anim.fy) * e;
+      if (anim.tx !== anim.fx || anim.tz !== anim.fz) bob += dt * 18;
+    }
+    if (k >= 1) {
+      const ex = anim.exitAfter; anim = null;
+      if (ex) { descendT = 0.001; }
+      else if (queued && state === 'play') { const q = queued; queued = null; act(q); }
+    }
+  }
+  let camY = 0.5 + Math.sin(bob) * 0.012;
+  if (descendT > 0) { descendT += dt; camY += Math.min(0.3, descendT * descendT * 0.8); const f = $('flash'); f.style.background = '#e8f4ff'; f.style.opacity = Math.min(0.92, descendT * 1.3); if (descendT > 0.8 && state === 'exiting') { descendT = 0; floorCleared(); } }
+  if (map) {
+    camera.position.set(cam.x, camY, cam.z); camera.rotation.y = cam.yaw;
+    camera.rotation.x = state === 'caught' ? 0.06 : 0;
+    torch.position.set(cam.x - Math.sin(cam.yaw) * 0.12, camY + 0.05, cam.z - Math.cos(cam.yaw) * 0.12);
+    torch.intensity = 3.3 + Math.sin(tAll * 13) * 0.18 + Math.sin(tAll * 7.3) * 0.22;
+    for (const s of statues) {
+      const u = s.mesh.userData;
+      const stoneK = s.stone / STONE_MAX;
+      u.shown += ((s.stone > 0 || !s.awake ? 1 : 0) - u.shown) * Math.min(1, dt * 8);
+      u.wake = Math.max(0, (u.wake || 0) - dt * 1.2);
+      u.mat.color.copy(STONE_DARK).lerp(STONE_LIGHT, u.shown * (s.awake ? 0.55 + stoneK * 0.45 : 0.6));
+      const gl = s.awake ? u.shown * (0.08 + stoneK * 0.22) : 0.03;
+      u.mat.emissive.setRGB(u.flash * 0.6 + gl * 0.7, u.flash * 0.7 + gl * 0.9, u.flash * 0.9 + gl * 1.25);
+      u.flash = Math.max(0, u.flash - dt * 2.5);
+      const eye = Math.max(1 - u.shown * 0.85, u.wake);
+      u.eyeMat.color.setRGB(eye, 0.06 + eye * 0.1, 0.05);
+      u.ringMat.opacity = s.stone > 0 ? 0.25 + 0.1 * Math.sin(tAll * 4) : 0;
+      if (u.arcStone !== s.stone) { u.arcStone = s.stone; u.arc.geometry.dispose(); u.arc.geometry = new THREE.RingGeometry(0.31, 0.36, 32, 1, Math.PI / 2, Math.PI * 2 * Math.max(0.001, stoneK)); u.arc.visible = s.stone > 0; }
+    }
+    if (level && level.userData.key) { const k = level.userData.key; k.rotation.y += dt * 1.8; k.position.y = 0.42 + Math.sin(tAll * 2.2) * 0.04; }
+    if (level) { const e = level.userData.exit; e.colMat.opacity = 0.2 + Math.sin(tAll * 2.5) * 0.06; }
+  }
+  for (const k of ['l', 'r', 'b', 't']) { if (edgeV[k] > 0) { edgeV[k] = Math.max(0, edgeV[k] - dt * 1.1); $('e' + k.toUpperCase()).style.opacity = edgeV[k]; } }
+  if (map && state !== 'title') drawMini();
+  if (flashT > 0) { flashT = Math.max(0, flashT - dt * 1.2); const f = $('flash'); f.style.background = '#a00'; f.style.opacity = flashT * 0.6; }
+  else if (descendT === 0 && state === 'play') $('flash').style.opacity = 0;
+  renderer.render(scene, camera);
+}
+let descendT = 0;
+
+// demo scene behind the title
+$('floor').textContent = '';
+floorIdx = 0; cfg = FLOORS[0]; floorSeed = 12345; genFloor(cfg, floorSeed); haveKey = true; buildLevel(); setCamNow(); updateSeen();
+resize(); showTitle();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

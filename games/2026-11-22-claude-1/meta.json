@@ -1,0 +1,463 @@
+{
+  "id": "2026-11-22-claude-1",
+  "status": "published",
+  "title": "ふりむき迷宮",
+  "genre": "ダンジョン探索",
+  "concept": "石像は見られている間だけ動けず、見つめた分だけ長く石になる。ただしふりむくにも1手かかる。背後で石がこすれる音を聞き、ふりむいて見つめて時間を稼ぐか、石のうちに横をすり抜けて走るか、一手ごとの「見る／進む」の駆け引きが核。",
+  "howToPlay": "下のボタンで進む・向きを変える・ふりむく・見つめる。石像を見つめて石にし、そのすきに鍵を取って階段へ。全5階。",
+  "libraryDecision": "three.js を使用。一人称の3Dでないと「うしろが見えない」「ふりむくと目の前にいる」怖さが成り立たないため。再考で、像を見つめるほど青白い石に変わり足元の輪が残り時間を示す見た目と、灯りの届く距離＝視界という作りを足した。",
+  "soundDecision": "BGMは低い持続音だけにし、像が動くたびに左右に定位した「石がこすれる音」を鳴らす。見えない背後の気配を耳で知り、ふりむくかどうかを決めるのが遊びの中心なので、音は情報として最優先。近づくと心音、見つけた瞬間に不協和音、石にするたびに澄んだ音。",
+  "improvements": [
+    {
+      "found": "最初の階でも像を一度も見ないまま背後からつかまる／北が固定の小さな地図では一人称で左右を取り違え行き止まりに何度も入る／像が細い通路に立つと先へ進めず詰む",
+      "changed": "像は眠っていて近づくか目が合うと起き（起きて3手は動かない）、速さを階ごとに半分〜3/4にした。間取りを最初から見せ、向いている方向が常に上になる回る地図にした。石の像はすり抜けられる（すり抜けると背後に回る）ようにし、気配がした方向の画面の縁を赤く光らせた。ボットに数百回遊ばせて、見つめるほうが生き残る速さに調整した",
+      "foundEn": "Caught from behind on the first floor without ever seeing a statue / a small north-up map made me mix up left and right in first person and walk into dead ends / a statue in a narrow corridor blocked the way for good",
+      "changedEn": "Statues now sleep until you come near or meet their gaze (and wait 3 moves after waking), and move at 1/2–3/4 speed per floor. The floor plan is shown from the start on a heading-up rotating map. Stone statues can be slipped past (they end up behind you), and the screen edge glows red toward a sound. Tuned speeds with hundreds of bot runs so that staring clearly helps survival"
+    },
+    {
+      "found": "最短の道を歩くと最初の階で像に出会わず、見つめる・すり抜けるを知らないまま進む／石の輪がたまっても温かい灯りの中で像の見た目がほとんど変わらない／階段が暗くて見つけにくく、抜けた瞬間にカメラが天井を突き抜けて崩れる",
+      "changed": "1体目の像は必ず最初の目的地への通り道の途中で眠るように配置した。初めて像を見たときに「見つめるほど石の輪がたまる。石のうちはすり抜けられる」と1行だけ出す。石になるほど像が青白く光るようにした。階段を明るくし、青い光を足し、抜けるときは光の中へ白くフェードする演出にした。B4F・B3F の抜け道を増やして難しさの段差をならした",
+      "foundEn": "Walking the shortest route on the first floor never met a statue, so players would never learn to stare or slip past / even with a full stone ring the statue barely changed look under the warm torch / the stairs were dark and hard to spot, and on exit the camera clipped through the ceiling",
+      "changedEn": "The first statue now always sleeps midway on the route to the first goal. On first sight, one line explains that staring fills the stone ring and stone statues can be slipped past. Statues glow pale blue as they turn to stone. Brighter stairs with a blue light, and the exit now fades into white light. Added more loops on B4F/B3F to smooth the difficulty steps"
+    },
+    {
+      "found": "右上の「鍵 ✕ 0手」が詰まって読みにくい／地図の金色の点が鍵だと分からない／曲がり角から像の体が見えているのに、中心が隠れていると石にならず理不尽",
+      "changed": "右上の表示に間をあけた。鍵のある階の最初に「地図の金色が鍵」と1行出す。像を見たかどうかを、目の位置から像の中心と体の両脇への3本の視線で判定し、見えている像は石になるようにした",
+      "foundEn": "The top-right \"Key ✕ 0 moves\" was cramped / nothing said the gold dot on the map is the key / a statue whose body showed at a corner did not petrify because its centre was hidden",
+      "changedEn": "Spaced out the top-right display. Key floors open with one line saying gold on the map is the key. Sight is now checked with three rays from the eye (centre and both sides of the body), so a statue you can see does petrify"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "ダンジョン探索",
+      "en": "Dungeon crawler",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "見られている間だけ止まる石像の迷宮。見つめた分だけ長く石になり、ふりむくのにも1手かかる一人称ダンジョン（3D）。",
+        "ideaEn": "A first-person (3D) maze of statues that freeze only while watched; the longer you stare, the longer they stay stone, but turning around costs a move.",
+        "fromDraw": true
+      },
+      {
+        "idea": "しゃぼん玉を長押しでふくらませ、風に乗せて花の種を遠くの鉢へ運ぶ。大きいほど遠くへ飛ぶが割れやすい（2D）。",
+        "ideaEn": "Hold to blow a soap bubble and ride the wind to carry a seed to a far pot; bigger flies farther but pops easier (2D).",
+        "fromDraw": false
+      },
+      {
+        "idea": "雪の積もった町を除雪車でなぞって道をあける。押した雪は脇に山になり、次の道をふさぐので順番を考える（俯瞰3D）。",
+        "ideaEn": "Trace routes with a snowplow; pushed snow piles up and blocks the next road, so plan the order (top-down 3D).",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "tap",
+      "swipe"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Look-Back Maze",
+      "concept": "Statues can move only while unseen, and the longer you stare, the longer they stay stone, but turning around costs a move too. Hear stone scraping behind you, then choose: turn and stare to buy time, or slip past while they are stone and run. The core is the move-by-move trade-off between looking and going.",
+      "howToPlay": "Use the buttons to step, turn, turn back and stare. Stare statues into stone, grab the key and reach the stairs. Five floors.",
+      "libraryDecision": "Uses three.js. The fear of \"you cannot see behind you\" and \"it is right there when you turn\" only works in first-person 3D. The rethink added statues that turn pale blue as they petrify with a ring showing the remaining stone time, and made the torch reach equal your sight range.",
+      "soundDecision": "Only a low drone as music; every time a statue moves you hear stone scraping, panned left/right. Hearing the unseen presence behind you and deciding whether to turn is the heart of the game, so sound is treated as information first. A heartbeat when close, a dissonant sting on sight, and a clear chime each time you petrify one."
+    }
+  },
+  "createdAt": "2026-11-22T09:07:00+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-22T09:07:00+09:00",
+    "metricsFrom": "2026-11-22T00:05:41.906Z",
+    "transcript": "ea5b36b5-fdfa-4cce-81d2-1b73e7105955.jsonl",
+    "validationRuns": 7,
+    "finishedAt": "2026-11-22T09:35:50+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-22T09:32:23+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "45.6KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=16",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=11",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=17",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=12",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 46705,
+    "lines": 726
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "一人称の迷路なので、右上の回る地図と正面の画面を見比べないと道が分からず、慣れるまで行き止まりで手数を失いやすい",
+    "comment": "左へ曲がった瞬間に赤い目の像が2マス先にいたときは本当にびくっとした。3回見つめて青白い石にし、横をすり抜けて光の階段へ走り、ふりむくと曲がり角から腕だけのぞいていた――この一連はこの作品ならではで、もう1回やりたくなる。一方で、ボタンで1マスずつ進む操作はテンポがゆっくりで、地図を読む手間もある。数分は普通に遊べるので★3。画像は play.mjs の画面を見て判断し、難しさは自作のボットで数百回試して調整した",
+    "similar": [
+      {
+        "title": "Zenomatrix",
+        "url": "https://thinkygames.com/games/zenomatrix/",
+        "similarity": "高",
+        "note": "見ていない間だけ動く像を避ける一人称の部屋。こちらはマス目の迷宮で、ふりむくにも1手かかり、見つめた時間だけ長く石になる・石のうちはすり抜けられる点が違う",
+        "note_en": "First-person chambers with statues that move only when unseen. Mine is a grid maze where turning costs a move, staring longer keeps them stone longer, and stone statues can be slipped past"
+      },
+      {
+        "title": "Statues (Room710Games)",
+        "url": "https://store.steampowered.com/app/413680",
+        "similarity": "中",
+        "note": "見られていないときだけ動く像の一人称ホラー（ドクター・フーの嘆きの天使が元）。こちらはターン制で、音の方向と回る地図で背後の気配を読む",
+        "note_en": "First-person horror with statues that move only when not looked at (inspired by Doctor Who weeping angels). Mine is turn-based, reading the presence behind you by sound direction and a rotating map"
+      }
+    ],
+    "research": "WebSearch で「first-person maze statues move only when you look away」を検索し、似た作品を確認した。ルーツは『ドクター・フー』の嘆きの天使や SCP-173 に由来する「見ていないと動く像」の定番の仕組み",
+    "i18n": {
+      "en": {
+        "worst": "Being a first-person maze, you must keep comparing the rotating map with the view to find your way, and until you get used to it you lose moves in dead ends",
+        "comment": "When I turned left and a red-eyed statue stood two tiles away, I genuinely flinched. Staring it into pale stone, slipping past to the lit stairs, then looking back to see just an arm peeking round the corner is a sequence unique to this game and makes me want another go. On the other hand, stepping tile by tile with buttons is slow, and reading the map takes effort. Solidly playable for a few minutes, so 3 stars. I judged from the play.mjs screenshots and tuned difficulty with hundreds of runs of my own bot",
+        "research": "Searched the web for first-person maze games with statues that move when you look away. The root is the well-known look-away statue idea from Doctor Who's weeping angels and SCP-173"
+      }
+    },
+    "method": "スマホ縦画面で 9 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 9 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 300ms",
+        "note": "開始。右上の地図は向いている方向が上。青が階段",
+        "noteEn": "Start. The map top-right is heading-up; blue is the stairs",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.50,0.84) 120ms → wait 250ms → tap(0.50,0.84) 120ms → wait 250ms → tap(0.17,0.84) 120ms → wait 250ms → tap(0.50,0.84) 120ms → wait 250ms → tap(0.50,0.84) 120ms → wait 250ms",
+        "note": "地図を見て2歩、左へ曲がって2歩",
+        "noteEn": "Following the map: 2 steps, left, 2 steps",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.17,0.84) 120ms → wait 300ms",
+        "note": "左を向くと赤い目の像がこちらへ来ていた。上の縁が赤く光って気配を知らせる",
+        "noteEn": "Turning left: a red-eyed statue coming at me; the top edge glows red",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.75,0.94) 120ms → wait 250ms → tap(0.75,0.94) 120ms → wait 250ms → tap(0.75,0.94) 120ms → wait 300ms",
+        "note": "3回見つめる。像が青白い石になり、足元の輪が満ちる",
+        "noteEn": "Stare 3 times: it turns pale stone and the ring fills",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.50,0.84) 120ms → wait 250ms → tap(0.50,0.84) 120ms → wait 300ms",
+        "note": "石のうちにすり抜ける。今度は像がうしろに",
+        "noteEn": "Slip past while it is stone; now it is behind me",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.83,0.84) 120ms → wait 250ms → tap(0.50,0.84) 120ms → wait 250ms → tap(0.50,0.84) 120ms → wait 300ms",
+        "note": "右へ曲がると光の差す階段が見えた",
+        "noteEn": "Turning right I see the stairs lit from above",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.25,0.94) 120ms → wait 300ms",
+        "note": "気になってふりむく。角から像の腕がのぞいている。地図ではまだ石の輪が残っている",
+        "noteEn": "I look back: an arm peeks round the corner; the map shows its stone ring still left",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.25,0.94) 120ms → wait 250ms → tap(0.50,0.84) 120ms → wait 250ms → tap(0.50,0.84) 120ms → wait 1600ms",
+        "note": "向き直って階段へ駆けこむ。白い光の中へ",
+        "noteEn": "Turn again and dash up the stairs into the light",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "save",
+            "data": {
+              "floor": 2,
+              "best": 0
+            }
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.50,0.50) 120ms → wait 600ms",
+        "note": "B4F。地図の金色が鍵。鍵がないと階段は開かない",
+        "noteEn": "B4F: gold on the map is the key; the stairs need it",
+        "image": "ai-play/step-09.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end",
+            "score": 1
+          },
+          {
+            "agf": "save",
+            "data": {
+              "floor": 2,
+              "best": 0
+            }
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-22T09:35:50+09:00"
+  },
+  "publishedAt": "2026-11-22T09:35:50+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 43371,
+    "outputTokens": 68552,
+    "contextTokens": 28488322,
+    "turns": 123,
+    "toolCalls": 128,
+    "webSearches": 0,
+    "minutes": 30.2,
+    "from": "2026-11-22T00:05:41.906Z",
+    "to": "2026-11-22T00:35:53.107Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-22T09:35:53+09:00",
+    "validationRuns": 7,
+    "codeKB": 45.6
+  }
+}
