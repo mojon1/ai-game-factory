@@ -1,0 +1,200 @@
+{
+  "device": "android",
+  "seed": 20261007,
+  "startedAt": "2026-11-22T03:03:37.757Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "tap": [
+          0.5,
+          0.5
+        ],
+        "wait": 100
+      },
+      "desc": "tap(0.50,0.50) 120ms",
+      "note": "手札と報酬の両方で所持数を確認できる版を開始する。",
+      "noteEn": "I start the version showing owned counts in both hand and rewards.",
+      "image": "ai-play/step-01.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": [
+        {
+          "tap": [
+            0.28,
+            0.61
+          ]
+        },
+        {
+          "tap": [
+            0.72,
+            0.61
+          ]
+        },
+        {
+          "tap": [
+            0.28,
+            0.77
+          ]
+        },
+        {
+          "tap": [
+            0.72,
+            0.77
+          ],
+          "wait": 900
+        }
+      ],
+      "desc": "tap(0.28,0.61) 120ms → tap(0.72,0.61) 120ms → tap(0.28,0.77) 120ms → tap(0.72,0.77) 120ms",
+      "note": "最初の門を再現し、報酬の所持数が表示されるか確かめる。",
+      "noteEn": "I replay the first gate and check owned counts on the rewards.",
+      "image": "ai-play/step-02.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "action": {
+        "tap": [
+          0.5,
+          0.42
+        ],
+        "wait": 100
+      },
+      "desc": "tap(0.50,0.42) 120ms",
+      "note": "大振りの所持0を確認して加える。二つ目の門で使えるか試す。",
+      "noteEn": "I add Heavy Blow after confirming zero owned copies.",
+      "image": "ai-play/step-03.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "action": [
+        {
+          "tap": [
+            0.72,
+            0.77
+          ]
+        },
+        {
+          "tap": [
+            0.72,
+            0.77
+          ]
+        },
+        {
+          "tap": [
+            0.28,
+            0.61
+          ],
+          "wait": 100
+        }
+      ],
+      "desc": "tap(0.72,0.77) 120ms → tap(0.72,0.77) 120ms → tap(0.28,0.61) 120ms",
+      "note": "ひらめきで引いた大振りと守備を併用し、攻撃11を与えて受ける傷を0にする。",
+      "noteEn": "I combine the Heavy Blow drawn by Insight with Guard, dealing 11 while reducing incoming damage to zero.",
+      "image": "ai-play/step-04.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "action": {
+        "tap": [
+          0.5,
+          0.91
+        ],
+        "wait": 100
+      },
+      "desc": "tap(0.50,0.91) 120ms",
+      "note": "手番を終える。守り5で予告5を防ぎ、次の手札と敵の盾を見る。",
+      "noteEn": "I end the turn, blocking all five damage, and inspect the new hand and enemy shield.",
+      "image": "ai-play/step-05.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "action": [
+        {
+          "tap": [
+            0.28,
+            0.77
+          ]
+        },
+        {
+          "tap": [
+            0.72,
+            0.77
+          ],
+          "wait": 900
+        }
+      ],
+      "desc": "tap(0.28,0.77) 120ms → tap(0.72,0.77) 120ms",
+      "note": "残り7なので斬撃二枚で倒せる。防御より決着を選び、次の報酬へ。",
+      "noteEn": "With 7 health left, two Strikes finish the keeper. I choose the kill over defense.",
+      "image": "ai-play/step-06.jpg",
+      "errors": [],
+      "signals": [
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        },
+        {
+          "agf": "start"
+        },
+        {
+          "agf": "end"
+        }
+      ]
+    }
+  ],
+  "initialErrors": []
+}

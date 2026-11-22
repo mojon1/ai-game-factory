@@ -1,0 +1,353 @@
+{
+  "id": "2026-11-22-gpt-1",
+  "status": "published",
+  "title": "五つの門の小さなデッキ",
+  "genre": "デッキ構築",
+  "concept": "番人の次の攻撃を見て、攻撃と守りへ二つの力を配る。門を越えるたび強い札を足すか、弱い斬撃を減らすかを選び、体力を次の戦いへ持ち越す。枚数だけでなく引きやすさを育てる短い旅。",
+  "howToPlay": "力の範囲でカードを使い、手番を終えます。番人を倒したらカードを足すか斬撃を減らし、五つの門を抜けてください。",
+  "libraryDecision": "カードの文と予告を一画面で比較するため平面のHTMLを使う。3Dや物理、画面効果は判断の読みやすさを強めないため使わない。",
+  "soundDecision": "攻撃・守り・被害を短い高さの異なる音で分け、報酬を高い音で区切る。考える時間を残すためBGMは使わない。",
+  "improvements": [
+    {
+      "found": "敵の残り体力が数字だけで進み具合を読みづらい／札を使うたび位置が詰まり、同じ場所への連打で別の札を使いそう／予告と守りを毎回引き算しないと受ける傷が分からない。",
+      "changed": "敵の体力バーと被弾の動きを追加。使用済みの位置を空けて札の場所を固定し、ひらめきだけは空き位置へ引く。守りを差し引いた被害を予告へ表示した。",
+      "foundEn": "Numeric enemy health hid progress; shifting cards risked accidental follow-up plays; incoming damage required repeated subtraction.",
+      "changedEn": "Added an enemy health bar and hit reaction, fixed card slots with played placeholders, drew Insight into an empty slot, and showed net incoming health loss."
+    },
+    {
+      "found": "報酬を選ぶとき、既に持つ札の枚数が見えず増減を比較しづらい／攻撃と守備の札が同じ色で探しづらい／山札と捨札の残りが別画面にあり、引き直しの近さを追いにくい。",
+      "changed": "報酬と除去候補へ所持枚数を表示。札を役割別に色分けし、山札・捨札の残りを力の下へ常時表示した。斬撃がない時の除去も無効にする。",
+      "foundEn": "Rewards hid owned-card counts; attacks and guards looked alike; draw and discard counts required a separate screen.",
+      "changedEn": "Rewards show owned counts, roles have distinct card colors, pile counts remain below energy, and removing Strike is disabled when none remain."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "デッキ構築",
+      "en": "Deck-building",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "五つの門を抜ける小さなデッキ。札を足すか減らすかで次の引きを変える。2Dのカードで予告と手札を読み、3Dの厚みは使わない。",
+        "ideaEn": "Build a small deck through five gates, changing future draws by adding or removing cards. Flat cards keep forecasts and hands readable.",
+        "fromDraw": true
+      },
+      {
+        "idea": "風に向かって傘を傾け、飛ぶ種を花壇へ運ぶ。俯瞰2Dで風と影を見渡し、3Dは遮るため使わない。",
+        "ideaEn": "Tilt an umbrella in wind to guide seeds into beds, shown from above for clear wind and shadow relationships.",
+        "fromDraw": false
+      },
+      {
+        "idea": "形の違う器を水面に浮かべ、重りの置き方で水平に保つ。3Dの傾きと水面の高さを手応えにする。",
+        "ideaEn": "Balance differently shaped floating bowls with weights, using 3D tilt and water height as feedback.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "other",
+    "input": [
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "A Small Deck, Five Gates",
+      "concept": "Read the keeper's next attack and split two energy between offense and defense. Add a strong card or remove a weak Strike at each gate, carrying health forward and improving draw reliability rather than only deck size.",
+      "howToPlay": "Play cards within your energy, then end the turn. After defeating a keeper, add a card or remove a Strike and pass five gates.",
+      "libraryDecision": "Flat HTML compares card text and forecasts on one screen. 3D, physics and effects would not improve those decisions.",
+      "soundDecision": "Distinct short notes acknowledge attacks, blocks, damage and rewards. No background music interrupts thinking."
+    }
+  },
+  "createdAt": "2026-11-22T11:58:57+09:00",
+  "specVersion": 11,
+  "maker": "gpt",
+  "credits": [
+    {
+      "role": "main",
+      "name": "gpt-6.1-sol",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol",
+      "via": "Codex"
+    }
+  ],
+  "generation": {
+    "pipeline": "Codex",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-22T11:58:57+09:00",
+    "metricsFrom": "2026-11-22T02:56:47.101Z",
+    "transcript": null,
+    "validationRuns": 4,
+    "finishedAt": "2026-11-22T12:05:56+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-22T12:03:34+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "11.0KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=-",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 11223,
+    "lines": 23
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "gpt-6.1-sol",
+      "vendor": "OpenAI",
+      "model": "gpt-6.1-sol"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "敵の行動は攻撃と時々の盾だけで、選ぶ報酬も毎回同じ三種なので、二周目の変化が乏しい。",
+    "comment": "二つ目の門で、ひらめきから引いた大振りと守備を同時に使い、11点を与えて5点の攻撃を防げた。残り7には斬撃二枚で決着を選び、次の報酬で斬撃を減らすと山札が10枚へ戻る。五戦の体力持ち越しとデッキの足し引きに数分の判断があるため★3。",
+    "similar": [
+      {
+        "title": "Slay the Spire",
+        "url": "https://www.megacrit.com/press-kits/slay-the-spire/",
+        "similarity": "高",
+        "note": "予告を見て力を攻撃と防御に配り、戦闘後のカード追加・除去で山札を育てる構造が共通する。こちらは六種のカードと五戦だけで、地図・遺物・イベントは持たない小さな構成。",
+        "note_en": "Forecast-based energy allocation and growing a deck through post-battle additions/removals share the same structure. This version has only six card types and five fights, with no map, relics or events."
+      }
+    ],
+    "research": "Slay the Spireをウェブ検索し、開発元Mega Critの公式プレスキットで一人用デッキ構築の構造を確認した。",
+    "i18n": {
+      "en": {
+        "worst": "Enemies only attack and sometimes gain shields, and the same three rewards recur, limiting a second run.",
+        "comment": "At gate two, Insight drew Heavy Blow; pairing it with Guard dealt 11 and blocked five. Two Strikes then finished the remaining seven, and removing a Strike at the next reward returned the deck to ten cards. Five health-carrying battles and deck adjustments provide a few minutes of ordinary decisions, earning three stars.",
+        "research": "Searched Slay the Spire and consulted developer Mega Crit's official press kit."
+      }
+    },
+    "method": "スマホ縦画面で 6 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 6 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "手札と報酬の両方で所持数を確認できる版を開始する。",
+        "noteEn": "I start the version showing owned counts in both hand and rewards.",
+        "signals": [
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.28,0.61) 120ms → tap(0.72,0.61) 120ms → tap(0.28,0.77) 120ms → tap(0.72,0.77) 120ms",
+        "note": "最初の門を再現し、報酬の所持数が表示されるか確かめる。",
+        "noteEn": "I replay the first gate and check owned counts on the rewards.",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.50,0.42) 120ms",
+        "note": "大振りの所持0を確認して加える。二つ目の門で使えるか試す。",
+        "noteEn": "I add Heavy Blow after confirming zero owned copies.",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.72,0.77) 120ms → tap(0.72,0.77) 120ms → tap(0.28,0.61) 120ms",
+        "note": "ひらめきで引いた大振りと守備を併用し、攻撃11を与えて受ける傷を0にする。",
+        "noteEn": "I combine the Heavy Blow drawn by Insight with Guard, dealing 11 while reducing incoming damage to zero.",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.50,0.91) 120ms",
+        "note": "手番を終える。守り5で予告5を防ぎ、次の手札と敵の盾を見る。",
+        "noteEn": "I end the turn, blocking all five damage, and inspect the new hand and enemy shield.",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.28,0.77) 120ms → tap(0.72,0.77) 120ms",
+        "note": "残り7なので斬撃二枚で倒せる。防御より決着を選び、次の報酬へ。",
+        "noteEn": "With 7 health left, two Strikes finish the keeper. I choose the kill over defense.",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-22T12:05:56+09:00"
+  },
+  "publishedAt": "2026-11-22T12:05:56+09:00",
+  "metrics": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "thinkingTokens": 3672,
+    "outputTokens": 9220,
+    "contextTokens": 9052610,
+    "turns": 22,
+    "toolCalls": 22,
+    "webSearches": null,
+    "minutes": 9.2,
+    "from": "2026-11-22T02:56:47.101Z",
+    "to": "2026-11-22T03:05:59.576Z",
+    "method": "Codexのtoken_usage_recordをresponse_idで重複除去し企画開始から自己判定完了まで集計。入力はキャッシュ込み、出力は思考を控除。ツールはトップレベル呼出のみ。",
+    "methodEn": "Aggregated unique Codex response usage from planning through review. Input includes cached tokens; output excludes reasoning; tools count top-level calls.",
+    "recordedAt": "2026-11-22T12:05:59+09:00",
+    "validationRuns": 4,
+    "codeKB": 11,
+    "evidence": "metrics-evidence.json"
+  }
+}
