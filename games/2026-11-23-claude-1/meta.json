@@ -1,0 +1,422 @@
+{
+  "id": "2026-11-23-claude-1",
+  "status": "published",
+  "title": "とめ・はね・はらい",
+  "genre": "お絵かき",
+  "concept": "指を筆にして漢字を一文字ずつ書く。ゆっくり書けば太く、速いと細く、筆の離し方で「とめ・はね・はらい」が決まる。止めて押さえるか、勢いで細く抜くか、一画ごとの終わり方を先生が朱の◎○△で採点する手触りが核。",
+  "howToPlay": "朱色のお手本を指でなぞって一画ずつ書く。札の「とめ」は止まってから離し、「はらい」「はね」は勢いのまま抜く。",
+  "libraryDecision": "使わない。核は墨のにじみ・かすれと筆の太さの変化で、Canvas 2D に毛の束を重ねて描く自作の筆で十分に表現でき、3D や物理演算は書く手触りを強めないため。",
+  "soundDecision": "BGM はなし。書いている間だけ速さに応じて音が変わる紙のこすれ音を鳴らし、先生の採点は◎ほど高い澄んだ音にした。静かな習字の部屋の集中を保ち、一画ごとの評価を耳でも受け取れるようにするため。",
+  "improvements": [
+    {
+      "found": "お手本の縁が数珠のようにガタガタで見づらい／採点の印が同じ場所に重なり、どの画の評価か分からない／太すぎても書き順を間違えても88点が出て、上達の手応えがない",
+      "changed": "お手本の点を細かく取り直してなめらかにし、印を各画の真ん中の外側に置いた。採点に太さの一致を加え、書き順の減点を強めた。字ごとの自己ベストと、全14字の花丸を集める「花丸帳」を足した",
+      "foundEn": "The model outline was beaded and rough / grading marks piled up in one spot so you could not tell which stroke they meant / even too-thick, wrong-order writing scored 88, so improving felt pointless",
+      "changedEn": "Resampled the model finely, moved marks to just outside each stroke's middle, added width matching and a stronger stroke-order penalty, and added per-character bests plus a gold-flower book of all 14 characters"
+    },
+    {
+      "found": "ゆっくり止めて書くと必ず「太い」と言われ、とめと太さが両立しない／雑に書いても合計441点で師範になり、段位の重みがない／結果画面で花丸が段位の文字に重なり、下敷きの黒い板が残って見える",
+      "changed": "筆の最大の太さを下げ、ゆっくり書いてもお手本に近い太さに収まるようにした。段位の基準と花丸（92点以上）を上げ、結果画面の重なりと下敷きを直した。素早いはねが「弱い」と判定されないよう抜きの速さの基準も下げた",
+      "foundEn": "Writing slowly to stop always got 'too thick', so stops and correct width conflicted / sloppy writing still reached 441 and 'Instructor', so ranks meant little / on the results screen the gold flower overlapped the rank and the black felt pad remained",
+      "changedEn": "Lowered the max brush width so slow strokes stay near model width, raised rank thresholds and the gold-flower line (92+), fixed the overlap and felt pad, and lowered the flick speed threshold so quick flicks are not judged weak"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "お絵かき",
+      "en": "Drawing",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "指を筆にした書道。速さで太さが変わり、離し方で「とめ・はね・はらい」を書き分けて、お手本との一致と終わり方を朱で採点する。",
+        "ideaEn": "Finger-brush calligraphy: speed sets thickness and how you lift writes stop/flick/sweep, graded in red against a model.",
+        "fromDraw": true
+      },
+      {
+        "idea": "長押しでしゃぼん玉をふくらませ、離して風に乗せる。大きいほど高得点だが割れやすく、とげのある枝の間を漂わせる。",
+        "ideaEn": "Hold to blow a soap bubble, release to drift it on the wind; bigger scores more but pops easier among thorny branches.",
+        "fromDraw": false
+      },
+      {
+        "idea": "紙をスワイプで折って紙ひこうきを作り、投げて飛ばす3D。折り方の違いで曲がり方や滞空が変わる。",
+        "ideaEn": "A 3D game of folding a paper plane with swipes and throwing it; how you fold changes its curve and hang time.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "goal",
+    "input": [
+      "draw"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Stop, Flick, Sweep",
+      "concept": "Your finger is a brush writing one kanji at a time. Slow is thick, fast is thin, and how you lift decides stop, flick or sweep. The core is the feel of pressing to a stop or sweeping off thin, each stroke graded by the teacher in red ◎○△.",
+      "howToPlay": "Trace the red model one stroke at a time. For a 'stop' tag, pause before lifting; for 'sweep' and 'flick', lift while still moving.",
+      "libraryDecision": "No library. The core is ink bleed, dry-brush streaks and changing width, which a hand-made bristle brush on Canvas 2D expresses fully; 3D or physics would not strengthen the writing feel.",
+      "soundDecision": "No BGM. While writing, a paper-rubbing sound changes with speed, and the teacher's marks chime higher for better grades. It keeps the quiet focus of a calligraphy room and lets you hear each stroke's grade."
+    }
+  },
+  "createdAt": "2026-11-23T09:07:31+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-23T09:07:31+09:00",
+    "metricsFrom": "2026-11-23T00:05:44.602Z",
+    "transcript": "a549d184-d22f-4222-9ee4-782370c00e42.jsonl",
+    "validationRuns": 5,
+    "finishedAt": "2026-11-23T09:34:25+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-23T09:34:24+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "38.2KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=71",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=73",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=56",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=77",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 39073,
+    "lines": 667
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "5文字を書くだけで変化が少なく、指の速さで太さを操る感覚は数字の◎○△でしか確かめられないので、慣れると単調になりやすい",
+    "comment": "ゆっくり書いて止めた横画は「とめ◎」、勢いで抜いた払いは先がかすれて細く消え、筆らしい手応えがある。わざと速く書いた二画目は細く抜けて△と『とめずに抜けた』と言われ、離し方の違いがすぐ伝わった。字ごとのベストと花丸帳はもう1回の理由になるが、5文字は同じ流れの繰り返しで、驚きは少ない。自己プレイの道具は一画の中で速さを変えられないので、とめ→はねのような緩急は試せていない。",
+    "similar": [
+      {
+        "title": "The Japanese Calligraphy (Steam)",
+        "url": "https://store.steampowered.com/app/3304490",
+        "similarity": "中",
+        "note": "とめ・はね・はらいの筆遣いを再現する書道ゲーム。こちらはスマホの指で速さ＝太さにし、各画の終わり方を自動で採点する",
+        "note_en": "A calligraphy game reproducing tome/hane/harai brushwork; this one maps finger speed to width on phones and auto-grades each stroke ending"
+      },
+      {
+        "title": "Soragaki",
+        "url": "https://apps.apple.com/us/app/soragaki/id545609501",
+        "similarity": "中",
+        "note": "お手本をなぞって書き順やとめ・はね・はらいを学ぶ学習アプリ。こちらは学習より筆の手触りと点数・段位の遊び",
+        "note_en": "A learning app for tracing models and stroke order including tome/hane/harai; this one focuses on brush feel and scoring/ranks rather than study"
+      }
+    ],
+    "research": "WebSearchで書道・とめはねはらい採点のゲームやアプリを1回検索した",
+    "i18n": {
+      "en": {
+        "worst": "Only five characters per run with little variation; you can only confirm your speed-to-width control through ◎○△ marks, so it can get monotonous once learned",
+        "comment": "A slow horizontal with a stop gets 'Stop ◎', and a fast sweep thins out with dry-brush streaks, which feels brush-like. My deliberately fast second stroke swept off thin and got △ 'didn't stop', so the difference in lifting came across at once. Per-character bests and the gold-flower book give a reason to replay, but the five characters follow the same flow with few surprises. The self-play tool cannot vary speed within one stroke, so I could not test slow-then-flick hane.",
+        "research": "One WebSearch for calligraphy games/apps that grade tome/hane/harai"
+      }
+    },
+    "method": "スマホ縦画面で 9 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 9 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "wait 3000ms",
+        "note": "タイトルで筆が自動で字を書く。墨のかすれが見える",
+        "noteEn": "Title: the brush writes by itself, with dry-brush streaks",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "開始。朱色のお手本と1画目の番号、終わり方の札「とめ」",
+        "noteEn": "Start: red model, stroke number and the 'stop' tag",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "path(0.34,0.36→0.51,0.36→0.69,0.35) 1600ms",
+        "note": "ゆっくり書いて止める。とめ◎",
+        "noteEn": "Slow with a stop: Stop ◎",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "path(0.18,0.54→0.50,0.54→0.82,0.54) 450ms",
+        "note": "わざと速く。細く抜けて『とめずに抜けた』と△",
+        "noteEn": "Deliberately fast: thin, swept off, marked △ 'didn't stop'",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 2500ms",
+        "note": "点数が数え上がる。抜けた分だけ減点",
+        "noteEn": "Score counts up, lower for the missed stop",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.50,0.90) 120ms",
+        "note": "次は「人」。払いの札",
+        "noteEn": "Next: 人 with sweep tags",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "path(0.54,0.25→0.51,0.37→0.42,0.50→0.20,0.64) 420ms",
+        "note": "勢いよく払う。先がかすれて細く抜ける",
+        "noteEn": "Fast sweep: the tip thins and streaks",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "path(0.50,0.44→0.61,0.55→0.85,0.65) 300ms",
+        "note": "右払い",
+        "noteEn": "Sweep right",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "wait 2500ms",
+        "note": "採点。払いが決まると気持ちいい",
+        "noteEn": "Graded; a clean sweep feels good",
+        "image": "ai-play/step-09.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-23T09:34:25+09:00"
+  },
+  "publishedAt": "2026-11-23T09:34:25+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 24912,
+    "outputTokens": 41716,
+    "contextTokens": 8840344,
+    "turns": 46,
+    "toolCalls": 56,
+    "webSearches": 0,
+    "minutes": 28.7,
+    "from": "2026-11-23T00:05:44.602Z",
+    "to": "2026-11-23T00:34:25.117Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-23T09:34:25+09:00",
+    "validationRuns": 5,
+    "codeKB": 38.2
+  }
+}

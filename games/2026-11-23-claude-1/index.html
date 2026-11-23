@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>とめ・はね・はらい</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #2a211b; }
+canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const JA = LANG === 'ja';
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+const T = JA ? {
+  title: 'とめ・はね・はらい', sub: '筆で一文字ずつ書く',
+  how1: '朱色のお手本を、指の筆でなぞって書く。', how2: 'ゆっくり書けば太く、速く書けば細くなる。', how3: '筆の離し方で「とめ」「はね」「はらい」を書き分けよう。',
+  start: 'タップでスタート', total: '合計', best: 'ベスト', of: '字', stroke: '画',
+  hint: 'ゆっくり＝太い　速い＝細い　最後に止める／抜く',
+  tome: 'とめ', hane: 'はね', harai: 'はらい',
+  ok: { tome: 'とめ◎', hane: 'はね◎', harai: 'はらい◎' },
+  wrongFlick: { tome: 'とめずに抜けた', hane: 'はねの向き', harai: 'はらいの向き' },
+  weak: { tome: 'とめが弱い', hane: 'はねが弱い', harai: 'はらいが弱い' },
+  stopped: { tome: '', hane: 'はねずに止めた', harai: 'はらわずに止めた' },
+  order: '書き順', rev: '逆向き', off: 'ずれ', thinW: '細い', thickW: '太い', nth: (n) => n + '画目',
+  charBest: 'この字のベスト', charRec: 'この字の自己ベスト！', book: '花丸帳', pts: '点', next: 'タップで次へ', again: 'タップでもう一度', newBest: 'ベスト更新！', result: '今日の作品',
+  c: { spill: '墨がはみ出し気味。速く細く書く所を作ろう', thin: '線がお手本に届いていない。ゆっくり太く', ends: 'とめ・はね・はらいを意識して', order: '書き順に気をつけて', great: '見事！', good: 'よく書けました', fine: 'まずまず', try: 'もう少し' },
+  rank: 'の腕前',
+}
+: {
+  title: 'Stop, Flick, Sweep', sub: 'Brush calligraphy, one character at a time',
+  how1: 'Trace the red model with your finger-brush.', how2: 'Slow strokes are thick, fast strokes are thin.', how3: 'How you lift decides the ending: stop, flick or sweep.',
+  start: 'Tap to start', total: 'Total', best: 'Best', of: 'chars', stroke: 'strokes',
+  hint: 'Slow = thick   Fast = thin   End: stop or sweep off',
+  tome: 'stop', hane: 'flick', harai: 'sweep',
+  ok: { tome: 'Stop ◎', hane: 'Flick ◎', harai: 'Sweep ◎' },
+  wrongFlick: { tome: 'Didn\'t stop', hane: 'Flick direction', harai: 'Sweep direction' },
+  weak: { tome: 'Weak stop', hane: 'Weak flick', harai: 'Weak sweep' },
+  stopped: { tome: '', hane: 'Stopped, no flick', harai: 'Stopped, no sweep' },
+  order: 'Order', rev: 'Reversed', off: 'Off line', thinW: 'Too thin', thickW: 'Too thick', nth: (n) => 'Stroke ' + n,
+  charBest: 'Best for this one', charRec: 'Personal best for this one!', book: 'Gold-flower book', pts: 'pts', next: 'Tap to continue', again: 'Tap to play again', newBest: 'New best!', result: 'Today\'s works',
+  c: { spill: 'Ink spilled out. Go faster where it should be thin', thin: 'Lines don\'t fill the model. Go slower, thicker', ends: 'Mind your stops, flicks and sweeps', order: 'Watch the stroke order', great: 'Masterful!', good: 'Well written', fine: 'Not bad', try: 'Keep practicing' },
+  rank: '',
+};
+const RANKS = [[485, '名人', 'Master'], [465, '師範', 'Instructor'], [445, '三段', '3rd Dan'], [420, '初段', '1st Dan'], [390, '一級', '1st Kyu'], [340, '三級', '3rd Kyu'], [0, '五級', '5th Kyu']];
+const MEAN = { '一': 'one', '二': 'two', '十': 'ten', '人': 'person', '八': 'eight', '川': 'river', '大': 'big', '口': 'mouth', '小': 'small', '山': 'mountain', '木': 'tree', '子': 'child', '水': 'water', '心': 'heart' };
+const READ = { '一': 'いち', '二': 'に', '十': 'じゅう', '人': 'ひと', '八': 'はち', '川': 'かわ', '大': 'おお', '口': 'くち', '小': 'ちい', '山': 'やま', '木': 'き', '子': 'こ', '水': 'みず', '心': 'こころ' };
+
+// ---- お手本（0〜100 の紙座標）。e: 終わり方 / c: 曲線 / w: 太さ
+const CH = {
+  '一': [{ p: [[16, 50], [50, 48], [84, 50]], e: 'tome', w: 8 }],
+  '二': [{ p: [[30, 34], [70, 32]], e: 'tome' }, { p: [[16, 68], [50, 66], [84, 68]], e: 'tome', w: 8 }],
+  '十': [{ p: [[14, 44], [86, 43]], e: 'tome' }, { p: [[50, 14], [50, 88]], e: 'tome' }],
+  '人': [{ p: [[54, 12], [51, 36], [42, 60], [18, 86]], e: 'harai', c: 1 }, { p: [[50, 44], [62, 64], [88, 84]], e: 'harai', c: 1 }],
+  '八': [{ p: [[40, 24], [36, 52], [16, 80]], e: 'harai', c: 1 }, { p: [[58, 24], [68, 52], [88, 78]], e: 'harai', c: 1 }],
+  '川': [{ p: [[24, 16], [24, 52], [14, 84]], e: 'harai', c: 1 }, { p: [[50, 26], [50, 70]], e: 'tome' }, { p: [[78, 14], [78, 88]], e: 'tome' }],
+  '大': [{ p: [[14, 38], [86, 36]], e: 'tome' }, { p: [[51, 12], [50, 40], [40, 64], [16, 88]], e: 'harai', c: 1 }, { p: [[53, 44], [66, 66], [88, 86]], e: 'harai', c: 1 }],
+  '口': [{ p: [[26, 26], [28, 80]], e: 'tome' }, { p: [[26, 26], [74, 26], [72, 80]], e: 'tome' }, { p: [[28, 78], [72, 78]], e: 'tome' }],
+  '小': [{ p: [[50, 10], [50, 82], [40, 74]], e: 'hane' }, { p: [[30, 38], [20, 62]], e: 'tome' }, { p: [[70, 36], [84, 60]], e: 'tome' }],
+  '山': [{ p: [[50, 12], [50, 78]], e: 'tome' }, { p: [[18, 34], [18, 80], [82, 80]], e: 'tome' }, { p: [[82, 30], [82, 82]], e: 'tome' }],
+  '木': [{ p: [[12, 34], [88, 33]], e: 'tome' }, { p: [[50, 8], [50, 92]], e: 'tome' }, { p: [[48, 36], [34, 60], [12, 78]], e: 'harai', c: 1 }, { p: [[52, 38], [68, 58], [88, 74]], e: 'tome', c: 1 }],
+  '子': [{ p: [[24, 18], [70, 18], [50, 38]], e: 'tome' }, { p: [[50, 38], [52, 84], [42, 78]], e: 'hane' }, { p: [[12, 54], [88, 52]], e: 'tome' }],
+  '水': [{ p: [[52, 8], [52, 86], [42, 78]], e: 'hane' }, { p: [[16, 34], [38, 34], [14, 74]], e: 'harai' }, { p: [[80, 22], [58, 44]], e: 'harai' }, { p: [[56, 44], [70, 66], [90, 84]], e: 'harai', c: 1 }],
+  '心': [{ p: [[28, 32], [36, 42]], e: 'tome' }, { p: [[18, 50], [22, 78], [34, 86], [68, 86], [78, 74]], e: 'hane', c: 1 }, { p: [[50, 30], [58, 44]], e: 'tome' }, { p: [[74, 36], [86, 52]], e: 'tome' }],
+};
+const TIERS = [['一', '二', '十'], ['人', '八', '川'], ['大', '口', '小'], ['山', '木', '子'], ['水', '心']];
+
+// 曲線・折れ線を 1 単位ごとに区切り、各点に太さを持たせる
+function sampleStroke(s) {
+  const P = s.p, raw = [];
+  if (s.c && P.length > 2) {
+    const ext = [P[0], ...P, P[P.length - 1]];
+    for (let i = 1; i < ext.length - 2; i++) {
+      const [p0, p1, p2, p3] = [ext[i - 1], ext[i], ext[i + 1], ext[i + 2]];
+      const nk = Math.max(8, Math.ceil(Math.hypot(p2[0] - p1[0], p2[1] - p1[1]) * 3));
+      for (let k = 0; k < nk; k++) {
+        const t = k / nk, t2 = t * t, t3 = t2 * t;
+        raw.push([0.5 * (2 * p1[0] + (-p0[0] + p2[0]) * t + (2 * p0[0] - 5 * p1[0] + 4 * p2[0] - p3[0]) * t2 + (-p0[0] + 3 * p1[0] - 3 * p2[0] + p3[0]) * t3),
+          0.5 * (2 * p1[1] + (-p0[1] + p2[1]) * t + (2 * p0[1] - 5 * p1[1] + 4 * p2[1] - p3[1]) * t2 + (-p0[1] + 3 * p1[1] - 3 * p2[1] + p3[1]) * t3)]);
+      }
+    }
+    raw.push(P[P.length - 1]);
+  } else {
+    for (let i = 0; i < P.length - 1; i++) { const nk = Math.max(8, Math.ceil(Math.hypot(P[i + 1][0] - P[i][0], P[i + 1][1] - P[i][1]) * 3)); for (let k = 0; k < nk; k++) raw.push([P[i][0] + (P[i + 1][0] - P[i][0]) * k / nk, P[i][1] + (P[i + 1][1] - P[i][1]) * k / nk]); }
+    raw.push(P[P.length - 1]);
+  }
+  // 弧長で 1 単位ごとに取り直す
+  const out = [{ x: raw[0][0], y: raw[0][1], d: 0 }];
+  let acc = 0, lastX = raw[0][0], lastY = raw[0][1], total = 0;
+  for (let i = 1; i < raw.length; i++) total += Math.hypot(raw[i][0] - raw[i - 1][0], raw[i][1] - raw[i - 1][1]);
+  for (let i = 1; i < raw.length; i++) {
+    const dx = raw[i][0] - lastX, dy = raw[i][1] - lastY, d = Math.hypot(dx, dy);
+    acc += d; lastX = raw[i][0]; lastY = raw[i][1];
+    if (acc - out[out.length - 1].d >= 1 || i === raw.length - 1) out.push({ x: lastX, y: lastY, d: acc });
+  }
+  // 「はね」は最後の折れから先が細くなる
+  let hookFrom = total;
+  if (s.e === 'hane') { const a = P[P.length - 2], b = P[P.length - 1]; hookFrom = total - Math.hypot(b[0] - a[0], b[1] - a[1]); }
+  const base = s.w || 7;
+  for (const q of out) {
+    const t = q.d / total;
+    let w = base;
+    if (q.d < 6) w = base * (1.25 - 0.25 * q.d / 6);
+    if (s.e === 'tome' && t > 0.93) w = base * 1.15;
+    if (s.e === 'harai' && t > 0.5) w = base * (1 - 0.85 * Math.pow((t - 0.5) / 0.5, 1.2));
+    if (s.e === 'hane' && q.d > hookFrom - 3) w = base * Math.max(0.15, 1.1 - 0.95 * (q.d - hookFrom + 3) / (total - hookFrom + 3));
+    q.w = w;
+  }
+  const n = out.length, e0 = out[Math.max(0, n - 6)], e1 = out[n - 1];
+  const el = Math.hypot(e1.x - e0.x, e1.y - e0.y) || 1;
+  return { s: out, len: total, end: s.e, dir: [(e1.x - e0.x) / el, (e1.y - e0.y) / el], start: out[0], last: e1 };
+}
+
+// ---- 画面
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+let W = 360, H = 640, DPR = 1;
+const R = 720, U = R / 100; // 紙の内部解像度（1単位 = 7.2px）
+const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+const paperC = mk(R, R), guideC = mk(R, R), inkC = mk(R, R), markC = mk(R, R);
+const pctx = paperC.getContext('2d'), gctx = guideC.getContext('2d'), ictx = inkC.getContext('2d'), mctx = markC.getContext('2d');
+let paper = { x: 12, y: 90, s: 336 };
+
+function makePaper() {
+  const g = pctx;
+  g.fillStyle = '#f4efe2'; g.fillRect(0, 0, R, R);
+  const img = g.getImageData(0, 0, R, R), d = img.data;
+  for (let i = 0; i < d.length; i += 4) { const n = (Math.random() - 0.5) * 10; d[i] += n; d[i + 1] += n; d[i + 2] += n * 0.8; }
+  g.putImageData(img, 0, 0);
+  g.strokeStyle = 'rgba(150,130,100,0.10)';
+  for (let i = 0; i < 260; i++) { // 紙の繊維
+    g.lineWidth = 0.6 + Math.random() * 0.8; g.beginPath();
+    let x = Math.random() * R, y = Math.random() * R, a = Math.random() * 6.28; g.moveTo(x, y);
+    for (let k = 0; k < 4; k++) { a += (Math.random() - 0.5) * 1.2; x += Math.cos(a) * 9; y += Math.sin(a) * 9; g.lineTo(x, y); }
+    g.stroke();
+  }
+  g.strokeStyle = 'rgba(120,100,70,0.09)'; g.lineWidth = 2; // 折り目
+  g.beginPath(); g.moveTo(R / 2, 0); g.lineTo(R / 2, R); g.moveTo(0, R / 2); g.lineTo(R, R / 2); g.stroke();
+}
+makePaper();
+
+function resize() {
+  DPR = Math.min(2, devicePixelRatio || 1);
+  W = Math.max(1, innerWidth); H = Math.max(1, innerHeight);
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+  const top = 92, bottom = 138;
+  const s = Math.max(120, Math.min(W - 24, H - top - bottom, 520));
+  paper = { x: (W - s) / 2, y: top + Math.max(0, (H - top - bottom - s) * 0.35), s };
+}
+addEventListener('resize', resize); resize();
+const toPaper = (cx, cy) => ({ x: (cx - paper.x) / paper.s * 100, y: (cy - paper.y) / paper.s * 100 });
+const toScreen = (x, y) => ({ x: paper.x + x / 100 * paper.s, y: paper.y + y / 100 * paper.s });
+
+// ---- 音（Web Audio で筆のこすれと先生の朱の音）
+let AC = null, noiseG = null, noiseF = null;
+function initAudio() {
+  if (AC) { if (AC.state === 'suspended') AC.resume(); return; }
+  try {
+    AC = new (window.AudioContext || window.webkitAudioContext)();
+    const len = AC.sampleRate * 2, buf = AC.createBuffer(1, len, AC.sampleRate), ch = buf.getChannelData(0);
+    let b = 0; for (let i = 0; i < len; i++) { b = b * 0.6 + (Math.random() * 2 - 1) * 0.4; ch[i] = b; }
+    const src = AC.createBufferSource(); src.buffer = buf; src.loop = true;
+    noiseF = AC.createBiquadFilter(); noiseF.type = 'bandpass'; noiseF.frequency.value = 2200; noiseF.Q.value = 0.7;
+    noiseG = AC.createGain(); noiseG.gain.value = 0;
+    src.connect(noiseF); noiseF.connect(noiseG); noiseG.connect(AC.destination); src.start();
+  } catch (e) { AC = null; }
+}
+function brushSound(v, on) {
+  if (!AC || !noiseG) return;
+  const t = AC.currentTime;
+  noiseG.gain.setTargetAtTime(on ? Math.min(0.07, 0.012 + v * 0.025) : 0, t, on ? 0.03 : 0.06);
+  noiseF.frequency.setTargetAtTime(1400 + Math.min(3, v) * 900, t, 0.05);
+}
+function tone(f, dur = 0.25, vol = 0.08, type = 'sine', when = 0) {
+  if (!AC) return;
+  try {
+    const t = AC.currentTime + when, o = AC.createOscillator(), g = AC.createGain();
+    o.type = type; o.frequency.value = f; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0008, t + dur);
+    o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t + dur + 0.05);
+  } catch (e) {}
+}
+function knock() { tone(1250, 0.07, 0.06, 'triangle'); tone(620, 0.12, 0.05, 'sine'); }
+
+// ---- 筆（毛の束 + 墨の量 + 速さで太さが変わる）
+const WMAX = 8.5;
+const BR = Array.from({ length: 13 }, (_, i) => ({ o: -0.5 + (i + 0.5) / 13 + (Math.random() - 0.5) * 0.03, k: 0.35 + Math.random() * 0.65 }));
+let st = null; // 書いている最中の一画
+function inkSeg(x0, y0, w0, x1, y1, w1, ink, vs) {
+  const g = ictx, dx = x1 - x0, dy = y1 - y0, d = Math.hypot(dx, dy) || 0.001, nx = -dy / d, ny = dx / d;
+  const eff = ink - Math.max(0, vs - 1.4) * 0.16;
+  const core = Math.max(0, Math.min(1, (eff - 0.28) / 0.4));
+  g.lineCap = 'round';
+  if (core > 0) {
+    g.strokeStyle = `rgba(20,17,22,${0.9 * core})`; g.lineWidth = Math.max(0.5, (w0 + w1) * 0.5 * 0.8) * U;
+    g.beginPath(); g.moveTo(x0 * U, y0 * U); g.lineTo(x1 * U, y1 * U); g.stroke();
+  }
+  for (const b of BR) {
+    if (eff < (1 - b.k) * 0.55 + 0.05) continue; // 墨が切れた毛はかすれる
+    g.strokeStyle = `rgba(18,15,20,${0.42 + 0.3 * b.k})`; g.lineWidth = Math.max(0.35, (w0 + w1) * 0.5 * 0.13) * U;
+    g.beginPath(); g.moveTo((x0 + nx * b.o * w0) * U, (y0 + ny * b.o * w0) * U); g.lineTo((x1 + nx * b.o * w1) * U, (y1 + ny * b.o * w1) * U); g.stroke();
+  }
+}
+function dab(x, y, r, a) {
+  const g = ictx, gr = g.createRadialGradient(x * U, y * U, 0, x * U, y * U, r * U);
+  gr.addColorStop(0, `rgba(20,17,22,${a})`); gr.addColorStop(0.7, `rgba(20,17,22,${a * 0.85})`); gr.addColorStop(1, 'rgba(20,17,22,0)');
+  g.fillStyle = gr; g.beginPath(); g.arc(x * U, y * U, r * U, 0, 6.2832); g.fill();
+}
+function beginStroke(x, y, t) {
+  st = { pts: [{ x, y, t, w: WMAX * 0.62 }], lx: x, ly: y, lt: t, w: WMAX * 0.62, vs: 0, ink: 1, press: 0, len: 0, moved: t };
+  dab(x, y, st.w * 0.55, 0.85);
+}
+function wTarget() { return WMAX * Math.max(0.3, Math.min(1, 1.1 - 0.22 * st.vs)) * (1 + Math.min(0.55, st.press)); }
+function moveStroke(x, y, t) {
+  if (!st) return;
+  const dx = x - st.lx, dy = y - st.ly, d = Math.hypot(dx, dy), dt = Math.max(1, t - st.lt);
+  if (d < 0.25) return;
+  const v = d / dt * 10; // 紙の幅/秒
+  st.vs = st.vs * 0.65 + v * 0.35;
+  st.press = Math.max(0, st.press - dt / 250);
+  const n = Math.max(1, Math.ceil(d / 1.2));
+  let px = st.lx, py = st.ly, pw = st.w;
+  for (let i = 1; i <= n; i++) {
+    const nx = st.lx + dx * i / n, ny = st.ly + dy * i / n;
+    st.w += (wTarget() - st.w) * Math.min(1, dt / n / 45);
+    inkSeg(px, py, pw, nx, ny, st.w, st.ink, st.vs);
+    st.ink = Math.max(0, st.ink - (d / n) * 0.0055 * (st.w / 7) - Math.max(0, st.vs - 2) * 0.002);
+    px = nx; py = ny; pw = st.w;
+  }
+  st.len += d; st.lx = x; st.ly = y; st.lt = t; st.moved = t;
+  st.pts.push({ x, y, t, w: st.w });
+  brushSound(st.vs, true);
+}
+function holdStroke(t, dt) { // 止まっている間：墨がにじんで太る
+  if (!st || t - st.moved < 110) return;
+  st.vs *= Math.pow(0.5, dt / 60);
+  st.press = Math.min(0.9, st.press + dt / 900);
+  st.w += (wTarget() - st.w) * Math.min(1, dt / 120);
+  st.lt = t;
+  st.pts.push({ x: st.lx, y: st.ly, t, w: st.w });
+  dab(st.lx, st.ly, st.w * 0.46 * (1 + st.press * 0.3), 0.035 + 0.02 * st.ink);
+  brushSound(0, false);
+}
+function liftSpeed(pts, t) {
+  let i = pts.length - 1, len = 0;
+  while (i > 0 && t - pts[i - 1].t <= 90) { len += Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y); i--; }
+  const span = Math.max(30, t - pts[i].t);
+  return len / span * 10;
+}
+function endStroke(t) {
+  if (!st) return null;
+  const s = st; st = null; brushSound(0, false);
+  const lv = liftSpeed(s.pts, t);
+  // 最後の向き
+  let j = s.pts.length - 1, acc = 0; const L = s.pts[j];
+  while (j > 0 && acc < 5) { acc += Math.hypot(s.pts[j].x - s.pts[j - 1].x, s.pts[j].y - s.pts[j - 1].y); j--; }
+  let dx = L.x - s.pts[j].x, dy = L.y - s.pts[j].y; const dl = Math.hypot(dx, dy) || 1; dx /= dl; dy /= dl;
+  let kind = 'mid';
+  if (lv < 0.55) kind = 'tome';
+  else if (lv > 1.15) kind = 'flick';
+  if (kind === 'flick' && acc > 1) { // 抜き：勢いのまま細く抜ける
+    const tl = Math.max(5, Math.min(17, lv * 5.5));
+    let px = L.x, py = L.y, pw = s.w, ink = s.ink;
+    for (let k = 1; k <= tl; k++) {
+      const f = k / tl, nx = L.x + dx * k, ny = L.y + dy * k, nw = Math.max(0.25, s.w * (1 - f) * (1 - f * 0.2));
+      ink = Math.max(0, ink - 0.03);
+      inkSeg(px, py, pw, nx, ny, nw, ink, lv);
+      px = nx; py = ny; pw = nw;
+      s.pts.push({ x: nx, y: ny, t, w: nw });
+    }
+    if (lv > 2.2) for (let k = 0; k < 3; k++) { if (Math.random() < 0.6) dab(px + dx * (3 + Math.random() * 6) + (Math.random() - 0.5) * 3, py + dy * (3 + Math.random() * 6) + (Math.random() - 0.5) * 3, 0.3 + Math.random() * 0.5, 0.7); }
+  } else if (kind === 'tome') {
+    dab(L.x, L.y, s.w * 0.58, 0.8); // 押さえて止める
+  }
+  let aw = 0; for (const q of s.pts) aw += q.w || 0; aw /= s.pts.length;
+  return { pts: s.pts, kind, lv, dir: [dx, dy], len: s.len, w: aw };
+}
+
+// ---- 採点
+function resample(pts) {
+  const out = [pts[0]];
+  for (let i = 1; i < pts.length; i++) {
+    const a = out[out.length - 1], b = pts[i], d = Math.hypot(b.x - a.x, b.y - a.y);
+    if (d < 1) continue;
+    const n = Math.ceil(d);
+    for (let k = 1; k <= n; k++) out.push({ x: a.x + (b.x - a.x) * k / n, y: a.y + (b.y - a.y) * k / n, w: (a.w || 7) + ((b.w || 7) - (a.w || 7)) * k / n });
+  }
+  return out;
+}
+const near = (p, arr) => { let m = 1e9; for (const q of arr) { const d = (p.x - q.x) ** 2 + (p.y - q.y) ** 2; if (d < m) m = d; } return Math.sqrt(m); };
+function nearI(p, arr) { let m = 1e9, k = 0; for (let i = 0; i < arr.length; i++) { const q = arr[i], d = (p.x - q.x) ** 2 + (p.y - q.y) ** 2; if (d < m) { m = d; k = i; } } return [Math.sqrt(m), k]; }
+function fitStroke(rs, M) {
+  let cov = 0, wd = 0, wn = 0, sg = 0;
+  for (const q of M.s) { const [d, k] = nearI(q, rs); if (d < 5) { cov++; const df = (rs[k].w || 7) - q.w; sg += df; wd += Math.min(1, Math.abs(df) / Math.max(4, q.w)); wn++; } }
+  cov /= M.s.length;
+  const wS = wn ? Math.max(0, 1 - wd / wn * 1.4) : 0;
+  let dev = 0; for (const p of rs) dev += Math.min(20, near(p, M.s)); dev /= rs.length;
+  const devS = Math.max(0, Math.min(1, 1 - (dev - 1.2) / 7));
+  return { cov, devS, wS, sg, fit: cov * 0.6 + devS * 0.4 };
+}
+function judgeStroke(res) {
+  const rs = resample(res.pts);
+  let best = -1, bf = null;
+  for (let j = 0; j < model.length; j++) {
+    if (used[j]) continue;
+    const f = fitStroke(rs, model[j]);
+    if (!bf || f.fit > bf.fit) { bf = f; best = j; }
+  }
+  const expect = used.indexOf(false);
+  const notes = [];
+  if (bf.fit < 0.2) best = expect, bf = fitStroke(rs, model[best]);
+  used[best] = true;
+  const M = model[best];
+  const ps = rs[0];
+  const rev = Math.hypot(ps.x - M.start.x, ps.y - M.start.y) > Math.hypot(ps.x - M.last.x, ps.y - M.last.y) + 4;
+  // 終わり方
+  let endS = 0, endTxt = '';
+  const cos = res.dir[0] * M.dir[0] + res.dir[1] * M.dir[1];
+  if (M.end === 'tome') {
+    if (res.kind === 'tome') { endS = 1; endTxt = T.ok.tome; }
+    else if (res.kind === 'mid') { endS = 0.5; endTxt = T.weak.tome; }
+    else { endS = 0; endTxt = T.wrongFlick.tome; }
+  } else {
+    if (res.kind === 'flick' && cos > 0.45) { endS = 1; endTxt = T.ok[M.end]; }
+    else if (res.kind === 'flick') { endS = 0.4; endTxt = T.wrongFlick[M.end]; }
+    else if (res.kind === 'mid') { endS = cos > 0.45 ? 0.5 : 0.3; endTxt = T.weak[M.end]; }
+    else { endS = 0; endTxt = T.stopped[M.end]; }
+  }
+  let sc = 100 * (0.28 * bf.cov + 0.17 * bf.devS + 0.2 * bf.wS + 0.35 * endS);
+  if (bf.wS < 0.55) notes.push(bf.sg < 0 ? T.thinW : T.thickW);
+  if (rev) { sc *= 0.7; notes.push(T.rev); }
+  if (best !== expect) { sc *= 0.85; notes.push(T.order); orderMiss = true; }
+  if (bf.fit < 0.45) notes.push(T.off);
+  sc = Math.round(Math.max(0, Math.min(100, sc)));
+  const mark = sc >= 88 ? 3 : sc >= 70 ? 2 : sc >= 45 ? 1 : 0;
+  return { sc, mark, endS, endTxt, notes, idx: best, end: res.pts[res.pts.length - 1] };
+}
+const GN = 50, gridC = mk(GN, GN), gridX = gridC.getContext('2d', { willReadFrequently: true });
+function grid(src, th) {
+  gridX.clearRect(0, 0, GN, GN); gridX.drawImage(src, 0, 0, GN, GN);
+  const d = gridX.getImageData(0, 0, GN, GN).data, out = new Uint8Array(GN * GN);
+  for (let i = 0; i < GN * GN; i++) out[i] = d[i * 4 + 3] > th ? 1 : 0;
+  return out;
+}
+function dil(a) {
+  const o = new Uint8Array(GN * GN);
+  for (let y = 0; y < GN; y++) for (let x = 0; x < GN; x++) {
+    if (!a[y * GN + x]) continue;
+    for (let j = -1; j <= 1; j++) for (let i = -1; i <= 1; i++) { const X = x + i, Y = y + j; if (X >= 0 && Y >= 0 && X < GN && Y < GN) o[Y * GN + X] = 1; }
+  }
+  return o;
+}
+function shapeScore() {
+  const ink = grid(inkC, 70), mod = grid(maskC, 110), di = dil(ink), dm = dil(mod);
+  let ni = 0, nm = 0, pi = 0, rm = 0;
+  for (let i = 0; i < GN * GN; i++) { if (ink[i]) { ni++; if (dm[i]) pi++; } if (mod[i]) { nm++; if (di[i]) rm++; } }
+  const P = ni ? pi / ni : 0, Rr = nm ? rm / nm : 0;
+  return { P, R: Rr, F: P + Rr ? 2 * P * Rr / (P + Rr) : 0 };
+}
+
+// ---- お手本を描く
+const maskC = mk(R, R), maskX = maskC.getContext('2d');
+function drawModel(g, mdl, color) {
+  g.fillStyle = color;
+  for (const M of mdl) for (const q of M.s) { g.beginPath(); g.arc(q.x * U, q.y * U, q.w / 2 * U, 0, 6.2832); g.fill(); }
+}
+
+// ---- ゲームの状態
+let scene = 'title', sceneT = 0, now = 0;
+let run = [], ci = 0, model = [], used = [], results = [], orderMiss = false, charRes = null, total = 0;
+let best = 0, newBest = false, works = [];
+let marks = []; // 朱の印
+let popups = []; // 文字の知らせ
+let guideA = 1, hintT = 0, demo = null, firstChar = true;
+let saveData = null, cbest = {};
+addEventListener('message', (e) => { if (e.data && e.data.agf === 'loaded' && e.data.data) { saveData = e.data.data; best = saveData.best || 0; cbest = saveData.cb || {}; } });
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+
+const pick = (a) => a[Math.floor(Math.random() * a.length)];
+function startRun() {
+  st = null; pid = null; run = TIERS.map(pick); ci = 0; total = 0; works = []; newBest = false;
+  signal('start');
+  startChar();
+}
+function startChar() {
+  const ch = run[ci];
+  model = CH[ch].map(sampleStroke);
+  used = model.map(() => false); results = []; orderMiss = false; charRes = null; marks = []; popups = [];
+  ictx.clearRect(0, 0, R, R); gctx.clearRect(0, 0, R, R); maskX.clearRect(0, 0, R, R);
+  drawModel(gctx, model, '#d9482b'); drawModel(maskX, model, '#000');
+  guideA = 1; scene = 'write'; sceneT = 0; hintT = firstChar ? 5 : 0; firstChar = false;
+}
+function finishChar() {
+  const sh = shapeScore();
+  const avg = results.reduce((a, r) => a + r.sc, 0) / results.length;
+  const endAvg = results.reduce((a, r) => a + r.endS, 0) / results.length;
+  const sc = Math.round(Math.max(0, Math.min(100, 0.75 * avg + 0.25 * sh.F * 100)));
+  let cm;
+  if (sc >= 92) cm = T.c.great;
+  else if (sh.P < 0.72 && sh.P <= sh.R) cm = T.c.spill;
+  else if (sh.R < 0.72) cm = T.c.thin;
+  else if (endAvg < 0.65) cm = T.c.ends;
+  else if (orderMiss) cm = T.c.order;
+  else cm = sc >= 80 ? T.c.good : sc >= 60 ? T.c.fine : T.c.try;
+  const prev = cbest[run[ci]] || 0;
+  charRes = { sc, cm, shown: 0, prev, rec: sc > prev };
+  if (sc > prev) cbest[run[ci]] = sc;
+  total += sc;
+  const th = mk(160, 160), tg = th.getContext('2d');
+  tg.drawImage(paperC, 0, 0, 160, 160); tg.drawImage(inkC, 0, 0, 160, 160);
+  works.push({ ch: run[ci], sc, img: th });
+  scene = 'judge'; sceneT = 0;
+}
+function finishRun() {
+  newBest = total > best;
+  if (newBest) best = total;
+  try { parent.postMessage({ agf: 'save', data: { best, cb: cbest } }, '*'); } catch (e) {}
+  signal('end', { score: total });
+  scene = 'final'; sceneT = 0;
+}
+function rankOf(v) { for (const r of RANKS) if (v >= r[0]) return JA ? r[1] : r[2]; return ''; }
+
+// ---- 入力
+let pid = null;
+cv.addEventListener('pointerdown', (e) => {
+  e.preventDefault(); initAudio();
+  if (scene === 'title') { demo = null; startRun(); return; }
+  if (scene === 'charDone' && sceneT > 0.7) { ci++; if (ci >= run.length) finishRun(); else startChar(); return; }
+  if (scene === 'final' && sceneT > 0.7) { startRun(); return; }
+  if (scene !== 'write' || pid !== null) return;
+  const p = toPaper(e.clientX, e.clientY);
+  if (p.x < -3 || p.y < -3 || p.x > 103 || p.y > 103) return;
+  pid = e.pointerId; try { cv.setPointerCapture(pid); } catch (er) {}
+  hintT = Math.min(hintT, 0.6);
+  beginStroke(p.x, p.y, performance.now());
+});
+cv.addEventListener('pointermove', (e) => {
+  if (e.pointerId !== pid || !st) return;
+  const list = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+  for (const q of (list.length ? list : [e])) { const p = toPaper(q.clientX, q.clientY); moveStroke(p.x, p.y, performance.now()); }
+});
+function up(e) {
+  if (e.pointerId !== pid) return;
+  pid = null;
+  if (!st) return;
+  const p = toPaper(e.clientX, e.clientY); moveStroke(p.x, p.y, performance.now());
+  const res = endStroke(performance.now());
+  if (!res || res.len < 2.5 || scene !== 'write') return; // 小さすぎる点は画に数えない
+  const j = judgeStroke(res);
+  results.push(j);
+  const Mm = model[j.idx], mid = Mm.s[Mm.s.length >> 1];
+  let ox = mid.x - 50, oy = mid.y - 50; const ol = Math.hypot(ox, oy);
+  if (ol < 4) { ox = 0.7; oy = -0.7; } else { ox /= ol; oy /= ol; }
+  marks.push({ x: Math.max(6, Math.min(94, mid.x + ox * 10)), y: Math.max(6, Math.min(94, mid.y + oy * 10)), m: j.mark, t: 0 });
+  popups.push({ txt: T.nth(results.length) + '  ' + [j.endTxt, ...j.notes].filter(Boolean).join(' ・ '), good: j.mark, t: 0 });
+  if (popups.length > 3) popups.shift();
+  if (j.mark === 3) { tone(990, 0.22, 0.06); tone(1480, 0.3, 0.045, 'sine', 0.06); }
+  else if (j.mark === 2) tone(784, 0.22, 0.06);
+  else if (j.mark === 1) tone(523, 0.22, 0.05);
+  else tone(196, 0.25, 0.07, 'triangle');
+  if (results.length >= model.length) { scene = 'pause'; sceneT = 0; }
+}
+cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+
+// ---- タイトルの実演（同じ筆で自動で書く）
+function makeDemo() {
+  const ch = pick(['永' in CH ? '永' : '水', '大', '心', '木']);
+  const mdl = CH[ch].map(sampleStroke);
+  ictx.clearRect(0, 0, R, R);
+  return { mdl, si: 0, k: 0, t: 0, wait: 0.5, hold: 0, ch };
+}
+function stepDemo(dt) {
+  const D = demo; if (!D) return;
+  if (D.wait > 0) { D.wait -= dt; return; }
+  if (D.si >= D.mdl.length) { D.hold += dt; if (D.hold > 2.2) demo = makeDemo(); return; }
+  const M = D.mdl[D.si], tnow = performance.now();
+  if (D.k === 0) { beginStroke(M.s[0].x, M.s[0].y, tnow); D.k = 0.001; D.dw = 0.12; return; }
+  if (D.dw > 0) { D.dw -= dt; holdStroke(tnow, dt * 1000); return; }
+  const frac = D.k / M.len, endish = frac > 0.55;
+  let sp = 0.75; // 紙/秒
+  if (M.end === 'tome' && frac > 0.85) sp = 0.35;
+  if (M.end === 'harai' && endish) sp = 0.9 + (frac - 0.55) * 4;
+  if (M.end === 'hane') sp = frac > 0.8 ? 2.4 : 0.7;
+  D.k = Math.min(M.len, D.k + sp * 100 * dt);
+  let q = M.s[0]; for (const s of M.s) { if (s.d <= D.k) q = s; else break; }
+  moveStroke(q.x, q.y, tnow);
+  if (D.k >= M.len) {
+    if (M.end === 'tome') { st.pts.push({ x: q.x, y: q.y, t: tnow + 200 }); endStroke(tnow + 300); }
+    else endStroke(tnow);
+    D.si++; D.k = 0; D.wait = 0.25;
+  }
+}
+
+// ---- 描画
+function txt(s, x, y, size, color, align = 'center', weight = '600', maxW = W - 24) {
+  ctx.font = `${weight} ${size}px ${FONT}`; ctx.textAlign = align; ctx.textBaseline = 'middle';
+  const w = ctx.measureText(s).width; let sz = size;
+  if (w > maxW) { sz = Math.max(12, size * maxW / w); ctx.font = `${weight} ${sz}px ${FONT}`; }
+  ctx.fillStyle = color; ctx.fillText(s, x, y);
+}
+function drawDesk() {
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, '#3a2c22'); g.addColorStop(1, '#241a14');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  // 下敷き
+  if (scene === 'final') return;
+  const m = 8; ctx.fillStyle = '#18161a'; ctx.fillRect(paper.x - m, paper.y - m, paper.s + m * 2, paper.s + m * 2);
+}
+function drawPaper(showGuide) {
+  ctx.save(); ctx.shadowColor = 'rgba(0,0,0,0.35)'; ctx.shadowBlur = 8; ctx.shadowOffsetY = 2;
+  ctx.drawImage(paperC, paper.x, paper.y, paper.s, paper.s); ctx.restore();
+  if (showGuide && guideA > 0.01) { ctx.globalAlpha = 0.2 * guideA; ctx.drawImage(guideC, paper.x, paper.y, paper.s, paper.s); ctx.globalAlpha = 1; }
+  ctx.drawImage(inkC, paper.x, paper.y, paper.s, paper.s);
+}
+function drawNextHint() {
+  const idx = used.indexOf(false); if (idx < 0) return;
+  const M = model[idx], a = toScreen(M.start.x, M.start.y), b = toScreen(M.last.x, M.last.y);
+  const pulse = 0.65 + 0.35 * Math.sin(now * 5);
+  ctx.globalAlpha = guideA;
+  // 書き出しの番号
+  ctx.fillStyle = `rgba(217,72,43,${0.85 * pulse})`; ctx.beginPath(); ctx.arc(a.x, a.y, 11, 0, 6.2832); ctx.fill();
+  txt(String(idx + 1), a.x, a.y + 1, 13, '#fff', 'center', '700');
+  // 次の画をなぞる薄い道
+  ctx.strokeStyle = 'rgba(217,72,43,0.35)'; ctx.lineWidth = 2; ctx.setLineDash([4, 5]); ctx.beginPath();
+  M.s.forEach((q, i) => { const p = toScreen(q.x, q.y); i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y); }); ctx.stroke(); ctx.setLineDash([]);
+  // 終わり方の札
+  const lab = T[M.end], ox = M.dir[0] * 16, oy = M.dir[1] * 16;
+  let lx = b.x + ox, ly = b.y + oy;
+  ctx.font = `700 13px ${FONT}`; const lw = ctx.measureText(lab).width + 12;
+  lx = Math.max(paper.x + lw / 2 + 2, Math.min(paper.x + paper.s - lw / 2 - 2, lx)); ly = Math.max(paper.y + 12, Math.min(paper.y + paper.s - 12, ly));
+  ctx.fillStyle = 'rgba(217,72,43,0.92)'; roundRect(lx - lw / 2, ly - 10, lw, 20, 10); ctx.fill();
+  txt(lab, lx, ly + 1, 13, '#fff', 'center', '700');
+  ctx.globalAlpha = 1;
+}
+function roundRect(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function drawMark(mk) {
+  const p = toScreen(mk.x, mk.y), k = paper.s / 336, r = 11 * k, prog = Math.min(1, mk.t / 0.35);
+  ctx.strokeStyle = '#d9341f'; ctx.lineCap = 'round'; ctx.lineWidth = 3 * k;
+  if (mk.m >= 1) { ctx.beginPath(); ctx.arc(p.x, p.y, mk.m === 1 ? r * 0.8 : r, -1.8, -1.8 + 6.4 * prog); ctx.stroke(); }
+  if (mk.m === 3) { const p2 = Math.max(0, Math.min(1, (mk.t - 0.2) / 0.3)); ctx.beginPath(); ctx.arc(p.x, p.y, r * 0.55, -1.8, -1.8 + 6.4 * p2); ctx.stroke(); }
+  if (mk.m === 1) { ctx.beginPath(); ctx.moveTo(p.x, p.y - r * 0.9 * prog); ctx.lineTo(p.x - r * 0.8 * prog, p.y + r * 0.6 * prog); ctx.lineTo(p.x + r * 0.8 * prog, p.y + r * 0.6 * prog); ctx.closePath(); ctx.stroke(); }
+  if (mk.m === 0) { ctx.beginPath(); ctx.moveTo(p.x - r * 0.7, p.y - r * 0.7); ctx.lineTo(p.x - r * 0.7 + r * 1.4 * prog, p.y - r * 0.7 + r * 1.4 * prog); ctx.moveTo(p.x + r * 0.7, p.y - r * 0.7); ctx.lineTo(p.x + r * 0.7 - r * 1.4 * prog, p.y - r * 0.7 + r * 1.4 * prog); ctx.stroke(); }
+}
+function drawHanamaru(cx, cy, r, prog) {
+  ctx.strokeStyle = '#d9341f'; ctx.lineCap = 'round'; ctx.lineWidth = Math.max(3, r * 0.09);
+  // うずまき
+  const turns = 2.3, n = 60, m = Math.floor(n * Math.min(1, prog * 1.6));
+  ctx.beginPath();
+  for (let i = 0; i <= m; i++) { const f = i / n, a = -1.6 + f * turns * 6.2832, rr = r * (0.18 + 0.5 * f); const x = cx + Math.cos(a) * rr, y = cy + Math.sin(a) * rr * 0.92; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+  ctx.stroke();
+  // 花びら
+  const pp = Math.max(0, Math.min(1, (prog - 0.55) / 0.45)), np = Math.floor(9 * pp);
+  for (let i = 0; i < np; i++) { const a = -1.6 + i / 9 * 6.2832; ctx.beginPath(); ctx.arc(cx + Math.cos(a) * r * 0.86, cy + Math.sin(a) * r * 0.86, r * 0.2, a - 1.9, a + 1.9); ctx.stroke(); }
+}
+function drawHUD() {
+  txt(`${T.total} ${total}`, 16, 24, 17, '#f2e8d6', 'left', '700', W * 0.45);
+  txt(`${Math.min(ci + 1, run.length)} / ${run.length} ${T.of}   ${T.best} ${best}`, W - 16, 24, 14, '#cdbfa8', 'right', '600', W * 0.5);
+  const ch = run[ci] || '';
+  const info = JA ? `「${ch}」 ${READ[ch] || ''}・${model.length}${T.stroke}` : `“${ch}” ${MEAN[ch] || ''} · ${model.length} ${T.stroke}`;
+  txt(info, W / 2, 62, 16, '#f2e8d6', 'center', '600');
+  // 画の進み（点）
+  const n = model.length, gap = 14, x0 = W / 2 - (n - 1) * gap / 2;
+  for (let i = 0; i < n; i++) { ctx.fillStyle = i < results.length ? '#d9482b' : 'rgba(242,232,214,0.3)'; ctx.beginPath(); ctx.arc(x0 + i * gap, 80, 4, 0, 6.2832); ctx.fill(); }
+}
+function drawPopups() {
+  const y0 = paper.y + paper.s + 26;
+  popups.forEach((p, i) => {
+    const a = Math.min(1, p.t * 4) * (i === popups.length - 1 ? 1 : 0.55);
+    ctx.globalAlpha = a;
+    txt(p.txt, W / 2, y0 + (popups.length - 1 - i) * 22, 15, p.good >= 2 ? '#ffd9c9' : p.good === 1 ? '#e8cdb0' : '#c9a98f', 'center', '600');
+    ctx.globalAlpha = 1;
+  });
+}
+function draw() {
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  drawDesk();
+  if (scene === 'title') {
+    drawPaper(false);
+    ctx.fillStyle = 'rgba(36,26,20,0.0)';
+    txt(T.title, W / 2, 46, Math.min(34, W * 0.09), '#f6ecd9', 'center', '800');
+    txt(T.sub, W / 2, 76, 14, '#cdbfa8', 'center', '500');
+    const y = paper.y + paper.s + 22;
+    txt(T.how1, W / 2, y, 14, '#efe3cf', 'center', '500');
+    txt(T.how2, W / 2, y + 22, 14, '#efe3cf', 'center', '500');
+    txt(T.how3, W / 2, y + 44, 14, '#efe3cf', 'center', '500');
+    ctx.globalAlpha = 0.6 + 0.4 * Math.sin(now * 3);
+    txt(T.start, W / 2, Math.min(H - 20, y + 84), 18, '#ffcfb8', 'center', '700');
+    ctx.globalAlpha = 1;
+    if (best > 0) txt(`${T.best} ${best}`, W - 14, H - 14, 13, '#a8977f', 'right', '500');
+    return;
+  }
+  if (scene === 'final') { drawFinal(); return; }
+  drawHUD();
+  drawPaper(true);
+  if (scene === 'write') drawNextHint();
+  for (const mk of marks) drawMark(mk);
+  if (charRes && (scene === 'judge' || scene === 'charDone')) {
+    const shown = Math.round(charRes.shown);
+    if (charRes.sc >= 92 && scene === 'charDone') drawHanamaru(paper.x + paper.s * 0.9, paper.y + paper.s * 0.9, paper.s * 0.1, Math.min(1, sceneT / 0.8));
+    const y = paper.y + paper.s + 34;
+    txt(`${shown}${T.pts}`, W / 2, y, 34, charRes.sc >= 85 ? '#ffb39a' : '#f6ecd9', 'center', '800');
+    if (scene === 'charDone') {
+      txt(charRes.cm, W / 2, y + 32, 15, '#efe3cf', 'center', '600');
+      const ct = charRes.rec && charRes.prev ? T.charRec : `${T.charBest} ${Math.max(charRes.prev, charRes.sc)}`;
+      txt(ct, W / 2, y + 54, 13, charRes.rec && charRes.prev ? '#ffcf6b' : '#a8977f', 'center', '600');
+      if (sceneT > 0.7) { ctx.globalAlpha = 0.6 + 0.4 * Math.sin(now * 3); txt(T.next, W / 2, Math.min(H - 16, y + 84), 16, '#ffcfb8', 'center', '700'); ctx.globalAlpha = 1; }
+    }
+  } else drawPopups();
+  if (hintT > 0 && scene === 'write') { ctx.globalAlpha = Math.min(1, hintT); txt(T.hint, W / 2, H - 18, 14, '#f6ecd9', 'center', '600'); ctx.globalAlpha = 1; }
+}
+function drawFinal() {
+  txt(T.result, W / 2, 34, 18, '#cdbfa8', 'center', '600');
+  const n = works.length, cols = Math.min(n, 5), cell = Math.min((W - 24) / cols, 110), gap = 4;
+  const rowW = cols * cell, x0 = (W - rowW) / 2, y0 = 60;
+  works.forEach((w, i) => {
+    const x = x0 + i * cell + gap / 2, s = cell - gap;
+    ctx.drawImage(w.img, x, y0, s, s);
+    txt(String(w.sc), x + s / 2, y0 + s + 12, 13, w.sc >= 85 ? '#ffb39a' : '#e9dcc6', 'center', '700');
+  });
+  const ym = y0 + cell + 54;
+  const rk = rankOf(total);
+  txt(JA ? `${rk}${T.rank}` : rk, W / 2, ym + 10, Math.min(48, W * 0.13), '#ffd2bd', 'center', '800');
+  txt(`${T.total} ${total} / 500`, W / 2, ym + 64, 26, '#f6ecd9', 'center', '800');
+  txt(newBest ? T.newBest : `${T.best} ${best}`, W / 2, ym + 98, 16, newBest ? '#ffcf6b' : '#cdbfa8', 'center', '700');
+  if (newBest || total >= 465) drawHanamaru(W / 2 + Math.min(140, W * 0.4), ym + 64, 20, Math.min(1, sceneT / 0.9));
+  const all = Object.keys(CH), got = all.filter((c) => (cbest[c] || 0) >= 92).length;
+  const yb = ym + 132;
+  txt(`${T.book} ${got} / ${all.length}`, W / 2, yb, 14, '#cdbfa8', 'center', '600');
+  const bc = Math.min(24, (W - 24) / 7), bx = W / 2 - bc * 3.5;
+  all.forEach((c, i) => {
+    const x = bx + (i % 7 + 0.5) * bc, y = yb + 22 + Math.floor(i / 7) * (bc + 4), v = cbest[c] || 0;
+    if (v >= 92) { ctx.fillStyle = 'rgba(217,52,31,0.9)'; ctx.beginPath(); ctx.arc(x, y, bc * 0.46, 0, 6.2832); ctx.fill(); }
+    txt(c, x, y + 1, Math.round(bc * 0.62), v >= 92 ? '#fff' : v ? '#e9dcc6' : 'rgba(233,220,198,0.28)', 'center', '700');
+  });
+  if (sceneT > 0.7) { ctx.globalAlpha = 0.6 + 0.4 * Math.sin(now * 3); txt(T.again, W / 2, Math.min(H - 20, yb + 22 + 2 * (bc + 4) + 18), 18, '#ffcfb8', 'center', '700'); ctx.globalAlpha = 1; }
+}
+
+// ---- ループ
+let lastT = performance.now();
+function loop(t) {
+  const dt = Math.min(0.05, Math.max(0, (t - lastT) / 1000)); lastT = t; now += dt;
+  sceneT += dt;
+  if (st && pid !== null) holdStroke(performance.now(), dt * 1000);
+  if (scene === 'title') { if (!demo) demo = makeDemo(); stepDemo(dt); }
+  for (const m of marks) m.t += dt;
+  for (const p of popups) p.t += dt;
+  if (hintT > 0) hintT -= dt;
+  if (scene === 'pause' && sceneT > 0.55) finishChar();
+  if (scene === 'judge') {
+    guideA = Math.max(0, guideA - dt * 2);
+    charRes.shown = Math.min(charRes.sc, charRes.shown + dt * charRes.sc * 1.6);
+    if (charRes.shown >= charRes.sc) { scene = 'charDone'; sceneT = 0; knock(); if (charRes.sc >= 92) [784, 988, 1175, 1568].forEach((f, i) => tone(f, 0.3, 0.05, 'sine', i * 0.07)); }
+  }
+  if (scene === 'write' || scene === 'pause') guideA = Math.min(1, guideA + dt * 3);
+  draw();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
