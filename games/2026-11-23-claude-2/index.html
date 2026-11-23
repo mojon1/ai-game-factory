@@ -1,0 +1,762 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>のりうつれ！ひとだま</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; }
+html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #110f22; }
+canvas { display: block; width: 100vw; height: 100dvh; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+const FONT = 'system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif';
+
+const DICT = {
+  ja: {
+    title: 'のりうつれ！ひとだま',
+    how: ['ひとだまは、取った駒にのりうつる。', '光る点をタップして動き、敵の駒をぜんぶ取ろう。', '赤いマスは狙われている。手数にも限りがある。'],
+    tap: 'タップでスタート', again: 'タップでもう一度', next: 'タップで次の夜へ', retry: 'タップでやり直す',
+    hint: '光る点をタップ。敵の駒に重なると、その駒にのりうつる',
+    night: (n) => `第${n}夜`, left: (n) => `のこり ${n}手`, par: (n) => `最短 ${n}手`,
+    body: 'いまの体', enemy: '敵の',
+    names: ['歩', '王', '飛', '角', '桂'],
+    desc: ['たて・よこに1マス', 'まわり8方向に1マス', 'たて・よこにどこまでも', 'ななめにどこまでも', 'L字にとびこえる'],
+    watched: (n) => `そこは「${n}」に狙われている`,
+    clear: '成仏！', best: 'ベスト', newBest: 'ベスト更新！', shortest: '最短！',
+    dead: '道がとだえた…', deadSub: 'もう全部は取りきれない', out: '手数が尽きた…', outSub: '同じ盤をもう一度',
+    over: 'ひとだまが消えた', reached: (n) => `第${n}夜まで`, lives: '灯',
+    tapInfo: '敵の駒をタップすると、狙う範囲が見える',
+    chain: (n) => `${n}連のりうつり`,
+    prevBad: '前回の失敗', retryInfo: '暗いマスは、前回道がとだえた一手',
+  },
+  en: {
+    title: 'Possess! Wisp Chess',
+    how: ['The wisp possesses every piece it captures.', 'Tap a glowing dot to move. Capture every enemy.', 'Red squares are watched. Moves are limited.'],
+    tap: 'Tap to start', again: 'Tap to play again', next: 'Tap for the next night', retry: 'Tap to retry',
+    hint: 'Tap a glowing dot. Land on an enemy to possess it',
+    night: (n) => `Night ${n}`, left: (n) => `${n} moves left`, par: (n) => `best ${n}`,
+    body: 'Your body', enemy: 'Enemy ',
+    names: ['Pawn', 'King', 'Rook', 'Bishop', 'Knight'],
+    desc: ['1 step straight', '1 step any way', 'any distance straight', 'any distance diagonal', 'L-shaped jump'],
+    watched: (n) => `That square is watched by the ${n}`,
+    clear: 'Released!', best: 'Best', newBest: 'New best!', shortest: 'Shortest!',
+    dead: 'No way through…', deadSub: 'You can no longer take them all', out: 'Out of moves…', outSub: 'Try the same board again',
+    over: 'The wisp faded', reached: (n) => `Reached night ${n}`, lives: 'Flames',
+    tapInfo: 'Tap an enemy piece to see what it watches',
+    chain: (n) => `${n}x chain`,
+    prevBad: 'last miss', retryInfo: 'The dark square is the move that failed last time',
+  },
+}[LANG];
+const GLYPH = LANG === 'ja' ? ['歩', '王', '飛', '角', '桂'] : ['P', 'K', 'R', 'B', 'N'];
+
+// ---------- pieces ----------
+const ORTH = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+const DIAG = [[1, 1], [1, -1], [-1, 1], [-1, -1]];
+const K8 = ORTH.concat(DIAG);
+const KN = [[1, 2], [2, 1], [-1, 2], [-2, 1], [1, -2], [2, -1], [-1, -2], [-2, -1]];
+const TY = [
+  { step: ORTH }, // 歩
+  { step: K8 },   // 王
+  { slide: ORTH }, // 飛
+  { slide: DIAG }, // 角
+  { step: KN, jump: true }, // 桂
+];
+
+function makeOcc(P, mask) {
+  const occ = new Int8Array(P.N * P.N).fill(-1);
+  for (let i = 0; i < P.en.length; i++) if ((mask >> i) & 1) occ[P.en[i].y * P.N + P.en[i].x] = i;
+  return occ;
+}
+function genMoves(P, occ, px, py, t) {
+  const N = P.N, ty = TY[t], out = [];
+  if (ty.step) for (const [dx, dy] of ty.step) {
+    const x = px + dx, y = py + dy;
+    if (x < 0 || y < 0 || x >= N || y >= N) continue;
+    out.push(x, y, occ[y * N + x]);
+  }
+  if (ty.slide) for (const [dx, dy] of ty.slide) {
+    let x = px + dx, y = py + dy;
+    while (x >= 0 && y >= 0 && x < N && y < N) {
+      const v = occ[y * N + x];
+      out.push(x, y, v);
+      if (v >= 0) break;
+      x += dx; y += dy;
+    }
+  }
+  return out;
+}
+function attacker(P, occ, mask, sx, sy) {
+  const N = P.N;
+  for (let i = 0; i < P.en.length; i++) {
+    if (!((mask >> i) & 1)) continue;
+    const e = P.en[i], ty = TY[e.t], dx = sx - e.x, dy = sy - e.y;
+    if (ty.step) for (const d of ty.step) if (d[0] === dx && d[1] === dy) return i;
+    if (ty.slide) for (const d of ty.slide) {
+      let x = e.x + d[0], y = e.y + d[1];
+      while (x >= 0 && y >= 0 && x < N && y < N) {
+        if (x === sx && y === sy) return i;
+        if (occ[y * N + x] >= 0) break;
+        x += d[0]; y += d[1];
+      }
+    }
+  }
+  return -1;
+}
+function solve(P, mask, px, py, t, maxD) {
+  if (mask === 0) return 0;
+  if (maxD <= 0) return -1;
+  const N = P.N, NN = N * N, k = P.en.length;
+  const seen = new Uint8Array((1 << k) * NN * 5);
+  const cache = new Map();
+  const getOcc = (m) => { let o = cache.get(m); if (!o) { o = makeOcc(P, m); cache.set(m, o); } return o; };
+  let fr = [[mask, py * N + px, t]];
+  seen[(mask * NN + py * N + px) * 5 + t] = 1;
+  for (let d = 0; d < maxD; d++) {
+    const nx = [];
+    for (const [m, p, tt] of fr) {
+      const occ = getOcc(m);
+      const mv = genMoves(P, occ, p % N, (p / N) | 0, tt);
+      for (let j = 0; j < mv.length; j += 3) {
+        const x = mv[j], y = mv[j + 1], c = mv[j + 2];
+        const nm = c >= 0 ? m & ~(1 << c) : m;
+        if (nm === 0) return d + 1;
+        const nt = c >= 0 ? P.en[c].t : tt;
+        const occ2 = c >= 0 ? getOcc(nm) : occ;
+        if (attacker(P, occ2, nm, x, y) >= 0) continue;
+        const key = (nm * NN + y * N + x) * 5 + nt;
+        if (seen[key]) continue;
+        seen[key] = 1;
+        nx.push([nm, y * N + x, nt]);
+      }
+    }
+    if (!nx.length) return -1;
+    fr = nx;
+  }
+  return -1;
+}
+// moves with safety info from a state
+function legalMoves(P, mask, px, py, t) {
+  const occ = makeOcc(P, mask);
+  const mv = genMoves(P, occ, px, py, t), out = [];
+  for (let j = 0; j < mv.length; j += 3) {
+    const x = mv[j], y = mv[j + 1], c = mv[j + 2];
+    const nm = c >= 0 ? mask & ~(1 << c) : mask;
+    const att = nm === 0 ? -1 : attacker(P, c >= 0 ? makeOcc(P, nm) : occ, nm, x, y);
+    out.push({ x, y, c, nm, nt: c >= 0 ? P.en[c].t : t, att });
+  }
+  return out;
+}
+
+// ---------- stage generator ----------
+function genStage(s) {
+  const N = s <= 4 ? 5 : 6;
+  const k = Math.min(3 + Math.floor((s - 1) / 2), 7);
+  const allowed = s <= 2 ? [0, 1, 2, 3] : [0, 1, 2, 3, 4];
+  const slack = s <= 1 ? 2 : s <= 7 ? 1 : 0;
+  let fallback = null;
+  const t0 = performance.now();
+  for (let tries = 0; tries < 900; tries++) {
+    const cells = [];
+    for (let i = 0; i < N * N; i++) cells.push(i);
+    for (let i = cells.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [cells[i], cells[j]] = [cells[j], cells[i]]; }
+    const pc = cells[0];
+    const P = { N, en: [] };
+    for (let i = 0; i < k; i++) P.en.push({ x: cells[i + 1] % N, y: (cells[i + 1] / N) | 0, t: allowed[(Math.random() * allowed.length) | 0] });
+    const pt = s === 1 ? 1 : allowed[(Math.random() * allowed.length) | 0];
+    const px = pc % N, py = (pc / N) | 0;
+    const mask = (1 << k) - 1;
+    if (attacker(P, makeOcc(P, mask), mask, px, py) >= 0) continue;
+    const par = solve(P, mask, px, py, pt, k + 3);
+    if (par < 0) continue;
+    const budget = par + slack;
+    if (!fallback) fallback = { P, px, py, pt, par, budget };
+    const elapsed = performance.now() - t0;
+    if (elapsed > 600) break;
+    const relax = tries > 500;
+    const first = legalMoves(P, mask, px, py, pt).filter((m) => m.att < 0);
+    if (first.length < 2) continue;
+    let good = 0, goodCaps = 0, safeCaps = 0;
+    for (const m of first) {
+      const ok = m.nm === 0 || solve(P, m.nm, m.x, m.y, m.nt, budget - 1) >= 0;
+      if (m.c >= 0) safeCaps++;
+      if (ok) { good++; if (m.c >= 0) goodCaps++; }
+    }
+    if (!relax) {
+      if (s >= 2 && good >= first.length) continue; // needs at least one trap
+      if (s >= 3 && good > Math.max(2, first.length * 0.5)) continue;
+      if (s >= 2 && safeCaps < 1) continue;
+      if (s >= 4 && safeCaps - goodCaps < 1) continue; // at least one tempting capture is a trap
+      if (par < k) continue;
+    }
+    return { P, px, py, pt, par, budget };
+  }
+  return fallback || genStage(Math.max(1, s - 1));
+}
+
+// ---------- audio ----------
+let AC = null, master = null;
+function ensureAudio() {
+  try {
+    if (!AC) {
+      AC = new (window.AudioContext || window.webkitAudioContext)();
+      master = AC.createGain(); master.gain.value = 0.5; master.connect(AC.destination);
+    }
+    if (AC.state === 'suspended') AC.resume();
+  } catch (e) {}
+}
+function tone(f, dur, type = 'sine', vol = 0.15, f2 = null, delay = 0) {
+  if (!AC) return;
+  try {
+    const t = AC.currentTime + delay;
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.05);
+  } catch (e) {}
+}
+let noiseBuf = null;
+function noise(dur, freq, vol, delay = 0) {
+  if (!AC) return;
+  try {
+    if (!noiseBuf) {
+      noiseBuf = AC.createBuffer(1, AC.sampleRate * 0.3, AC.sampleRate);
+      const d = noiseBuf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    }
+    const t = AC.currentTime + delay;
+    const s = AC.createBufferSource(); s.buffer = noiseBuf;
+    const f = AC.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = 2.5;
+    const g = AC.createGain();
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(f); f.connect(g); g.connect(master); s.start(t); s.stop(t + dur + 0.02);
+  } catch (e) {}
+}
+const SFX = {
+  clack() { noise(0.05, 2400, 0.5); tone(330, 0.07, 'triangle', 0.12, 200); },
+  possess(n) { const b = 300 * Math.pow(1.122, n); noise(0.06, 2000, 0.4); tone(b, 0.4, 'sine', 0.14, b * 2.4); tone(b * 1.5, 0.35, 'triangle', 0.05, b * 3, 0.03); },
+  nope() { tone(200, 0.16, 'square', 0.05, 150); tone(150, 0.2, 'square', 0.04, 110, 0.08); },
+  fail() { [392, 330, 262, 196].forEach((f, i) => tone(f, 0.4, 'triangle', 0.1, f * 0.97, i * 0.13)); },
+  clear() { [523, 587, 659, 784, 880, 1047].forEach((f, i) => tone(f, 0.5, 'sine', 0.1, null, i * 0.07)); tone(1568, 0.9, 'sine', 0.05, null, 0.45); },
+  select() { tone(660, 0.06, 'sine', 0.05); },
+};
+
+// ---------- canvas ----------
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+let W = 360, H = 640, DPR = 1;
+let cell = 60, bx = 12, by = 120;
+function resize() {
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = Math.max(1, innerWidth); H = Math.max(1, innerHeight);
+  cv.width = Math.max(1, (W * DPR) | 0); cv.height = Math.max(1, (H * DPR) | 0);
+  layout();
+}
+function layout() {
+  const N = st ? st.P.N : 5;
+  const top = 98, bottom = 128;
+  const avail = Math.max(40, Math.min(W - 24, H - top - bottom, 520));
+  cell = Math.floor(avail / N);
+  bx = Math.round((W - cell * N) / 2);
+  by = Math.round(top + Math.max(0, (H - top - bottom - cell * N) / 2));
+}
+addEventListener('resize', resize);
+
+// ---------- state ----------
+let scene = 'title';
+let run = null, st = null, def = null, moves = [];
+let anim = null, overlay = null, inspect = -1, dangerFx = null, flip = null;
+let parts = [], pops = [], rings = [];
+let best = 0, hintUntil = 0, now = performance.now();
+let possessCount = 0;
+
+addEventListener('message', (e) => { if (e.data && e.data.agf === 'loaded' && e.data.data && typeof e.data.data.best === 'number') best = e.data.data.best; });
+signal('load');
+
+
+function startRun() {
+  run = { stage: 1, score: 0, lives: 3, cleared: 0 };
+  signal('start');
+  loadStage(genStage(1));
+  hintUntil = now + 5000;
+}
+function loadStage(d) {
+  def = d;
+  st = { P: { N: d.P.N, en: d.P.en.map((e) => ({ ...e })) }, mask: (1 << d.P.en.length) - 1, px: d.px, py: d.py, t: d.pt, left: d.budget, used: 0, chain: 0, chainBonus: 0 };
+  possessCount = 0;
+  scene = 'play'; overlay = null; anim = null; inspect = -1; dangerFx = null; flip = null;
+  layout(); refresh();
+}
+function refresh() { moves = legalMoves(st.P, st.mask, st.px, st.py, st.t); }
+function cellCenter(x, y) { return [bx + (x + 0.5) * cell, by + (y + 0.5) * cell]; }
+
+function onTap(x, y) {
+  ensureAudio();
+  if (scene === 'title') { startRun(); return; }
+  if (scene === 'over') { if (now - overlay.t0 > 700) startRun(); return; }
+  if (scene !== 'play') return;
+  if (overlay) {
+    if (now - overlay.t0 < 700) return;
+    if (overlay.kind === 'clear') {
+      run.stage++;
+      if (run.cleared % 3 === 0 && run.lives < 3) run.lives++;
+      loadStage(genStage(run.stage));
+    } else if (overlay.kind === 'fail') {
+      if (run.lives <= 0) gameOver(); else loadStage(def);
+    }
+    return;
+  }
+  if (anim) return;
+  const N = st.P.N;
+  const cx = Math.floor((x - bx) / cell), cy = Math.floor((y - by) / cell);
+  if (cx < 0 || cy < 0 || cx >= N || cy >= N) { inspect = -1; return; }
+  const m = moves.find((m) => m.x === cx && m.y === cy);
+  if (m) {
+    if (m.att >= 0) { dangerFx = { x: cx, y: cy, att: m.att, t0: now }; SFX.nope(); return; }
+    doMove(m); return;
+  }
+  const occ = makeOcc(st.P, st.mask);
+  const e = occ[cy * N + cx];
+  if (e >= 0) { inspect = inspect === e ? -1 : e; SFX.select(); return; }
+  inspect = -1;
+}
+cv.addEventListener('pointerdown', (e) => { e.preventDefault(); onTap(e.clientX, e.clientY); }, { passive: false });
+
+function doMove(m) {
+  const dist = Math.hypot(m.x - st.px, m.y - st.py);
+  st.prev = { mask: st.mask, px: st.px, py: st.py, t: st.t };
+  anim = { m, fx: st.px, fy: st.py, t0: now, dur: 150 + 45 * dist, jump: !!TY[st.t].jump };
+  inspect = -1; dangerFx = null;
+}
+function finishMove() {
+  const m = anim.m; anim = null;
+  st.px = m.x; st.py = m.y; st.left--; st.used++;
+  const [cx, cy] = cellCenter(m.x, m.y);
+  if (m.c >= 0) {
+    st.mask = m.nm; st.t = m.nt; possessCount++; st.chain++;
+    flip = { t0: now };
+    SFX.possess(possessCount);
+    burst(cx, cy, '#f1e3c2', 18); burst(cx, cy, '#8ff3ff', 12); rings.push({ x: cx, y: cy, t0: now });
+    const cb = st.chain >= 2 ? 30 * (st.chain - 1) : 0;
+    run.score += cb; st.chainBonus += cb;
+    if (st.mask !== 0) {
+      pops.push({ x: cx, y: cy - cell * 0.55, text: DICT.names[m.nt] + '！', t0: now, color: '#bff6ff', size: 24 });
+      if (cb) pops.push({ x: cx, y: cy - cell * 0.95, text: `${DICT.chain(st.chain)} +${cb}`, t0: now + 120, color: '#fff2a8', size: 16 });
+    }
+  } else {
+    st.chain = 0;
+    SFX.clack();
+    burst(cx, cy, '#6ad8ff', 5, 0.5);
+  }
+  refresh();
+  if (st.mask === 0) {
+    const shortest = st.used <= def.par;
+    const gain = 100 + run.stage * 20 + st.left * 40 + (shortest ? 60 : 0);
+    run.score += gain; run.cleared++;
+    const total = gain + st.chainBonus;
+    overlay = { kind: 'clear', t0: now + 350, shortest, gain: total };
+    setTimeout(() => SFX.clear(), 250);
+    for (let i = 0; i < 4; i++) setTimeout(() => burst(cx, cy, '#8ff3ff', 14, 1.4), 120 * i);
+    return;
+  }
+  const safe = moves.some((mm) => mm.att < 0);
+  let reason = null;
+  if (st.left <= 0) reason = 'out';
+  else if (!safe || solve(st.P, st.mask, st.px, st.py, st.t, st.left) < 0) reason = 'dead';
+  if (reason) {
+    run.lives--;
+    if (reason === 'dead' && st.prev) { def.bad = def.bad || []; def.bad.push({ ...st.prev, x: m.x, y: m.y }); }
+    overlay = { kind: 'fail', reason, t0: now + 450 };
+    setTimeout(() => SFX.fail(), 300);
+  }
+}
+function gameOver() {
+  scene = 'over';
+  const nb = run.score > best;
+  if (nb) { best = run.score; try { parent.postMessage({ agf: 'save', data: { best } }, '*'); } catch (e) {} }
+  overlay = { kind: 'over', t0: now, newBest: nb };
+  signal('end', { score: run.score });
+}
+
+function burst(x, y, color, n, sp = 1) {
+  for (let i = 0; i < n; i++) {
+    const a = Math.random() * Math.PI * 2, v = (60 + Math.random() * 160) * sp;
+    parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 40, life: 0.6 + Math.random() * 0.5, age: 0, color, r: 2 + Math.random() * 3, rot: Math.random() * 6 });
+  }
+}
+
+// ---------- drawing ----------
+function rr(x, y, w, h, r) { ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x, y, w, h, r) : ctx.rect(x, y, w, h); }
+function fitText(text, x, y, maxW, size, weight = '600', align = 'center') {
+  let s = size;
+  ctx.font = `${weight} ${s}px ${FONT}`;
+  while (s > 12 && ctx.measureText(text).width > maxW) { s -= 1; ctx.font = `${weight} ${s}px ${FONT}`; }
+  ctx.textAlign = align; ctx.fillText(text, x, y);
+}
+function koma(cx, cy, size, t, mine, alpha = 1, sx = 1) {
+  const w = size * 0.8, h = size * 0.86, dir = mine ? 1 : -1;
+  ctx.save(); ctx.globalAlpha = alpha; ctx.translate(cx, cy); ctx.scale(sx, dir);
+  ctx.beginPath();
+  ctx.moveTo(0, -h / 2); ctx.lineTo(w * 0.4, -h * 0.3); ctx.lineTo(w * 0.5, h / 2); ctx.lineTo(-w * 0.5, h / 2); ctx.lineTo(-w * 0.4, -h * 0.3); ctx.closePath();
+  if (mine) { ctx.shadowColor = '#5fe0ff'; ctx.shadowBlur = size * 0.35; }
+  const g = ctx.createLinearGradient(0, -h / 2, 0, h / 2);
+  if (mine) { g.addColorStop(0, '#e6fbff'); g.addColorStop(1, '#9fe3f7'); } else { g.addColorStop(0, '#f6e8c8'); g.addColorStop(1, '#dcc394'); }
+  ctx.fillStyle = g; ctx.fill(); ctx.shadowBlur = 0;
+  ctx.lineWidth = Math.max(1.5, size * 0.035); ctx.strokeStyle = mine ? '#2a9cc8' : '#7a5530'; ctx.stroke();
+  ctx.scale(1, dir);
+  // movement marks
+  const mk = mine ? '#1786b6' : '#c0392b';
+  ctx.fillStyle = mk; ctx.strokeStyle = mk; ctx.lineWidth = Math.max(1.2, size * 0.03);
+  const ty = TY[t], r = size * 0.3, dot = Math.max(1.6, size * 0.035);
+  if (ty.step && !ty.jump) for (const [dx, dy] of ty.step) {
+    const l = Math.hypot(dx, dy);
+    ctx.beginPath(); ctx.arc(dx / l * r, dy / l * r + size * 0.04, dot, 0, 7); ctx.fill();
+  }
+  if (ty.jump) for (const [dx, dy] of ty.step) {
+    ctx.beginPath(); ctx.arc(dx * r * 0.5, dy * r * 0.5 + size * 0.04, dot * 0.85, 0, 7); ctx.fill();
+  }
+  if (ty.slide) for (const [dx, dy] of ty.slide) {
+    const l = Math.hypot(dx, dy), ux = dx / l, uy = dy / l, oy = size * 0.04;
+    ctx.beginPath(); ctx.moveTo(ux * r * 0.62, uy * r * 0.62 + oy); ctx.lineTo(ux * r * 1.05, uy * r * 1.05 + oy); ctx.stroke();
+  }
+  ctx.fillStyle = mine ? '#0b3a55' : '#2b1a0e';
+  ctx.font = `800 ${Math.round(size * (LANG === 'ja' ? 0.36 : 0.34))}px ${FONT}`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(GLYPH[t], 0, size * 0.05);
+  ctx.restore();
+}
+function wisp(cx, cy, size, tt) {
+  const bob = Math.sin(tt * 0.004) * size * 0.05;
+  const x = cx + size * 0.32, y = cy - size * 0.42 + bob;
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  const g = ctx.createRadialGradient(x, y, 0, x, y, size * 0.32);
+  g.addColorStop(0, 'rgba(200,255,255,0.9)'); g.addColorStop(0.4, 'rgba(90,220,255,0.45)'); g.addColorStop(1, 'rgba(40,120,255,0)');
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, size * 0.32, 0, 7); ctx.fill();
+  // flame tail
+  ctx.fillStyle = 'rgba(160,250,255,0.85)';
+  ctx.beginPath();
+  const s = size * 0.11, sway = Math.sin(tt * 0.009) * s * 0.8;
+  ctx.moveTo(x - s, y);
+  ctx.quadraticCurveTo(x - s * 0.6, y - s * 2.2, x + sway, y - s * 3);
+  ctx.quadraticCurveTo(x + s * 0.4, y - s * 1.6, x + s, y);
+  ctx.arc(x, y, s, 0, Math.PI);
+  ctx.fill();
+  ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(x, y, s * 0.45, 0, 7); ctx.fill();
+  ctx.restore();
+}
+function patternIcon(x, y, sz, t, mine) {
+  const n = 5, c = sz / n;
+  ctx.save();
+  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+    ctx.fillStyle = (i + j) % 2 ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.11)';
+    ctx.fillRect(x + i * c, y + j * c, c - 1, c - 1);
+  }
+  const ty = TY[t], col = mine ? '#6fe3ff' : '#ff6b6b';
+  ctx.fillStyle = col;
+  const mark = (dx, dy) => { const i = 2 + dx, j = 2 + dy; if (i < 0 || j < 0 || i >= n || j >= n) return; ctx.fillRect(x + i * c + 2, y + j * c + 2, c - 5, c - 5); };
+  if (ty.step) for (const [dx, dy] of ty.step) mark(dx, dy);
+  if (ty.slide) for (const [dx, dy] of ty.slide) for (let k = 1; k <= 2; k++) mark(dx * k, dy * k);
+  ctx.fillStyle = mine ? '#e6fbff' : '#f6e8c8';
+  ctx.beginPath(); ctx.arc(x + 2.5 * c, y + 2.5 * c, c * 0.35, 0, 7); ctx.fill();
+  ctx.restore();
+}
+
+function threatMap() {
+  // squares attacked if the wisp were not on board
+  const N = st.P.N, occ = makeOcc(st.P, st.mask), map = new Int8Array(N * N).fill(-1);
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+    if (occ[y * N + x] >= 0) {
+      // is this enemy defended?
+      const i = occ[y * N + x], nm = st.mask & ~(1 << i);
+      if (nm && attacker(st.P, makeOcc(st.P, nm), nm, x, y) >= 0) map[y * N + x] = 2;
+      continue;
+    }
+    if (attacker(st.P, occ, st.mask, x, y) >= 0) map[y * N + x] = 1;
+  }
+  return map;
+}
+function enemyRange(i) {
+  const N = st.P.N, occ = makeOcc(st.P, st.mask), e = st.P.en[i], out = [];
+  const mv = genMoves(st.P, occ, e.x, e.y, e.t);
+  for (let j = 0; j < mv.length; j += 3) out.push([mv[j], mv[j + 1]]);
+  return out;
+}
+
+function drawBG() {
+  const g = ctx.createRadialGradient(W / 2, H * 0.35, 0, W / 2, H * 0.4, Math.max(W, H) * 0.8);
+  g.addColorStop(0, '#24204a'); g.addColorStop(1, '#0b0a18');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  // stars
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  for (let i = 0; i < 40; i++) {
+    const x = (i * 97.3 % 1) * W, y = ((i * 61.7) % 37) / 37 * H * 0.9;
+    const tw = 0.5 + 0.5 * Math.sin(now * 0.002 + i);
+    ctx.globalAlpha = 0.15 + tw * 0.35; ctx.fillRect((x + i * 53) % W, y, 1.5, 1.5);
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawBoard() {
+  const N = st.P.N;
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 20;
+  rr(bx - 8, by - 8, cell * N + 16, cell * N + 16, 12); ctx.fillStyle = '#2b1d14'; ctx.fill();
+  ctx.restore();
+  const tm = threatMap();
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+    ctx.fillStyle = (x + y) % 2 ? '#8a6b47' : '#91714c';
+    ctx.fillRect(bx + x * cell, by + y * cell, cell, cell);
+    if (tm[y * N + x] === 1) {
+      const X = bx + x * cell, Y = by + y * cell;
+      ctx.fillStyle = 'rgba(150,20,40,0.55)';
+      ctx.fillRect(X, Y, cell, cell);
+      ctx.save(); ctx.beginPath(); ctx.rect(X, Y, cell, cell); ctx.clip();
+      ctx.strokeStyle = 'rgba(255,90,100,0.35)'; ctx.lineWidth = 2;
+      for (let k = -cell; k < cell; k += cell / 4) { ctx.beginPath(); ctx.moveTo(X + k, Y + cell); ctx.lineTo(X + k + cell, Y); ctx.stroke(); }
+      ctx.restore();
+    }
+  }
+  ctx.strokeStyle = 'rgba(20,10,5,0.55)'; ctx.lineWidth = 1;
+  for (let i = 0; i <= N; i++) {
+    ctx.beginPath(); ctx.moveTo(bx + i * cell, by); ctx.lineTo(bx + i * cell, by + N * cell); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(bx, by + i * cell); ctx.lineTo(bx + N * cell, by + i * cell); ctx.stroke();
+  }
+  // inspect range
+  if (inspect >= 0 && ((st.mask >> inspect) & 1)) {
+    ctx.fillStyle = 'rgba(255,170,40,0.38)';
+    for (const [x, y] of enemyRange(inspect)) ctx.fillRect(bx + x * cell + 2, by + y * cell + 2, cell - 4, cell - 4);
+  }
+  // enemies
+  for (let i = 0; i < st.P.en.length; i++) {
+    if (!((st.mask >> i) & 1)) continue;
+    const e = st.P.en[i], [cx, cy] = cellCenter(e.x, e.y);
+    if (anim && anim.m.c === i) {
+      const p = Math.min(1, (now - anim.t0) / anim.dur);
+      koma(cx, cy, cell, e.t, false, 1 - p * 0.3);
+    } else koma(cx, cy, cell, e.t, false);
+    if (tm[e.y * N + e.x] === 2) {
+      // guarded: red dashed frame + lock badge
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255,80,90,0.95)'; ctx.lineWidth = 2.5; ctx.setLineDash([5, 4]);
+      rr(bx + e.x * cell + 3, by + e.y * cell + 3, cell - 6, cell - 6, 6); ctx.stroke(); ctx.setLineDash([]);
+      const lx = bx + e.x * cell + cell * 0.2, ly = by + e.y * cell + cell * 0.22, lr = Math.max(8, cell * 0.14);
+      ctx.fillStyle = '#d6263c'; ctx.beginPath(); ctx.arc(lx, ly, lr, 0, 7); ctx.fill();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(lx, ly - lr * 0.15, lr * 0.32, Math.PI, 0); ctx.stroke();
+      ctx.fillStyle = '#fff'; ctx.fillRect(lx - lr * 0.45, ly - lr * 0.12, lr * 0.9, lr * 0.62);
+      ctx.restore();
+    }
+    if (inspect === i) { ctx.strokeStyle = '#ffb030'; ctx.lineWidth = 3; rr(bx + e.x * cell + 2, by + e.y * cell + 2, cell - 4, cell - 4, 6); ctx.stroke(); }
+  }
+  // last attempt's wrong move
+  if (def.bad && !anim && !overlay) for (const b of def.bad) {
+    if (b.mask !== st.mask || b.px !== st.px || b.py !== st.py || b.t !== st.t) continue;
+    const X = bx + b.x * cell, Y = by + b.y * cell;
+    ctx.save(); ctx.fillStyle = 'rgba(20,10,30,0.55)'; ctx.fillRect(X + 2, Y + 2, cell - 4, cell - 4);
+    ctx.strokeStyle = '#ff7a85'; ctx.lineWidth = 3; ctx.setLineDash([4, 4]); rr(X + 4, Y + 4, cell - 8, cell - 8, 6); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = '#ffb4b8'; ctx.textBaseline = 'middle'; fitText(DICT.prevBad, X + cell / 2, Y + cell - 12, cell - 4, 12, '800');
+    ctx.restore(); ctx.textBaseline = 'alphabetic';
+  }
+  // moves
+  if (!anim && !overlay) {
+    const pulse = 0.75 + 0.25 * Math.sin(now * 0.006);
+    for (const m of moves) {
+      const [cx, cy] = cellCenter(m.x, m.y);
+      if (m.att >= 0) {
+        if (m.c >= 0) continue;
+        ctx.strokeStyle = 'rgba(255,90,100,0.7)'; ctx.lineWidth = 2;
+        const s = cell * 0.08;
+        ctx.beginPath(); ctx.moveTo(cx - s, cy - s); ctx.lineTo(cx + s, cy + s); ctx.moveTo(cx + s, cy - s); ctx.lineTo(cx - s, cy + s); ctx.stroke();
+      } else if (m.c >= 0) {
+        ctx.strokeStyle = `rgba(120,240,255,${pulse})`; ctx.lineWidth = 3.5;
+        ctx.shadowColor = '#5fe0ff'; ctx.shadowBlur = 10;
+        rr(bx + m.x * cell + 3, by + m.y * cell + 3, cell - 6, cell - 6, 8); ctx.stroke();
+        ctx.shadowBlur = 0;
+      } else {
+        ctx.fillStyle = `rgba(120,240,255,${0.55 * pulse + 0.2})`;
+        ctx.shadowColor = '#5fe0ff'; ctx.shadowBlur = 12;
+        ctx.beginPath(); ctx.arc(cx, cy, cell * 0.12, 0, 7); ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+  }
+  // danger fx
+  if (dangerFx) {
+    const a = 1 - (now - dangerFx.t0) / 1400;
+    if (a <= 0) dangerFx = null;
+    else {
+      const e = st.P.en[dangerFx.att];
+      const [ax, ay] = cellCenter(e.x, e.y), [tx, ty] = cellCenter(dangerFx.x, dangerFx.y);
+      ctx.save(); ctx.globalAlpha = Math.min(1, a * 1.5);
+      ctx.strokeStyle = '#ff4d5e'; ctx.lineWidth = 4; ctx.setLineDash([8, 6]); ctx.lineDashOffset = -now * 0.05;
+      ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(tx, ty); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = 'rgba(255,60,80,0.35)'; ctx.fillRect(bx + dangerFx.x * cell, by + dangerFx.y * cell, cell, cell);
+      ctx.strokeStyle = '#ff4d5e'; ctx.lineWidth = 3; rr(bx + e.x * cell + 2, by + e.y * cell + 2, cell - 4, cell - 4, 6); ctx.stroke();
+      ctx.restore();
+    }
+  }
+  // player
+  let px, py, sc = 1;
+  if (anim) {
+    const p = Math.min(1, (now - anim.t0) / anim.dur), e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+    const [fx, fy] = cellCenter(anim.fx, anim.fy), [tx, ty] = cellCenter(anim.m.x, anim.m.y);
+    px = fx + (tx - fx) * e; py = fy + (ty - fy) * e - Math.sin(p * Math.PI) * cell * (anim.jump ? 0.6 : 0.18);
+    sc = 1 + Math.sin(p * Math.PI) * 0.12;
+    if (p >= 1) { finishMove(); }
+  } else[px, py] = cellCenter(st.px, st.py);
+  let sx = 1;
+  if (flip) { const p = (now - flip.t0) / 260; if (p >= 1) flip = null; else sx = Math.abs(Math.cos(p * Math.PI)) * 0.9 + 0.1; }
+  let shake = 0;
+  if (dangerFx && now - dangerFx.t0 < 300) shake = Math.sin(now * 0.08) * 4;
+  koma(px + shake, py, cell * sc, st.t, true, 1, sx);
+  wisp(px + shake, py, cell * sc, now);
+}
+
+function drawHUD() {
+  ctx.fillStyle = '#fff'; ctx.textBaseline = 'alphabetic';
+  ctx.font = `800 28px ${FONT}`; ctx.textAlign = 'left'; ctx.fillText(String(run.score), 16, 40);
+  ctx.font = `600 14px ${FONT}`; ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.fillText(`${DICT.best} ${Math.max(best, run.score)}`, 16, 60);
+  ctx.textAlign = 'right'; ctx.fillStyle = '#fff'; ctx.font = `700 18px ${FONT}`;
+  ctx.fillText(DICT.night(run.stage), W - 16, 32);
+  for (let i = 0; i < 3; i++) {
+    const x = W - 24 - i * 22, y = 50;
+    ctx.globalAlpha = i < run.lives ? 1 : 0.18;
+    ctx.fillStyle = '#7ff0ff';
+    ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI); ctx.quadraticCurveTo(x - 6, y - 10, x + 1, y - 14); ctx.quadraticCurveTo(x + 4, y - 7, x + 6, y); ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+  // moves left
+  const low = st.left <= 1;
+  ctx.textAlign = 'center'; ctx.font = `800 18px ${FONT}`;
+  ctx.fillStyle = low ? '#ff8a80' : '#ffe9a8';
+  const ly = Math.max(84, by - 16);
+  ctx.fillText(`${DICT.left(st.left)}`, W / 2 - 46, ly);
+  ctx.font = `600 14px ${FONT}`; ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.fillText(`（${DICT.par(def.par)}）`, W / 2 + 54, ly);
+}
+
+function drawInfo() {
+  const N = st.P.N, y0 = by + N * cell + 18;
+  const isE = inspect >= 0 && ((st.mask >> inspect) & 1);
+  const t = isE ? st.P.en[inspect].t : st.t;
+  const box = Math.min(W - 24, 420), x0 = (W - box) / 2;
+  rr(x0, y0, box, 60, 12); ctx.fillStyle = 'rgba(255,255,255,0.07)'; ctx.fill();
+  patternIcon(x0 + 8, y0 + 6, 48, t, !isE);
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = isE ? '#ffb4a8' : '#9ff0ff';
+  fitText(`${isE ? DICT.enemy : DICT.body + '：'}${DICT.names[t]}`, x0 + 66, y0 + 25, box - 76, 16, '800', 'left');
+  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  fitText(DICT.desc[t], x0 + 66, y0 + 47, box - 76, 15, '600', 'left');
+  let msg = null, col = 'rgba(255,255,255,0.75)';
+  if (dangerFx) { msg = DICT.watched(DICT.names[st.P.en[dangerFx.att].t]); col = '#ff9a9a'; }
+  else if (now < hintUntil && run.stage === 1) msg = DICT.hint;
+  else if (def.bad && def.bad.length && st.used <= 2) msg = DICT.retryInfo;
+  else if (run.stage <= 2 && st.used >= 1 && st.used <= 3) msg = DICT.tapInfo;
+  if (msg) {
+    ctx.fillStyle = col;
+    fitText(msg, W / 2, Math.min(H - 16, y0 + 92), W - 24, 14, '600');
+  }
+}
+
+function drawOverlay() {
+  if (!overlay || now < overlay.t0) return;
+  const a = Math.min(1, (now - overlay.t0) / 300);
+  ctx.save(); ctx.globalAlpha = a;
+  ctx.fillStyle = 'rgba(8,6,20,0.62)'; ctx.fillRect(0, 0, W, H);
+  const cy = H * 0.42;
+  ctx.textBaseline = 'alphabetic';
+  if (overlay.kind === 'clear') {
+    ctx.fillStyle = '#bff6ff'; fitText(DICT.clear, W / 2, cy, W - 32, 46, '900');
+    ctx.fillStyle = '#fff2a8'; fitText('+' + overlay.gain, W / 2, cy + 44, W - 32, 26, '800');
+    if (overlay.shortest) { ctx.fillStyle = '#8ff3ff'; fitText(DICT.shortest, W / 2, cy + 76, W - 32, 18, '700'); }
+    if (now - overlay.t0 > 700) { ctx.globalAlpha = a * (0.6 + 0.4 * Math.sin(now * 0.006)); ctx.fillStyle = '#fff'; fitText(DICT.next, W / 2, cy + 130, W - 32, 18, '700'); }
+  } else if (overlay.kind === 'fail') {
+    ctx.fillStyle = '#ffb4a8'; fitText(overlay.reason === 'out' ? DICT.out : DICT.dead, W / 2, cy, W - 32, 34, '900');
+    ctx.fillStyle = 'rgba(255,255,255,0.8)'; fitText(overlay.reason === 'out' ? DICT.outSub : DICT.deadSub, W / 2, cy + 34, W - 32, 16, '600');
+    ctx.fillStyle = '#7ff0ff'; fitText(`${DICT.lives} ${'●'.repeat(Math.max(0, run.lives))}${'○'.repeat(3 - Math.max(0, run.lives))}`, W / 2, cy + 68, W - 32, 18, '700');
+    if (now - overlay.t0 > 700) { ctx.globalAlpha = a * (0.6 + 0.4 * Math.sin(now * 0.006)); ctx.fillStyle = '#fff'; fitText(run.lives > 0 ? DICT.retry : DICT.again.replace('もう一度', '結果へ').replace('play again', 'see result'), W / 2, cy + 120, W - 32, 18, '700'); }
+  }
+  ctx.restore();
+}
+
+function drawTitle() {
+  drawBG();
+  // decorative board
+  const s = Math.min(W * 0.17, 72), cx = W / 2, cy = H * 0.5;
+  ctx.save(); ctx.globalAlpha = 0.95;
+  koma(cx - s * 1.2, cy, s, 2, false); koma(cx + s * 1.2, cy, s, 4, false); koma(cx, cy - s * 0.2, s * 1.1, 3, true);
+  wisp(cx, cy - s * 0.2, s * 1.1, now);
+  ctx.restore();
+  ctx.fillStyle = '#e6fbff'; ctx.textBaseline = 'alphabetic';
+  ctx.shadowColor = '#5fe0ff'; ctx.shadowBlur = 18;
+  fitText(DICT.title, W / 2, H * 0.24, W - 28, 38, '900');
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  DICT.how.forEach((l, i) => fitText(l, W / 2, H * 0.66 + i * 26, W - 28, 15, '600'));
+  if (best > 0) { ctx.fillStyle = 'rgba(255,255,255,0.6)'; fitText(`${DICT.best} ${best}`, W / 2, H * 0.66 + 92, W - 28, 15, '600'); }
+  ctx.globalAlpha = 0.6 + 0.4 * Math.sin(now * 0.005);
+  ctx.fillStyle = '#fff'; fitText(DICT.tap, W / 2, H * 0.9, W - 28, 20, '800');
+  ctx.globalAlpha = 1;
+}
+function drawOver() {
+  drawBG();
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = '#bff6ff'; fitText(DICT.over, W / 2, H * 0.28, W - 28, 30, '900');
+  ctx.fillStyle = 'rgba(255,255,255,0.8)'; fitText(DICT.reached(run.stage), W / 2, H * 0.36, W - 28, 18, '700');
+  ctx.fillStyle = '#fff'; fitText(String(run.score), W / 2, H * 0.5, W - 28, 60, '900');
+  ctx.fillStyle = overlay.newBest ? '#fff2a8' : 'rgba(255,255,255,0.7)';
+  fitText(overlay.newBest ? DICT.newBest : `${DICT.best} ${best}`, W / 2, H * 0.57, W - 28, 20, '800');
+  wisp(W / 2 - 20, H * 0.72, 70, now);
+  if (now - overlay.t0 > 700) { ctx.globalAlpha = 0.6 + 0.4 * Math.sin(now * 0.005); ctx.fillStyle = '#fff'; fitText(DICT.again, W / 2, H * 0.88, W - 28, 20, '800'); ctx.globalAlpha = 1; }
+}
+
+let last = performance.now();
+function frame(ts) {
+  now = ts;
+  const dt = Math.min(0.05, (ts - last) / 1000); last = ts;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  if (scene === 'title') drawTitle();
+  else if (scene === 'over') drawOver();
+  else {
+    drawBG(); drawHUD(); drawBoard(); drawInfo();
+  }
+  for (const p of parts) { p.age += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 260 * dt; p.vx *= 0.97; p.rot += dt * 8; }
+  parts = parts.filter((p) => p.age < p.life);
+  for (const p of parts) {
+    ctx.globalAlpha = 1 - p.age / p.life; ctx.fillStyle = p.color;
+    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.fillRect(-p.r, -p.r * 0.6, p.r * 2, p.r * 1.2); ctx.restore();
+  }
+  ctx.globalAlpha = 1;
+  rings = rings.filter((r) => now - r.t0 < 450);
+  for (const r of rings) {
+    const k = (now - r.t0) / 450;
+    ctx.globalAlpha = 1 - k; ctx.strokeStyle = '#9ff6ff'; ctx.lineWidth = 4 * (1 - k) + 1;
+    ctx.beginPath(); ctx.arc(r.x, r.y, cell * (0.3 + k * 0.9), 0, 7); ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+  pops = pops.filter((p) => now - p.t0 < 1100);
+  for (const p of pops) {
+    const k = (now - p.t0) / 1100; if (k < 0) continue;
+    ctx.globalAlpha = 1 - k; ctx.fillStyle = p.color; ctx.textBaseline = 'alphabetic';
+    fitText(p.text, p.x, Math.max(by + 26, p.y) - k * 40 + (p.y < by + 26 ? 30 : 0), W, p.size || 22, '900');
+  }
+  ctx.globalAlpha = 1;
+  if (scene === 'play') drawOverlay();
+  requestAnimationFrame(frame);
+}
+resize();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
