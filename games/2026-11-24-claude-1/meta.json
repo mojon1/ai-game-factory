@@ -1,0 +1,490 @@
+{
+  "id": "2026-11-24-claude-1",
+  "status": "published",
+  "title": "めぶんりょうクイズ",
+  "genre": "クイズ",
+  "concept": "数えない・測らない、ひと目の感覚で答える目分量クイズ。豆は数秒だけ見せて布をかぶせ、角度、コップの水の量、ランプの秒数、線の長さ、円の広さを見積もる。答え合わせで正解の針が数直線を走って自分のピンに近づくドキドキと、円すいのコップや広さの倍率で目がだまされる驚きが核。",
+  "howToPlay": "左右にドラッグして答えの数を合わせ、「これだ！」を押す。近いほど高得点で、10問の合計を競う。",
+  "libraryDecision": "使わない。豆を皿に散らす・数えながら光らせる・水位や角度の目盛りを描く演出は Canvas 2D で十分なめらかに作れ、物理や3Dを足しても『ひと目で見積もる』面白さは強まらないため。",
+  "soundDecision": "BGMは入れず、見ることに集中できる静けさにした。ドラッグで値が変わるたびの小さなカチッ、答え合わせで数えるたびに上がっていく音程、判定ごとのジングルで、正解の針が自分の予想に近づく緊張を耳でも盛り上げる。",
+  "improvements": [
+    {
+      "found": "豆が見えたまま14秒あるので、最初の問題はただ数えるだけになり「ひと目」の感覚クイズにならない／判定の文字が数え上げの数字や水の目盛りに重なって読めない／赤い豆が黒豆とほとんど見分けられず、円の広さの答え合わせも四角が並ぶだけで分かりにくい",
+      "changed": "豆の問題は2〜3秒だけ見せて布をかぶせる形にし、残り時間を皿のふちの輪で見せた。判定と得点は下の答えパネルに移し、数え上げの数字は皿の下へ。赤い豆を明るい赤にし、円の広さは小さい円を1つずつ大きい円の中へ並べる答え合わせにした。結果画面に「多めに見るタイプ／少なめに見るタイプ」の一言を足した",
+      "foundEn": "Beans stayed visible for 14 s, so the first question became plain counting rather than an at-a-glance guess; grade text overlapped the counter and the volume scale; red beans were nearly indistinguishable from black ones, and the circle-area reveal was just a grid of squares",
+      "changedEn": "Bean questions now show the plate for only 2–3 s (a ring shows the time) and then a cloth covers it. Grade and points moved into the answer panel and the counter below the plate. Red beans are now bright red; the area reveal stamps copies of the small circle into the big one. The result screen adds a line saying whether you tend to guess high or low"
+    },
+    {
+      "found": "答えのピンが毎回真ん中から始まるので、何もせずに押しても水の量などで高得点が出てしまう／毎回同じ10問の並びで、2回目に新しさがない／ゆっくりドラッグすると値がほとんど動かず、もどかしい",
+      "changed": "ピンの初期位置を毎回ランダムにして、自分で合わせないと当たらないようにした。「長い線は短い棒の何本分？」の問題を足し、2・6・8問目は角度・線の長さ・円の広さ・ランプから毎回入れ替わるようにした。ゆっくりドラッグしたときの動きを速くした",
+      "foundEn": "The answer pin always started in the middle, so pressing without moving it still scored well on things like water; every run had the same 10 questions in the same order; slow drags barely moved the value",
+      "changedEn": "The pin now starts at a random spot each question, so you must set it yourself. Added a \"how many sticks long is the line?\" question, and slots 2, 6 and 8 now rotate between angle, line length, circle area and lamp time. Slow drags respond more"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "クイズ",
+      "en": "Quiz",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "目分量クイズ。豆の数・角度・水の量・秒数などをひと目で見積もり、答え合わせで正解の針が自分の予想を越えていく。",
+        "ideaEn": "An eyeballing quiz: estimate bean counts, angles, water volume and seconds at a glance; on reveal the answer needle races past (or stops at) your guess.",
+        "fromDraw": true
+      },
+      {
+        "idea": "夜の軒先に風鈴を吊るし、風の通り道で鳴り方が変わる音の遊び場。目標も終わりもない。",
+        "ideaEn": "A sound playground of wind chimes under night eaves; how they ring depends on the wind paths. No goal, no end.",
+        "fromDraw": false
+      },
+      {
+        "idea": "流しそうめんを箸でつまむ。流れの速さと麺のすべりを読み、つまむ瞬間の指の開き加減で量が変わる。",
+        "ideaEn": "Catch flowing somen noodles with chopsticks: read the stream speed and slipperiness; how wide you pinch decides how much you catch.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "limit",
+    "input": [
+      "drag",
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Eyeball It!",
+      "concept": "A quiz answered by gut sense, never counting or measuring: beans flash for a few seconds before a cloth covers them, then angles, water in odd glasses, how long a lamp shone, line lengths and circle areas. The core is the reveal, when the answer needle races along the number line toward your pin, and the surprise when cone glasses and area ratios fool your eye.",
+      "howToPlay": "Drag left/right to set your number, then press \"That's it!\". Closer guesses score more; 10 questions per game.",
+      "libraryDecision": "None. Scattering beans, lighting them up as they are counted, and drawing volume and angle scales all run smoothly in Canvas 2D; physics or 3D would not make at-a-glance estimating more fun.",
+      "soundDecision": "No BGM, so you can focus on looking. A tiny click as the value changes, rising pitch with each counted item during the reveal, and a jingle per grade make the needle approaching your guess tense to hear as well."
+    }
+  },
+  "createdAt": "2026-11-24T09:07:08+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-24T09:07:08+09:00",
+    "metricsFrom": "2026-11-24T00:05:54.725Z",
+    "transcript": "7f003e2a-6091-4d0d-9de9-d88e102ae626.jsonl",
+    "validationRuns": 3,
+    "finishedAt": "2026-11-24T09:25:58+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-24T09:22:22+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "42.3KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=106",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=110",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=90",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=81",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 43326,
+    "lines": 714
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 2
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "問題の種類が6つしかなく、数回遊ぶと見慣れてしまう。ランプの秒数だけは見る問題ではなく、答え合わせも点灯時間ぶん待たされて間延びする",
+    "comment": "角度147°をぴったり当てたときの、正解の針が自分のピンにぴたりと止まる瞬間は気持ちよかった。円すいのコップで高さ6割を60%と答えたら正解36%で、目盛りが下に詰まっていく答え合わせに素直に驚いた。豆は数秒で布がかかるので数えられず、本当に目分量になる。結果の「6%多めに見るタイプ」は少し次を試したくなる。一方で問題の型は早めに出尽くし、何度も戻るほどの深さはまだない。",
+    "similar": [
+      {
+        "title": "The Eyeballing Game",
+        "url": "https://www.core77.com/posts/11444/Stop-what-youre-doing-and-test-yourself-with-The-Eyeballing-Game",
+        "similarity": "中",
+        "note": "目だけで角度や中点を合わせて誤差を競う点が近い。こちらは数を答えるクイズ形式で、豆の数・水の量・時間なども扱い、正解の針が走る答え合わせを見せる",
+        "note_en": "Close in judging angles and midpoints by eye and scoring the error. This one is a quiz where you answer a number, covers bean counts, water volume and time too, and stages a reveal with a running answer needle"
+      },
+      {
+        "title": "Stars（数の見積もりゲーム）",
+        "url": "https://github.com/phil-r/stars",
+        "similarity": "中",
+        "note": "画面の点の数を見積もるゲーム。こちらは豆を数秒だけ見せて布で隠し、数え上げながら正解へ近づく演出と、他の種類の問題を混ぜている",
+        "note_en": "A game of estimating how many things are on screen. Here the beans flash briefly before a cloth hides them, the reveal counts up toward the answer, and other question types are mixed in"
+      }
+    ],
+    "research": "WebSearch で目分量・見積もりゲームを1回検索し、角度などを目で合わせる The Eyeballing Game と、数を見積もる Stars を見つけた",
+    "i18n": {
+      "en": {
+        "worst": "Only six question types, so they feel familiar after a few runs. The lamp question is about timing rather than looking, and its reveal makes you wait out the whole duration",
+        "comment": "Hitting a 147° angle exactly, with the answer needle stopping right on my pin, felt great. On the cone glass I said 60% from the height and the answer was 36%; watching the volume marks bunch up at the bottom was a genuine surprise. Beans get covered after a few seconds, so you truly have to eyeball them. The 'you guess 6% high' line made me want one more try. But the question types run out quickly; not yet deep enough to keep coming back.",
+        "research": "One WebSearch for eyeballing/estimation games found The Eyeballing Game (matching angles by eye) and Stars (estimating counts)"
+      }
+    },
+    "method": "スマホ縦画面で 12 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 12 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 1000ms",
+        "note": "3回目。開始、豆を一瞬見る",
+        "noteEn": "Third run; glimpse the beans",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.48,0.82) 120ms → tap(0.50,0.92) 120ms → wait 2800ms",
+        "note": "見えた瞬間の印象で24",
+        "noteEn": "Gut feeling 24",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.50,0.50) 120ms → wait 400ms",
+        "note": "次へ",
+        "noteEn": "Next",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "swipe(0.50,0.72→0.58,0.72) 400ms → wait 200ms",
+        "note": "鈍角。140台後半と見てドラッグで右へ",
+        "noteEn": "Obtuse, high 140s; drag right",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.89,0.92) 120ms → tap(0.89,0.92) 120ms → tap(0.89,0.92) 120ms → tap(0.50,0.92) 120ms → wait 2500ms",
+        "note": "+で微調整して147°",
+        "noteEn": "Fine-tune with + to 147",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.50,0.50) 120ms → wait 400ms",
+        "note": "次へ",
+        "noteEn": "Next",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.53,0.82) 120ms → tap(0.50,0.92) 120ms → wait 2500ms → tap(0.50,0.50) 120ms → wait 10000ms → tap(0.40,0.82) 120ms → tap(0.50,0.92) 120ms → wait 8000ms → tap(0.50,0.50) 120ms → wait 1500ms",
+        "note": "水は半分強で53%。ランプは4秒と推測。次は豆2問目",
+        "noteEn": "Water ~53%; lamp guess 4s; next is beans #2",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 1500ms → tap(0.47,0.82) 120ms → tap(0.50,0.92) 120ms → wait 3200ms → tap(0.50,0.50) 120ms → wait 400ms",
+        "note": "大豆。布がかかった後で70と回答",
+        "noteEn": "Soybeans; answered 70 after the cloth",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.46,0.82) 120ms → tap(0.50,0.92) 120ms → wait 2500ms",
+        "note": "棒6本分くらい",
+        "noteEn": "About 6 sticks",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.50,0.50) 120ms → wait 400ms → tap(0.40,0.82) 120ms → tap(0.50,0.92) 120ms → wait 2500ms → tap(0.50,0.50) 120ms → wait 500ms",
+        "note": "変わったコップは40%と回答、次へ",
+        "noteEn": "Odd glass: answer 40%, next",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.48,0.82) 120ms → tap(0.50,0.92) 120ms → wait 2500ms → tap(0.50,0.50) 120ms → wait 1200ms",
+        "note": "直角より少し狭い86°。次は大量の豆",
+        "noteEn": "Just under a right angle, 86; next many beans",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.62,0.82) 120ms → tap(0.50,0.92) 120ms → wait 4000ms → tap(0.50,0.50) 120ms → wait 1500ms → tap(0.38,0.82) 120ms → tap(0.50,0.92) 120ms → wait 4000ms → tap(0.50,0.50) 120ms → wait 900ms",
+        "note": "緑豆は200前後と見て回答。最後の赤い豆も答えて結果へ",
+        "noteEn": "Mung beans ~200; answer the red beans and see results",
+        "image": "ai-play/step-12.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 826
+            }
+          },
+          {
+            "agf": "end",
+            "score": 826
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-24T09:25:58+09:00"
+  },
+  "publishedAt": "2026-11-24T09:25:58+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 11300,
+    "outputTokens": 50966,
+    "contextTokens": 15693485,
+    "turns": 81,
+    "toolCalls": 116,
+    "webSearches": 0,
+    "minutes": 20.1,
+    "from": "2026-11-24T00:05:54.725Z",
+    "to": "2026-11-24T00:25:58.624Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-24T09:25:58+09:00",
+    "validationRuns": 3,
+    "codeKB": 42.3
+  }
+}
