@@ -1,0 +1,610 @@
+{
+  "id": "2026-11-25-claude-1",
+  "status": "published",
+  "title": "ころがれ！サイコロ勇者",
+  "genre": "ダンジョン探索",
+  "concept": "自分がサイコロになってダンジョンを転がる。転がるたびに上の目が変わり、その目が敵の数以上なら勝ち。隣の4マスに「転がった後の目」が金・水色・赤で見え、敵の次の一歩も予告されるので、どの順に転がれば強い目で敵に当たれるかを読むのが核。傷を負わずに倒し続けると連撃で点が増える。",
+  "howToPlay": "スワイプでサイコロを1マス転がす。転がった後の上の目が敵の数以上なら倒せる（水色の敵はぴったりの目だけ）。階段で下の階へ。",
+  "libraryDecision": "three.js（と角丸の箱）を使う。サイコロは上の面だけでなく側面の目が見えることで「次にどの目が上に来るか」を想像できるので、立体で転がる手触りそのものが遊びの核になる。再考で、転がるときに辺を軸に90度倒れる動き、たいまつの光がサイコロについて回る演出を足した。",
+  "soundDecision": "ZzFXで効果音だけ付けた（転がるコトッ、倒す音、ぴったりの高い音、被ダメージ、階段）。考えながら一歩ずつ進むゲームなのでBGMは入れず、一手ごとの手応えを音で返すことを優先した。",
+  "improvements": [
+    {
+      "found": "壁が明るい床と見分けられず何度もぶつかる／予告の数字が小さく、サイコロや敵の数字と重なる／1階は動かないスライムだけで緊張感がない",
+      "changed": "壁を青灰色のレンガで高くし、床を暖色に。予告の数字をサイコロの四辺に寄せた。1階からコウモリを1匹出し、敵はスタート付近に置かない。",
+      "foundEn": "Walls looked like light floor tiles so I kept bumping into them / the preview numbers were tiny and overlapped the die and enemy badges / floor 1 had only static slimes, no tension",
+      "changedEn": "Walls became tall blue-grey bricks and the floor warm brown. Preview numbers hug the four sides of the die. One bat appears from floor 1 and enemies never start next to you."
+    },
+    {
+      "found": "敵が高さのせいで実際より1マス近く見え、隣だと思って転がすと空振る／金・赤の色の意味が説明されていない／自分のマスを狙う敵の予告がサイコロの下に隠れて見えない",
+      "changed": "カメラを真上寄りにし、敵の足元に輪を付け、隣の4マスを結果の色の枠で囲んだ。画面下に色の凡例を置き、狙われているときはサイコロの周りに赤い輪が点滅するようにした。",
+      "foundEn": "Enemies looked one tile closer than they were because of their height, so I rolled at empty air / the meaning of gold and red was never explained / an attack aimed at my own tile was hidden under the die",
+      "changedEn": "A more top-down camera, a ring under every enemy, and coloured outlines on the four neighbouring tiles. A colour legend at the bottom, and a pulsing red ring around the die when an enemy is about to hit it."
+    },
+    {
+      "found": "倒しても点が少し増えるだけで、慎重に道順を選ぶごほうびが弱い／1階の敵の数字が全部同じになりやすく単調／ハートの回復アイテムが何か分からない",
+      "changed": "傷を負わずに倒し続けると「連撃」で点の倍率が上がるようにした（傷を負うと途切れる）。敵の数字を1〜最大値で散らし、回復はハートの形にした。",
+      "foundEn": "Winning only added a few points, so careful routing felt unrewarded / floor-1 enemies often all had the same number / the healing item was unrecognisable",
+      "changedEn": "Added a chain: every win without taking damage raises the score multiplier (getting hurt resets it). Enemy numbers are spread from 1 up, and healing became a heart."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "ダンジョン探索",
+      "en": "Dungeon crawler",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "自分がサイコロになってダンジョンを転がり、転がった後の上の目で敵と戦う。目の出方を先読みして道順を選ぶ。",
+        "ideaEn": "You are a die rolling through a dungeon; the top face after each roll is your strength against enemies. Plan routes by predicting which face comes up.",
+        "fromDraw": true
+      },
+      {
+        "idea": "ねこじゃらしで猫と遊ぶ。獲物らしい止まる・隠れる動きで猫を興奮させ、飛びかかる瞬間にさっと引いてかわす。",
+        "ideaEn": "Tease a cat with a feather toy: move it like prey (stop, hide) to excite the cat, then whisk it away just as it pounces.",
+        "fromDraw": false
+      },
+      {
+        "idea": "夜の縁側で風鈴を吊るす遊び場。指で風を送ると、吊るした位置と長さで違う音が重なって鳴る。",
+        "ideaEn": "A playground of wind chimes on a night veranda: blow wind with your finger and chimes hung at different spots and lengths ring together.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "fail",
+    "input": [
+      "swipe",
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Roll On! Dice Hero",
+      "concept": "You are a die rolling through a dungeon. Each roll changes the top face, and you beat an enemy if that face is at least its number. The four neighbouring tiles show the face you would roll in gold, cyan or red, and enemies telegraph their next step, so the core is reading which order of rolls lets you hit each enemy with a strong face. Winning without getting hurt builds a chain multiplier.",
+      "howToPlay": "Swipe to roll the die one tile. If the top face after the roll is at least the enemy's number you win (cyan enemies need the exact face). Take the stairs to go deeper.",
+      "libraryDecision": "Uses three.js (with RoundedBoxGeometry). Seeing the side faces of the die lets you imagine which number comes up next, so the 3D rolling itself is the core. The rethink added a true 90° tip over the edge and a torch light that follows the die.",
+      "soundDecision": "Sound effects only, made with ZzFX (a wooden clack per roll, hits, a bright tone for exact matches, damage, stairs). It is a step-by-step thinking game, so no music: each move gets a crisp sound response instead."
+    }
+  },
+  "createdAt": "2026-11-25T11:15:51+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-25T11:15:51+09:00",
+    "metricsFrom": "2026-11-25T02:14:43.019Z",
+    "transcript": "74d09696-f6da-480d-8811-9950dcd0cc19.jsonl",
+    "validationRuns": 12,
+    "finishedAt": "2026-11-25T11:49:05+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-25T11:48:50+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "44.5KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=221",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=234",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=216",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=231",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 45604,
+    "lines": 756
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0,
+    "idleStarts": 0
+  },
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js"
+    },
+    {
+      "name": "three.js addons",
+      "version": "0.186.1",
+      "file": "three-addons-0.186.1.min.js"
+    },
+    {
+      "name": "ZzFX",
+      "version": "1.4.0",
+      "file": "zzfx-1.4.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "敵を倒し終えたあと階段まで歩く手数や、動かないスライムだけの場面は単なる移動になり、考えどころが薄い。サイコロで敵を倒す発想そのものは既存の小品にもある。",
+    "comment": "1階でコウモリが目の前に降りてくると読んで一歩進み、水色の「ぴったり2」で倒して2連撃、左のスライムを金の4で3連撃、回りこんで最後の1匹で4連撃・全滅回復、という流れは気持ちよかった。転がる前に4方向の結果が色で見えるので迷わず遊べる。ただ1〜2階は敵が弱く、深い階まで行かないと先読みの面白さが濃くならない。",
+    "similar": [
+      {
+        "title": "Dice Dungeon (GMTK Game Jam 2022)",
+        "url": "https://pothencial.itch.io/dice-dungeon",
+        "similarity": "高",
+        "note": "自分がサイコロになって盤上を転がり、敵とぶつかったときの目で勝負する点が同じ。こちらは「以上で勝ち」「ぴったりの敵」、敵の行き先の予告、連撃、階を下るローグ風の構成。",
+        "note_en": "Same core: you are a die moving on a grid and the face decides fights. Mine adds win-if-at-least plus exact-only foes, telegraphed enemy moves, a chain multiplier and descending floors."
+      },
+      {
+        "title": "Mighty Rollers",
+        "url": "https://untrainedmonkey.itch.io/mighty-rollers",
+        "similarity": "中",
+        "note": "サイコロを敵の上に転がし、上の目がダメージになる点が似ている。こちらは目が敵の数以上かどうかの一発勝負で、敵の反撃（カウンター）も上の目で決まる。",
+        "note_en": "Also rolls a die onto enemies with the top face as damage. Mine is a single threshold check, and enemy attacks are resolved by your current top face too (counters)."
+      }
+    ],
+    "research": "WebSearchで「dice rolling puzzle game top face dungeon roguelike」を1回検索し、上の目で戦うサイコロ移動の作品を2件確認した。",
+    "i18n": {
+      "en": {
+        "worst": "Walking to the stairs after clearing a floor, and stretches with only static slimes, are plain movement with little to think about. The die-versus-enemy idea itself exists in earlier small games.",
+        "comment": "On floor 1 I stepped forward predicting the bat would land in front of me, beat it with a cyan exact 2 for a 2-chain, took the slime on the left with a gold 4 for 3, then circled round for the last one: 4-chain and a heart back. That run felt good, and seeing the result of all four rolls in colour means you never feel lost. But floors 1–2 are easy; the lookahead only gets rich deeper down.",
+        "research": "One WebSearch for 'dice rolling puzzle game top face dungeon roguelike'; found two dice-movement games where the top face decides combat."
+      }
+    },
+    "method": "スマホ縦画面で 18 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 18 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 300ms",
+        "note": "開始。スライム2が3匹とコウモリ2",
+        "noteEn": "Start. Three slime-2s and a bat 2",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "swipe(0.50,0.80→0.50,0.65) 150ms → wait 600ms",
+        "note": "上へ。右のスライム2の横へ",
+        "noteEn": "Up, beside the slime 2",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "swipe(0.50,0.80→0.50,0.65) 150ms → wait 600ms",
+        "note": "上へ。右のスライム2の横へ",
+        "noteEn": "Up, beside the slime 2",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "swipe(0.50,0.80→0.65,0.80) 150ms → wait 700ms",
+        "note": "金の4でスライム2を倒す",
+        "noteEn": "Gold 4 beats slime 2",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "swipe(0.50,0.80→0.65,0.80) 150ms → wait 600ms",
+        "note": "右へ。コウモリの列へ",
+        "noteEn": "Right, into the bat's column",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "swipe(0.50,0.80→0.50,0.65) 150ms → wait 600ms",
+        "note": "上へ",
+        "noteEn": "Up",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "swipe(0.50,0.80→0.50,0.65) 150ms → wait 600ms",
+        "note": "上へ",
+        "noteEn": "Up",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "swipe(0.50,0.80→0.50,0.65) 150ms → wait 600ms",
+        "note": "上へ。コウモリを追う",
+        "noteEn": "Up, chasing the bat",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "swipe(0.50,0.80→0.50,0.65) 150ms → wait 600ms",
+        "note": "上へ。コウモリが目の前に来るはず",
+        "noteEn": "Up; the bat should land in front of me",
+        "image": "ai-play/step-09.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "swipe(0.50,0.80→0.50,0.65) 150ms → wait 350ms",
+        "note": "ぴったり2でコウモリを倒す。2連撃",
+        "noteEn": "Exact 2 beats the bat: chain of 2",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "swipe(0.50,0.80→0.35,0.80) 150ms → wait 700ms",
+        "note": "金の4で左のスライムを倒す。3連撃",
+        "noteEn": "Gold 4 beats the slime on the left: chain 3",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "swipe(0.50,0.80→0.35,0.80) 150ms → wait 600ms",
+        "note": "左へ",
+        "noteEn": "Left",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "swipe(0.50,0.65→0.50,0.80) 150ms → wait 600ms",
+        "note": "下へ。最後のスライムの右",
+        "noteEn": "Down, right of the last slime",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "swipe(0.50,0.80→0.35,0.80) 150ms → wait 400ms",
+        "note": "金の3で最後のスライム。全滅でハート回復",
+        "noteEn": "Gold 3 on the last slime; floor cleared, heart restored",
+        "image": "ai-play/step-14.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "swipe(0.50,0.80→0.50,0.65) 150ms → wait 600ms",
+        "note": "上の宝箱を取る",
+        "noteEn": "Grab the chest above",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 16,
+        "action": "swipe(0.50,0.80→0.35,0.80) 150ms → wait 600ms",
+        "note": "左へ",
+        "noteEn": "Left",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 17,
+        "action": "swipe(0.50,0.80→0.35,0.80) 150ms → wait 900ms",
+        "note": "階段へ。地下2階へ",
+        "noteEn": "Onto the stairs, down to B2",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 18,
+        "action": "swipe(0.50,0.65→0.50,0.80) 150ms → wait 500ms → swipe(0.50,0.80→0.35,0.80) 150ms → wait 500ms → swipe(0.50,0.80→0.35,0.80) 150ms → wait 500ms → swipe(0.50,0.80→0.50,0.65) 150ms → wait 1200ms",
+        "note": "左の壁を回りこんで階段へ",
+        "noteEn": "Around the wall to the stairs",
+        "image": "ai-play/step-18.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-25T11:49:05+09:00"
+  },
+  "publishedAt": "2026-11-25T11:49:05+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 30751,
+    "outputTokens": 56579,
+    "contextTokens": 25191859,
+    "turns": 118,
+    "toolCalls": 123,
+    "webSearches": 0,
+    "minutes": 34.4,
+    "from": "2026-11-25T02:14:43.019Z",
+    "to": "2026-11-25T02:49:05.445Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-25T11:49:05+09:00",
+    "validationRuns": 12,
+    "codeKB": 44.5
+  }
+}
