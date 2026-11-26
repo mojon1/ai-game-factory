@@ -1,0 +1,750 @@
+{
+  "id": "2026-11-26-claude-2",
+  "status": "published",
+  "title": "ねこのなわばり",
+  "genre": "陣取り",
+  "concept": "さかなは一番近いねこのもの。指をすべらせると、なわばりの境界がその場で組みかわり、とれるさかなの数が音の高さで聞こえる。相手のさかなを横どりできる一点を、目と耳でさぐり当てるのが核。最後はねこが食べて太る。",
+  "howToPlay": "画面に指をおいてすべらせ、さかながたくさんとれる場所で指をはなすと、ねこをおく。全部おいたら、さかなの多いほうが勝ち。",
+  "libraryDecision": "ライブラリは使わない。境界線が指に合わせて一瞬で組みかわる軽さが大事で、数ひきのねこの境界は素の Canvas で毎フレーム計算して描けるため、足しても面白さは増えないと判断した。",
+  "soundDecision": "BGMは付けず、効果音だけにした。指をすべらせている間、とれる数が変わるたびに数に応じた高さの音が鳴り、良い場所を耳でさがせる。ねこをおくと鳴き声、最後はさかなを食べるたびに音が上がる。考える遊びなので曲は入れなかった。",
+  "improvements": [
+    {
+      "found": "①交互に「一番多くとれる場所」をさがすだけで、置き場所に迷う理由が少ない。②結果のパネルがねこを隠し、食べて太る様子がほとんど見えない。③おいた直後の「よこどり」と「+数」の文字が重なって読めない。",
+      "changed": "マイナス2点のきゅうりを足し、さかなをとりに行くときゅうりも付いてくる損得を作った（ねこは食べるとびっくりしてとび上がる）。ねこが太る量を2倍にし、結果のパネルを下へ寄せた。文字は上下にずらした。相手の強さは、対戦を自動で数百回ずつ回して、後半が勝てなくなりすぎないように調整した。",
+      "foundEn": "(1) Taking turns just finding the richest spot left little to agonise over. (2) The result panel hid the cats, so you could barely see them fatten. (3) The \"Stolen\" and \"+N\" labels overlapped after placing.",
+      "changedEn": "Added cucumbers worth −2, so grabbing fish can drag a cucumber along (a cat that eats one jumps in shock). Doubled how much cats fatten and moved the result panel down. Separated the labels. Tuned the rival by auto-playing hundreds of matches per stage so late stages are not hopeless."
+    },
+    {
+      "found": "①結果のパネルがまだ大きく、下にいるねこが隠れる。②ねこの下にさかながもぐって、金のさかなが誰のものか見えない。③ぎりぎりの勝ちと大勝ちの区別がなく、同じステージをもう一度やる理由がない。",
+      "changed": "結果のパネルを低く小さくした。さかなをねこの上に描き、ねこ同士が重ならないよう最小の間隔を広げた。差の大きさで星1〜3を付け、ルールの注意書きが出るステージでは案内を長く表示するようにした。",
+      "foundEn": "(1) The result panel was still big and hid cats near the bottom. (2) Fish slid under cats, so you could not see who owned a golden fish. (3) A narrow win and a rout looked the same, giving no reason to retry a stage.",
+      "changedEn": "Made the result panel shorter. Fish are now drawn above cats, and the minimum gap between cats is wider. Added 1–3 stars by winning margin, and stage banners that explain a new rule stay on screen longer."
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "陣取り",
+      "en": "Territory control",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "ねこのなわばり: さかなは一番近いねこのもの。相手と交互にねこをおき、指をすべらせると境界がその場で変わるのを見ながら、多くとれる場所をさがす（2D・見下ろしの地図）。",
+        "ideaEn": "Cat Turf: each fish belongs to the nearest cat. Take turns placing cats, sliding a finger to watch the borders reshape live and find the richest spot (2D top-down map).",
+        "fromDraw": true
+      },
+      {
+        "idea": "花火の遊び場: 夜空に指で描いた形のとおりに花火が開く。目標のない遊び場で、光のにじみを使って3Dの夜空に打ち上げる。",
+        "ideaEn": "Fireworks playground: fireworks burst in whatever shape you draw on the night sky. A goal-free toy in a 3D sky with glowing bloom.",
+        "fromDraw": false
+      },
+      {
+        "idea": "氷みがきカーリング: 3Dの氷の上で石をはじいて投げ、石の前の氷を指でこすって、のびと曲がりを調整して的に止める。",
+        "ideaEn": "Ice-rubbing curling: flick a stone down 3D ice, then rub the ice ahead of it with a finger to extend and curl its path onto the target.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "drag"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Cat Turf",
+      "concept": "Each fish belongs to the nearest cat. As you slide your finger the territory borders reshape instantly and the number of fish you would win is heard as a pitch. The core is hunting, by eye and ear, for the one spot that steals the rival's fish. At the end the cats eat and grow fat.",
+      "howToPlay": "Touch and slide to search, then release where you win the most fish to place a cat. When all cats are placed, whoever has more fish wins.",
+      "libraryDecision": "No library. What matters is that the borders reshape instantly under the finger, and with only a few cats they can be computed and drawn every frame on a plain canvas, so a library would not add fun.",
+      "soundDecision": "No BGM, sound effects only. While sliding, a note plays whenever the catch changes, pitched by how many fish you would win, so you can search by ear. Cats meow when placed and the pitch climbs as they eat. It is a thinking game, so no music."
+    }
+  },
+  "createdAt": "2026-11-26T12:06:48+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Fable 5.2",
+      "vendor": "Anthropic",
+      "model": "claude-fable-5-2",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-26T12:06:48+09:00",
+    "metricsFrom": "2026-11-26T03:05:34.626Z",
+    "transcript": "3d182644-aaf6-4bbe-9ef3-bd32e98239ab.jsonl",
+    "validationRuns": 3,
+    "finishedAt": "2026-11-26T12:21:06+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-26T12:17:02+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "34.5KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=168",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=244",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=144",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=227",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 35353,
+    "lines": 629
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 0.1,
+    "idleStarts": 1
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Fable 5.2",
+      "vendor": "Anthropic",
+      "model": "claude-fable-5-2"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "読み合いが浅い。自分が最後におくステージでは「いま一番多くとれる場所」を指でさがすだけで勝ててしまい、1ステージが30秒ほどで終わるので、数ステージで同じことのくり返しに感じる。",
+    "comment": "ステージ2で9対16と負けていたのを、最後の1ぴきで金のさかなごと横どりして16対9にひっくり返した場面は気持ちよかった。ステージ3では金のさかなをねらったらきゅうりも付いてきて差し引き+2にしかならず、置き場所を考える理由になっていた。境界が指に合わせて組みかわる手触りは良い。ただ数分は普通に遊べる程度で、もう1回と強く思うほどではないので星3。音は自己プレイでは聞けていない。",
+    "similar": [
+      {
+        "title": "The Voronoi Game（計算幾何の研究。Ahn・Cheng・Cheong・Golin・van Oostrum 2004、Cheong・Har-Pele",
+        "url": "https://arxiv.org/abs/cs/0305016v1",
+        "similarity": "高",
+        "note": "2人が交互に点をおき、一番近い点のものになる領域（ボロノイ図）の広さを競う、というルールの骨組みは同じ。こちらは面積ではなく散らばったさかな（金は3、きゅうりは−2）の数を競い、指をすべらせると境界と取れる数がその場で変わって音でも聞こえる点が違う。",
+        "note_en": "Same skeleton: two players alternately place points and compete over the nearest-point (Voronoi) regions. Here you compete for scattered fish (gold = 3, cucumber = −2) rather than area, and sliding a finger reshapes the borders live with the catch heard as a pitch."
+      },
+      {
+        "title": "Voronoi diagram area game（ブラウザゲーム）",
+        "url": "https://cfbrasz.github.io/VoronoiColoring.html",
+        "similarity": "高",
+        "note": "交互に点をおいてボロノイ図の面積の多さで勝敗を決めるブラウザゲーム。こちらは面積ではなく点在するさかなの数え合いで、マイナスのきゅうり、のらねこ、ドラッグ中の先読み表示、食べて太る演出がある。",
+        "note_en": "A browser game where players alternately place points and the larger Voronoi area wins. Ours counts scattered fish instead of area, and adds negative cucumbers, stray cats, a live preview while dragging and cats that fatten as they eat."
+      }
+    ],
+    "research": "ウェブ検索を2回（ボロノイ図で面積を競うゲーム、いちばん近い店に客が行く立地競争）行った。ルールの骨組みは計算幾何で研究されている「ボロノイゲーム」と同じで、同じルールのブラウザゲームも見つかった。経済学のホテリングの立地競争も同じ発想のルーツにあたる。",
+    "i18n": {
+      "en": {
+        "worst": "The mind game is shallow. On stages where you place last, simply sliding to the spot with the biggest catch wins, and a stage lasts about 30 seconds, so after a few stages it feels repetitive.",
+        "comment": "Turning a 9-16 deficit in stage 2 into 16-9 with the last cat, stealing the golden fish, felt great. In stage 3, going for a golden fish dragged a cucumber along for only net +2, which gave a reason to think about placement. The borders reshaping under the finger feel good. Still, it is a game you play normally for a few minutes rather than one that demands another round, so 3 stars. I could not hear the sound in self-play.",
+        "research": "Two web searches (games competing for Voronoi area; location competition where customers go to the nearest shop). The rule skeleton matches the \"Voronoi game\" studied in computational geometry, and a browser game with the same rule exists. Hotelling's location competition in economics shares the same root idea."
+      }
+    },
+    "method": "スマホ縦画面で 12 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 12 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms → wait 2000ms",
+        "note": "タイトルをタップ。ステージ1が始まり、相手が先に1ぴきおいた。さかなは全部青い",
+        "noteEn": "Tapped the title. Stage 1 began and the rival placed first; every fish is blue",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "path(0.60,0.45→0.45,0.55→0.38,0.60) 900ms → wait 1300ms",
+        "note": "相手のねこのすぐ上、群れのまん中に1ぴき目。相手の2ひき目が来た",
+        "noteEn": "First cat just above the rival, in the middle of the school. The rival's second came",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "path(0.30,0.30→0.50,0.40→0.52,0.44) 900ms → wait 4000ms",
+        "note": "上の群れに2ひき目。食べ終わって結果",
+        "noteEn": "Second cat to the upper school. Dinner, then the result",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "best": {
+                "0": 1
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 8
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.50,0.50) 120ms → wait 2000ms",
+        "note": "8対7のぎりぎり勝ちで星1つ。タップでステージ2へ",
+        "noteEn": "A narrow 8-7 win, one star. Tapped on to stage 2",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "best": {
+                "0": 1
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 8
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "path(0.20,0.50→0.35,0.60→0.42,0.63) 900ms → wait 1300ms",
+        "note": "左の金のさかな2ひきの間に1ぴき目。相手が右へ2ひき目",
+        "noteEn": "First cat between the two golden fish on the left. The rival answered on the right",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "best": {
+                "0": 1
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 8
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "path(0.60,0.40→0.80,0.50→0.86,0.57) 900ms → wait 1300ms",
+        "note": "右の金のさかなを横どりしに2ひき目",
+        "noteEn": "Second cat to steal the golden fish on the right",
+        "image": "ai-play/step-06.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "best": {
+                "0": 1
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 8
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "path(0.15,0.60→0.25,0.72→0.33,0.79) 900ms → wait 4300ms",
+        "note": "9対16で負けている。最後の1ぴきを下の群れへおき、金のさかなごと横どりして逆転をねらう",
+        "noteEn": "Behind 9-16. Placed the last cat in the lower school to steal the golden fish and turn it around",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "best": {
+                "0": 1
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 8
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 2,
+              "best": {
+                "0": 1,
+                "1": 7
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 16
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.50,0.50) 120ms → wait 2000ms",
+        "note": "最後の1ぴきで16対9に逆転、星2つ。ステージ3へ。きゅうりが出てきた",
+        "noteEn": "The last cat turned it into 16-9, two stars. On to stage 3: cucumbers appeared",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "best": {
+                "0": 1
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 8
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 2,
+              "best": {
+                "0": 1,
+                "1": 7
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 16
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "path(0.60,0.40→0.40,0.30→0.30,0.27) 900ms → wait 1300ms",
+        "note": "きゅうり3本は右下にななめに並ぶ。きゅうりをさけて上の群れに1ぴき目をおいた。相手の2ひき目が来た",
+        "noteEn": "Three cucumbers lie diagonally to the lower right. Avoided them and placed the first cat in the upper school. The rival's second came",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "best": {
+                "0": 1
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 8
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 2,
+              "best": {
+                "0": 1,
+                "1": 7
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 16
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "path(0.60,0.50→0.80,0.70→0.88,0.81) 900ms → wait 1300ms",
+        "note": "右下のさかなを取りに2ひき目。きゅうり1本もいっしょに付いてきた。相手は3びき目をおいた",
+        "noteEn": "Second cat for the lower-right fish; one cucumber came with it. The rival placed its third",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "best": {
+                "0": 1
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 8
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 2,
+              "best": {
+                "0": 1,
+                "1": 7
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 16
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "path(0.15,0.75→0.25,0.68→0.30,0.63) 900ms → wait 900ms",
+        "note": "8対9。金のさかなのすぐ下に最後の1ぴき。金のさかなは横どりできたが、まん中のきゅうりも自分のものになり、差し引き+2",
+        "noteEn": "8-9. Last cat just below the golden fish. It stole the golden fish, but the middle cucumber became mine too: net +2",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "best": {
+                "0": 1
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 8
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 2,
+              "best": {
+                "0": 1,
+                "1": 7
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 16
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "wait 3400ms",
+        "note": "食べ終わって10対7で勝ち、星1つ。きゅうりで点が引かれ、思ったより差がつかなかった",
+        "noteEn": "Dinner over: a 10-7 win, one star. Cucumbers cut the score, so the margin was smaller than hoped",
+        "image": "ai-play/step-12.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 1,
+              "best": {
+                "0": 1
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 8
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 2,
+              "best": {
+                "0": 1,
+                "1": 7
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 16
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "stage": 3,
+              "best": {
+                "0": 1,
+                "1": 7,
+                "2": 3
+              }
+            }
+          },
+          {
+            "agf": "end",
+            "score": 10
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-26T12:21:06+09:00"
+  },
+  "publishedAt": "2026-11-26T12:21:06+09:00",
+  "metrics": {
+    "model": "claude-fable-5-2",
+    "effort": "medium",
+    "thinkingTokens": 24023,
+    "outputTokens": 45389,
+    "contextTokens": 6909425,
+    "turns": 36,
+    "toolCalls": 62,
+    "webSearches": 0,
+    "minutes": 15.5,
+    "from": "2026-11-26T03:05:34.626Z",
+    "to": "2026-11-26T03:21:06.885Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-26T12:21:06+09:00",
+    "validationRuns": 3,
+    "codeKB": 34.5
+  }
+}
