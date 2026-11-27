@@ -1,0 +1,414 @@
+{
+  "id": "2026-11-27-claude-2",
+  "status": "published",
+  "title": "まもれ！ケーキのろうそく",
+  "genre": "アクション",
+  "concept": "誕生日ケーキのろうそくを、吹きこむ風から指一本の「手」でかばい続ける。手の風下だけが風よけになるので、風の向きに並んだ火は一つの手でまとめて守れる。ろうそくが増えるほど、どこに手を置けば何本救えるかを一瞬で見ぬく位置取りが核。",
+  "howToPlay": "矢印が風上を教えてくれるので、そちらに指を置いて火をかばう。2本指で両手も使え、火の真上に手を置くとあつくて消える。",
+  "libraryDecision": "使わない。ケーキと火と風の筋は Canvas 2D の重ね描きで十分きれいに出せ、3D や物理にしても「風上に手を置く」判断は強まらないため。",
+  "soundDecision": "BGM なし。風は Web Audio のノイズで、予告で小さくざわめき、吹くと強く、来る側の左右に振って耳でも風上が分かるようにした。セーフの連続で上がる音と、ろうそくが増えるたびに一音ずつ進む小さな旋律で、守り続ける気持ちよさを足した。",
+  "improvements": [
+    {
+      "found": "風の矢印が画面の端にあり、ケーキのどこに手を置けばいいか読みにくい／かばえても手応えがない／新しいろうそくが風の最中に出てすぐ弱る",
+      "changed": "矢印をケーキのすぐ外の風上に出すようにした。風が終わったとき守りきった火に「セーフ！」と火花とボーナス、連続セーフで倍率と上がる音を付けた。新しいろうそくは風がやんでから出し、2秒の猶予を付けた",
+      "foundEn": "The wind arrow sat at the screen edge, hard to relate to the cake / no reward for a successful shelter / new candles appeared mid-gust and got blown at once",
+      "changedEn": "Arrow now appears just outside the cake on the upwind side. Flames fully sheltered through a gust get 'Safe!', sparkles and a bonus, with a streak multiplier and rising chime. New candles appear only between gusts with a 2s grace"
+    },
+    {
+      "found": "皿の上で矢印が白く見えにくい／何もしなくても26秒もつほど甘く、どの火を救うかの緊張が薄い／ろうそくが奥行きで重なって隠れる",
+      "changed": "矢印に暗い丸の下地を付けた。風で弱る速さを上げ、回復を遅くして、守らなかった火は2回の風で消えるようにした。ろうそくの配置を画面上の距離でも離した",
+      "foundEn": "Arrow hard to see over the white plate / idling still survived 26s, so choosing which flame to save had little tension / candles overlapped in depth",
+      "changedEn": "Dark disc behind the arrow. Faster wind damage and slower recovery, so an unprotected flame dies in about two gusts. Candles are now spaced by on-screen distance too"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "ボードゲーム",
+      "en": "Board game",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "チェッカーの連続ジャンプだけを抜き出し、指で一筆になぞって何枚飛びこせるかを読む詰めボードゲーム（盤を少し傾けた立体で）。",
+        "ideaEn": "A checkers puzzle about multi-jumps only: trace one path to leap as many pieces as possible (on a tilted 3D board).",
+        "fromDraw": true
+      },
+      {
+        "idea": "誕生日ケーキのろうそくを、風上に置いた指の「手」でかばい続ける生き延びゲーム。風の向きに並んだ火は一つの手でまとめて守れる。",
+        "ideaEn": "Survive by shielding birthday-cake candles from gusts with your finger as a hand; flames lined up downwind share one hand's shelter.",
+        "fromDraw": false
+      },
+      {
+        "idea": "やじろべえの両腕に落ちてくる荷物を左右へ振り分け、傾きを保ったまま積み上げる。",
+        "ideaEn": "Sort falling parcels onto both arms of a balancing toy, keeping it level as the load grows.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 1
+  },
+  "structure": {
+    "goal": "survive",
+    "ending": "fail",
+    "input": [
+      "drag",
+      "multi"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Shield the Candles",
+      "concept": "Keep birthday-cake candles alight by shielding them from gusts with your finger as a hand. Only the area downwind of the hand is calm, so flames lined up with the wind can share one hand. As candles multiply, the core is reading in an instant where one hand saves the most.",
+      "howToPlay": "An arrow shows where the next gust comes from; put your finger there to shelter the flames. Two fingers give two hands, but covering a flame directly smothers it.",
+      "libraryDecision": "None. Canvas 2D layering draws the cake, flames and wind streaks well enough, and 3D or physics would not sharpen the 'hand upwind' decision.",
+      "soundDecision": "No BGM. Wind is Web Audio noise that rustles during the warning, roars when it blows, and is panned to the side it comes from so you can hear the upwind side. A rising chime for Safe streaks and a little melody advancing one note per new candle make keeping them lit feel good."
+    }
+  },
+  "createdAt": "2026-11-27T12:06:45+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-27T12:06:45+09:00",
+    "metricsFrom": "2026-11-27T03:05:49.944Z",
+    "transcript": "3acfb000-f291-49e2-80ce-8f4e524a9cd9.jsonl",
+    "validationRuns": 4,
+    "finishedAt": "2026-11-27T12:16:08+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-27T12:15:46+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "32.7KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "複数の指を指ごとに扱っている（pointerId）",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Tracks each finger separately (pointerId)"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=149",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=112",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=129",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=169",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 33515,
+    "lines": 747
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 0
+  },
+  "libraries": [],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "変化がろうそくの本数と風の重なりだけで、数分遊ぶと同じ判断のくり返しに感じやすい。風の向きと手のかばう範囲の関係も、最初の数回はつかみにくい。",
+    "comment": "左から風が来たとき、横に並んだ青とピンクの2本を左に置いた一つの手でまとめて守れて「セーフ！×2」が出た場面が一番気持ちよかった。並んでいない2本を2本指で別々にかばうのも手応えがある。ただ、何をすればいいかが分かるまでに1〜2回の風がかかり、後半は変化が少なめ。",
+    "similar": [
+      {
+        "title": "Will you let the candle die?",
+        "url": "https://juankz.itch.io/will-you-let-the-candle-die",
+        "similarity": "高",
+        "note": "手を動かして風をさえぎりろうそくを守る点が同じ。こちらはケーキの上で本数が増え、風下にできる風よけの帯で複数本を一度に守る位置取りと2本指の両手が中心。",
+        "note_en": "Same idea of moving a hand to block wind from a candle. Here candles multiply on a cake and the core is positioning so the calm zone behind one hand covers several, plus two-finger hands."
+      },
+      {
+        "title": "By the Candlelight",
+        "url": "https://cacctus1.itch.io/by-the-candlelight",
+        "similarity": "中",
+        "note": "カーソルで突風をさえぎって火を守る。こちらはスマホのタッチで、風の予告矢印と連続セーフの得点がある。",
+        "note_en": "Block gusts with the cursor to keep a candle lit. This one is touch-based with warning arrows and a Safe-streak score."
+      }
+    ],
+    "research": "「手で風をさえぎってろうそくを守るゲーム」をウェブ検索し、itch.io の同じ発想の作品を確認した。",
+    "i18n": {
+      "en": {
+        "worst": "Variety comes only from more candles and overlapping gusts, so after a few minutes it feels like the same decision repeated. The link between wind direction and the calm zone behind the hand takes a few gusts to grasp.",
+        "comment": "Best moment: a gust from the left, blue and pink candles in a row, and one hand on the left saved both for Safe x2. Shielding two unaligned candles with two fingers also feels good. It takes a gust or two to understand, and the late game varies little.",
+        "research": "Web-searched for games about shielding a candle from wind with a hand; found same-idea titles on itch.io."
+      }
+    },
+    "method": "スマホ縦画面で 8 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 8 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "開始",
+        "noteEn": "Start",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "wait 2600ms",
+        "note": "最初の予告",
+        "noteEn": "First warning",
+        "image": "ai-play/step-02.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.68,0.50) 3800ms",
+        "note": "右上の風をかばう",
+        "noteEn": "Shelter from the upper-right gust",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 1400ms",
+        "note": "次の予告",
+        "noteEn": "Next warning",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "tap(0.20,0.60) 3600ms",
+        "note": "左の濃い丸の矢印がはっきり見える。左で2本まとめてかばう",
+        "noteEn": "Arrow on a dark disc is now clear. One hand on the left covers both",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "wait 1200ms",
+        "note": "次の予告",
+        "noteEn": "Next warning",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "wait 900ms",
+        "note": "次の予告を待つ",
+        "noteEn": "Waiting for the warning",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "multi(0.63,0.62 | 0.44,0.61) 3600ms",
+        "note": "右下から風。2本は風の向きに並んでいないので、2本指でそれぞれの風上をかばう",
+        "noteEn": "Gust from lower right; candles not in line, so two fingers, one upwind of each",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-27T12:16:08+09:00"
+  },
+  "publishedAt": "2026-11-27T12:16:08+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 10973,
+    "outputTokens": 33568,
+    "contextTokens": 9615095,
+    "turns": 56,
+    "toolCalls": 63,
+    "webSearches": 0,
+    "minutes": 10.3,
+    "from": "2026-11-27T03:05:49.944Z",
+    "to": "2026-11-27T03:16:08.302Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-27T12:16:08+09:00",
+    "validationRuns": 4,
+    "codeKB": 32.7
+  }
+}
