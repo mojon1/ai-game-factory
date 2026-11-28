@@ -1,0 +1,530 @@
+{
+  "id": "2026-11-28-claude-1",
+  "status": "published",
+  "title": "ねらえ！縁日の射的",
+  "genre": "シューティング",
+  "concept": "縁日の射的を3Dの物理で。コルクが当たった高さで景品の倒れ方が変わり、上を撃てば倒れ、下だと押されるだけ。重い大物は一発では揺れて戻るので、奥へ揺れた瞬間にもう一発重ねて落とす。積んだ箱をまとめて崩す気持ちよさも核。",
+  "howToPlay": "画面を押すと指の少し上に照準が出て、はなすとコルクが飛ぶ。棚から落ちた景品がもらえる。コルクが尽きたら終わり。",
+  "libraryDecision": "three.js（3D）と cannon-es（3D物理）を使う。当たった高さ・重さで倒れ方が変わることが遊びの核なので、物理で本当に揺れて倒れることが必要。再考で、大物の「揺れ戻し」に2発目を合わせる狙いと、積み上げを崩すと上もまとめて落ちる仕掛けを足した。ZzFX で効果音。",
+  "soundDecision": "ZzFX でコルクの「ポン」、箱に当たる「コツ」、ぬいぐるみの「ポフ」、景品が落ちたときの鐘を鳴らし、当たりの手応えを耳でも返す。BGM は小さな太鼓と笛、人のざわめきの縁日の雰囲気で、狙いの邪魔をしない音量にした。",
+  "improvements": [
+    {
+      "found": "だるま・くまは何発撃っても落ちず、何が起きているか分からない／倒れたロボットが後ろの段にもたれて落ちない／鉄砲が大きく右下の景品を隠し、値札も小さくて読めない",
+      "changed": "衝撃と重さを測り直し、大物は「奥へ揺れている間にもう一発」で落ちるようにして、その間だけ「いま！」の合図を出した。段の隙間を広げ、重心が棚の奥端を越えたら獲得にした。鉄砲を短く画面の下へ寄せ、値札を大きくした",
+      "foundEn": "The daruma and bear never fell and it was unclear why / a toppled robot leaned on the next tier instead of falling / the big gun hid prizes and the price tags were unreadable",
+      "changedEn": "Re-tuned impulse and weights so big prizes fall to a second shot while they swing back, with a NOW! cue during that window. Widened the gaps and count a prize once its centre passes the back edge. Shortened the gun to the bottom edge and enlarged the tags"
+    },
+    {
+      "found": "小さい景品はどれも「上を撃てば1発」で考える場面がない／一度に何個も落とす楽しみがなく「2つ落とし」が出ない／屋台が変わっても止まった的ばかりで変化がない",
+      "changed": "キャラメルの3段積みを置き、下の箱を崩すと上もまとめて落ちて「2つ落とし」でコルク+1になるようにした。屋台2からは中段が左右に動くお盆になり、屋台が進むほど速くなる。外れたときも分かるようにコルクの軌跡を出した",
+      "foundEn": "Every small prize fell to one top shot, so there was nothing to think about / no way to drop several at once, so the multi-drop bonus never happened / later stalls were still static targets",
+      "changedEn": "Added three-box caramel stacks: knock out a bottom box and the top falls too, giving a multi-drop and +1 cork. From stall 2 the middle tier is a sliding tray that speeds up each stall. Added a cork tracer so misses are readable"
+    },
+    {
+      "found": "箱の真ん中に当たって動かなかったとき、なぜ倒れないのか分からない／くまは2発目が少し遅れるだけで戻ってしまい、「いま！」に合わせても落ちないことがある／結果画面でベストとの差やどこまで進んだかが分からず、もう1回の目標が持てない",
+      "changed": "低い所に当たって倒れなかったときは、当たった所に「もっと上！」と出す（1回の遊びで3回まで）。くまを少し軽くし、「いま！」が出ている間の2発目なら落ちるようにした。結果画面に進んだ屋台とベストまでの差を出し、景品の一覧を折り返さないようにした",
+      "foundEn": "When a cork hit the middle of a box and nothing happened, there was no clue why / the bear sprang back if the second shot was a little late, even during NOW! / the result screen gave no target for the next run",
+      "changedEn": "A low hit that fails now shows \"Aim higher!\" at the impact (up to 3 times a game). Made the bear a little lighter so a second shot during NOW! drops it. The result screen shows the stall reached and the gap to your best, with a tidy prize list"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "シューティング",
+      "en": "Shooter",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "縁日の射的。コルク鉄砲で棚の景品を撃ち、当たった高さで倒れ方が変わる3D物理のシューティング。",
+        "ideaEn": "A festival cork-gun stall: shoot prizes on 3D physics shelves; where the cork hits decides how they tip.",
+        "fromDraw": true
+      },
+      {
+        "idea": "夜空の花火師。長押しで玉を打ち上げ、離した高さで開く。重なった花火が連鎖して大輪になる。",
+        "ideaEn": "Night fireworks: hold to launch a shell, release to burst; overlapping bursts chain into bigger blooms.",
+        "fromDraw": false
+      },
+      {
+        "idea": "ほたるの合図。暗い川辺で点滅するほたるに合わせてタップし、同じリズムで光る群れを集める。",
+        "ideaEn": "Firefly signals: tap in time with blinking fireflies by a dark river to gather a synchronized swarm.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "score",
+    "ending": "limit",
+    "input": [
+      "hold",
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Pop! Festival Cork Gun",
+      "concept": "A festival shooting stall with 3D physics. Where the cork hits decides how a prize moves: high shots tip it, low shots just push. Heavy prizes rock and come back, so you land a second cork as they swing away. Collapsing stacked boxes is part of the core too.",
+      "howToPlay": "Press to show the sight just above your finger, release to fire a cork. Prizes that fall off the shelf are yours. The game ends when you run out of corks.",
+      "libraryDecision": "Uses three.js (3D) and cannon-es (3D physics): the core is that hit height and weight change how a prize tips, so prizes must really rock and fall. The rethink added timing a second shot to a big prize's back-swing and stacks that fall together. ZzFX for sound effects.",
+      "soundDecision": "ZzFX gives the cork pop, a wooden tok on boxes, a soft puff on the plush bear and a bell when a prize drops, so every hit answers through the ear. The BGM is a quiet festival bed of taiko, flute and crowd murmur, kept low so it never distracts from aiming."
+    }
+  },
+  "createdAt": "2026-11-28T09:06:52+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-28T09:06:52+09:00",
+    "metricsFrom": "2026-11-28T00:05:48.904Z",
+    "transcript": "ce7dd227-71d7-496d-af5b-2afdcd8a3b61.jsonl",
+    "validationRuns": 7,
+    "finishedAt": "2026-11-28T10:08:27+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-28T09:51:11+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "52.6KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=433",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=420",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=372",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=370",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 53839,
+    "lines": 825
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 13
+  },
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js"
+    },
+    {
+      "name": "cannon-es",
+      "version": "0.20.0",
+      "file": "cannon-es-0.20.0.min.js"
+    },
+    {
+      "name": "ZzFX",
+      "version": "1.4.0",
+      "file": "zzfx-1.4.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "小さい景品は上を狙えばほぼ1発で落ちるので、考える場面が大物と積み上げに偏る。動くお盆は当たり外れが運に近く感じる時がある",
+    "comment": "ロボットの真ん中を撃って「もっと上！」と言われ、上の端を撃ち直すと奥へバタンと倒れる流れは分かりやすく気持ちいい。キャラメルの積み上げの下を崩すと3つまとめて落ちてコルクが増え、くまは「いま！」の間に2発目を重ねると奥へ落ちて150点、ここが一番の山場だった。屋台1を完売して屋台2へ進めた。一方、手前の景品は単純作業になりやすく、動くお盆は2発外した。自己プレイは操作ごとに最初から再生する方式のため、物理のわずかな違いで途中から配置が変わった画面がある。音は画面だけでは確かめられていない。",
+    "similar": [
+      {
+        "title": "射的でお祭り（iOS）",
+        "url": "https://apps.apple.com/us/app/%E5%B0%84%E7%9A%84%E3%81%A7%E3%81%8A%E7%A5%AD%E3%82%8A/id1389704073",
+        "similarity": "中",
+        "note": "縁日の射的という題材が同じ。流れてくる商品をタップで撃つ点で、当たった高さや揺れで倒れ方が変わる物理の遊びは無い",
+        "note_en": "Same festival shooting-stall theme, but you tap passing goods; no physics where hit height and rocking decide the fall"
+      },
+      {
+        "title": "Carnival Shooting Gallery（itch.io）",
+        "url": "https://felipe-gar.itch.io/carnival-shooting-gallery",
+        "similarity": "中",
+        "note": "弾と的の物理を試す射的ゲーム。こちらは景品を棚から落とすことと、大物の揺れ戻しに2発目を合わせる点が違う",
+        "note_en": "A shooting gallery testing bullet and target physics; this game differs in knocking prizes off shelves and timing a second shot to a big prize’s back-swing"
+      }
+    ],
+    "research": "WebSearch で日本語（射的 ゲーム コルク 景品 物理 スマホ）と英語（carnival shooting gallery cork gun knock down prizes physics game）を1回ずつ検索した。ルーツは日本の縁日の射的そのもの",
+    "i18n": {
+      "en": {
+        "worst": "Small prizes almost always fall to one high shot, so the decisions concentrate on the big prizes and stacks; hitting the sliding tray can feel more like luck than skill",
+        "comment": "Hitting the middle of the robot box got 'Aim higher!', and re-aiming at the top edge tipped it over backwards: clear and satisfying. Knocking out the bottom of the caramel stack dropped all three and earned corks; landing a second cork on the bear during NOW! was the high point (150 pts). I sold out stall 1 and reached stall 2. The front-row prizes become routine, and I missed the sliding tray twice. The self-play replays from the start every step, so small physics differences changed the layout in some later frames. I could not verify the sound from screenshots.",
+        "research": "Searched once in Japanese and once in English with WebSearch. The root is the real Japanese festival cork-gun stall itself"
+      }
+    },
+    "method": "スマホ縦画面で 13 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 13 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.60) 120ms",
+        "note": "タイトルをタップして開始",
+        "noteEn": "Tap the title to start",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.40,0.59) 800ms → wait 1000ms",
+        "note": "ロボットの箱の真ん中を撃つ。ずれただけで倒れず「もっと上！」と出た",
+        "noteEn": "Hit the middle of the robot box: it only shifts and 'Aim higher!' appears",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.40,0.55) 800ms → wait 300ms",
+        "note": "上の端をねらい直すと、ロボットが奥へ倒れた",
+        "noteEn": "Re-aimed at the top edge and the robot tips over backwards",
+        "image": "ai-play/step-03.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "wait 600ms → tap(0.45,0.77) 700ms → wait 1200ms",
+        "note": "キャラメルの積み上げの下の箱を撃つ。上の箱もまとめて落ちてコルクが増えた",
+        "noteEn": "Hit a bottom box of the caramel stack; the others fall too and I earn corks",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "wait 300ms → tap(0.66,0.39) 700ms → wait 120ms → tap(0.66,0.39) 60ms → wait 1300ms",
+        "note": "くまの頭を撃ち、「いま！」の間にすぐ2発目。くまが奥へ落ちた",
+        "noteEn": "Shoot the bear's head and fire again during NOW!; the bear falls back",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "tap(0.34,0.45) 700ms → wait 930ms → tap(0.34,0.45) 50ms → wait 1500ms",
+        "note": "だるまは揺れて戻る。2回目に奥へ揺れる「いま！」に合わせてもう一発",
+        "noteEn": "The daruma rocks back and forth; fire again on its second back-swing (NOW!)",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.20,0.56) 600ms → wait 500ms → tap(0.59,0.56) 600ms → wait 500ms → tap(0.79,0.58) 600ms → wait 500ms → tap(0.10,0.75) 600ms → wait 500ms → tap(0.27,0.74) 600ms → wait 500ms → tap(0.72,0.74) 600ms → wait 500ms → tap(0.88,0.75) 600ms → wait 1000ms",
+        "note": "こけし・キャラメル・ラムネを順に落としていく",
+        "noteEn": "Knock down the kokeshi, caramels and ramune one by one",
+        "image": "ai-play/step-07.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "wait 2800ms",
+        "note": "屋台2。中段がお盆ごと左右に動く",
+        "noteEn": "Stall 2: the middle row slides on a tray",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.50,0.55) 600ms → wait 600ms → tap(0.50,0.55) 600ms → wait 800ms",
+        "note": "お盆の上の動くロボットの頭をねらう。動きを読んで撃つのが難しい",
+        "noteEn": "Aim at the moving robot on the tray; leading the shot is tricky",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "tap(0.26,0.76) 600ms → wait 800ms → tap(0.10,0.70) 600ms → wait 600ms → tap(0.59,0.70) 600ms → wait 1000ms",
+        "note": "積み上げを崩し、手前のこけしを2つ撃つ",
+        "noteEn": "Collapse the stack and shoot the two front kokeshi",
+        "image": "ai-play/step-10.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.10,0.75) 500ms → wait 500ms → tap(0.59,0.75) 500ms → wait 500ms → tap(0.76,0.71) 500ms → wait 500ms → tap(0.91,0.75) 500ms → wait 900ms",
+        "note": "手前の段を片付ける",
+        "noteEn": "Clear the front row",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.50,0.55) 400ms → wait 700ms → tap(0.50,0.55) 400ms → wait 900ms",
+        "note": "お盆の真ん中で待ちぶせして、通る景品を撃つ",
+        "noteEn": "Wait at the centre of the tray and shoot what passes",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "tap(0.58,0.55) 300ms → wait 700ms → tap(0.34,0.45) 600ms → wait 60ms → tap(0.34,0.45) 50ms → wait 4500ms",
+        "note": "動くロボットとだるまに最後のコルクを使う",
+        "noteEn": "Spend the last corks on the moving robot and the daruma",
+        "image": "ai-play/step-13.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 620
+            }
+          },
+          {
+            "agf": "end",
+            "score": 620
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-28T10:08:27+09:00"
+  },
+  "publishedAt": "2026-11-28T10:08:27+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 44465,
+    "outputTokens": 72018,
+    "contextTokens": 27678031,
+    "turns": 117,
+    "toolCalls": 121,
+    "webSearches": 0,
+    "minutes": 62.7,
+    "from": "2026-11-28T00:05:48.904Z",
+    "to": "2026-11-28T01:08:28.024Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-28T10:08:28+09:00",
+    "validationRuns": 7,
+    "codeKB": 52.6
+  }
+}
