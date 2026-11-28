@@ -1,0 +1,936 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>ぬけだせ！月夜のアトリエ</title>
+<style>
+html, body, canvas, * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; }
+html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #14121f; color: #fff;
+  font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif; }
+#c { position: fixed; left: 0; top: 0; width: 100vw; height: 100dvh; display: block; }
+.hide { display: none !important; }
+#hud { position: fixed; left: 0; right: 0; top: 0; display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 10px 0 14px; z-index: 5; pointer-events: none; text-shadow: 0 2px 4px #000c; }
+#hud .l { font-size: 14px; line-height: 1.1; color: #e8dcc8; }
+#hud .l b { display: block; font-size: 26px; font-weight: 800; color: #fff3d6; font-variant-numeric: tabular-nums; }
+#hintBtn { pointer-events: auto; min-width: 64px; height: 44px; border-radius: 22px; border: 2px solid #ffe2a0; background: #2b2238cc; color: #ffe2a0; font-size: 16px; font-weight: 700; font-family: inherit; padding: 0 14px; }
+#inv { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; display: flex; gap: 6px; justify-content: center; align-items: center; padding: 8px 6px calc(8px + env(safe-area-inset-bottom)); background: linear-gradient(#0000, #0b0912e6 35%); min-height: 60px; }
+#inv .slot { width: 50px; height: 50px; border-radius: 12px; background: #2a2236; border: 2px solid #4a3d5c; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px #0008; }
+#inv .slot.new { animation: pulse .9s ease-out 2; border-color: #ffe08a; }
+#inv .slot svg { width: 38px; height: 38px; }
+#inv .empty { font-size: 13px; color: #a898b8; }
+@keyframes pulse { 50% { transform: scale(1.18); box-shadow: 0 0 16px #ffd060; } }
+#toast { position: fixed; left: 50%; bottom: 84px; transform: translateX(-50%); z-index: 9; max-width: 90vw; width: max-content; box-sizing: border-box; font-size: 15px; line-height: 1.45; padding: 9px 16px; border-radius: 14px;
+  background: #1a1424e8; border: 1px solid #6a5a80; color: #fff; text-align: center; pointer-events: none; transition: opacity .35s; }
+#banner { position: fixed; left: 50%; top: 18%; transform: translate(-50%, -50%); z-index: 7; pointer-events: none; text-align: center; white-space: nowrap; }
+#banner b { display: block; font-size: min(11vw, 48px); color: #ffe27a; text-shadow: 0 0 18px #ffb000, 0 3px 6px #000; }
+#banner span { font-size: 16px; color: #fff; text-shadow: 0 2px 4px #000; }
+.ov { position: fixed; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; box-sizing: border-box;
+  background: radial-gradient(ellipse at 50% 40%, rgba(30,22,50,.45), rgba(8,6,16,.88)); }
+.ov h1 { margin: 0 0 8px; font-size: min(9.4vw, 44px); line-height: 1.2; color: #fff1c8; text-shadow: 0 0 20px #8a7cff, 0 4px 10px #000; }
+.ov .sub { font-size: min(4.2vw, 17px); color: #c9c0ff; margin-bottom: 22px; }
+.ov .how { font-size: min(4.2vw, 17px); line-height: 1.75; margin: 0 0 26px; color: #fff; text-shadow: 0 2px 4px #000; }
+.ov .how em { font-style: normal; color: #9dffcf; }
+.ov .tap { font-size: min(5vw, 21px); font-weight: 700; color: #fff; animation: blink 1.3s ease-in-out infinite; }
+@keyframes blink { 50% { opacity: .35; } }
+#result .lbl { font-size: 18px; color: #c9c0ff; }
+#result .big { font-size: min(15vw, 72px); font-weight: 900; color: #ffe27a; text-shadow: 0 0 22px #ffb000, 0 5px 12px #000; margin: 4px 0; font-variant-numeric: tabular-nums; }
+#result .best { font-size: 17px; margin: 6px 0; }
+#result .new { color: #7dffb0; font-weight: 800; font-size: 20px; }
+#result .det { font-size: 15px; color: #e0d8f0; margin: 8px 0 26px; line-height: 1.6; }
+#panel { position: fixed; inset: 0; z-index: 8; display: flex; align-items: center; justify-content: center; background: #05040acc; }
+#card { position: relative; width: min(88vw, 360px); box-sizing: border-box; padding: 22px 18px 18px; border-radius: 18px; background: #f3ead8; color: #3a2a1c; box-shadow: 0 10px 40px #000c; text-align: center; }
+#card h2 { margin: 0 0 12px; font-size: 18px; color: #5a3a20; }
+#card .x { position: absolute; right: 6px; top: 6px; width: 44px; height: 44px; border: 0; background: none; font-size: 26px; color: #7a5a40; font-family: inherit; }
+#card .note { font-size: 17px; line-height: 1.8; text-align: left; padding: 6px 8px 4px; background: repeating-linear-gradient(#f3ead8 0 29px, #d8c8a8 29px 30px); font-family: inherit; }
+.dials { display: flex; gap: 8px; justify-content: center; margin: 4px 0 6px; }
+.dial { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.dial button { width: 56px; height: 46px; border-radius: 10px; border: 0; background: #6b4a2e; color: #ffe8c0; font-size: 20px; font-family: inherit; }
+.dial button:active { background: #8a6240; }
+.dial .d { width: 56px; height: 60px; line-height: 60px; font-size: 38px; font-weight: 800; background: #2a1c12; color: #ffe8c0; border-radius: 8px; box-shadow: inset 0 3px 8px #000; font-variant-numeric: tabular-nums; }
+.sw { display: flex; gap: 10px; justify-content: center; margin-top: 10px; min-height: 54px; align-items: center; }
+.sw button { width: 54px; height: 54px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 2px 6px #0006; }
+.sw button.sel { outline: 4px solid #3a2a1c; outline-offset: 2px; }
+.small { font-size: 14px; color: #7a6050; margin-top: 8px; line-height: 1.5; }
+#card svg.fl { width: min(60vw, 230px); height: min(60vw, 230px); }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud" class="hide">
+  <div class="l"><span id="tTime"></span><b id="time">0:00</b></div>
+  <button id="hintBtn"></button>
+</div>
+<div id="inv" class="hide"></div>
+<div id="toast" style="opacity:0"></div>
+<div id="banner" class="hide"><b id="bannerB"></b><span id="bannerS"></span></div>
+<div id="panel" class="hide"><div id="card"></div></div>
+<div id="title" class="ov">
+  <h1 id="ttl"></h1>
+  <div class="sub" id="tsub"></div>
+  <p class="how" id="thow"></p>
+  <div class="tap" id="ttap"></div>
+</div>
+<div id="result" class="ov hide">
+  <div class="lbl" id="rLbl"></div>
+  <div class="big" id="rTime">0:00</div>
+  <div class="best" id="rBest"></div>
+  <div class="det" id="rDet"></div>
+  <div class="tap" id="rTap"></div>
+</div>
+<script src="../../lib/three-0.186.1.min.js"></script>
+<script src="../../lib/three-addons-0.186.1.min.js"></script>
+<script src="../../lib/zzfx-1.4.0.min.js"></script>
+<script>
+'use strict';
+for (const t of ['contextmenu', 'selectstart', 'gesturestart']) addEventListener(t, (e) => e.preventDefault(), { passive: false });
+const LANG = new URLSearchParams(location.search).get('lang') || (/^ja/i.test(navigator.language) ? 'ja' : 'en');
+const DICT = {
+  ja: {
+    title: 'ぬけだせ！月夜のアトリエ', sub: '画家の部屋に とじこめられた…',
+    how: '<em>ドラッグ</em>で部屋をまわして<br><em>タップ</em>で調べる<br>鍵を見つけて ドアから抜け出そう',
+    tap: 'タップでスタート', time: 'じかん', hintBtn: 'ヒント', again: 'タップでもう一度',
+    first: 'ドラッグで部屋をまわす ／ タップで調べる', noItem: 'もちものなし',
+    win: '脱出成功！', winSub: '月夜の屋根へ', clearT: 'クリアタイム', best: (t) => `ベスト ${t}`, newBest: 'ベスト更新！',
+    det: (h, t) => `ヒント ${h}回 ／ タップ ${t}回`,
+    rugFlip: 'めくれたはしを ひっくり返すと…小さな鍵！', rug: 'ふかふかのじゅうたん。どこかの はしが めくれている', gotSmallKey: '小さな鍵を 手に入れた',
+    drawerLocked: '引き出しには 鍵がかかっている', drawerOpen: '小さな鍵で あいた！ 筆とメモが入っていた', drawerEmpty: '引き出しは もう空っぽ',
+    memoT: '画家のメモ', memo: 'わたしの絵は<br><b>窓の外から のぞくもの。</b><br>あかりを消して、ごらんなさい。',
+    lampOff: 'まっくら…あれ？ 部屋のあちこちが 光っている', lampOn: 'あかりをつけた',
+    boxT: '小箱の 4けたの鍵', boxOpen: 'カチッ！ 小箱に 黄色の絵の具が入っていた', boxEmpty: '小箱は もう空っぽ',
+    jar: (c) => `${c}の絵の具を 手に入れた`, jarHave: 'もう持っている', colors: { r: '赤', b: '青', y: '黄色' },
+    frameT: '見本の絵', frameDark: '暗くて よく見えない', canvasDark: '暗くて 色がわからない',
+    paintT: 'かきかけの花', noBrush: '筆がないと ぬれない…', noPaint: '絵の具を持っていない', paintHow: '色をえらんで 花びらをタップ',
+    paintWrong: 'ぜんぶぬったのに 何も起きない…見本を よく見て',
+    paintDone: 'できた！ キャンバスが ずれて…裏に鍵！', gotDoorKey: 'ドアの鍵を 手に入れた！',
+    doorLocked: 'ドアには 大きな鍵穴。鍵がかかっている', doorOpen: 'ガチャリ…！',
+    window: '月がきれい。窓は はめごろしで あかない', windowDark: '窓から 月あかりが さしこんでいる',
+    books: '絵の本。「絵は 見る場所で 姿をかえる」と書いてある', clock: 'チクタク…夜はまだ長い', globe: 'くるくる回る地球儀',
+    plant: '葉っぱが ゆれた', cat: 'にゃあ…（ねこは 眠そうだ）', easel: 'イーゼルに キャンバスが立てかけてある', desk: '画家の つくえ',
+    shelf: '本だな。絵の具の びんと 小箱がある', wall: '花がらの かべ紙', floor: 'よく みがかれた床',
+    aligned: '見えた！', alignedSub: '光る点が 数字にそろった',
+    hints: [
+      'じゅうたんの はしが めくれている所がある。部屋をまわして 探そう',
+      '小さな鍵は つくえの 引き出しに 合いそう',
+      'メモのとおり、つくえの ランプを消してみよう',
+      '光る点が 数字にそろう向きがある。窓のほうから のぞきこもう',
+      'そろった4けたで、本だなの 小箱をあけよう',
+      'あかりをつけて ドアの横の見本を見よう。…その絵、さかさまに かかっていない？ くきの向きに注意して キャンバスをぬろう',
+      'ドアの鍵で ドアをあけよう！',
+    ],
+  },
+  en: {
+    title: 'Moonlit Atelier Escape', sub: 'Locked in a painter’s room…',
+    how: '<em>Drag</em> to turn the room<br><em>Tap</em> to look closer<br>Find the key and slip out the door',
+    tap: 'Tap to start', time: 'TIME', hintBtn: 'Hint', again: 'Tap to play again',
+    first: 'Drag to turn the room / Tap to inspect', noItem: 'No items',
+    win: 'Escaped!', winSub: 'Out onto the moonlit roof', clearT: 'Clear time', best: (t) => `Best ${t}`, newBest: 'New best!',
+    det: (h, t) => `Hints ${h} / Taps ${t}`,
+    rugFlip: 'You flip the curled corner… a small key!', rug: 'A soft rug. One of its corners is curled up', gotSmallKey: 'Got the small key',
+    drawerLocked: 'The drawer is locked', drawerOpen: 'The small key fits! A brush and a note inside', drawerEmpty: 'The drawer is empty now',
+    memoT: 'Painter’s note', memo: 'My painting is meant<br><b>to be peeked at from outside the window.</b><br>Turn off the light, and see.',
+    lampOff: 'Darkness… wait, spots are glowing all over the room', lampOn: 'Light on',
+    boxT: 'Little box — 4-digit lock', boxOpen: 'Click! Yellow paint inside the box', boxEmpty: 'The box is empty now',
+    jar: (c) => `Got ${c} paint`, jarHave: 'Already have it', colors: { r: 'red', b: 'blue', y: 'yellow' },
+    frameT: 'Sample painting', frameDark: 'Too dark to see', canvasDark: 'Too dark to tell colors',
+    paintT: 'Unfinished flower', noBrush: 'You need a brush to paint…', noPaint: 'You have no paint', paintHow: 'Pick a color, tap a petal',
+    paintWrong: 'All painted, but nothing happens… look at the sample closely',
+    paintDone: 'Done! The canvas slides… a key behind it!', gotDoorKey: 'Got the door key!',
+    doorLocked: 'A big keyhole. The door is locked', doorOpen: 'Clunk…!',
+    window: 'Lovely moon. The window does not open', windowDark: 'Moonlight pours through the window',
+    books: 'An art book: “A picture changes with where you stand”', clock: 'Tick tock… the night is long', globe: 'The globe spins',
+    plant: 'The leaves rustle', cat: 'Mrrow… (the cat is sleepy)', easel: 'A canvas on an easel', desk: 'The painter’s desk',
+    shelf: 'A shelf with paint jars and a little box', wall: 'Flowery wallpaper', floor: 'A polished floor',
+    aligned: 'There!', alignedSub: 'The glowing dots form digits',
+    hints: [
+      'A rug corner is curled up somewhere. Turn the room to find it',
+      'The small key looks like it fits the desk drawer',
+      'Do what the note says: switch off the desk lamp',
+      'From one angle the dots line up into digits. Peek in from the window side',
+      'Use those 4 digits on the little box on the shelf',
+      'Light on, check the sample by the door. …Is it hanging upside down? Mind the stem, then paint the canvas',
+      'Open the door with the door key!',
+    ],
+  },
+};
+const L = DICT[LANG] || DICT.en;
+const $ = (id) => document.getElementById(id);
+document.title = L.title;
+$('ttl').textContent = L.title; $('tsub').textContent = L.sub; $('thow').innerHTML = L.how; $('ttap').textContent = L.tap;
+$('tTime').textContent = L.time; $('hintBtn').textContent = L.hintBtn; $('rTap').textContent = L.again;
+const signal = (type, data = {}) => { try { parent.postMessage({ agf: type, ...data }, '*'); } catch (e) {} };
+const fmt = (s) => { s = Math.floor(s); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
+
+// ---------- save ----------
+let best = 0;
+addEventListener('message', (e) => { if (e.data && e.data.agf === 'loaded' && e.data.data) best = e.data.data.best || 0; });
+try { parent.postMessage({ agf: 'load' }, '*'); } catch (e) {}
+
+// ---------- sound ----------
+let audioOn = false, actx = null, shimmer = null;
+const S = {};
+function initAudio() {
+  if (audioOn) return; audioOn = true;
+  try { ZZFX.audioContext?.resume(); } catch (e) {}
+  actx = (typeof ZZFX !== 'undefined' && ZZFX.audioContext) || null;
+  if (typeof ZZFX !== 'undefined') ZZFX.volume = 0.3;
+  try {
+    S.tap = new ZZFXSound([.5, .05, 300, 0, .01, .05, 1, 1.5, -10, , , , , .3]);
+    S.get = new ZZFXSound([.6, 0, 880, .01, .08, .25, 0, 1.6, , , 440, .06, , , , , , .7]);
+    S.lock = new ZZFXSound([.7, .05, 1200, 0, .005, .03, 3, .5, , , , , , 1]);
+    S.unlock = new ZZFXSound([.8, 0, 600, 0, .02, .12, 3, .6, , , 300, .05, , 1]);
+    S.no = new ZZFXSound([.4, .05, 180, 0, .02, .08, 1, 1, -5]);
+    S.dial = new ZZFXSound([.35, 0, 1600, 0, 0, .02, 3, .4, , , , , , 1]);
+    S.sw = new ZZFXSound([.6, 0, 900, 0, .003, .02, 3, .3, , , , , , 1.5]);
+    S.flip = new ZZFXSound([.5, .1, 220, .02, .06, .12, 4, 1, 4, , , , , 1.2]);
+    S.slide = new ZZFXSound([.5, .1, 120, .05, .1, .15, 4, .5, , , , , , 2]);
+    S.meow = new ZZFXSound([.6, .05, 520, .03, .1, .2, 0, 1.4, 6, -2, , , , , , , .1, .6]);
+    S.paint = new ZZFXSound([.4, .1, 400, 0, .03, .06, 4, .4, , , , , , 3]);
+    S.door = new ZZFXSound([.7, .1, 90, .1, .3, .5, 2, 2, 1, , , , , .4, , , , .8]);
+    S.win = new ZZFXSound([.6, 0, 523, .02, .3, .7, 0, 1.4, , , 262, .12, .14, , , , , .7]);
+    S.align = new ZZFXSound([.6, 0, 1047, .01, .4, .9, 0, 2, , , 523, .1, .1, , , , , .6]);
+  } catch (e) {}
+  // closeness shimmer: two soft detuned sines, louder as the dots line up
+  try {
+    const g = actx.createGain(); g.gain.value = 0; g.connect(actx.destination);
+    const o1 = actx.createOscillator(), o2 = actx.createOscillator();
+    o1.type = 'sine'; o2.type = 'sine'; o1.frequency.value = 660; o2.frequency.value = 663;
+    const lp = actx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2000;
+    o1.connect(lp); o2.connect(lp); lp.connect(g); o1.start(); o2.start();
+    shimmer = { g, o1, o2 };
+  } catch (e) { shimmer = null; }
+}
+const play = (k, d = 0) => { try { if (!S[k]) return; d ? setTimeout(() => S[k].play(), d) : S[k].play(); } catch (e) {} };
+let lastTick = 0;
+function tick(now) {
+  if (!actx || now - lastTick < 1000) return; lastTick = now;
+  try {
+    const t = actx.currentTime, o = actx.createOscillator(), g = actx.createGain(), f = actx.createBiquadFilter();
+    o.type = 'square'; o.frequency.value = (Math.floor(now / 1000) % 2) ? 2400 : 2000; f.type = 'highpass'; f.frequency.value = 1800;
+    g.gain.setValueAtTime(.012, t); g.gain.exponentialRampToValueAtTime(.0001, t + .03);
+    o.connect(f); f.connect(g); g.connect(actx.destination); o.start(t); o.stop(t + .04);
+  } catch (e) {}
+}
+
+// ---------- three ----------
+const canvas = $('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.1;
+const scene = new THREE.Scene();
+const BG_LIGHT = new THREE.Color(0x231c33), BG_DARK = new THREE.Color(0x07070f);
+scene.background = BG_LIGHT.clone();
+const camera = new THREE.PerspectiveCamera(50, 9 / 16, .1, 60);
+const TARGET = new THREE.Vector3(0, .85, 0);
+let DIST = 7.6;
+const RB = THREE_ADDONS.RoundedBoxGeometry;
+const R = 1.8, H = 2.4;
+
+function tex(w, h, draw) { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t; }
+const mat = (o) => new THREE.MeshStandardMaterial(Object.assign({ roughness: .8, metalness: 0 }, o));
+function mesh(geo, m, x, y, z, parent, tap) { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); parent.add(o); if (tap) o.userData.tap = tap; return o; }
+function box(w, h, d, color, x, y, z, parent, tap, round = .02) {
+  const g = round > 0 ? new RB(w, h, d, 2, Math.min(round, w / 2.1, h / 2.1, d / 2.1)) : new THREE.BoxGeometry(w, h, d);
+  return mesh(g, mat({ color }), x, y, z, parent, tap);
+}
+
+// textures
+const floorTex = tex(512, 512, (g, w, h) => {
+  for (let i = 0; i < 8; i++) {
+    const l = 46 + (i * 37 % 13);
+    g.fillStyle = `hsl(28, 45%, ${l}%)`; g.fillRect(i * 64, 0, 64, h);
+    g.fillStyle = '#0003'; g.fillRect(i * 64, 0, 2, h);
+    const off = (i * 173) % 512; g.fillRect(i * 64, off, 64, 2);
+    g.strokeStyle = '#0000000d'; for (let k = 0; k < 10; k++) { g.beginPath(); const x = i * 64 + 6 + k * 6; g.moveTo(x, 0); g.bezierCurveTo(x + 4, 150, x - 4, 350, x + 2, 512); g.stroke(); }
+  }
+});
+floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping; floorTex.repeat.set(1.6, 1.6);
+const wallTex = tex(256, 256, (g, w, h) => {
+  g.fillStyle = '#efe3c8'; g.fillRect(0, 0, w, h);
+  g.fillStyle = '#e4d3b0'; for (let x = 0; x < w; x += 32) g.fillRect(x, 0, 12, h);
+  for (let y = 16; y < h; y += 64) for (let x = 22; x < w; x += 64) {
+    const ox = (y / 64 | 0) % 2 ? 32 : 0;
+    g.fillStyle = '#c98a8a'; for (let k = 0; k < 4; k++) { g.beginPath(); g.arc(x + ox + Math.cos(k * 1.57) * 4, y + Math.sin(k * 1.57) * 4, 3.5, 0, 7); g.fill(); }
+    g.fillStyle = '#d9b25a'; g.beginPath(); g.arc(x + ox, y, 2.5, 0, 7); g.fill();
+  }
+});
+wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping; wallTex.repeat.set(3, 2);
+const rugTex = tex(512, 384, (g, w, h) => {
+  g.fillStyle = '#8c2f3a'; g.fillRect(0, 0, w, h);
+  g.strokeStyle = '#e9c77a'; g.lineWidth = 10; g.strokeRect(22, 22, w - 44, h - 44);
+  g.strokeStyle = '#2e4a6e'; g.lineWidth = 6; g.strokeRect(44, 44, w - 88, h - 88);
+  g.fillStyle = '#e9c77a';
+  for (let i = 0; i < 9; i++) { g.save(); g.translate(w / 2, h / 2); g.rotate(i * Math.PI / 4.5); g.beginPath(); g.ellipse(0, 50, 16, 40, 0, 0, 7); g.fill(); g.restore(); }
+  g.fillStyle = '#2e4a6e'; g.beginPath(); g.arc(w / 2, h / 2, 26, 0, 7); g.fill();
+  for (let x = 70; x < w - 60; x += 40) { g.fillStyle = '#c56a52'; g.beginPath(); g.arc(x, 66, 6, 0, 7); g.arc(x, h - 66, 6, 0, 7); g.fill(); }
+});
+const doorTex = tex(128, 256, (g, w, h) => {
+  g.fillStyle = '#7a4a2a'; g.fillRect(0, 0, w, h);
+  g.fillStyle = '#683c20'; g.fillRect(14, 16, w - 28, 100); g.fillRect(14, 136, w - 28, 104);
+  g.strokeStyle = '#9a6a42'; g.lineWidth = 3; g.strokeRect(14, 16, w - 28, 100); g.strokeRect(14, 136, w - 28, 104);
+});
+const skyTex = tex(256, 256, (g, w, h) => {
+  const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#101a44'); gr.addColorStop(1, '#2a3a7a'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  g.fillStyle = '#fff'; for (let i = 0; i < 40; i++) { g.globalAlpha = .4 + Math.random() * .6; g.fillRect(Math.random() * w, Math.random() * h * .8, 2, 2); }
+  g.globalAlpha = 1; g.fillStyle = '#fff6d0'; g.shadowColor = '#fff6d0'; g.shadowBlur = 30; g.beginPath(); g.arc(170, 80, 34, 0, 7); g.fill();
+  g.shadowBlur = 0; g.fillStyle = '#1b2350'; g.fillRect(0, h - 40, w, 40); g.fillStyle = '#26306a'; for (let x = 0; x < w; x += 46) g.fillRect(x, h - 64 + (x % 3) * 8, 30, 64);
+});
+const clockTex = tex(128, 128, (g, w) => {
+  g.fillStyle = '#fbf6ea'; g.beginPath(); g.arc(64, 64, 60, 0, 7); g.fill(); g.strokeStyle = '#5a3a20'; g.lineWidth = 6; g.stroke();
+  g.fillStyle = '#5a3a20'; for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6; g.fillRect(64 + Math.sin(a) * 48 - 3, 64 - Math.cos(a) * 48 - 3, 6, 6); }
+  g.lineCap = 'round'; g.lineWidth = 6; g.beginPath(); g.moveTo(64, 64); g.lineTo(64 + 22, 64 - 22); g.stroke(); g.lineWidth = 4; g.beginPath(); g.moveTo(64, 64); g.lineTo(64 - 6, 64 - 40); g.stroke();
+});
+
+// ---------- room ----------
+const base = new THREE.Group(); scene.add(base);
+const groups = { N: new THREE.Group(), E: new THREE.Group(), S: new THREE.Group(), W: new THREE.Group() };
+for (const k in groups) { groups[k].userData.op = 1; scene.add(groups[k]); }
+// floor slab (dollhouse base)
+box(R * 2 + .16, .2, R * 2 + .16, 0x3a2a3e, 0, -.1, 0, base, 'floor', .04);
+const floorM = mat({ map: floorTex, roughness: .6 });
+const floor = mesh(new THREE.PlaneGeometry(R * 2, R * 2), floorM, 0, .002, 0, base, 'floor'); floor.rotation.x = -Math.PI / 2;
+// low skirting always visible
+for (const [x, z, w, d] of [[0, -R, R * 2, .06], [0, R, R * 2, .06], [-R, 0, .06, R * 2], [R, 0, .06, R * 2]]) box(w, .14, d, 0x6a4632, x, .07, z, base, 'wall', 0);
+function wall(k) {
+  const g = groups[k], m = mat({ map: wallTex.clone(), roughness: .9 });
+  m.map.needsUpdate = true;
+  const w = mesh(new THREE.PlaneGeometry(R * 2, H), m, 0, H / 2, 0, g, 'wall');
+  const trim = box(R * 2, .1, .05, 0x8a5e3e, 0, .2, .02, g, 'wall', 0);
+  const top = box(R * 2, .08, .06, 0x8a5e3e, 0, H - .04, .02, g, 'wall', 0);
+  return w;
+}
+// N wall at z=-R (faces +z)
+groups.N.position.set(0, 0, -R); wall('N');
+groups.S.position.set(0, 0, R); groups.S.rotation.y = Math.PI; wall('S');
+groups.E.position.set(R, 0, 0); groups.E.rotation.y = -Math.PI / 2; wall('E');
+groups.W.position.set(-R, 0, 0); groups.W.rotation.y = Math.PI / 2; wall('W');
+// In each group's local space: x along wall, y up, +z into the room.
+
+// --- N: door + sample frame
+const doorPivot = new THREE.Group(); doorPivot.position.set(.65 - .42, 0, .03); groups.N.add(doorPivot);
+for (const [x, y, w, h] of [[.65 - .46, 1.0, .08, 2.0], [.65 + .46, 1.0, .08, 2.0], [.65, 2.01, 1.0, .08]]) box(w, h, .07, 0x5a3420, x, y, .01, groups.N, 'door', .01);
+const doorM = mat({ map: doorTex });
+const door = mesh(new THREE.BoxGeometry(.84, 1.94, .05), doorM, .42, .97, .02, doorPivot, 'door');
+const knob = mesh(new THREE.SphereGeometry(.045, 16, 12), mat({ color: 0xe0b040, metalness: .7, roughness: .3 }), .74, .95, .08, doorPivot, 'door');
+const keyhole = box(.04, .08, .01, 0x1a1008, .74, .85, .05, doorPivot, 'door', 0);
+const outside = mesh(new THREE.PlaneGeometry(.84, 1.94), new THREE.MeshBasicMaterial({ map: skyTex }), .65, .97, .006, groups.N); outside.userData.tap = 'door';
+// frame
+box(.7, .7, .05, 0x9a7040, -.85, 1.45, .03, groups.N, 'frame', .015);
+const frameCv = document.createElement('canvas'); frameCv.width = frameCv.height = 256;
+const frameTex = new THREE.CanvasTexture(frameCv); frameTex.colorSpace = THREE.SRGBColorSpace;
+mesh(new THREE.PlaneGeometry(.58, .58), mat({ map: frameTex, roughness: .9 }), -.85, 1.45, .058, groups.N, 'frame').rotation.z = Math.PI; // hung upside down
+// hook light switch decor
+box(.08, .12, .02, 0xf0e8d8, 1.3, 1.1, .01, groups.N, 'wall', .01);
+
+// --- E: window + plant
+const winX = -.35;
+mesh(new THREE.PlaneGeometry(1.0, .9), new THREE.MeshBasicMaterial({ map: skyTex }), winX, 1.5, .005, groups.E, 'window');
+for (const [x, y, w, h] of [[winX, 1.05, 1.12, .07], [winX, 1.95, 1.12, .07], [winX - .53, 1.5, .07, .9], [winX + .53, 1.5, .07, .9], [winX, 1.5, .04, .9], [winX, 1.5, 1.0, .04]]) box(w, h, .06, 0xf4f0e6, x, y, .03, groups.E, 'window', .01);
+box(1.2, .05, .16, 0xf4f0e6, winX, 1.02, .08, groups.E, 'window', .01);
+const curtM = mat({ color: 0x5a6fae, roughness: 1 });
+for (const s of [-1, 1]) { const c = box(.18, 1.1, .05, 0, winX + s * .68, 1.45, .07, groups.E, 'window', .03); c.material = curtM; }
+// plant
+const pot = box(.3, .32, .3, 0xb8643a, .95, .16, .3, groups.E, 'plant', .04);
+const leafM = mat({ color: 0x3f8a4a, roughness: .7 });
+const plant = new THREE.Group(); plant.position.set(.95, .32, .3); groups.E.add(plant);
+for (let i = 0; i < 7; i++) { const l = mesh(new THREE.SphereGeometry(.12, 10, 8), leafM, Math.cos(i * 2.4) * .12, .18 + i * .07, Math.sin(i * 2.4) * .12, plant, 'plant'); l.scale.set(1, .45, .6); l.rotation.set(Math.random(), i, .4); }
+
+// --- S: bookshelf (local: wall along x, +z into room)
+const shelfX = .5;
+const shelfM = 0x6a4428;
+box(1.5, .06, .4, shelfM, shelfX, 1.85, .2, groups.S, 'shelf', .01);
+for (const y of [.04, .6, 1.2]) box(1.5, .05, .4, shelfM, shelfX, y, .2, groups.S, 'shelf', .01);
+for (const s of [-1, 1]) box(.05, 1.88, .4, shelfM, shelfX + s * .73, .94, .2, groups.S, 'shelf', .01);
+box(1.5, 1.88, .02, 0x4a2e1a, shelfX, .94, .01, groups.S, 'shelf', 0);
+// books
+const bookCols = [0x8a3a3a, 0x2f5a7a, 0x6a7a3a, 0xc9a24a, 0x5a3a6a, 0x3a6a5a, 0xa85a3a];
+let bx = shelfX - .68;
+for (let i = 0; i < 12; i++) { const w = .06 + (i * 7 % 5) * .012, h = .3 + (i * 5 % 4) * .04; box(w, h, .26, bookCols[i % 7], bx + w / 2, .07 + h / 2, .2, groups.S, 'books', .008); bx += w + .006; if (bx > shelfX + .7) break; }
+bx = shelfX + .1;
+for (let i = 0; i < 6; i++) { const w = .07, h = .32 + (i % 3) * .05; const b = box(w, h, .26, bookCols[(i + 3) % 7], bx + w / 2, 1.225 + h / 2, .2, groups.S, 'books', .008); bx += w + .006; }
+// paint jars (middle shelf)
+const jars = {};
+function jar(k, color, x) {
+  const g = new THREE.Group(); g.position.set(x, .625, .22); groups.S.add(g);
+  mesh(new THREE.CylinderGeometry(.08, .08, .16, 18), mat({ color: 0xdfe8ee, roughness: .2, transparent: true, opacity: .75 }), 0, .08, 0, g, 'jar_' + k);
+  mesh(new THREE.CylinderGeometry(.072, .072, .11, 18), mat({ color }), 0, .06, 0, g, 'jar_' + k);
+  const lid = mesh(new THREE.CylinderGeometry(.085, .085, .035, 18), mat({ color: 0x333333 }), 0, .175, 0, g, 'jar_' + k);
+  jars[k] = { g, lid };
+}
+jar('r', 0xd8403e, shelfX - .55); jar('b', 0x3a66d8, shelfX - .35);
+// little box with lock
+const boxG = new THREE.Group(); boxG.position.set(shelfX + .28, .625, .2); groups.S.add(boxG);
+box(.36, .2, .26, 0x9a5a2a, 0, .1, 0, boxG, 'box', .02);
+const lidPivot = new THREE.Group(); lidPivot.position.set(0, .2, -.13); boxG.add(lidPivot);
+box(.37, .05, .27, 0x7a4220, 0, .02, .135, lidPivot, 'box', .02);
+box(.12, .1, .02, 0xd8b048, 0, .1, .135, boxG, 'box', .005);
+const yellowIn = mesh(new THREE.CylinderGeometry(.04, .04, .14, 12), mat({ color: 0xf2c230 }), 0, .1, 0, boxG); yellowIn.rotation.z = Math.PI / 2; yellowIn.visible = false;
+// globe on top
+const globe = new THREE.Group(); globe.position.set(shelfX - .45, 1.88, .2); groups.S.add(globe);
+mesh(new THREE.CylinderGeometry(.05, .08, .05, 12), mat({ color: 0x5a3a20 }), 0, .025, 0, globe, 'globe');
+const ball = mesh(new THREE.SphereGeometry(.13, 20, 14), mat({ map: tex(128, 64, (g, w, h) => { g.fillStyle = '#3a6aa8'; g.fillRect(0, 0, w, h); g.fillStyle = '#7aa84a'; for (let i = 0; i < 9; i++) { g.beginPath(); g.ellipse((i * 37) % w, 12 + (i * 23) % 40, 12, 7, i, 0, 7); g.fill(); } }) }), 0, .19, 0, globe, 'globe');
+
+// --- W: desk + lamp + clock (local x along wall: local +x = world -z? computed by rotation)
+const deskZ = .15;  // local x
+box(1.3, .05, .62, 0x7a5030, deskZ, .74, .31, groups.W, 'desk', .015);
+for (const [x, z] of [[-.6, .04], [.6, .04], [-.6, .58], [.6, .58]]) box(.05, .72, .05, 0x5a3820, deskZ + x, .36, z, groups.W, 'desk', .01);
+// drawer
+const drawer = new THREE.Group(); drawer.position.set(deskZ, .62, 0); groups.W.add(drawer);
+box(.6, .14, .5, 0x8a5a34, 0, 0, .3, drawer, 'drawer', .01);
+box(.62, .16, .03, 0x9a6a3e, 0, 0, .56, drawer, 'drawer', .01);
+mesh(new THREE.SphereGeometry(.025, 10, 8), mat({ color: 0xd8b048, metalness: .6, roughness: .3 }), 0, .02, .585, drawer, 'drawer');
+box(.025, .04, .01, 0x1a1008, 0, -.035, .575, drawer, 'drawer', 0);
+const brush3d = new THREE.Group(); brush3d.position.set(-.1, .08, .35); drawer.add(brush3d);
+const br1 = mesh(new THREE.CylinderGeometry(.012, .012, .3, 8), mat({ color: 0xc89a5a }), 0, 0, 0, brush3d); br1.rotation.z = Math.PI / 2;
+const br2 = mesh(new THREE.ConeGeometry(.02, .07, 8), mat({ color: 0x222222 }), .18, 0, 0, brush3d); br2.rotation.z = -Math.PI / 2;
+const memo3d = box(.16, .01, .2, 0xf8f2e0, .14, .08, .32, drawer, null, 0);
+// lamp
+const lamp = new THREE.Group(); lamp.position.set(deskZ - .45, .765, .3); groups.W.add(lamp);
+mesh(new THREE.CylinderGeometry(.1, .12, .04, 18), mat({ color: 0x2e4a3a, metalness: .4, roughness: .4 }), 0, .02, 0, lamp, 'lamp');
+mesh(new THREE.CylinderGeometry(.015, .015, .4, 8), mat({ color: 0xb8a070, metalness: .6, roughness: .3 }), 0, .22, 0, lamp, 'lamp');
+const shadeM = mat({ color: 0xf2d79a, emissive: 0xffc870, emissiveIntensity: 1.2, side: THREE.DoubleSide });
+const shade = mesh(new THREE.CylinderGeometry(.09, .2, .2, 20, 1, true), shadeM, 0, .45, 0, lamp, 'lamp');
+const bulb = mesh(new THREE.SphereGeometry(.05, 12, 8), new THREE.MeshBasicMaterial({ color: 0xfff2c0 }), 0, .38, 0, lamp, 'lamp');
+// clock
+const clk = mesh(new THREE.CircleGeometry(.2, 28), mat({ map: clockTex }), deskZ + .2, 1.75, .02, groups.W, 'clock');
+const clkRim = mesh(new THREE.TorusGeometry(.2, .025, 8, 28), mat({ color: 0x5a3a20 }), deskZ + .2, 1.75, .02, groups.W, 'clock');
+// small painting on W wall
+box(.5, .36, .04, 0x9a7040, deskZ - .4, 1.55, .02, groups.W, 'wall', .01);
+mesh(new THREE.PlaneGeometry(.42, .28), mat({ map: tex(128, 96, (g, w, h) => { g.fillStyle = '#9ac0e0'; g.fillRect(0, 0, w, h); g.fillStyle = '#6a9a5a'; g.beginPath(); g.moveTo(0, h); g.lineTo(40, 40); g.lineTo(80, 70); g.lineTo(128, 30); g.lineTo(128, h); g.fill(); }) }), deskZ - .4, 1.55, .045, groups.W, 'wall');
+
+// --- center: rug, easel, chair + cat (base group, always visible)
+const RUG = { x: .15, z: .3, w: 2.2, d: 1.6, y: .012 };
+const rugM = mat({ map: rugTex, roughness: 1, side: THREE.DoubleSide });
+rugTex.repeat.set(1 / RUG.w, 1 / RUG.d); rugTex.offset.set(.5, .5);
+let flapA = .95, rugMesh = null, flapPivot = null, flapAxis = null, flapSign = 1, smallKey3d = null;
+function buildRug(corner) {
+  if (rugMesh) { base.remove(rugMesh); base.remove(flapPivot); }
+  const hw = RUG.w / 2, hd = RUG.d / 2, f = .56;
+  const sx = corner & 1 ? 1 : -1, sy = corner & 2 ? 1 : -1; // in shape coords (x, y), y = -z
+  const C = [sx * hw, sy * hd], P1 = [sx * (hw - f), sy * hd], P2 = [sx * hw, sy * (hd - f)];
+  const pts = [[-hw, -hd], [hw, -hd], [hw, hd], [-hw, hd]];
+  const shape = new THREE.Shape();
+  const out = [];
+  for (const p of pts) { if (p[0] === C[0] && p[1] === C[1]) { if (pts.indexOf(p) % 2 === (sx * sy > 0 ? 0 : 1)) { out.push(P2, P1); } else { out.push(P1, P2); } } else out.push(p); }
+  // ensure proper winding by order: corners are ccw; replace corner with the two hinge points in ccw order
+  const ccw = []; for (const p of pts) { if (p[0] === C[0] && p[1] === C[1]) { const prev = pts[(pts.indexOf(p) + 3) % 4]; const a = (prev[0] === C[0]) ? P2 : P1; const b = a === P1 ? P2 : P1; ccw.push(a, b); } else ccw.push(p); }
+  shape.moveTo(ccw[0][0], ccw[0][1]); for (let i = 1; i < ccw.length; i++) shape.lineTo(ccw[i][0], ccw[i][1]);
+  const g = new THREE.ShapeGeometry(shape); g.rotateX(-Math.PI / 2);
+  rugMesh = mesh(g, rugM, RUG.x, RUG.y, RUG.z, base, 'rug');
+  const fs = new THREE.Shape(); fs.moveTo(P1[0], P1[1]); fs.lineTo(C[0], C[1]); fs.lineTo(P2[0], P2[1]); fs.lineTo(P1[0], P1[1]);
+  const fg = new THREE.ShapeGeometry(fs); fg.rotateX(-Math.PI / 2);
+  const mid = new THREE.Vector3((P1[0] + P2[0]) / 2, 0, -(P1[1] + P2[1]) / 2);
+  fg.translate(-mid.x, 0, -mid.z);
+  flapPivot = new THREE.Group(); flapPivot.position.set(RUG.x + mid.x, RUG.y + .004, RUG.z + mid.z); base.add(flapPivot);
+  const flap = mesh(fg, rugM, 0, 0, 0, flapPivot, 'flap');
+  const back = mesh(fg.clone(), mat({ color: 0xf0e2c0, roughness: 1, side: THREE.DoubleSide }), 0, -.004, 0, flapPivot, 'flap');
+  flapAxis = new THREE.Vector3(P2[0] - P1[0], 0, -(P2[1] - P1[1])).normalize();
+  const cw = new THREE.Vector3(C[0], 0, -C[1]).sub(mid);
+  const test = cw.clone().applyAxisAngle(flapAxis, .3);
+  flapSign = test.y > 0 ? 1 : -1;
+  // small key under the corner
+  if (smallKey3d) base.remove(smallKey3d);
+  smallKey3d = makeKey(0xc8ccd8, .55);
+  const kp = new THREE.Vector3(C[0] - sx * .16, 0, -(C[1] - sy * .16));
+  smallKey3d.position.set(RUG.x + kp.x, .02, RUG.z + kp.z); smallKey3d.rotation.y = Math.random() * 6;
+  smallKey3d.traverse((o) => { o.userData.tap = 'smallKey'; });
+  smallKey3d.visible = false; base.add(smallKey3d);
+}
+function makeKey(color, s) {
+  const g = new THREE.Group(), m = mat({ color, metalness: .8, roughness: .25, emissive: color, emissiveIntensity: .15 });
+  const ring = mesh(new THREE.TorusGeometry(.05 * s * 2, .015 * s * 2, 8, 16), m, -.12 * s * 2, 0, 0, g); ring.rotation.x = Math.PI / 2;
+  mesh(new THREE.BoxGeometry(.2 * s * 2, .02 * s * 2, .025 * s * 2), m, 0, 0, 0, g);
+  mesh(new THREE.BoxGeometry(.025 * s * 2, .02 * s * 2, .05 * s * 2), m, .08 * s * 2, 0, .03 * s * 2, g);
+  mesh(new THREE.BoxGeometry(.025 * s * 2, .02 * s * 2, .04 * s * 2), m, .04 * s * 2, 0, .025 * s * 2, g);
+  return g;
+}
+// easel
+const easel = new THREE.Group(); easel.position.set(.2, 0, -.95); easel.rotation.y = .45; base.add(easel);
+const easM = 0x9a6a3a;
+for (const s of [-1, 1]) { const l = box(.05, 1.7, .05, easM, s * .32, .85, 0, easel, 'easel', .01); l.rotation.z = s * -.12; }
+const backLeg = box(.05, 1.6, .05, easM, 0, .78, -.35, easel, 'easel', .01); backLeg.rotation.x = .25;
+box(.8, .05, .1, easM, 0, .72, .04, easel, 'easel', .01);
+// door key taped to the back board (revealed when canvas swings)
+const doorKey3d = makeKey(0xf0c040, .9); doorKey3d.position.set(0, 1.12, .05); doorKey3d.rotation.x = Math.PI / 2; doorKey3d.rotation.z = .4; easel.add(doorKey3d);
+doorKey3d.traverse((o) => { o.userData.tap = 'doorKey'; });
+box(.7, .6, .02, 0x5a3a20, 0, 1.1, .02, easel, 'easel', .005);
+const canvasPivot = new THREE.Group(); canvasPivot.position.set(0, .75, .1); easel.add(canvasPivot);
+const paintCv = document.createElement('canvas'); paintCv.width = paintCv.height = 256;
+const paintTex = new THREE.CanvasTexture(paintCv); paintTex.colorSpace = THREE.SRGBColorSpace;
+box(.74, .74, .04, 0xe8e0d0, 0, .37, 0, canvasPivot, 'canvas', .01);
+mesh(new THREE.PlaneGeometry(.68, .68), mat({ map: paintTex, roughness: .95 }), 0, .37, .021, canvasPivot, 'canvas');
+// chair + cat
+const chair = new THREE.Group(); chair.position.set(-.4, 0, .72); chair.rotation.y = .9; base.add(chair);
+box(.5, .06, .5, 0x8a3a3a, 0, .46, 0, chair, 'chair', .03);
+for (const [x, z] of [[-.2, -.2], [.2, -.2], [-.2, .2], [.2, .2]]) box(.05, .45, .05, 0x5a3820, x, .22, z, chair, 'chair', .01);
+box(.5, .5, .05, 0x5a3820, 0, .74, -.23, chair, 'chair', .02);
+const cat = new THREE.Group(); cat.position.set(0, .5, .02); chair.add(cat);
+const catM = mat({ color: 0x3a3440, roughness: .9 }), catW = mat({ color: 0xf0e8e0, roughness: .9 });
+const cb = mesh(new THREE.SphereGeometry(.17, 18, 12), catM, 0, .1, 0, cat, 'cat'); cb.scale.set(1.15, .7, .9);
+const ch = mesh(new THREE.SphereGeometry(.1, 16, 12), catM, .16, .14, .06, cat, 'cat');
+for (const s of [-1, 1]) { const e = mesh(new THREE.ConeGeometry(.035, .07, 8), catM, .17 + s * .01, .24, .06 + s * .055, cat, 'cat'); e.rotation.x = s * .3; }
+mesh(new THREE.SphereGeometry(.035, 8, 6), catW, .24, .12, .07, cat, 'cat');
+const tailPivot = new THREE.Group(); tailPivot.position.set(-.18, .06, 0); cat.add(tailPivot);
+const tail = mesh(new THREE.CylinderGeometry(.025, .03, .3, 8), catM, -.02, 0, .14, tailPivot, 'cat'); tail.rotation.x = Math.PI / 2.2;
+// stool with palette
+const stool = new THREE.Group(); stool.position.set(1.42, 0, -1.3); base.add(stool);
+mesh(new THREE.CylinderGeometry(.2, .2, .05, 18), mat({ color: 0x7a5030 }), 0, .5, 0, stool, 'easel');
+for (let i = 0; i < 3; i++) { const l = box(.04, .5, .04, 0x5a3820, Math.cos(i * 2.1) * .13, .25, Math.sin(i * 2.1) * .13, stool, 'easel', .01); }
+const pal = mesh(new THREE.CylinderGeometry(.16, .16, .015, 20), mat({ color: 0xd8b888 }), 0, .535, 0, stool, 'easel'); pal.scale.set(1.2, 1, .85);
+for (const [c, a] of [[0xd8403e, 0], [0x3a66d8, 1.2], [0xf2c230, 2.4], [0x3f8a4a, 3.6]]) mesh(new THREE.SphereGeometry(.03, 8, 6), mat({ color: c }), Math.cos(a) * .1, .545, Math.sin(a) * .08, stool, 'easel').scale.y = .4;
+
+// lights
+const hemi = new THREE.HemisphereLight(0xfff0dd, 0x4a3040, 1.0); scene.add(hemi);
+const moon = new THREE.DirectionalLight(0x9ab4ff, .5); moon.position.set(5, 4, 1.5); scene.add(moon);
+const lampLight = new THREE.PointLight(0xffb870, 5, 7, 1.4); scene.add(lampLight);
+const doorGlow = new THREE.PointLight(0xb8ccff, 0, 6, 1.2); doorGlow.position.set(.65, 1.3, -R + .5); scene.add(doorGlow);
+const fill = new THREE.DirectionalLight(0xffe2c0, .9); fill.position.set(-2, 5, 4); scene.add(fill);
+
+// fading materials per wall group
+for (const k in groups) {
+  const mats = new Set();
+  groups[k].traverse((o) => { o.userData.grp = k; if (o.material) mats.add(o.material); });
+  groups[k].userData.mats = [...mats];
+  for (const m of mats) { m.userData.baseOp = m.opacity; m.userData.baseT = m.transparent; }
+}
+
+// ---------- the anamorphic paint ----------
+const FONT = {
+  0: ['01110', '10001', '10001', '10001', '10001', '10001', '01110'], 1: ['00100', '01100', '00100', '00100', '00100', '00100', '01110'],
+  2: ['01110', '10001', '00001', '00010', '00100', '01000', '11111'], 3: ['11110', '00001', '00001', '01110', '00001', '00001', '11110'],
+  4: ['00010', '00110', '01010', '10010', '11111', '00010', '00010'], 5: ['11111', '10000', '11110', '00001', '00001', '10001', '01110'],
+  6: ['00110', '01000', '10000', '11110', '10001', '10001', '01110'], 7: ['11111', '00001', '00010', '00100', '01000', '01000', '01000'],
+  8: ['01110', '10001', '10001', '01110', '10001', '10001', '01110'], 9: ['01110', '10001', '10001', '01111', '00001', '00010', '01100'],
+};
+let DIGIT_Y = -.08;
+const MAGIC = { yaw: 62 * Math.PI / 180, pitch: 24 * Math.PI / 180 };
+const dotGeo = new THREE.CircleGeometry(1, 14);
+const dotMat = new THREE.MeshBasicMaterial({ color: 0x9dffcf, transparent: true, opacity: .2, toneMapped: false, depthWrite: false });
+const decoyMat = new THREE.MeshBasicMaterial({ color: 0x9dffcf, transparent: true, opacity: .2, toneMapped: false, depthWrite: false });
+let dots = [];
+function wallDot(yaw) { const s = Math.sin(yaw), c = Math.cos(yaw); return { N: -c, S: c, E: s, W: -s }; }
+const HIDE_T = .3;
+function placeCamera(cam, yaw, pitch) {
+  cam.position.set(TARGET.x + DIST * Math.sin(yaw) * Math.cos(pitch), TARGET.y + DIST * Math.sin(pitch), TARGET.z + DIST * Math.cos(yaw) * Math.cos(pitch));
+  cam.lookAt(TARGET);
+}
+function paintDots(code) {
+  for (const d of dots) d.parent && d.parent.remove(d);
+  dots = [];
+  const cam = new THREE.PerspectiveCamera(50, 9 / 16, .1, 60);
+  placeCamera(cam, MAGIC.yaw, MAGIC.pitch); cam.updateMatrixWorld(); cam.updateProjectionMatrix();
+  // paint against the layout the player will have by then: drawer open, rug corner flipped away
+  const dz = drawer.position.z; drawer.position.z = .34;
+  scene.updateMatrixWorld(true);
+  const wd = wallDot(MAGIC.yaw), targets = [];
+  scene.traverse((o) => { if (o.isMesh && !o.userData.dot && (!o.userData.grp || wd[o.userData.grp] <= HIDE_T) && o.visible && o.userData.tap !== 'flap') targets.push(o); });
+  const rc = new THREE.Raycaster();
+  const aspect = 9 / 16, tanV = Math.tan(THREE.MathUtils.degToRad(25));
+  const COLS = 4 * 5 + 3 * 1.6, x0 = -.66, step = 1.32 / COLS, y0 = DIGIT_Y;
+  const put = (nx, ny, rNdc, m, isDigit) => {
+    rc.setFromCamera(new THREE.Vector2(nx, ny), cam);
+    const hit = rc.intersectObjects(targets, false)[0];
+    if (!hit || !hit.face) return;
+    const n = hit.face.normal.clone().transformDirection(hit.object.matrixWorld).normalize();
+    const r = rc.ray.direction.clone();
+    if (n.dot(r) > 0) n.negate();
+    const cosA = Math.max(.22, Math.abs(n.dot(r)));
+    const xp = r.clone().sub(n.clone().multiplyScalar(r.dot(n)));
+    if (xp.lengthSq() < 1e-6) xp.set(1, 0, 0).cross(n); xp.normalize();
+    const yp = n.clone().cross(xp).normalize();
+    const rw = rNdc * aspect * hit.distance * tanV;
+    const M = new THREE.Matrix4().makeBasis(xp.multiplyScalar(rw / cosA), yp.multiplyScalar(rw), n.clone());
+    M.setPosition(hit.point.clone().add(n.multiplyScalar(.006)));
+    const d = new THREE.Mesh(dotGeo, m); d.userData.dot = true; d.userData.digit = isDigit;
+    d.matrixAutoUpdate = false;
+    const inv = new THREE.Matrix4().copy(hit.object.matrixWorld).invert();
+    d.matrix.multiplyMatrices(inv, M);
+    d.userData.grp = hit.object.userData.grp || null;
+    d.renderOrder = 2;
+    hit.object.add(d); dots.push(d);
+  };
+  for (let di = 0; di < 4; di++) {
+    const rows = FONT[code[di]];
+    for (let ry = 0; ry < 7; ry++) for (let cx = 0; cx < 5; cx++) {
+      if (rows[ry][cx] !== '1') continue;
+      const at = (cxx, ryy) => put(x0 + (di * 6.6 + cxx + .5) * step, y0 - (ryy - 3) * step * aspect, step * .4, dotMat, true);
+      at(cx, ry);
+      if (cx < 4 && rows[ry][cx + 1] === '1') at(cx + .5, ry);
+      if (ry < 6 && rows[ry + 1][cx] === '1') at(cx, ry + .5);
+      if (ry < 6 && cx < 4 && rows[ry + 1][cx + 1] === '1' && rows[ry][cx + 1] !== '1' && rows[ry + 1][cx] !== '1') at(cx + .5, ry + .5);
+      if (ry < 6 && cx > 0 && rows[ry + 1][cx - 1] === '1' && rows[ry][cx - 1] !== '1' && rows[ry + 1][cx] !== '1') at(cx - .5, ry + .5);
+    }
+  }
+  // decoy splatter around the digits
+  let n = 0, guard = 0;
+  while (n < 70 && guard++ < 400) {
+    const nx = Math.random() * 1.9 - .95, ny = Math.random() * 1.6 - .8;
+    if (Math.abs(nx) < .74 && Math.abs(ny - y0) < .22) continue;
+    put(nx, ny, step * (.18 + Math.random() * .3), decoyMat, false); n++;
+  }
+  drawer.position.z = dz; scene.updateMatrixWorld(true);
+}
+
+// ---------- state ----------
+const ORDER = ['smallKey', 'brush', 'memo', 'r', 'b', 'y', 'doorKey'];
+let st = null, yaw = 0.35, pitch = .55, vyaw = 0, vpitch = 0, phase = 'title', titleAt = 0, resultAt = 0;
+const COLORS = { r: '#d8403e', b: '#3a66d8', y: '#f2c230' };
+function newState() {
+  let code; do { code = Array.from({ length: 4 }, () => Math.floor(Math.random() * 10)); } while (new Set(code).size < 3);
+  let target; do { target = Array.from({ length: 4 }, () => 'rby'[Math.floor(Math.random() * 3)]); } while (!target.includes('y') || new Set(target).size < 3);
+  return { code, target, corner: Math.floor(Math.random() * 4), inv: new Set(), rugFlipped: false, keyTaken: false, drawerOpen: false, dark: false, codeSeen: false,
+    boxOpen: false, petals: [null, null, null, null], canvasOpen: false, doorKey: false, doorOpen: false, hints: 0, taps: 0, t0: 0, elapsed: 0, playing: false,
+    dial: [0, 0, 0, 0], sel: null, alignedNow: false };
+}
+function drawFlower(cv, petals, dim) {
+  const g = cv.getContext('2d'), w = cv.width, h = cv.height;
+  g.fillStyle = '#f6f1e6'; g.fillRect(0, 0, w, h);
+  g.strokeStyle = '#6a9a5a'; g.lineWidth = w * .03; g.beginPath(); g.moveTo(w / 2, h * .55); g.quadraticCurveTo(w * .46, h * .8, w / 2, h * .98); g.stroke();
+  g.fillStyle = '#6a9a5a'; g.beginPath(); g.ellipse(w * .6, h * .82, w * .09, w * .035, -.6, 0, 7); g.fill();
+  const cx = w / 2, cy = h * .4, rr = w * .15;
+  for (let i = 0; i < 4; i++) {
+    const a = i * Math.PI / 2;
+    g.save(); g.translate(cx + Math.sin(a) * rr, cy - Math.cos(a) * rr); g.rotate(a);
+    g.beginPath(); g.ellipse(0, 0, w * .09, w * .13, 0, 0, 7);
+    g.fillStyle = petals[i] ? COLORS[petals[i]] : '#fffdf8'; g.fill();
+    g.strokeStyle = petals[i] ? '#0004' : '#9a8a70'; g.lineWidth = w * .012; if (!petals[i]) g.setLineDash([w * .03, w * .02]); g.stroke(); g.restore();
+  }
+  g.fillStyle = '#8a5a2a'; g.beginPath(); g.arc(cx, cy, w * .06, 0, 7); g.fill();
+}
+function resetWorld() {
+  buildRug(st.corner);
+  smallKey3d.visible = false;
+  flapA = .95; flapPivot.quaternion.setFromAxisAngle(flapAxis, flapSign * flapA);
+  drawer.position.z = 0; brush3d.visible = true; memo3d.visible = true;
+  lidPivot.rotation.x = 0; yellowIn.visible = false;
+  canvasPivot.rotation.x = 0; doorKey3d.visible = false;
+  doorPivot.rotation.y = 0; doorGlow.intensity = 0; outside.material.color.setScalar(1);
+  for (const k in jars) jars[k].lid.position.y = .175;
+  drawFlower(frameCv, st.target); frameTex.needsUpdate = true;
+  drawFlower(paintCv, st.petals); paintTex.needsUpdate = true;
+  setDark(false, true);
+  scene.updateMatrixWorld(true);
+  // paint dots with the world in its "drawer open" layout so that later moves don't disturb them
+  paintDots(st.code);
+}
+
+// ---------- UI ----------
+const ICONS = {
+  smallKey: '<svg viewBox="0 0 40 40"><circle cx="12" cy="20" r="6" fill="none" stroke="#c8ccd8" stroke-width="4"/><path d="M18 20h16M29 20v6M34 20v5" stroke="#c8ccd8" stroke-width="4" stroke-linecap="round"/></svg>',
+  doorKey: '<svg viewBox="0 0 40 40"><circle cx="11" cy="20" r="7" fill="none" stroke="#f0c040" stroke-width="5"/><path d="M18 20h18M30 20v8M36 20v6" stroke="#f0c040" stroke-width="5" stroke-linecap="round"/></svg>',
+  brush: '<svg viewBox="0 0 40 40"><path d="M8 32 28 12" stroke="#c89a5a" stroke-width="5" stroke-linecap="round"/><path d="M27 13l7-7-2 9z" fill="#222"/></svg>',
+  memo: '<svg viewBox="0 0 40 40"><rect x="9" y="6" width="22" height="28" rx="2" fill="#f8f2e0"/><path d="M13 13h14M13 19h14M13 25h9" stroke="#8a7a60" stroke-width="2"/></svg>',
+  r: '<svg viewBox="0 0 40 40"><rect x="12" y="10" width="16" height="22" rx="4" fill="#d8403e"/><rect x="11" y="6" width="18" height="6" rx="2" fill="#333"/></svg>',
+  b: '<svg viewBox="0 0 40 40"><rect x="12" y="10" width="16" height="22" rx="4" fill="#3a66d8"/><rect x="11" y="6" width="18" height="6" rx="2" fill="#333"/></svg>',
+  y: '<svg viewBox="0 0 40 40"><rect x="12" y="10" width="16" height="22" rx="4" fill="#f2c230"/><rect x="11" y="6" width="18" height="6" rx="2" fill="#333"/></svg>',
+};
+let newItem = null;
+function renderInv() {
+  const el = $('inv'); el.innerHTML = '';
+  const items = ORDER.filter((k) => st.inv.has(k));
+  if (!items.length) { el.innerHTML = `<span class="empty">${L.noItem}</span>`; return; }
+  for (const k of items) {
+    const d = document.createElement('div'); d.className = 'slot' + (k === newItem ? ' new' : ''); d.innerHTML = ICONS[k]; d.dataset.k = k;
+    d.addEventListener('pointerdown', (e) => { e.stopPropagation(); initAudio(); onItem(k); });
+    el.appendChild(d);
+  }
+  newItem = null;
+}
+function give(k) { st.inv.add(k); newItem = k; renderInv(); play('get'); }
+let toastT = 0;
+function toast(s, ms = 2600) { const t = $('toast'); t.innerHTML = s; t.style.opacity = 1; toastT = performance.now() + ms; }
+function banner(b, s) { $('bannerB').textContent = b; $('bannerS').textContent = s; $('banner').classList.remove('hide'); setTimeout(() => $('banner').classList.add('hide'), 2200); }
+function onItem(k) {
+  if (k === 'memo') return openPanel('memo');
+  const names = { smallKey: L.gotSmallKey, doorKey: L.gotDoorKey, brush: '🖌', r: L.colors.r, b: L.colors.b, y: L.colors.y };
+  toast(k === 'brush' ? L.paintHow : (L.colors[k] ? L.jar(L.colors[k]) : names[k]));
+}
+// panels
+let panelOpen = null;
+function closePanel() { $('panel').classList.add('hide'); panelOpen = null; }
+$('panel').addEventListener('pointerdown', (e) => { if (e.target.id === 'panel') { e.stopPropagation(); closePanel(); } });
+function flowerSvg(petals, tappable) {
+  let s = '<svg class="fl" viewBox="0 0 200 200"><rect width="200" height="200" rx="6" fill="#fbf7ee"/><path d="M100 110 Q92 160 100 196" stroke="#6a9a5a" stroke-width="6" fill="none"/><ellipse cx="120" cy="164" rx="18" ry="7" fill="#6a9a5a" transform="rotate(-34 120 164)"/>';
+  for (let i = 0; i < 4; i++) {
+    const a = i * 90, px = 100 + Math.sin(a * Math.PI / 180) * 30, py = 80 - Math.cos(a * Math.PI / 180) * 30;
+    const p = petals[i];
+    s += `<ellipse data-i="${i}" cx="${px}" cy="${py}" rx="18" ry="26" transform="rotate(${a} ${px} ${py})" fill="${p ? COLORS[p] : '#fffdf8'}" stroke="${p ? '#0004' : '#9a8a70'}" stroke-width="2.5" ${p ? '' : 'stroke-dasharray="6 4"'} ${tappable ? 'style="cursor:pointer"' : ''}/>`;
+  }
+  return s + '<circle cx="100" cy="80" r="12" fill="#8a5a2a"/></svg>';
+}
+function openPanel(kind) {
+  panelOpen = kind;
+  const c = $('card'); let h = '<button class="x" id="px">×</button>';
+  if (kind === 'memo') h += `<h2>${L.memoT}</h2><div class="note">${L.memo}</div>`;
+  if (kind === 'frame') h += `<h2>${L.frameT}</h2><div style="transform:rotate(180deg)">${flowerSvg(st.target, false)}</div>`;
+  if (kind === 'box') {
+    h += `<h2>${L.boxT}</h2><div class="dials">`;
+    for (let i = 0; i < 4; i++) h += `<div class="dial"><button data-u="${i}">▲</button><div class="d" id="d${i}">${st.dial[i]}</div><button data-dn="${i}">▼</button></div>`;
+    h += '</div>';
+  }
+  if (kind === 'paint') {
+    h += `<h2>${L.paintT}</h2>${flowerSvg(st.petals, true)}<div class="sw">`;
+    for (const k of 'rby') if (st.inv.has(k)) h += `<button data-c="${k}" class="${st.sel === k ? 'sel' : ''}" style="background:${COLORS[k]}"></button>`;
+    h += `</div><div class="small">${L.paintHow}</div>`;
+  }
+  c.innerHTML = h; $('panel').classList.remove('hide');
+  $('px').addEventListener('pointerdown', (e) => { e.stopPropagation(); closePanel(); });
+  c.querySelectorAll('[data-u],[data-dn]').forEach((b) => b.addEventListener('pointerdown', (e) => {
+    e.stopPropagation(); const up = b.dataset.u != null, i = +(up ? b.dataset.u : b.dataset.dn);
+    st.dial[i] = (st.dial[i] + (up ? 1 : 9)) % 10; $('d' + i).textContent = st.dial[i]; play('dial');
+    if (st.dial.every((v, j) => v === st.code[j])) setTimeout(openBox, 350);
+  }));
+  c.querySelectorAll('[data-c]').forEach((b) => b.addEventListener('pointerdown', (e) => { e.stopPropagation(); st.sel = b.dataset.c; play('tap'); openPanel('paint'); }));
+  c.querySelectorAll('ellipse[data-i]').forEach((p) => p.addEventListener('pointerdown', (e) => {
+    e.stopPropagation(); if (!st.sel) { toast(L.paintHow); return; }
+    st.petals[+p.dataset.i] = st.sel; play('paint'); drawFlower(paintCv, st.petals); paintTex.needsUpdate = true; openPanel('paint');
+    if (st.petals.every((v, j) => v === st.target[j])) setTimeout(finishPaint, 450);
+    else if (st.petals.every((v) => v)) { play('no'); toast(L.paintWrong, 3000); }
+  }));
+}
+function openBox() { closePanel(); st.boxOpen = true; play('unlock'); anim(lidPivot.rotation, 'x', -1.7, 600); yellowIn.visible = true; setTimeout(() => { yellowIn.visible = false; give('y'); toast(L.boxOpen); }, 700); }
+function finishPaint() {
+  closePanel(); st.canvasOpen = true; doorKey3d.visible = true; play('slide'); anim(canvasPivot.rotation, 'x', -1.35, 900); toast(L.paintDone, 3200);
+}
+// tiny tween helper
+const tweens = [];
+function anim(obj, key, to, ms, done) { tweens.push({ obj, key, from: obj[key], to, t: 0, ms, done }); }
+function stepTweens(dt) {
+  for (let i = tweens.length - 1; i >= 0; i--) {
+    const w = tweens[i]; w.t += dt * 1000; const k = Math.min(1, w.t / w.ms), e = 1 - Math.pow(1 - k, 3);
+    w.obj[w.key] = w.from + (w.to - w.from) * e; if (k >= 1) { tweens.splice(i, 1); w.done && w.done(); }
+  }
+}
+function setDark(on, instant) {
+  st.dark = on;
+  lampLight.intensity = on ? 0 : 5; shadeM.emissiveIntensity = on ? 0 : 1.2; bulb.material.color.set(on ? 0x554a30 : 0xfff2c0);
+  hemi.intensity = on ? .42 : 1.0; hemi.color.set(on ? 0x6070b0 : 0xfff0dd);
+  fill.intensity = on ? 0 : .9; moon.intensity = on ? 1.1 : .5;
+  scene.background.copy(on ? BG_DARK : BG_LIGHT);
+}
+
+// ---------- taps ----------
+function onTap(kind) {
+  st.taps++;
+  const T = (s) => toast(s);
+  switch (kind) {
+    case 'flap':
+      if (!st.rugFlipped) { st.rugFlipped = true; play('flip'); anim({ get v() { return flapA; }, set v(x) { flapA = x; flapPivot.quaternion.setFromAxisAngle(flapAxis, flapSign * x); } }, 'v', 2.9, 700); smallKey3d.visible = true; T(L.rugFlip); }
+      else T(L.rug);
+      break;
+    case 'smallKey': if (!st.keyTaken) { st.keyTaken = true; smallKey3d.visible = false; give('smallKey'); T(L.gotSmallKey); } break;
+    case 'rug': T(L.rug); play('tap'); break;
+    case 'drawer':
+      if (st.drawerOpen) { T(L.drawerEmpty); play('tap'); }
+      else if (st.inv.has('smallKey')) {
+        st.drawerOpen = true; st.inv.delete('smallKey'); renderInv(); play('unlock'); anim(drawer.position, 'z', .34, 600);
+        setTimeout(() => { brush3d.visible = false; memo3d.visible = false; give('brush'); st.inv.add('memo'); renderInv(); T(L.drawerOpen); setTimeout(() => openPanel('memo'), 900); }, 750);
+      } else { T(L.drawerLocked); play('lock'); }
+      break;
+    case 'lamp': setDark(!st.dark); play('sw'); T(st.dark ? L.lampOff : L.lampOn); break;
+    case 'box': if (st.boxOpen) { T(L.boxEmpty); play('tap'); } else { play('tap'); openPanel('box'); } break;
+    case 'jar_r': case 'jar_b': {
+      const k = kind.slice(4);
+      if (st.inv.has(k)) { T(L.jarHave); play('tap'); } else { give(k); T(L.jar(L.colors[k])); const lid = jars[k].lid; anim(lid.position, 'y', .26, 200, () => anim(lid.position, 'y', .175, 300)); }
+      break;
+    }
+    case 'frame': if (st.dark) { T(L.frameDark); play('tap'); } else { play('tap'); openPanel('frame'); } break;
+    case 'canvas':
+      if (st.canvasOpen) { T(L.easel); break; }
+      if (st.dark) { T(L.canvasDark); play('tap'); break; }
+      if (!st.inv.has('brush')) { T(L.noBrush); play('no'); break; }
+      if (!['r', 'b', 'y'].some((k) => st.inv.has(k))) { T(L.noPaint); play('no'); break; }
+      if (!st.sel || !st.inv.has(st.sel)) st.sel = ['r', 'b', 'y'].find((k) => st.inv.has(k));
+      play('tap'); openPanel('paint'); break;
+    case 'doorKey': if (st.canvasOpen && !st.doorKey) { st.doorKey = true; doorKey3d.visible = false; give('doorKey'); T(L.gotDoorKey); } else T(L.easel); break;
+    case 'door':
+      if (st.doorOpen) break;
+      if (st.doorKey) { win(); } else { T(L.doorLocked); play('lock'); }
+      break;
+    case 'window': T(st.dark ? L.windowDark : L.window); play('tap'); break;
+    case 'books': T(L.books); play('tap'); break;
+    case 'clock': T(L.clock); play('tap'); break;
+    case 'globe': T(L.globe); play('tap'); spinGlobe = 12; break;
+    case 'plant': T(L.plant); play('tap'); rustle = 1; break;
+    case 'cat': case 'chair': if (kind === 'cat') { T(L.cat); play('meow'); wag = 1; } else { T(L.cat); play('tap'); wag = .6; } break;
+    case 'easel': T(L.easel); play('tap'); break;
+    case 'desk': T(L.desk); play('tap'); break;
+    case 'shelf': T(L.shelf); play('tap'); break;
+    case 'wall': T(L.wall); break;
+    case 'floor': T(L.floor); break;
+  }
+}
+let spinGlobe = 0, rustle = 0, wag = 0;
+function hintIndex() {
+  if (st.doorKey) return 6;
+  if (st.boxOpen || st.canvasOpen) return 5;
+  if (st.codeSeen) return 4;
+  if (st.drawerOpen) return st.dark ? 3 : 2;
+  if (st.keyTaken) return 1;
+  return 0;
+}
+$('hintBtn').addEventListener('pointerdown', (e) => { e.stopPropagation(); initAudio(); if (phase !== 'play') return; st.hints++; play('tap'); toast('💡 ' + L.hints[hintIndex()], 4200); });
+
+function win() {
+  st.doorOpen = true; st.playing = false; play('unlock'); toast(L.doorOpen);
+  setTimeout(() => { play('door'); anim(doorPivot.rotation, 'y', -1.9, 1200); anim(doorGlow, 'intensity', 9, 1400); outside.material.color.setScalar(1.8); }, 300);
+  if (st.dark) setDark(false);
+  vyaw = vpitch = 0;
+  const ty = yaw + ((((.15 - yaw) % (Math.PI * 2)) + Math.PI * 3) % (Math.PI * 2) - Math.PI);
+  anim({ get v() { return yaw; }, set v(x) { yaw = x; } }, 'v', ty, 1300);
+  anim({ get v() { return pitch; }, set v(x) { pitch = x; } }, 'v', .36, 1300);
+  setTimeout(() => play('win'), 1200);
+  const t = st.elapsed;
+  setTimeout(() => {
+    phase = 'result'; resultAt = performance.now();
+    const nb = !best || t < best; if (nb) { best = t; try { parent.postMessage({ agf: 'save', data: { best } }, '*'); } catch (e) {} }
+    $('rLbl').innerHTML = `<div style="font-size:min(10vw,44px);font-weight:900;color:#fff1c8;text-shadow:0 0 20px #8a7cff">${L.win}</div><div style="margin:4px 0 14px">${L.winSub}</div>${L.clearT}`;
+    $('rTime').textContent = fmt(t);
+    $('rBest').innerHTML = nb ? `<span class="new">${L.newBest}</span>` : L.best(fmt(best));
+    $('rDet').textContent = L.det(st.hints, st.taps);
+    $('result').classList.remove('hide'); $('hud').classList.add('hide'); $('inv').classList.add('hide');
+    signal('end');
+  }, 2300);
+}
+
+function start() {
+  st = newState(); resetWorld();
+  yaw = .35; pitch = .55; vyaw = vpitch = 0;
+  st.playing = true; st.t0 = performance.now(); phase = 'play';
+  $('title').classList.add('hide'); $('result').classList.add('hide'); $('hud').classList.remove('hide'); $('inv').classList.remove('hide');
+  renderInv(); toast(L.first, 4000);
+  signal('start');
+}
+
+// ---------- input ----------
+const ptr = new Map();
+let drag = null;
+canvas.addEventListener('pointerdown', (e) => {
+  initAudio();
+  if (phase === 'title') { if (performance.now() - titleAt > 200) start(); return; }
+  if (phase === 'result') { if (performance.now() - resultAt > 700) start(); return; }
+  if (panelOpen) return;
+  ptr.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  vyaw = vpitch = 0;
+  if (ptr.size === 1) drag = { id: e.pointerId, x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, t: performance.now(), moved: 0 };
+  try { canvas.setPointerCapture(e.pointerId); } catch (er) {}
+});
+canvas.addEventListener('pointermove', (e) => {
+  if (!drag || e.pointerId !== drag.id) return;
+  const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY;
+  drag.moved += Math.abs(dx) + Math.abs(dy);
+  const k = 4.2 / Math.max(320, innerWidth), now = performance.now(), edt = Math.max(8, now - (drag.lt || now - 16)) / 1000; drag.lt = now;
+  yaw -= dx * k; pitch = Math.max(.2, Math.min(1.1, pitch + dy * k * .8));
+  vyaw = vyaw * .6 + (-dx * k / edt) * .4; vpitch = vpitch * .6 + (dy * k * .8 / edt) * .4;
+});
+function endPtr(e) {
+  ptr.delete(e.pointerId);
+  if (!drag || e.pointerId !== drag.id) return;
+  const d = drag; drag = null;
+  if (d.moved < 12 && performance.now() - d.t < 600) { vyaw = vpitch = 0; pick(e.clientX, e.clientY); }
+}
+canvas.addEventListener('pointerup', endPtr);
+canvas.addEventListener('pointercancel', (e) => { ptr.delete(e.pointerId); if (drag && drag.id === e.pointerId) drag = null; });
+// title overlay taps
+for (const id of ['title', 'result']) $(id).addEventListener('pointerdown', (e) => { initAudio(); if (phase === 'title') start(); else if (phase === 'result' && performance.now() - resultAt > 700) start(); });
+const rc = new THREE.Raycaster(), v2 = new THREE.Vector2();
+function effVisible(o) { while (o) { if (!o.visible) return false; if (o.userData.op != null && o.userData.op < .5) return false; o = o.parent; } return true; }
+const GENERIC = new Set(['floor', 'wall', 'rug', 'desk', 'shelf', 'easel', 'chair', 'books']);
+const hotV = new THREE.Vector3(), hotB = new THREE.Box3();
+function hotspots() {
+  const L = [[smallKey3d, 'smallKey', 40], [doorKey3d, 'doorKey', 44], [flapPivot, 'flap', 38], [drawer, 'drawer', 34], [lamp, 'lamp', 36], [boxG, 'box', 34],
+    [jars.r.g, 'jar_r', 26], [jars.b.g, 'jar_b', 26], [canvasPivot, 'canvas', 30], [knob, 'door', 30], [cat, 'cat', 26]];
+  return L.filter(([o]) => o && effVisible(o));
+}
+function pick(x, y) {
+  if (!st.playing) return;
+  v2.set(x / innerWidth * 2 - 1, -(y / innerHeight) * 2 + 1);
+  rc.setFromCamera(v2, camera);
+  const hits = rc.intersectObjects(scene.children, true);
+  let kind = null;
+  for (const h of hits) {
+    const o = h.object; if (o.userData.dot) continue; if (!effVisible(o)) continue;
+    let t = o; while (t && !t.userData.tap) t = t.parent;
+    kind = t ? t.userData.tap : null; break;
+  }
+  if (!kind || GENERIC.has(kind)) {
+    // forgiving taps: snap to a nearby important thing
+    let bestD = 1e9, bestK = null;
+    for (const [o, k, r] of hotspots()) {
+      hotB.setFromObject(o); hotB.getCenter(hotV); hotV.project(camera);
+      const sx = (hotV.x + 1) / 2 * innerWidth, sy = (1 - hotV.y) / 2 * innerHeight, d = Math.hypot(sx - x, sy - y);
+      if (d < r && d < bestD) { bestD = d; bestK = k; }
+    }
+    if (bestK) kind = bestK;
+  }
+  if (kind) onTap(kind);
+}
+
+// ---------- loop ----------
+function resize() {
+  const w = Math.max(1, innerWidth), h = Math.max(1, innerHeight);
+  renderer.setSize(w, h, false); camera.aspect = w / h;
+  // keep the room in frame on wider screens with the same vertical fov
+  camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize); resize();
+let last = performance.now();
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  if (phase === 'title') { yaw += dt * .12; }
+  else if (!drag) { vyaw = Math.max(-4, Math.min(4, vyaw)); vpitch = Math.max(-3, Math.min(3, vpitch)); yaw += vyaw * dt; pitch = Math.max(.2, Math.min(1.1, pitch + vpitch * dt)); vyaw *= Math.pow(.0008, dt); vpitch *= Math.pow(.0008, dt); if (Math.abs(vyaw) < .01) vyaw = 0; if (Math.abs(vpitch) < .01) vpitch = 0; }
+  // alignment
+  let close = 0;
+  if (st && phase === 'play') {
+    let dy = ((yaw - MAGIC.yaw) % (Math.PI * 2) + Math.PI * 3) % (Math.PI * 2) - Math.PI, dp = pitch - MAGIC.pitch;
+    const ang = Math.hypot(dy, dp * .6);
+    if (st.dark) {
+      close = Math.max(0, 1 - ang / .3);
+      if (!drag && ang < .22) { vyaw *= Math.pow(1e-5, dt); vpitch *= Math.pow(1e-5, dt); }
+      if (!drag && ang < .085 && ang > .002) { yaw -= dy * Math.min(1, dt * 6); pitch -= dp * Math.min(1, dt * 6); vyaw *= .5; vpitch *= .5; }
+      const al = ang < .02;
+      if (al && !st.alignedNow) { st.alignedNow = true; play('align'); st.codeSeen = true; banner(L.aligned, L.alignedSub); }
+      if (!al && ang > .05) st.alignedNow = false;
+    } else st.alignedNow = false;
+    if (st.playing) { st.elapsed = (now - st.t0) / 1000; $('time').textContent = fmt(st.elapsed); tick(now); }
+  }
+  if (shimmer && actx) { try { const tgt = st && st.dark && phase === 'play' ? .05 * close * close : 0; shimmer.g.gain.setTargetAtTime(tgt, actx.currentTime, .08); shimmer.o1.frequency.setTargetAtTime(520 + close * 260, actx.currentTime, .1); shimmer.o2.frequency.setTargetAtTime(523 + close * 262 + (1 - close) * 6, actx.currentTime, .1); } catch (e) {} }
+  // dot look
+  const dark = st && st.dark;
+  const al = st && st.alignedNow;
+  dotMat.opacity = dark ? .95 : .07; decoyMat.opacity = dark ? .8 : .07;
+  dotMat.color.set(al ? 0xffe27a : 0x9dffcf);
+  placeCamera(camera, yaw, pitch);
+  // walls
+  const wd = wallDot(yaw);
+  for (const k in groups) {
+    const g = groups[k], tgt = wd[k] > HIDE_T ? 0 : 1, op0 = g.userData.op;
+    g.userData.op += (tgt - op0) * Math.min(1, dt * 9);
+    if (Math.abs(g.userData.op - tgt) < .01) g.userData.op = tgt;
+    const op = g.userData.op;
+    if (op !== op0 || !g.userData.init) {
+      g.userData.init = true; g.visible = op > .02;
+      for (const m of g.userData.mats) { m.opacity = m.userData.baseOp * op; m.transparent = m.userData.baseT || op < .99; m.depthWrite = op > .6; }
+    }
+  }
+  for (const d of dots) d.visible = !d.userData.grp || groups[d.userData.grp].userData.op > .6;
+  // lamp light position
+  lamp.getWorldPosition(lampLight.position); lampLight.position.y += .4;
+  // flavor anims
+  if (spinGlobe > 0) { ball.rotation.y += spinGlobe * dt; spinGlobe *= Math.pow(.3, dt); if (spinGlobe < .05) spinGlobe = 0; }
+  if (rustle > 0) { plant.rotation.z = Math.sin(now / 50) * .08 * rustle; rustle = Math.max(0, rustle - dt * 1.5); }
+  tailPivot.rotation.y = Math.sin(now / 900) * .2 + (wag > 0 ? Math.sin(now / 80) * .5 * wag : 0); if (wag > 0) wag = Math.max(0, wag - dt);
+  cb.scale.y = .7 + Math.sin(now / 1300) * .02;
+  if (st && !st.rugFlipped && flapPivot) { flapA = .9 + Math.sin(now / 700) * .12 + Math.sin(now / 260) * .04; flapPivot.quaternion.setFromAxisAngle(flapAxis, flapSign * flapA); }
+  stepTweens(dt);
+  if (toastT && now > toastT) { $('toast').style.opacity = 0; toastT = 0; }
+  renderer.render(scene, camera);
+}
+st = newState(); resetWorld(); titleAt = performance.now();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

@@ -1,0 +1,559 @@
+{
+  "id": "2026-11-28-claude-2",
+  "status": "published",
+  "title": "ぬけだせ！月夜のアトリエ",
+  "genre": "脱出",
+  "concept": "小さな画家の部屋を指でまわして調べる脱出ゲーム。あかりを消すと部屋じゅうに散った光る絵の具が、ある一方向から見たときだけ4けたの数字にそろう。部屋をまわすこと自体が謎解きになる、その「見えた！」の瞬間が核。",
+  "howToPlay": "ドラッグで部屋をまわし、タップで調べる。手がかりと道具を集めて鍵を見つけ、ドアから抜け出す。",
+  "libraryDecision": "three.js（と角丸の箱）を使う。核の「見る向きで点が数字にそろう」は立体の部屋を自由にまわせて初めて成り立つため。再考で、点を床・家具・壁の別々の奥行きに置き、ずれた向きでは崩れて見えるようにし、そろうと金色に変わる演出を足した。ZzFXで効果音。",
+  "soundDecision": "BGMは付けず、静かな時計の音と効果音だけにした。暗くした部屋で正解の向きに近づくほど澄んだ音が大きく高くなり、そろうとチャイムが鳴る。音が目と一緒に「もう少し」を教えてくれるので、探す手触りが強まる。",
+  "improvements": [
+    {
+      "found": "最後の色ぬりが見本を写すだけで頭を使わない／正解の向きに勝手に吸い付く範囲が広く、ほぼ平らな壁に描かれた数字はずれた向きでも読めて「見つけた」感じが薄い／暗くすると部屋がほぼ見えず、じゅうたんのめくれも家具に隠れて気づけない",
+      "changed": "見本の絵をさかさまに掛け、くきの向きに気づかないと開かないようにした（全部ぬって違えば知らせる）／数字を椅子・机・イーゼル・床にまたがる高さに置き直し、少しずれるだけで崩れるようにした。吸い付く範囲も狭めた／暗いときの月明かりを明るくし、めくれは風でパタパタ動くようにして、家具も角からどけた",
+      "foundEn": "The final painting was just copying a sample / The view snapped to the answer from far away, and digits on a flat wall were readable from wrong angles, so finding them felt unearned / In the dark the room was nearly invisible, and the curled rug corner hid behind furniture",
+      "changedEn": "The sample now hangs upside down; you must notice the stem (a wrong full painting tells you so) / Digits now span chair, desk, easel and floor, so a small miss scrambles them; the snap zone is smaller / Brighter moonlight in the dark; the curled corner flutters and furniture moved off the corners"
+    },
+    {
+      "found": "正解の近くで微調整すると慣性で行き過ぎて合わせにくい／数字が読める位置なのに上下のずれに厳しすぎて「見えた！」にならない／脱出の瞬間、ドアが見えない角度で開いて盛り上がらない",
+      "changed": "正解の近くでは回転の慣性を止める／上下方向の許容を広げ、そろうたびに音と表示で知らせる／脱出時に部屋がドアの正面へ回りこみ、開いたドアの向こうに月夜の空と光が差しこむ演出にした",
+      "foundEn": "Fine-tuning near the answer overshot due to inertia / Readable positions still did not count because vertical tolerance was too strict / The door opened out of view, so the escape felt flat",
+      "changedEn": "Inertia stops near the answer / Wider vertical tolerance, with sound and banner every time it clicks / On escape the room swings to face the door, revealing the moonlit sky and light pouring in"
+    }
+  ],
+  "planning": {
+    "genreDraw": {
+      "ja": "脱出",
+      "en": "Escape room",
+      "of": 56
+    },
+    "candidates": [
+      {
+        "idea": "（くじ：脱出）部屋をまわして調べる脱出ゲーム。あかりを消すと散った光る点が、一方向から見たときだけ暗証番号にそろう。3Dの部屋で。",
+        "ideaEn": "(Draw: escape room) Turn a tiny 3D room to search it. With the light off, scattered glowing dots line up into the code from one angle only.",
+        "fromDraw": true
+      },
+      {
+        "idea": "くもった窓を指でなぞって雨つぶを流す、目標のない遊び場。2Dで水の流れを気持ちよく。",
+        "ideaEn": "A goal-free toy: wipe a foggy window and send raindrops running. 2D, focused on water feel.",
+        "fromDraw": false
+      },
+      {
+        "idea": "長押しで風船をふくらませて荷物を浮かせ、屋根から屋根へ配達する。ふくらませすぎると割れる。",
+        "ideaEn": "Hold to inflate balloons and float parcels roof to roof; overinflate and they pop.",
+        "fromDraw": false
+      }
+    ],
+    "chosen": 0
+  },
+  "structure": {
+    "goal": "clear",
+    "ending": "goal",
+    "input": [
+      "drag",
+      "tap"
+    ]
+  },
+  "i18n": {
+    "en": {
+      "title": "Moonlit Atelier Escape",
+      "concept": "An escape room you turn with your finger. Switch off the light and glowing paint scattered around the room lines up into a 4-digit code from exactly one angle. Turning the room is the puzzle; the \"There!\" moment is the core.",
+      "howToPlay": "Drag to turn the room, tap to inspect. Collect clues and tools, find the key and slip out the door.",
+      "libraryDecision": "Uses three.js (with rounded boxes): seeing dots align from one angle only works in a freely turnable 3D room. The rethink placed dots at different depths (floor, furniture, walls) so wrong angles scramble them, and made them turn gold when aligned. ZzFX for sound effects.",
+      "soundDecision": "No BGM, just a quiet clock tick and effects. In the dark, a clear tone grows louder and higher as you near the right angle, and a chime rings when the digits align, so sound guides the search alongside your eyes."
+    }
+  },
+  "createdAt": "2026-11-28T12:06:40+09:00",
+  "specVersion": 11,
+  "maker": "claude",
+  "credits": [
+    {
+      "role": "main",
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5",
+      "via": "Claude Code"
+    }
+  ],
+  "generation": {
+    "pipeline": "Claude Code",
+    "trigger": "scheduled",
+    "startedAt": "2026-11-28T12:06:40+09:00",
+    "metricsFrom": "2026-11-28T03:05:35.048Z",
+    "transcript": "d3ce2db6-e0bb-45e6-833f-b4d5e110d50c.jsonl",
+    "validationRuns": 5,
+    "finishedAt": "2026-11-28T13:31:56+09:00"
+  },
+  "autoTest": {
+    "passed": true,
+    "testedAt": "2026-11-28T13:31:42+09:00",
+    "version": 3,
+    "checks": [
+      {
+        "name": "容量が上限以内",
+        "ok": true,
+        "detail": "65.1KB / 200KB",
+        "nameEn": "Size within limit"
+      },
+      {
+        "name": "外部リソース・通信を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No external resources or network calls"
+      },
+      {
+        "name": "共有ライブラリ以外のファイルを読み込んでいない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Loads no files except the shared library shelf"
+      },
+      {
+        "name": "alert/confirm/prompt/window.open を使っていない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No alert/confirm/prompt/window.open"
+      },
+      {
+        "name": "Pointer Events でタッチ操作に対応している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Touch input via Pointer Events"
+      },
+      {
+        "name": "長押しで文字選択・メニューが出ない指定がある",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Blocks text selection and menus on long press"
+      },
+      {
+        "name": "touch-action を指定している",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sets touch-action"
+      },
+      {
+        "name": "日本語/英語で表示が切り替わる",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Display switches between Japanese and English"
+      },
+      {
+        "name": "Android: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=394",
+        "nameEn": "Android: renders"
+      },
+      {
+        "name": "Android: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=403",
+        "nameEn": "Android: starts and responds to touch"
+      },
+      {
+        "name": "Android: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Android: no overflow"
+      },
+      {
+        "name": "iPhone: 描画されている",
+        "ok": true,
+        "detail": "canvas色数=362",
+        "nameEn": "iPhone: renders"
+      },
+      {
+        "name": "iPhone: タッチで開始・操作でき、画面が変化する",
+        "ok": true,
+        "detail": "canvas色数=421",
+        "nameEn": "iPhone: starts and responds to touch"
+      },
+      {
+        "name": "iPhone: 画面からはみ出さない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "iPhone: no overflow"
+      },
+      {
+        "name": "プレイ開始の合図（start）を送っている",
+        "ok": true,
+        "detail": "",
+        "nameEn": "Sends the play \"start\" signal"
+      },
+      {
+        "name": "JavaScript エラーが出ない",
+        "ok": true,
+        "detail": "",
+        "nameEn": "No JavaScript errors"
+      }
+    ],
+    "errors": []
+  },
+  "code": {
+    "bytes": 66643,
+    "lines": 937
+  },
+  "sound": {
+    "uses": true,
+    "idleHeard": 1,
+    "idleStarts": 3
+  },
+  "libraries": [
+    {
+      "name": "three.js",
+      "version": "0.186.1",
+      "file": "three-0.186.1.min.js"
+    },
+    {
+      "name": "three.js addons",
+      "version": "0.186.1",
+      "file": "three-addons-0.186.1.min.js"
+    },
+    {
+      "name": "ZzFX",
+      "version": "1.4.0",
+      "file": "zzfx-1.4.0.min.js"
+    }
+  ],
+  "aiReview": {
+    "reviewer": {
+      "name": "Claude Opus 5.5",
+      "vendor": "Anthropic",
+      "model": "claude-opus-5-5"
+    },
+    "stars": 3,
+    "works": "ok",
+    "worst": "謎が5つほどで短く、正解の数字と色・めくれの位置は毎回変わるが、流れは同じなので2回目以降の驚きは薄い",
+    "comment": "あかりを消して部屋じゅうに散った光る点を、窓のほうへ少しずつまわしていくと、点がすーっと寄って金色の9238にそろう瞬間は、初めて見たとき本当に「おっ」となった。ずれた向きでは椅子・机・床に分かれて崩れて見えるのがいい。さかさまの見本も、見たまま塗って何も起きずに気づく小さなひらめきがあった。ただ謎の数は少なく、数分で終わる。なお調整中に内部の状態（正解の番号）を確かめた回があり、最後の通しプレイでは画面を見ながら進めた。",
+    "similar": [
+      {
+        "title": "PERFECT ANGLE",
+        "url": "https://store.steampowered.com/app/427780",
+        "similarity": "中",
+        "note": "ばらばらの形を回して、ある角度だけ絵が現れる錯視パズル。こちらは脱出ゲームの中の暗証番号として使い、暗くして光らせる手順と組み合わせた",
+        "note_en": "Optical-illusion puzzler where a chaotic shape reveals a figure from one angle. Here it serves as an escape-room code combined with a lights-off reveal"
+      },
+      {
+        "title": "Anamorph",
+        "url": "https://toucharcade.com/games/anamorph",
+        "similarity": "中",
+        "note": "スマホで立体作品をまわし、絵が見える角度を探すアナモルフォーシスのゲーム。こちらは部屋そのものを見てまわる脱出の流れの一部",
+        "note_en": "Mobile anamorphic art game: rotate a 3D piece until the image appears. Here it is one step of an escape room where you turn the room itself"
+      }
+    ],
+    "research": "WebSearchで「anamorphic perspective align numbers escape room」などを1回検索し、角度で絵が現れるパズルを確認",
+    "i18n": {
+      "en": {
+        "worst": "Only about five puzzles, so it is short; the code, colors and rug corner change each time, but the sequence is the same, so replays lose the surprise",
+        "comment": "Turning the dark room toward the window until the scattered glowing dots drift together into a golden 9238 gave a real 'oh!' the first time. At wrong angles they break apart across chair, desk and floor, which sells it. The upside-down sample gave a small aha after painting it as-seen and nothing happened. But there are few puzzles and it ends in minutes. Note: while tuning I sometimes checked internal state (the code); the final run was played from the screen.",
+        "research": "One WebSearch for anamorphic/perspective puzzle games with escape-room elements"
+      }
+    },
+    "method": "スマホ縦画面で 15 手プレイ（時間を止めて1手ずつ操作）",
+    "methodEn": "Played 15 moves on a portrait phone screen (time frozen between moves)",
+    "playLog": [
+      {
+        "step": 1,
+        "action": "tap(0.50,0.50) 120ms",
+        "note": "3回目。スタート。じゅうたんのどこかが めくれていないか探す",
+        "noteEn": "Round 3. Start. Look for a curled rug corner",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "action": "tap(0.66,0.69) 120ms → wait 800ms → tap(0.69,0.70) 120ms",
+        "note": "右下のはしがパタパタ。ひっくり返すと小さな鍵。拾う",
+        "noteEn": "The lower-right corner flaps. Flip it: a small key. Grab it",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "tap(0.25,0.50) 120ms → wait 1700ms",
+        "note": "つくえの引き出しを 小さな鍵であける。筆とメモ",
+        "noteEn": "Unlock the desk drawer: a brush and a note",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "action": "tap(0.86,0.41) 120ms → tap(0.13,0.45) 120ms → wait 600ms",
+        "note": "メモどおり ランプを消す。部屋じゅうに 光る点",
+        "noteEn": "As the note says, lamp off. Glowing dots everywhere",
+        "image": "ai-play/step-04.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "action": "swipe(0.60,0.60→0.45,0.60) 900ms → wait 900ms",
+        "note": "窓のほうへ まわすと、点が すーっと寄って 数字になる",
+        "noteEn": "Turning toward the window, the dots drift together into digits",
+        "image": "ai-play/step-05.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 6,
+        "action": "swipe(0.75,0.60→0.27,0.60) 900ms → wait 900ms",
+        "note": "9238！ 本だなの側へ まわす",
+        "noteEn": "9238! Turn to the shelf side",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 7,
+        "action": "tap(0.83,0.47) 120ms → wait 300ms → tap(0.23,0.62) 120ms → tap(0.41,0.44) 120ms → tap(0.41,0.44) 120ms → tap(0.59,0.44) 120ms → tap(0.59,0.44) 120ms → tap(0.59,0.44) 120ms → tap(0.77,0.62) 120ms → tap(0.77,0.62) 120ms → wait 1500ms",
+        "note": "小箱に 9238 を合わせる。カチッ！ 黄色の絵の具",
+        "noteEn": "Dial 9238 on the box. Click! Yellow paint",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 8,
+        "action": "tap(0.70,0.46) 120ms → wait 400ms",
+        "note": "青のびんを取る",
+        "noteEn": "Take the blue jar",
+        "image": "ai-play/step-08.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 9,
+        "action": "tap(0.65,0.45) 120ms → wait 400ms",
+        "note": "赤のびんも取る",
+        "noteEn": "And the red jar",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "action": "swipe(0.20,0.60→0.70,0.60) 900ms → wait 900ms → tap(0.28,0.41) 120ms → wait 500ms",
+        "note": "ドアの側へもどり、ランプをつける",
+        "noteEn": "Back to the door side, lamp on",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 11,
+        "action": "tap(0.79,0.35) 120ms → wait 400ms",
+        "note": "見本の絵…くきが上を向いている。さかさまに掛かっている！",
+        "noteEn": "The sample… its stem points up. It is hanging upside down!",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 12,
+        "action": "tap(0.86,0.33) 120ms → tap(0.72,0.46) 120ms → wait 300ms → tap(0.68,0.69) 120ms → tap(0.50,0.36) 120ms → tap(0.41,0.42) 120ms → tap(0.33,0.69) 120ms → tap(0.58,0.42) 120ms → tap(0.50,0.69) 120ms → tap(0.50,0.48) 120ms → wait 1500ms",
+        "note": "ひっくり返して ぬる（上:黄 右:赤 下:青 左:黄）。キャンバスが倒れて 裏に金色の鍵！",
+        "noteEn": "Paint it flipped (top yellow, right red, bottom blue, left yellow). The canvas tips over: a golden key!",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 13,
+        "action": "tap(0.73,0.47) 120ms → wait 400ms",
+        "note": "ドアの鍵を取る",
+        "noteEn": "Take the door key",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 14,
+        "action": "tap(0.95,0.42) 120ms → wait 1400ms",
+        "note": "ドアをあける。部屋がドアのほうへ回りこみ、月夜の空が見える",
+        "noteEn": "Open the door. The view swings to the doorway and the moonlit sky",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          }
+        ]
+      },
+      {
+        "step": 15,
+        "action": "wait 1500ms",
+        "note": "脱出成功！クリアタイムとヒント回数が出る",
+        "noteEn": "Escaped! Clear time and hint count shown",
+        "image": "ai-play/step-15.webp",
+        "signals": [
+          {
+            "agf": "load"
+          },
+          {
+            "agf": "loaded",
+            "data": null
+          },
+          {
+            "agf": "start"
+          },
+          {
+            "agf": "save",
+            "data": {
+              "best": 22.598
+            }
+          },
+          {
+            "agf": "end"
+          }
+        ]
+      }
+    ],
+    "reviewedAt": "2026-11-28T13:31:56+09:00"
+  },
+  "publishedAt": "2026-11-28T13:31:56+09:00",
+  "metrics": {
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "thinkingTokens": 45240,
+    "outputTokens": 77418,
+    "contextTokens": 43255409,
+    "turns": 168,
+    "toolCalls": 170,
+    "webSearches": 0,
+    "minutes": 86.4,
+    "from": "2026-11-28T03:05:35.048Z",
+    "to": "2026-11-28T04:31:56.793Z",
+    "method": "Claude Code のセッション記録から集計（企画開始〜自己採点完了）",
+    "methodEn": "Summed from the Claude Code session log (from planning to finishing the self-review)",
+    "recordedAt": "2026-11-28T13:31:56+09:00",
+    "validationRuns": 5,
+    "codeKB": 65.1
+  }
+}
